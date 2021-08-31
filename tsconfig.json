@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outFile": "web/dist/index.js",
+        "outDir": "web/dist",
         "target": "es2019",
         "experimentalDecorators": true,
         "module": "amd",
