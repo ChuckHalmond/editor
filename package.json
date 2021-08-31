@@ -4,8 +4,7 @@
   "main": "web/dist/index.js",
   "types": "web/dist/index.d.ts",
   "files": [
-    "web/dist/index.js",
-    "web/dist/index.d.ts"
+    "web/dist/"
   ],
   "devDependencies": {
     "typescript": "^4.4.2"
