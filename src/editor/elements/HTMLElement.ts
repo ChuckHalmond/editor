@@ -428,7 +428,7 @@ function setHTMLElementEventListeners<K extends keyof HTMLElementTagNameMap>(
 function setHTMLElementStyles<E extends HTMLElement>(
     element: E,
     styles: {
-        [property: string]: string | [value: string, priority?: string]
+        [property: string]: string | [string, string]
     }
 ): E {
     Object.keys(styles).forEach((property) => {
