@@ -1,11 +1,8 @@
 {
-  "name": "engine",
+  "name": "editor",
   "version": "1.0.0",
-  "description": "",
   "main": "web/dist/index.js",
   "types": "web/dist/index.d.ts",
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "typescript": "^3.9.10"
   }
