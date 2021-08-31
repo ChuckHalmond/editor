@@ -10,7 +10,8 @@
         "strict": true,
         "declaration": true,
         "rootDir": "./src",
-        "baseUrl": "./src"
+        "baseUrl": "./src",
+        "types": ["web/dist/index.ts.js"]
     },
     "include": [
         "./src/**/*.ts"
