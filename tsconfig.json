@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "outFile": "web/dist/merged.js",
+        "outDir": "web/dist",
+        "target": "es2019",
+        "experimentalDecorators": true,
+        "module": "amd",
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "strict": true,
+        //"declaration": true,
+        "rootDir": "./src",
+        "baseUrl": "./src"
+    },
+    "include": [
+        "./src/**/*.ts"
+    ]
+}
