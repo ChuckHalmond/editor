@@ -4,6 +4,9 @@
   "main": "index.js",
   "types": "index.d.ts",
   "exports": "./web/dist/",
+  "files": [
+    "./web/dist/"
+  ],
   "devDependencies": {
     "typescript": "^4.4.2"
   }
