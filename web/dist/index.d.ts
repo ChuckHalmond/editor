@@ -1357,3 +1357,33 @@ declare module "editor/templates/table/TableTemplate" {
     }
     const HTMLTableTemplate: HTMLTableTemplate;
 }
+declare module "samples/temp" {
+    export { temp };
+    function temp(): void;
+}
+declare module "samples/Mockup" {
+    import "editor/elements/lib/containers/menus/Menu";
+    import "editor/elements/lib/containers/menus/MenuButton";
+    import "editor/elements/lib/containers/menus/MenuBar";
+    import "editor/elements/lib/containers/menus/MenuItem";
+    import "editor/elements/lib/containers/menus/MenuItemGroup";
+    import "editor/elements/lib/containers/tabs/Tab";
+    import "editor/elements/lib/containers/tabs/TabList";
+    import "editor/elements/lib/containers/tabs/TabPanel";
+    import "editor/elements/lib/controls/draggable/Draggable";
+    import "editor/elements/lib/controls/draggable/Dragzone";
+    import "editor/elements/lib/controls/draggable/Dropzone";
+    import "editor/elements/lib/controls/draggable/DropzoneInput";
+    import "editor/elements/lib/utils/Import";
+    import "editor/elements/lib/utils/Loader";
+    import "editor/elements/lib/utils/WidthSash";
+    import "editor/elements/lib/utils/HeightSash";
+    import "editor/elements/lib/containers/treeview/TreeViewList";
+    import "editor/elements/lib/containers/treeview/TreeViewItem";
+    import "editor/elements/lib/controls/breadcrumb/BreadcrumbItem";
+    import "editor/elements/lib/controls/breadcrumb/BreadcrumbTrail";
+    global {
+        var marked: (src: string) => string;
+    }
+    export function mockup(): Promise<void>;
+}
