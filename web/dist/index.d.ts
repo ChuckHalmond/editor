@@ -917,7 +917,7 @@ declare module "editor/elements/view/View" {
         private _removeReactiveListeners;
     }
 }
-declare module "samples/scenes/temp" {
+declare module "samples/temp" {
     export { temp };
     function temp(): void;
 }
@@ -1124,7 +1124,7 @@ declare module "editor/templates/menus/MenubarTemplate" {
 }
 declare module "editor/Editor" {
     import { Command } from "libs/commands/Command";
-    import { EEvent, EventDispatcher } from "libs/events/EventDispatcher";
+    import { Event, EventDispatcher } from "libs/events/EventDispatcher";
     import { HTMLEMenuBarElement } from "editor/elements/lib/containers/menus/MenuBar";
     import { HTMLEStatusBarElement } from "editor/elements/lib/containers/status/StatusBar";
     import { HotKey } from "editor/Input";
@@ -1133,7 +1133,7 @@ declare module "editor/Editor" {
     export { EditorCommand };
     export { EditorHotKey };
     type EditorEventsMap = {
-        "e-context-change": EEvent<"e-context-change">;
+        "e-context-change": Event<"e-context-change">;
     };
     interface Editor extends EventDispatcher<EditorEventsMap> {
         getState(key: string): any;
@@ -1186,7 +1186,7 @@ declare module "editor/Editor" {
         removeHotkeyExec(hotkey: EditorHotKey, exec: () => void): void;
     }
 }
-declare module "samples/scenes/Mockup" {
+declare module "samples/Mockup" {
     import "editor/elements/lib/containers/menus/Menu";
     import "editor/elements/lib/containers/menus/MenuButton";
     import "editor/elements/lib/containers/menus/MenuBar";
@@ -1356,34 +1356,4 @@ declare module "editor/templates/table/TableTemplate" {
         (desc: HTMLTableTemplateDescription): HTMLTableElement;
     }
     const HTMLTableTemplate: HTMLTableTemplate;
-}
-declare module "samples/temp" {
-    export { temp };
-    function temp(): void;
-}
-declare module "samples/Mockup" {
-    import "editor/elements/lib/containers/menus/Menu";
-    import "editor/elements/lib/containers/menus/MenuButton";
-    import "editor/elements/lib/containers/menus/MenuBar";
-    import "editor/elements/lib/containers/menus/MenuItem";
-    import "editor/elements/lib/containers/menus/MenuItemGroup";
-    import "editor/elements/lib/containers/tabs/Tab";
-    import "editor/elements/lib/containers/tabs/TabList";
-    import "editor/elements/lib/containers/tabs/TabPanel";
-    import "editor/elements/lib/controls/draggable/Draggable";
-    import "editor/elements/lib/controls/draggable/Dragzone";
-    import "editor/elements/lib/controls/draggable/Dropzone";
-    import "editor/elements/lib/controls/draggable/DropzoneInput";
-    import "editor/elements/lib/utils/Import";
-    import "editor/elements/lib/utils/Loader";
-    import "editor/elements/lib/utils/WidthSash";
-    import "editor/elements/lib/utils/HeightSash";
-    import "editor/elements/lib/containers/treeview/TreeViewList";
-    import "editor/elements/lib/containers/treeview/TreeViewItem";
-    import "editor/elements/lib/controls/breadcrumb/BreadcrumbItem";
-    import "editor/elements/lib/controls/breadcrumb/BreadcrumbTrail";
-    global {
-        var marked: (src: string) => string;
-    }
-    export function mockup(): Promise<void>;
 }

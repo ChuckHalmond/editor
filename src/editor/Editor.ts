@@ -1,6 +1,6 @@
 
 import { Command, isUndoCommand } from "libs/commands/Command";
-import { EEvent, EventDispatcher } from "libs/events/EventDispatcher";
+import { Event, EventDispatcher } from "libs/events/EventDispatcher";
 import { isTagElement } from "./elements/HTMLElement";
 import { HTMLEMenuBarElement } from "./elements/lib/containers/menus/MenuBar";
 import { HotKeyChangeEvent } from "./elements/lib/containers/menus/MenuItem";
@@ -15,7 +15,7 @@ export { EditorCommand };
 export { EditorHotKey };
 
 type EditorEventsMap = {
-    "e-context-change": EEvent<"e-context-change">;
+    "e-context-change": Event<"e-context-change">;
 }
 
 interface Editor extends EventDispatcher<EditorEventsMap> {
@@ -148,14 +148,14 @@ class EditorBase<State extends object> extends EventDispatcher<EditorEventsMap> 
             }
         });
 
-        document.body.addEventListener("trigger", (event: Event) => {
+        /*document.body.addEventListener("trigger", (event: Event) => {
             let target = event.target as any;
             if (isTagElement("e-menuitem", target)) {
                 if (target.command) {
                     this.executeCommand(target.command, target.commandArgs)
                 }
             }
-        });
+        });*/
 
         return Promise.all([
             new Promise<void>(

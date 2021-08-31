@@ -1,8 +1,7 @@
-import { Input } from "engine/core/input/Input";
 import { AttributeMutationMixin, AttributeMutationMixinBase, createMutationObserverCallback, isTagElement } from "editor/elements/HTMLElement";
 import { DataChangeEvent, HTMLEDropzoneElement } from "editor/elements/lib/controls/draggable/Dropzone";
-import { mockup } from "./scenes/Mockup";
-import { temp } from "./scenes/temp";
+import { mockup } from "./Mockup";
+import { temp } from "./temp";
 
 abstract class DataClassMixin extends AttributeMutationMixinBase {
   constructor(attributeValue: string) {
