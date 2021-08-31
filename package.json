@@ -1,11 +1,9 @@
 {
   "name": "editor",
   "version": "1.0.0",
-  "main": "./index.js",
-  "types": "./index.d.ts",
-  "exports": {
-    "./": "./web/dist"
-  },
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": "./web/dist/",
   "devDependencies": {
     "typescript": "^4.4.2"
   }
