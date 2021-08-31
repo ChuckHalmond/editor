@@ -1,6 +1,6 @@
 
-import { Command, isUndoCommand } from "libs/patterns/commands/Command";
-import { EEvent, EventDispatcher } from "libs/patterns/messaging/events/EventDispatcher";
+import { Command, isUndoCommand } from "libs/commands/Command";
+import { EEvent, EventDispatcher } from "libs/events/EventDispatcher";
 import { isTagElement } from "./elements/HTMLElement";
 import { HTMLEMenuBarElement } from "./elements/lib/containers/menus/MenuBar";
 import { HotKeyChangeEvent } from "./elements/lib/containers/menus/MenuItem";
