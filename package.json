@@ -6,9 +6,6 @@
   "exports": {
     "./": "./web/dist"
   },
-  "files": [
-    "./"
-  ],
   "devDependencies": {
     "typescript": "^4.4.2"
   }
