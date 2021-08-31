@@ -421,17 +421,17 @@ export async function mockup() {
             let target = event.target as HTMLETreeViewItemElement;
             console.log(target);
             if (isTagElement("e-treeviewitem", target)) {
-                let menu = Element("<e-menu>", {
+                let menu = Element("e-menu", {
                     props: {
                         name: "My menu"
                     },
                     children: [
-                        Element("<e-menuitem>", {
+                        Element("e-menuitem", {
                             props: {
                                 label: "Remove me!"
                             },
                             children: [
-                                Element("<span>", {
+                                Element("span", {
                                     props: {
                                         slot: "label",
                                         className: "menuitem__icon"

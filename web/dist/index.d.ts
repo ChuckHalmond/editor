@@ -206,7 +206,7 @@ declare module "editor/elements/HTMLElement" {
             [property: string]: string | [string, string];
         };
     }
-    function Element<K extends keyof HTMLElementTagNameMap>(tag: HTMLElementTag<K>, init?: HTMLInit<K>): HTMLElementTagNameMap[K];
+    function Element<K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLInit<K>): HTMLElementTagNameMap[K];
     type ReactiveNode = Node & {
         _reactAttributes: {
             _reactModel: ObjectModel<object>;
@@ -400,6 +400,66 @@ declare module "editor/elements/lib/containers/menus/MenuBar" {
         }
     }
 }
+declare module "editor/Input" {
+    export { Key };
+    export { KeyModifier };
+    export { HotKey };
+    export { MouseButton };
+    enum Key {
+        A = "a",
+        B = "b",
+        C = "c",
+        D = "d",
+        E = "e",
+        F = "f",
+        G = "g",
+        H = "h",
+        I = "i",
+        J = "j",
+        K = "k",
+        L = "l",
+        M = "m",
+        O = "o",
+        P = "p",
+        Q = "q",
+        R = "r",
+        S = "s",
+        T = "t",
+        U = "u",
+        V = "v",
+        W = "w",
+        X = "x",
+        Y = "y",
+        Z = "z",
+        ENTER = "Enter",
+        BACKSPACE = "Backspace",
+        ARROW_DOWN = "ArrowDown",
+        ARROW_LEFT = "ArrowLeft",
+        ARROW_RIGHT = "ArrowRight",
+        ARROW_UP = "ArrowUp",
+        SHIFT = "Shift"
+    }
+    enum KeyModifier {
+        Alt = "Alt",
+        Control = "Control",
+        Shift = "Shift"
+    }
+    enum MouseButton {
+        LEFT = 1,
+        WHEEL = 2,
+        RIGHT = 3,
+        FORWARD = 4,
+        BACK = 5
+    }
+    class HotKey {
+        readonly key: Key;
+        readonly mod1?: KeyModifier;
+        readonly mod2?: KeyModifier;
+        constructor(key: Key, mod1?: KeyModifier, mod2?: KeyModifier);
+        toString(): string;
+        test(event: KeyboardEvent): boolean;
+    }
+}
 declare module "editor/elements/lib/containers/menus/MenuItemGroup" {
     import { HTMLEMenuItemElement } from "editor/elements/lib/containers/menus/MenuItem";
     import { HTMLEMenuElement } from "editor/elements/lib/containers/menus/Menu";
@@ -446,9 +506,9 @@ declare module "editor/elements/lib/containers/menus/MenuItemGroup" {
     }
 }
 declare module "editor/elements/lib/containers/menus/MenuItem" {
-    import { HotKey } from "engine/core/input/Input";
     import { HTMLEMenuElement } from "editor/elements/lib/containers/menus/Menu";
     import { HTMLEMenuBarElement } from "editor/elements/lib/containers/menus/MenuBar";
+    import { HotKey } from "editor/Input";
     import { HTMLEMenuItemGroupElement } from "editor/elements/lib/containers/menus/MenuItemGroup";
     export { EMenuItemElementType };
     export { HTMLEMenuItemElement };
@@ -994,66 +1054,6 @@ declare module "editor/elements/lib/containers/status/StatusBar" {
         }
     }
 }
-declare module "editor/Input" {
-    export { Key };
-    export { KeyModifier };
-    export { HotKey };
-    export { MouseButton };
-    enum Key {
-        A = "a",
-        B = "b",
-        C = "c",
-        D = "d",
-        E = "e",
-        F = "f",
-        G = "g",
-        H = "h",
-        I = "i",
-        J = "j",
-        K = "k",
-        L = "l",
-        M = "m",
-        O = "o",
-        P = "p",
-        Q = "q",
-        R = "r",
-        S = "s",
-        T = "t",
-        U = "u",
-        V = "v",
-        W = "w",
-        X = "x",
-        Y = "y",
-        Z = "z",
-        ENTER = "Enter",
-        BACKSPACE = "Backspace",
-        ARROW_DOWN = "ArrowDown",
-        ARROW_LEFT = "ArrowLeft",
-        ARROW_RIGHT = "ArrowRight",
-        ARROW_UP = "ArrowUp",
-        SHIFT = "Shift"
-    }
-    enum KeyModifier {
-        Alt = "Alt",
-        Control = "Control",
-        Shift = "Shift"
-    }
-    enum MouseButton {
-        LEFT = 1,
-        WHEEL = 2,
-        RIGHT = 3,
-        FORWARD = 4,
-        BACK = 5
-    }
-    class HotKey {
-        readonly key: Key;
-        readonly mod1?: KeyModifier;
-        readonly mod2?: KeyModifier;
-        constructor(key: Key, mod1?: KeyModifier, mod2?: KeyModifier);
-        toString(): string;
-        test(event: KeyboardEvent): boolean;
-    }
-}
 declare module "editor/templates/menus/MenuItemGroupTemplate" {
     import { HTMLEMenuItemGroupElement } from "editor/elements/lib/containers/menus/MenuItemGroup";
     import { HTMLEMenuItemTemplateDescription } from "editor/templates/menus/MenuItemTemplate";
@@ -1298,18 +1298,6 @@ declare module "editor/elements/lib/containers/toolbar/ToolbarItemGroup" {
     export { HTMLEMenuItemGroupElement };
     function isHTMLEMenuItemGroupElement(elem: Element): elem is HTMLEMenuItemGroupElement;
     class HTMLEMenuItemGroupElement extends HTMLElement {
-    }
-}
-declare module "editor/elements/lib/math/Vector3Input" {
-    import { Vector3 } from "engine/libs/maths/algebra/vectors/Vector3";
-    export { Vector3InputElement };
-    class Vector3InputElement extends HTMLElement {
-        readonly vector: Vector3;
-        label: string;
-        tooltip: string;
-        constructor();
-        refresh(): void;
-        connectedCallback(): void;
     }
 }
 declare module "editor/elements/lib/misc/Palette" {

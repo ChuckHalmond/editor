@@ -1,7 +1,7 @@
-import { HotKey } from "engine/core/input/Input";
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, isTagElement, Fragment, bindShadowRoot } from "editor/elements/HTMLElement";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors, isTagElement, bindShadowRoot } from "editor/elements/HTMLElement";
 import { HTMLEMenuElement } from "editor/elements/lib/containers/menus/Menu";
 import { HTMLEMenuBarElement } from "editor/elements/lib/containers/menus/MenuBar";
+import { HotKey } from "editor/Input";
 import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
 
 export { EMenuItemElementType };

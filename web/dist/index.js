@@ -410,8 +410,7 @@ define("editor/elements/HTMLElement", ["require", "exports", "editor/elements/Sn
     }
     exports.HTMLElementConstructor = HTMLElementConstructor;
     ;
-    function Element(tag, init) {
-        const tagName = tag.slice(1, tag.length - 1);
+    function Element(tagName, init) {
         const element = document.createElement(tagName, init === null || init === void 0 ? void 0 : init.options);
         if (init) {
             if (init.props) {
@@ -1411,6 +1410,97 @@ define("editor/elements/lib/containers/menus/MenuBar", ["require", "exports", "e
         ])
     ], HTMLEMenuBarElementBase);
     exports.HTMLEMenuBarElementBase = HTMLEMenuBarElementBase;
+});
+define("editor/Input", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.MouseButton = exports.HotKey = exports.KeyModifier = exports.Key = void 0;
+    var Key;
+    (function (Key) {
+        Key["A"] = "a";
+        Key["B"] = "b";
+        Key["C"] = "c";
+        Key["D"] = "d";
+        Key["E"] = "e";
+        Key["F"] = "f";
+        Key["G"] = "g";
+        Key["H"] = "h";
+        Key["I"] = "i";
+        Key["J"] = "j";
+        Key["K"] = "k";
+        Key["L"] = "l";
+        Key["M"] = "m";
+        Key["O"] = "o";
+        Key["P"] = "p";
+        Key["Q"] = "q";
+        Key["R"] = "r";
+        Key["S"] = "s";
+        Key["T"] = "t";
+        Key["U"] = "u";
+        Key["V"] = "v";
+        Key["W"] = "w";
+        Key["X"] = "x";
+        Key["Y"] = "y";
+        Key["Z"] = "z";
+        Key["ENTER"] = "Enter";
+        Key["BACKSPACE"] = "Backspace";
+        Key["ARROW_DOWN"] = "ArrowDown";
+        Key["ARROW_LEFT"] = "ArrowLeft";
+        Key["ARROW_RIGHT"] = "ArrowRight";
+        Key["ARROW_UP"] = "ArrowUp";
+        Key["SHIFT"] = "Shift";
+    })(Key || (Key = {}));
+    exports.Key = Key;
+    var KeyModifier;
+    (function (KeyModifier) {
+        KeyModifier["Alt"] = "Alt";
+        KeyModifier["Control"] = "Control";
+        KeyModifier["Shift"] = "Shift";
+    })(KeyModifier || (KeyModifier = {}));
+    exports.KeyModifier = KeyModifier;
+    function displayKeyModifier(mode) {
+        switch (mode) {
+            case KeyModifier.Control:
+                return "Ctrl";
+            default:
+                return mode;
+        }
+    }
+    var MouseButton;
+    (function (MouseButton) {
+        MouseButton[MouseButton["LEFT"] = 1] = "LEFT";
+        MouseButton[MouseButton["WHEEL"] = 2] = "WHEEL";
+        MouseButton[MouseButton["RIGHT"] = 3] = "RIGHT";
+        MouseButton[MouseButton["FORWARD"] = 4] = "FORWARD";
+        MouseButton[MouseButton["BACK"] = 5] = "BACK";
+    })(MouseButton || (MouseButton = {}));
+    exports.MouseButton = MouseButton;
+    const testKeyModifier = (mod, event) => {
+        switch (mod) {
+            case 'Alt':
+                return event.altKey;
+            case 'Control':
+                return event.ctrlKey;
+            case 'Shift':
+                return event.shiftKey;
+            default:
+                return () => true;
+        }
+    };
+    class HotKey {
+        constructor(key, mod1, mod2) {
+            this.key = key;
+            this.mod1 = mod1;
+            this.mod2 = mod2;
+        }
+        toString() {
+            return `${this.mod1 ? `${displayKeyModifier(this.mod1)}+` : ''}${this.mod2 ? `${displayKeyModifier(this.mod2)}+` : ''}${(this.key.length === 1) ? this.key.toUpperCase() : this.key}`;
+        }
+        test(event) {
+            return ((!this.mod1 || testKeyModifier(this.mod1, event)) && (!this.mod2 || testKeyModifier(this.mod2, event)) && event.key === this.key);
+        }
+    }
+    exports.HotKey = HotKey;
 });
 define("editor/elements/lib/containers/menus/MenuItemGroup", ["require", "exports", "editor/elements/HTMLElement", "editor/elements/Snippets"], function (require, exports, HTMLElement_5, Snippets_2) {
     "use strict";
@@ -3731,10 +3821,9 @@ define("samples/temp", ["require", "exports", "editor/elements/HTMLElement", "ed
                 }
             ]
         });
-        const FieldFragment = (fieldset, field) => HTMLElement_22.Fragment(HTMLElement_22.Element(
-        /*html*/ `<div>`, {
+        const FieldFragment = (fieldset, field) => HTMLElement_22.Fragment(HTMLElement_22.Element("div", {
             children: [
-                HTMLElement_22.ReactiveNode(HTMLElement_22.Element(/*html*/ `<label>`), field, (div, property, oldValue, newValue) => {
+                HTMLElement_22.ReactiveNode(HTMLElement_22.Element(/*html*/ "label"), field, (div, property, oldValue, newValue) => {
                     switch (property) {
                         case "label":
                             if (newValue !== oldValue) {
@@ -3746,9 +3835,9 @@ define("samples/temp", ["require", "exports", "editor/elements/HTMLElement", "ed
                 DropzoneInputFragment(fieldset, field)
             ]
         }));
-        const DropzoneInputFragment = (host, field) => HTMLElement_22.Fragment(HTMLElement_22.Element(/*html*/ `<e-dropzoneinput>`, {
+        const DropzoneInputFragment = (host, field) => HTMLElement_22.Fragment(HTMLElement_22.Element(/*html*/ "e-dropzoneinput", {
             children: [
-                HTMLElement_22.ReactiveNode(HTMLElement_22.Element(/*html*/ `<e-dropzone>`, {
+                HTMLElement_22.ReactiveNode(HTMLElement_22.Element("e-dropzone", {
                     props: {
                         className: "field__dropzone",
                         slot: "dropzone",
@@ -3803,7 +3892,7 @@ define("samples/temp", ["require", "exports", "editor/elements/HTMLElement", "ed
                             break;
                     }
                 }),
-                HTMLElement_22.Element(/*html*/ `<input>`, {
+                HTMLElement_22.Element("input", {
                     props: {
                         className: "field__input",
                         slot: "input"
@@ -3816,7 +3905,7 @@ define("samples/temp", ["require", "exports", "editor/elements/HTMLElement", "ed
                 super(model);
             }
             render() {
-                return HTMLElement_22.Element(/*html*/ `<fieldset>`, {
+                return HTMLElement_22.Element("fieldset", {
                     props: {
                         className: "statement-fieldset"
                     },
@@ -3829,7 +3918,7 @@ define("samples/temp", ["require", "exports", "editor/elements/HTMLElement", "ed
                 super(model);
             }
             render() {
-                return HTMLElement_22.Element(/*html*/ `<div>`, {
+                return HTMLElement_22.Element("div", {
                     children: [
                         HTMLElement_22.ReactiveNode(document.createTextNode(`Last execution date : ${this.model.data.datetime}`), this.model, (node, property, oldValue, newValue) => {
                             if (property === "datetime") {
@@ -3845,8 +3934,8 @@ define("samples/temp", ["require", "exports", "editor/elements/HTMLElement", "ed
                 super(model);
             }
             render() {
-                return HTMLElement_22.Element(/*html*/ `<e-dragzone>`, {
-                    children: HTMLElement_22.ReactiveChildNodes(this.model.columns, (item) => HTMLElement_22.Element(/*html*/ `<e-draggable>`, {
+                return HTMLElement_22.Element("e-dragzone", {
+                    children: HTMLElement_22.ReactiveChildNodes(this.model.columns, (item) => HTMLElement_22.Element("e-draggable", {
                         props: {
                             textContent: item.data.name
                         }
@@ -3859,7 +3948,7 @@ define("samples/temp", ["require", "exports", "editor/elements/HTMLElement", "ed
                 super(model);
             }
             render() {
-                return HTMLElement_22.ReactiveNode(HTMLElement_22.Element(/*html*/ `<e-draggable>`), this.model, (draggable, property, oldValue, newValue) => {
+                return HTMLElement_22.ReactiveNode(HTMLElement_22.Element("e-draggable"), this.model, (draggable, property, oldValue, newValue) => {
                     switch (property) {
                         case "label":
                             if (newValue !== oldValue) {
@@ -4090,97 +4179,6 @@ define("editor/elements/lib/containers/status/StatusBar", ["require", "exports",
         ])
     ], HTMLEStatusBarElementBase);
     exports.HTMLEStatusBarElementBase = HTMLEStatusBarElementBase;
-});
-define("editor/Input", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.MouseButton = exports.HotKey = exports.KeyModifier = exports.Key = void 0;
-    var Key;
-    (function (Key) {
-        Key["A"] = "a";
-        Key["B"] = "b";
-        Key["C"] = "c";
-        Key["D"] = "d";
-        Key["E"] = "e";
-        Key["F"] = "f";
-        Key["G"] = "g";
-        Key["H"] = "h";
-        Key["I"] = "i";
-        Key["J"] = "j";
-        Key["K"] = "k";
-        Key["L"] = "l";
-        Key["M"] = "m";
-        Key["O"] = "o";
-        Key["P"] = "p";
-        Key["Q"] = "q";
-        Key["R"] = "r";
-        Key["S"] = "s";
-        Key["T"] = "t";
-        Key["U"] = "u";
-        Key["V"] = "v";
-        Key["W"] = "w";
-        Key["X"] = "x";
-        Key["Y"] = "y";
-        Key["Z"] = "z";
-        Key["ENTER"] = "Enter";
-        Key["BACKSPACE"] = "Backspace";
-        Key["ARROW_DOWN"] = "ArrowDown";
-        Key["ARROW_LEFT"] = "ArrowLeft";
-        Key["ARROW_RIGHT"] = "ArrowRight";
-        Key["ARROW_UP"] = "ArrowUp";
-        Key["SHIFT"] = "Shift";
-    })(Key || (Key = {}));
-    exports.Key = Key;
-    var KeyModifier;
-    (function (KeyModifier) {
-        KeyModifier["Alt"] = "Alt";
-        KeyModifier["Control"] = "Control";
-        KeyModifier["Shift"] = "Shift";
-    })(KeyModifier || (KeyModifier = {}));
-    exports.KeyModifier = KeyModifier;
-    function displayKeyModifier(mode) {
-        switch (mode) {
-            case KeyModifier.Control:
-                return "Ctrl";
-            default:
-                return mode;
-        }
-    }
-    var MouseButton;
-    (function (MouseButton) {
-        MouseButton[MouseButton["LEFT"] = 1] = "LEFT";
-        MouseButton[MouseButton["WHEEL"] = 2] = "WHEEL";
-        MouseButton[MouseButton["RIGHT"] = 3] = "RIGHT";
-        MouseButton[MouseButton["FORWARD"] = 4] = "FORWARD";
-        MouseButton[MouseButton["BACK"] = 5] = "BACK";
-    })(MouseButton || (MouseButton = {}));
-    exports.MouseButton = MouseButton;
-    const testKeyModifier = (mod, event) => {
-        switch (mod) {
-            case 'Alt':
-                return event.altKey;
-            case 'Control':
-                return event.ctrlKey;
-            case 'Shift':
-                return event.shiftKey;
-            default:
-                return () => true;
-        }
-    };
-    class HotKey {
-        constructor(key, mod1, mod2) {
-            this.key = key;
-            this.mod1 = mod1;
-            this.mod2 = mod2;
-        }
-        toString() {
-            return `${this.mod1 ? `${displayKeyModifier(this.mod1)}+` : ''}${this.mod2 ? `${displayKeyModifier(this.mod2)}+` : ''}${(this.key.length === 1) ? this.key.toUpperCase() : this.key}`;
-        }
-        test(event) {
-            return ((!this.mod1 || testKeyModifier(this.mod1, event)) && (!this.mod2 || testKeyModifier(this.mod2, event)) && event.key === this.key);
-        }
-    }
-    exports.HotKey = HotKey;
 });
 define("editor/templates/menus/MenuItemGroupTemplate", ["require", "exports", "editor/elements/HTMLElement", "editor/templates/menus/MenuItemTemplate"], function (require, exports, HTMLElement_25, MenuItemTemplate_1) {
     "use strict";
@@ -4868,17 +4866,17 @@ define("samples/Mockup", ["require", "exports", "editor/Editor", "editor/element
                 let target = event.target;
                 console.log(target);
                 if (HTMLElement_30.isTagElement("e-treeviewitem", target)) {
-                    let menu = HTMLElement_30.Element("<e-menu>", {
+                    let menu = HTMLElement_30.Element("e-menu", {
                         props: {
                             name: "My menu"
                         },
                         children: [
-                            HTMLElement_30.Element("<e-menuitem>", {
+                            HTMLElement_30.Element("e-menuitem", {
                                 props: {
                                     label: "Remove me!"
                                 },
                                 children: [
-                                    HTMLElement_30.Element("<span>", {
+                                    HTMLElement_30.Element("span", {
                                         props: {
                                             slot: "label",
                                             className: "menuitem__icon"
@@ -5922,88 +5920,14 @@ define("editor/elements/lib/containers/toolbar/ToolbarItemGroup", ["require", "e
     ], HTMLEMenuItemGroupElement);
     exports.HTMLEMenuItemGroupElement = HTMLEMenuItemGroupElement;
 });
-define("editor/elements/lib/math/Vector3Input", ["require", "exports", "editor/elements/HTMLElement", "engine/libs/maths/algebra/vectors/Vector3"], function (require, exports, HTMLElement_40, Vector3_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Vector3InputElement = void 0;
-    let Vector3InputElement = class Vector3InputElement extends HTMLElement {
-        constructor() {
-            super();
-            HTMLElement_40.bindShadowRoot(this, /*template*/ `
-            <link rel="stylesheet" href="css/theme.css"/>
-            <style>
-                :host {
-                    /*font-size: 1em;*/
-                }
-
-                [part~="input"] {
-                    padding: var(--container-padding);
-                    border-radius: var(--container-border-radius);
-        
-                    color: var(--theme-on-color);
-                    caret-color: var(--theme-on-color);
-                    text-align: center;
-                    background-color: var(--theme-color-600);
-                    width: 32px;
-                    border: 1px solid transparent;
-                    outline: 0;
-                }
-        
-                [part~="input"]::selection {
-                    background-color: var(--theme-color-200);
-                }
-                
-                [part~="input"]:focus {
-                    border: 1px solid var(--theme-on-color);
-                }
-            </style>
-        
-            <span id="label"></span> 
-            X <input part="input" id="x" is="number-input" type="text" spellcheck="false" value="0"/>
-            Y <input part="input" id="y" is="number-input" type="text" spellcheck="false" value="0"/>
-            Z <input part="input" id="z" is="number-input" type="text" spellcheck="false" value="0"/>
-        `);
-            this.vector = new Vector3_1.Vector3();
-            this.shadowRoot.getElementById('x').addEventListener('input', (event) => {
-                this.vector.x = parseFloat(event.target.value) || 0;
-            });
-            this.shadowRoot.getElementById('y').addEventListener('input', (event) => {
-                this.vector.y = parseFloat(event.target.value) || 0;
-            });
-            this.shadowRoot.getElementById('z').addEventListener('input', (event) => {
-                this.vector.z = parseFloat(event.target.value) || 0;
-            });
-            this.shadowRoot.getElementById('label').innerText = this.label;
-            this.tooltip = this.label;
-        }
-        refresh() {
-            this.shadowRoot.getElementById('x').value = this.vector.x.toString();
-            this.shadowRoot.getElementById('y').value = this.vector.y.toString();
-            this.shadowRoot.getElementById('z').value = this.vector.z.toString();
-        }
-        connectedCallback() {
-            this.refresh();
-        }
-    };
-    Vector3InputElement = __decorate([
-        HTMLElement_40.RegisterCustomHTMLElement({
-            name: 'e-vector3-input'
-        }),
-        HTMLElement_40.GenerateAttributeAccessors([
-            { name: 'label' },
-            { name: 'tooltip' }
-        ])
-    ], Vector3InputElement);
-    exports.Vector3InputElement = Vector3InputElement;
-});
-define("editor/elements/lib/misc/Palette", ["require", "exports", "editor/elements/HTMLElement"], function (require, exports, HTMLElement_41) {
+define("editor/elements/lib/misc/Palette", ["require", "exports", "editor/elements/HTMLElement"], function (require, exports, HTMLElement_40) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PaletteElement = void 0;
     let PaletteElement = class PaletteElement extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_41.bindShadowRoot(this, /*template*/ `
+            HTMLElement_40.bindShadowRoot(this, /*template*/ `
             <style>
                 :host {
                     display: block;
@@ -6032,10 +5956,10 @@ define("editor/elements/lib/misc/Palette", ["require", "exports", "editor/elemen
         }
     };
     PaletteElement = __decorate([
-        HTMLElement_41.RegisterCustomHTMLElement({
+        HTMLElement_40.RegisterCustomHTMLElement({
             name: 'e-palette'
         }),
-        HTMLElement_41.GenerateAttributeAccessors([{ name: 'colors', type: 'json' }])
+        HTMLElement_40.GenerateAttributeAccessors([{ name: 'colors', type: 'json' }])
     ], PaletteElement);
     exports.PaletteElement = PaletteElement;
 });
@@ -6062,18 +5986,18 @@ define("editor/objects/StructuredFormData", ["require", "exports", "editor/eleme
     }
     exports.StructuredFormData = StructuredFormData;
 });
-define("editor/templates/other/DraggableInputTemplate", ["require", "exports", "editor/elements/HTMLElement"], function (require, exports, HTMLElement_42) {
+define("editor/templates/other/DraggableInputTemplate", ["require", "exports", "editor/elements/HTMLElement"], function (require, exports, HTMLElement_41) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HTMLDraggableInputTemplate = void 0;
     const HTMLDraggableInputTemplate = (desc) => {
-        return HTMLElement_42.HTMLElementConstructor("e-draggable", {
+        return HTMLElement_41.HTMLElementConstructor("e-draggable", {
             props: {
                 id: desc.id,
                 className: desc.className
             },
             children: [
-                HTMLElement_42.HTMLElementConstructor("input", {
+                HTMLElement_41.HTMLElementConstructor("input", {
                     props: {
                         name: desc.name,
                         hidden: true
@@ -6084,20 +6008,20 @@ define("editor/templates/other/DraggableInputTemplate", ["require", "exports", "
     };
     exports.HTMLDraggableInputTemplate = HTMLDraggableInputTemplate;
 });
-define("editor/templates/table/TableTemplate", ["require", "exports", "editor/elements/HTMLElement"], function (require, exports, HTMLElement_43) {
+define("editor/templates/table/TableTemplate", ["require", "exports", "editor/elements/HTMLElement"], function (require, exports, HTMLElement_42) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HTMLTableTemplate = void 0;
     const HTMLTableTemplate = (desc) => {
-        const thead = HTMLElement_43.HTMLElementConstructor("thead", {
+        const thead = HTMLElement_42.HTMLElementConstructor("thead", {
             children: [
-                HTMLElement_43.HTMLElementConstructor("tr", {
+                HTMLElement_42.HTMLElementConstructor("tr", {
                     props: {
                         id: desc.id,
                         className: desc.className,
                     },
                     children: desc.headerCells.map((cell) => {
-                        return HTMLElement_43.HTMLElementConstructor("th", {
+                        return HTMLElement_42.HTMLElementConstructor("th", {
                             props: {
                                 scope: "col"
                             },
@@ -6109,9 +6033,9 @@ define("editor/templates/table/TableTemplate", ["require", "exports", "editor/el
                 })
             ]
         });
-        const tbody = HTMLElement_43.HTMLElementConstructor("tbody", {
+        const tbody = HTMLElement_42.HTMLElementConstructor("tbody", {
             children: desc.bodyCells.map((row) => {
-                return HTMLElement_43.HTMLElementConstructor("tr", {
+                return HTMLElement_42.HTMLElementConstructor("tr", {
                     props: {
                         id: desc.id,
                         className: desc.className,
@@ -6121,13 +6045,13 @@ define("editor/templates/table/TableTemplate", ["require", "exports", "editor/el
                             switch (cell.type) {
                                 case "data":
                                 default:
-                                    return HTMLElement_43.HTMLElementConstructor("td", {
+                                    return HTMLElement_42.HTMLElementConstructor("td", {
                                         children: [
                                             cell.content
                                         ]
                                     });
                                 case "header":
-                                    return HTMLElement_43.HTMLElementConstructor("th", {
+                                    return HTMLElement_42.HTMLElementConstructor("th", {
                                         props: {
                                             scope: "row"
                                         },
@@ -6138,7 +6062,7 @@ define("editor/templates/table/TableTemplate", ["require", "exports", "editor/el
                             }
                         }
                         else {
-                            return HTMLElement_43.HTMLElementConstructor("td", {
+                            return HTMLElement_42.HTMLElementConstructor("td", {
                                 children: [
                                     cell
                                 ]
@@ -6148,9 +6072,9 @@ define("editor/templates/table/TableTemplate", ["require", "exports", "editor/el
                 });
             })
         });
-        const tfoot = HTMLElement_43.HTMLElementConstructor("tfoot", {
+        const tfoot = HTMLElement_42.HTMLElementConstructor("tfoot", {
             children: [
-                HTMLElement_43.HTMLElementConstructor("tr", {
+                HTMLElement_42.HTMLElementConstructor("tr", {
                     props: {
                         id: desc.id,
                         className: desc.className,
@@ -6160,13 +6084,13 @@ define("editor/templates/table/TableTemplate", ["require", "exports", "editor/el
                             switch (cell.type) {
                                 case "data":
                                 default:
-                                    return HTMLElement_43.HTMLElementConstructor("td", {
+                                    return HTMLElement_42.HTMLElementConstructor("td", {
                                         children: [
                                             cell.content
                                         ]
                                     });
                                 case "header":
-                                    return HTMLElement_43.HTMLElementConstructor("th", {
+                                    return HTMLElement_42.HTMLElementConstructor("th", {
                                         props: {
                                             scope: "row"
                                         },
@@ -6177,7 +6101,7 @@ define("editor/templates/table/TableTemplate", ["require", "exports", "editor/el
                             }
                         }
                         else {
-                            return HTMLElement_43.HTMLElementConstructor("td", {
+                            return HTMLElement_42.HTMLElementConstructor("td", {
                                 children: [
                                     cell
                                 ]
@@ -6187,7 +6111,7 @@ define("editor/templates/table/TableTemplate", ["require", "exports", "editor/el
                 })
             ]
         });
-        const table = HTMLElement_43.HTMLElementConstructor("table", {
+        const table = HTMLElement_42.HTMLElementConstructor("table", {
             props: {
                 id: desc.id,
                 className: desc.className,

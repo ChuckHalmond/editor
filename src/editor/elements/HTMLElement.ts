@@ -291,8 +291,7 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
 }
 
 function Element<K extends keyof HTMLElementTagNameMap>(
-    tag: HTMLElementTag<K>, init?: HTMLInit<K>): HTMLElementTagNameMap[K] {
-        const tagName = tag.slice(1, tag.length - 1) as K;
+    tagName: K, init?: HTMLInit<K>): HTMLElementTagNameMap[K] {
         const element = document.createElement(tagName, init?.options);
         if (init) {
             if (init.props) {

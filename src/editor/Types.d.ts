@@ -1,1 +1,0 @@
-type HTMLElementTag<K extends keyof HTMLElementTagNameMap> = `<${K}>`;

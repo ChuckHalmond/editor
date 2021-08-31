@@ -4,6 +4,6 @@
   "main": "web/dist/index.js",
   "types": "web/dist/index.d.ts",
   "devDependencies": {
-    "typescript": "^3.9.10"
+    "typescript": "^4.4.2"
   }
 }

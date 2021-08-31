@@ -216,10 +216,10 @@ function temp() {
 
     const FieldFragment = (fieldset: HTMLElement, field: FieldModel) => Fragment(
         Element(
-            /*html*/`<div>`, {
+            "div", {
                 children: [
                     ReactiveNode(
-                        Element(/*html*/`<label>`),
+                        Element(/*html*/"label"),
                         field,
                         (div, property, oldValue, newValue) => {
                             switch (property) {
@@ -238,10 +238,10 @@ function temp() {
     );
 
     const DropzoneInputFragment = (host: Element, field: FieldModel) => Fragment(
-        Element(/*html*/`<e-dropzoneinput>`, {
+        Element(/*html*/"e-dropzoneinput", {
             children: [
                 ReactiveNode(
-                    Element(/*html*/`<e-dropzone>`, {
+                    Element("e-dropzone", {
                         props: {
                             className: "field__dropzone",
                             slot: "dropzone",
@@ -299,7 +299,7 @@ function temp() {
                         }
                     }
                 ),
-                Element(/*html*/`<input>`, {
+                Element("input", {
                     props: {
                         className: "field__input",
                         slot: "input"
@@ -316,7 +316,7 @@ function temp() {
         }
 
         public render() {
-            return Element(/*html*/`<fieldset>`, {
+            return Element("fieldset", {
                 props: {
                     className: "statement-fieldset"
                 },
@@ -335,7 +335,7 @@ function temp() {
         }
 
         public render() {
-            return Element(/*html*/`<div>`, {
+            return Element("div", {
                 children: [
                     ReactiveNode(
                         document.createTextNode(`Last execution date : ${this.model.data.datetime}`),
@@ -358,11 +358,11 @@ function temp() {
         }
 
         public render() {
-            return Element(/*html*/`<e-dragzone>`, {
+            return Element("e-dragzone", {
                 children: ReactiveChildNodes(
                     this.model.columns,
                     (item) =>
-                        Element(/*html*/`<e-draggable>`, {
+                        Element("e-draggable", {
                             props: {
                                 textContent: item.data.name
                             }
@@ -380,7 +380,7 @@ function temp() {
 
         public render() {
             return ReactiveNode(
-                Element(/*html*/`<e-draggable>`),
+                Element("e-draggable"),
                 this.model,
                 (draggable, property, oldValue, newValue) => {
                     switch (property) {
