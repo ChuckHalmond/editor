@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-        "outDir": "web/lib",
         "outFile": "web/dist/index.js",
         "target": "es2019",
         "experimentalDecorators": true,
@@ -11,7 +10,7 @@
         "declaration": true,
         "rootDir": "./src",
         "baseUrl": "./",
-        "skipLibCheck": true
+        "skipLibCheck": true,
     },
     "include": [
         "./src/**/*.ts"
