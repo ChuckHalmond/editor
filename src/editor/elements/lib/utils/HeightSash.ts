@@ -1,4 +1,4 @@
-import { bindShadowRoot, GenerateAttributeAccessors, RegisterCustomHTMLElement } from "editor/elements/HTMLElement";
+import { bindShadowRoot, GenerateAttributeAccessors, RegisterCustomHTMLElement } from "src/editor/elements/HTMLElement";
 
 export { HTMLEHeightSashElement };
 export { HTMLEHeightSashElementBase };

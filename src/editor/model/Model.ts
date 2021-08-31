@@ -1,4 +1,4 @@
-import { EventDispatcher, Event } from "libs/events/EventDispatcher";
+import { EventDispatcher, Event } from "src/libs/events/EventDispatcher";
 
 export { ObjectModelChangeEvent };
 export { ObjectModel };

@@ -1,9 +1,9 @@
-import { Fragment, Element, ReactiveChildNodes, ReactiveNode, parseStringTemplate, setElementChildren } from "editor/elements/HTMLElement";
-import { HTMLEDraggableElement } from "editor/elements/lib/controls/draggable/Draggable";
-import { HTMLEDragzoneElement } from "editor/elements/lib/controls/draggable/Dragzone";
-import { DataChangeEvent, HTMLEDropzoneElement } from "editor/elements/lib/controls/draggable/Dropzone";
-import { ViewBase } from "editor/elements/view/View";
-import { ListModelBase, ObjectModelBase, ListModel } from "editor/model/Model";
+import { Element, Fragment, ReactiveNode, ReactiveChildNodes, setElementChildren, parseStringTemplate } from "src/editor/elements/HTMLElement";
+import { HTMLEDraggableElement } from "src/editor/elements/lib/controls/draggable/Draggable";
+import { HTMLEDragzoneElement } from "src/editor/elements/lib/controls/draggable/Dragzone";
+import { HTMLEDropzoneElement, DataChangeEvent } from "src/editor/elements/lib/controls/draggable/Dropzone";
+import { ViewBase } from "src/editor/elements/view/View";
+import { ObjectModelBase, ListModel, ListModelBase } from "src/editor/model/Model";
 
 export { temp };
 

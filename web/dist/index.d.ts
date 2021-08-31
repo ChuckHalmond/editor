@@ -365,41 +365,6 @@ declare module "editor/elements/lib/controls/draggable/Dropzone" {
         }
     }
 }
-declare module "editor/elements/lib/containers/menus/MenuBar" {
-    import { HTMLEMenuItemElement } from "editor/elements/lib/containers/menus/MenuItem";
-    export { HTMLEMenuBarElement };
-    export { HTMLEMenuBarElementBase };
-    interface HTMLEMenuBarElement extends HTMLElement {
-        name: string;
-        active: boolean;
-        items: HTMLEMenuItemElement[];
-        readonly activeIndex: number;
-        readonly activeItem: HTMLEMenuItemElement | null;
-        focusItemAt(index: number, childMenu?: boolean): void;
-        focusItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): void;
-        reset(): void;
-        findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): HTMLEMenuItemElement | null;
-    }
-    class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement {
-        name: string;
-        active: boolean;
-        items: HTMLEMenuItemElement[];
-        private _activeIndex;
-        constructor();
-        get activeIndex(): number;
-        get activeItem(): HTMLEMenuItemElement | null;
-        connectedCallback(): void;
-        focusItemAt(index: number, childMenu?: boolean): void;
-        focusItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): void;
-        reset(): void;
-        findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): HTMLEMenuItemElement | null;
-    }
-    global {
-        interface HTMLElementTagNameMap {
-            "e-menubar": HTMLEMenuBarElement;
-        }
-    }
-}
 declare module "editor/Input" {
     export { Key };
     export { KeyModifier };
@@ -460,6 +425,41 @@ declare module "editor/Input" {
         test(event: KeyboardEvent): boolean;
     }
 }
+declare module "editor/elements/lib/containers/menus/MenuBar" {
+    import { HTMLEMenuItemElement } from "editor/elements/lib/containers/menus/MenuItem";
+    export { HTMLEMenuBarElement };
+    export { HTMLEMenuBarElementBase };
+    interface HTMLEMenuBarElement extends HTMLElement {
+        name: string;
+        active: boolean;
+        items: HTMLEMenuItemElement[];
+        readonly activeIndex: number;
+        readonly activeItem: HTMLEMenuItemElement | null;
+        focusItemAt(index: number, childMenu?: boolean): void;
+        focusItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): void;
+        reset(): void;
+        findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): HTMLEMenuItemElement | null;
+    }
+    class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement {
+        name: string;
+        active: boolean;
+        items: HTMLEMenuItemElement[];
+        private _activeIndex;
+        constructor();
+        get activeIndex(): number;
+        get activeItem(): HTMLEMenuItemElement | null;
+        connectedCallback(): void;
+        focusItemAt(index: number, childMenu?: boolean): void;
+        focusItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): void;
+        reset(): void;
+        findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): HTMLEMenuItemElement | null;
+    }
+    global {
+        interface HTMLElementTagNameMap {
+            "e-menubar": HTMLEMenuBarElement;
+        }
+    }
+}
 declare module "editor/elements/lib/containers/menus/MenuItemGroup" {
     import { HTMLEMenuItemElement } from "editor/elements/lib/containers/menus/MenuItem";
     import { HTMLEMenuElement } from "editor/elements/lib/containers/menus/Menu";
@@ -506,9 +506,9 @@ declare module "editor/elements/lib/containers/menus/MenuItemGroup" {
     }
 }
 declare module "editor/elements/lib/containers/menus/MenuItem" {
+    import { HotKey } from "editor/Input";
     import { HTMLEMenuElement } from "editor/elements/lib/containers/menus/Menu";
     import { HTMLEMenuBarElement } from "editor/elements/lib/containers/menus/MenuBar";
-    import { HotKey } from "editor/Input";
     import { HTMLEMenuItemGroupElement } from "editor/elements/lib/containers/menus/MenuItemGroup";
     export { EMenuItemElementType };
     export { HTMLEMenuItemElement };
@@ -1229,10 +1229,12 @@ declare module "editor/elements/forms/Snippets" {
             checked: boolean;
         } | {
             type: "radio";
-            nodes: [{
-                value: string;
-                checked: boolean;
-            }];
+            nodes: [
+                {
+                    value: string;
+                    checked: boolean;
+                }
+            ];
         } | {
             value: string;
         });

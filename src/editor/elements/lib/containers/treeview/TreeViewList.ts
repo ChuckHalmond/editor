@@ -1,4 +1,4 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, isTagElement, bindShadowRoot } from "editor/elements/HTMLElement";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors, isTagElement, bindShadowRoot } from "src/editor/elements/HTMLElement";
 import { HTMLETreeViewItemElement } from "./TreeViewItem";
 
 export { HTMLETreeViewListElement };

@@ -1,8 +1,9 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, isTagElement, bindShadowRoot } from "editor/elements/HTMLElement";
-import { HTMLEMenuElement } from "editor/elements/lib/containers/menus/Menu";
-import { HTMLEMenuBarElement } from "editor/elements/lib/containers/menus/MenuBar";
-import { HotKey } from "editor/Input";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "src/editor/elements/HTMLElement";
+import { HotKey } from "src/editor/Input";
+import { HTMLEMenuElement } from "./Menu";
+import { HTMLEMenuBarElement } from "./MenuBar";
 import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
+
 
 export { EMenuItemElementType };
 export { HTMLEMenuItemElement };

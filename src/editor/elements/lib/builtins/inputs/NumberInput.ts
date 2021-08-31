@@ -1,4 +1,4 @@
-import { GenerateAttributeAccessors, RegisterCustomHTMLElement } from "editor/elements/HTMLElement";
+import { GenerateAttributeAccessors, RegisterCustomHTMLElement } from "src/editor/elements/HTMLElement";
 
 export { NumberInputElement };
 

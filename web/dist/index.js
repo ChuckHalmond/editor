@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -586,7 +585,7 @@ define("editor/elements/HTMLElement", ["require", "exports", "editor/elements/Sn
             mutationsList.forEach((mutation) => {
                 mutation.addedNodes.forEach((node) => {
                     if (isElement(node)) {
-                        Snippets_1.forAllSubtreeElements(node, (childElement) => {
+                        (0, Snippets_1.forAllSubtreeElements)(node, (childElement) => {
                             [...childElement.attributes].forEach((attr) => {
                                 let matchingMixins = mixins.filter(mixin => areAttributesMatching(mixin.attributeType, mixin.attributeName, mixin.attributeValue, attr.name, attr.value));
                                 matchingMixins.forEach((mixin) => {
@@ -598,7 +597,7 @@ define("editor/elements/HTMLElement", ["require", "exports", "editor/elements/Sn
                 });
                 mutation.removedNodes.forEach((node) => {
                     if (isElement(node)) {
-                        Snippets_1.forAllSubtreeElements(node, (childElement) => {
+                        (0, Snippets_1.forAllSubtreeElements)(node, (childElement) => {
                             [...childElement.attributes].forEach((attr) => {
                                 let matchingMixins = mixins.filter(mixin => areAttributesMatching(mixin.attributeType, mixin.attributeName, mixin.attributeValue, attr.name, attr.value));
                                 matchingMixins.forEach((mixin) => {
@@ -635,7 +634,7 @@ define("editor/elements/lib/controls/draggable/Draggable", ["require", "exports"
     let HTMLEDraggableElementBase = class HTMLEDraggableElementBase extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_1.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_1.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     display: inline-block;
@@ -683,10 +682,10 @@ define("editor/elements/lib/controls/draggable/Draggable", ["require", "exports"
         }
     };
     HTMLEDraggableElementBase = __decorate([
-        HTMLElement_1.RegisterCustomHTMLElement({
+        (0, HTMLElement_1.RegisterCustomHTMLElement)({
             name: "e-draggable"
         }),
-        HTMLElement_1.GenerateAttributeAccessors([
+        (0, HTMLElement_1.GenerateAttributeAccessors)([
             { name: "selected", type: "boolean" },
             { name: "dragged", type: "boolean" },
             { name: "dragovered", type: "boolean" },
@@ -703,7 +702,7 @@ define("editor/elements/lib/controls/draggable/Dragzone", ["require", "exports",
     let HTMLEDragzoneElementBase = class HTMLEDragzoneElementBase extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_2.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_2.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     display: block;
@@ -762,7 +761,7 @@ define("editor/elements/lib/controls/draggable/Dragzone", ["require", "exports",
             const slot = (_a = this.shadowRoot) === null || _a === void 0 ? void 0 : _a.querySelector("slot");
             if (slot) {
                 slot.addEventListener("slotchange", () => {
-                    const draggables = slot.assignedElements().filter(elem => HTMLElement_2.isTagElement("e-draggable", elem));
+                    const draggables = slot.assignedElements().filter(elem => (0, HTMLElement_2.isTagElement)("e-draggable", elem));
                     this.draggables = draggables;
                     this.draggables.forEach((draggable) => {
                         draggable.draggable = true;
@@ -862,7 +861,7 @@ define("editor/elements/lib/controls/draggable/Dragzone", ["require", "exports",
         }
     };
     HTMLEDragzoneElementBase = __decorate([
-        HTMLElement_2.RegisterCustomHTMLElement({
+        (0, HTMLElement_2.RegisterCustomHTMLElement)({
             name: "e-dragzone"
         })
     ], HTMLEDragzoneElementBase);
@@ -875,7 +874,7 @@ define("editor/elements/lib/controls/draggable/Dropzone", ["require", "exports",
     let HTMLEDropzoneElementBase = class HTMLEDropzoneElementBase extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_3.bindShadowRoot(this, /*html*/ `
+            (0, HTMLElement_3.bindShadowRoot)(this, /*html*/ `
             <style>
                 :host {
                     display: block;
@@ -961,7 +960,7 @@ define("editor/elements/lib/controls/draggable/Dropzone", ["require", "exports",
             const slot = (_a = this.shadowRoot) === null || _a === void 0 ? void 0 : _a.querySelector("slot");
             if (slot) {
                 slot.addEventListener("slotchange", () => {
-                    const draggables = slot.assignedElements().filter(elem => HTMLElement_3.isTagElement("e-draggable", elem));
+                    const draggables = slot.assignedElements().filter(elem => (0, HTMLElement_3.isTagElement)("e-draggable", elem));
                     this.draggables = draggables;
                     this.draggables.forEach((draggable) => {
                         draggable.draggable = false;
@@ -1219,11 +1218,11 @@ define("editor/elements/lib/controls/draggable/Dropzone", ["require", "exports",
         }
     };
     HTMLEDropzoneElementBase = __decorate([
-        HTMLElement_3.RegisterCustomHTMLElement({
+        (0, HTMLElement_3.RegisterCustomHTMLElement)({
             name: "e-dropzone",
             observedAttributes: ["placeholder", "label"]
         }),
-        HTMLElement_3.GenerateAttributeAccessors([
+        (0, HTMLElement_3.GenerateAttributeAccessors)([
             { name: "dragovered", type: "string" },
             { name: "placeholder", type: "string" },
             { name: "disabled", type: "boolean" },
@@ -1236,6 +1235,97 @@ define("editor/elements/lib/controls/draggable/Dropzone", ["require", "exports",
     ], HTMLEDropzoneElementBase);
     exports.HTMLEDropzoneElementBase = HTMLEDropzoneElementBase;
 });
+define("editor/Input", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.MouseButton = exports.HotKey = exports.KeyModifier = exports.Key = void 0;
+    var Key;
+    (function (Key) {
+        Key["A"] = "a";
+        Key["B"] = "b";
+        Key["C"] = "c";
+        Key["D"] = "d";
+        Key["E"] = "e";
+        Key["F"] = "f";
+        Key["G"] = "g";
+        Key["H"] = "h";
+        Key["I"] = "i";
+        Key["J"] = "j";
+        Key["K"] = "k";
+        Key["L"] = "l";
+        Key["M"] = "m";
+        Key["O"] = "o";
+        Key["P"] = "p";
+        Key["Q"] = "q";
+        Key["R"] = "r";
+        Key["S"] = "s";
+        Key["T"] = "t";
+        Key["U"] = "u";
+        Key["V"] = "v";
+        Key["W"] = "w";
+        Key["X"] = "x";
+        Key["Y"] = "y";
+        Key["Z"] = "z";
+        Key["ENTER"] = "Enter";
+        Key["BACKSPACE"] = "Backspace";
+        Key["ARROW_DOWN"] = "ArrowDown";
+        Key["ARROW_LEFT"] = "ArrowLeft";
+        Key["ARROW_RIGHT"] = "ArrowRight";
+        Key["ARROW_UP"] = "ArrowUp";
+        Key["SHIFT"] = "Shift";
+    })(Key || (Key = {}));
+    exports.Key = Key;
+    var KeyModifier;
+    (function (KeyModifier) {
+        KeyModifier["Alt"] = "Alt";
+        KeyModifier["Control"] = "Control";
+        KeyModifier["Shift"] = "Shift";
+    })(KeyModifier || (KeyModifier = {}));
+    exports.KeyModifier = KeyModifier;
+    function displayKeyModifier(mode) {
+        switch (mode) {
+            case KeyModifier.Control:
+                return "Ctrl";
+            default:
+                return mode;
+        }
+    }
+    var MouseButton;
+    (function (MouseButton) {
+        MouseButton[MouseButton["LEFT"] = 1] = "LEFT";
+        MouseButton[MouseButton["WHEEL"] = 2] = "WHEEL";
+        MouseButton[MouseButton["RIGHT"] = 3] = "RIGHT";
+        MouseButton[MouseButton["FORWARD"] = 4] = "FORWARD";
+        MouseButton[MouseButton["BACK"] = 5] = "BACK";
+    })(MouseButton || (MouseButton = {}));
+    exports.MouseButton = MouseButton;
+    const testKeyModifier = (mod, event) => {
+        switch (mod) {
+            case 'Alt':
+                return event.altKey;
+            case 'Control':
+                return event.ctrlKey;
+            case 'Shift':
+                return event.shiftKey;
+            default:
+                return () => true;
+        }
+    };
+    class HotKey {
+        constructor(key, mod1, mod2) {
+            this.key = key;
+            this.mod1 = mod1;
+            this.mod2 = mod2;
+        }
+        toString() {
+            return `${this.mod1 ? `${displayKeyModifier(this.mod1)}+` : ''}${this.mod2 ? `${displayKeyModifier(this.mod2)}+` : ''}${(this.key.length === 1) ? this.key.toUpperCase() : this.key}`;
+        }
+        test(event) {
+            return ((!this.mod1 || testKeyModifier(this.mod1, event)) && (!this.mod2 || testKeyModifier(this.mod2, event)) && event.key === this.key);
+        }
+    }
+    exports.HotKey = HotKey;
+});
 define("editor/elements/lib/containers/menus/MenuBar", ["require", "exports", "editor/elements/HTMLElement"], function (require, exports, HTMLElement_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -1243,7 +1333,7 @@ define("editor/elements/lib/containers/menus/MenuBar", ["require", "exports", "e
     let HTMLEMenuBarElementBase = class HTMLEMenuBarElementBase extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_4.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_4.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     display: block;
@@ -1289,7 +1379,7 @@ define("editor/elements/lib/containers/menus/MenuBar", ["require", "exports", "e
             if (slot) {
                 slot.addEventListener("slotchange", () => {
                     const items = slot.assignedElements()
-                        .filter(item => HTMLElement_4.isTagElement("e-menuitem", item));
+                        .filter(item => (0, HTMLElement_4.isTagElement)("e-menuitem", item));
                     this.items = items;
                     items.forEach((item) => {
                         item.parentMenu = this;
@@ -1401,106 +1491,15 @@ define("editor/elements/lib/containers/menus/MenuBar", ["require", "exports", "e
         }
     };
     HTMLEMenuBarElementBase = __decorate([
-        HTMLElement_4.RegisterCustomHTMLElement({
+        (0, HTMLElement_4.RegisterCustomHTMLElement)({
             name: "e-menubar"
         }),
-        HTMLElement_4.GenerateAttributeAccessors([
+        (0, HTMLElement_4.GenerateAttributeAccessors)([
             { name: "name", type: "string" },
             { name: "active", type: "boolean" },
         ])
     ], HTMLEMenuBarElementBase);
     exports.HTMLEMenuBarElementBase = HTMLEMenuBarElementBase;
-});
-define("editor/Input", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.MouseButton = exports.HotKey = exports.KeyModifier = exports.Key = void 0;
-    var Key;
-    (function (Key) {
-        Key["A"] = "a";
-        Key["B"] = "b";
-        Key["C"] = "c";
-        Key["D"] = "d";
-        Key["E"] = "e";
-        Key["F"] = "f";
-        Key["G"] = "g";
-        Key["H"] = "h";
-        Key["I"] = "i";
-        Key["J"] = "j";
-        Key["K"] = "k";
-        Key["L"] = "l";
-        Key["M"] = "m";
-        Key["O"] = "o";
-        Key["P"] = "p";
-        Key["Q"] = "q";
-        Key["R"] = "r";
-        Key["S"] = "s";
-        Key["T"] = "t";
-        Key["U"] = "u";
-        Key["V"] = "v";
-        Key["W"] = "w";
-        Key["X"] = "x";
-        Key["Y"] = "y";
-        Key["Z"] = "z";
-        Key["ENTER"] = "Enter";
-        Key["BACKSPACE"] = "Backspace";
-        Key["ARROW_DOWN"] = "ArrowDown";
-        Key["ARROW_LEFT"] = "ArrowLeft";
-        Key["ARROW_RIGHT"] = "ArrowRight";
-        Key["ARROW_UP"] = "ArrowUp";
-        Key["SHIFT"] = "Shift";
-    })(Key || (Key = {}));
-    exports.Key = Key;
-    var KeyModifier;
-    (function (KeyModifier) {
-        KeyModifier["Alt"] = "Alt";
-        KeyModifier["Control"] = "Control";
-        KeyModifier["Shift"] = "Shift";
-    })(KeyModifier || (KeyModifier = {}));
-    exports.KeyModifier = KeyModifier;
-    function displayKeyModifier(mode) {
-        switch (mode) {
-            case KeyModifier.Control:
-                return "Ctrl";
-            default:
-                return mode;
-        }
-    }
-    var MouseButton;
-    (function (MouseButton) {
-        MouseButton[MouseButton["LEFT"] = 1] = "LEFT";
-        MouseButton[MouseButton["WHEEL"] = 2] = "WHEEL";
-        MouseButton[MouseButton["RIGHT"] = 3] = "RIGHT";
-        MouseButton[MouseButton["FORWARD"] = 4] = "FORWARD";
-        MouseButton[MouseButton["BACK"] = 5] = "BACK";
-    })(MouseButton || (MouseButton = {}));
-    exports.MouseButton = MouseButton;
-    const testKeyModifier = (mod, event) => {
-        switch (mod) {
-            case 'Alt':
-                return event.altKey;
-            case 'Control':
-                return event.ctrlKey;
-            case 'Shift':
-                return event.shiftKey;
-            default:
-                return () => true;
-        }
-    };
-    class HotKey {
-        constructor(key, mod1, mod2) {
-            this.key = key;
-            this.mod1 = mod1;
-            this.mod2 = mod2;
-        }
-        toString() {
-            return `${this.mod1 ? `${displayKeyModifier(this.mod1)}+` : ''}${this.mod2 ? `${displayKeyModifier(this.mod2)}+` : ''}${(this.key.length === 1) ? this.key.toUpperCase() : this.key}`;
-        }
-        test(event) {
-            return ((!this.mod1 || testKeyModifier(this.mod1, event)) && (!this.mod2 || testKeyModifier(this.mod2, event)) && event.key === this.key);
-        }
-    }
-    exports.HotKey = HotKey;
 });
 define("editor/elements/lib/containers/menus/MenuItemGroup", ["require", "exports", "editor/elements/HTMLElement", "editor/elements/Snippets"], function (require, exports, HTMLElement_5, Snippets_2) {
     "use strict";
@@ -1509,7 +1508,7 @@ define("editor/elements/lib/containers/menus/MenuItemGroup", ["require", "export
     let HTMLEMenuItemGroupElementBase = class HTMLEMenuItemGroupElementBase extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_5.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_5.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     display: inline-block;
@@ -1572,7 +1571,7 @@ define("editor/elements/lib/containers/menus/MenuItemGroup", ["require", "export
             if (slot) {
                 slot.addEventListener("slotchange", () => {
                     const items = slot.assignedElements()
-                        .filter(item => HTMLElement_5.isTagElement("e-menuitem", item));
+                        .filter(item => (0, HTMLElement_5.isTagElement)("e-menuitem", item));
                     this.items = items;
                     items.forEach((item) => {
                         item.group = this;
@@ -1598,7 +1597,7 @@ define("editor/elements/lib/containers/menus/MenuItemGroup", ["require", "export
             });
             this.addEventListener("mouseout", (event) => {
                 let target = event.target;
-                let thisIntersectsWithMouse = Snippets_2.pointIntersectsWithDOMRect(event.clientX, event.clientY, this.getBoundingClientRect());
+                let thisIntersectsWithMouse = (0, Snippets_2.pointIntersectsWithDOMRect)(event.clientX, event.clientY, this.getBoundingClientRect());
                 if ((this === target || this.items.includes(target)) && !thisIntersectsWithMouse) {
                     this.reset();
                     this.focus();
@@ -1616,7 +1615,7 @@ define("editor/elements/lib/containers/menus/MenuItemGroup", ["require", "export
             });
             this.addEventListener("radiochangerequest", (event) => {
                 let target = event.target;
-                if (HTMLElement_5.isTagElement("e-menuitem", target)) {
+                if ((0, HTMLElement_5.isTagElement)("e-menuitem", target)) {
                     let item = target;
                     if (item.type === "radio" && !item.checked) {
                         let checkedRadio = this.findItem((item) => {
@@ -1725,11 +1724,11 @@ define("editor/elements/lib/containers/menus/MenuItemGroup", ["require", "export
         }
     };
     HTMLEMenuItemGroupElementBase = __decorate([
-        HTMLElement_5.RegisterCustomHTMLElement({
+        (0, HTMLElement_5.RegisterCustomHTMLElement)({
             name: "e-menuitemgroup",
             observedAttributes: ["label"]
         }),
-        HTMLElement_5.GenerateAttributeAccessors([
+        (0, HTMLElement_5.GenerateAttributeAccessors)([
             { name: "label", type: "string" },
             { name: "type", type: "string" },
             { name: "name", type: "string" },
@@ -1746,7 +1745,7 @@ define("editor/elements/lib/containers/menus/MenuItem", ["require", "exports", "
     let HTMLEMenuItemElementBase = class HTMLEMenuItemElementBase extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_6.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_6.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     position: relative;
@@ -1932,7 +1931,7 @@ define("editor/elements/lib/containers/menus/MenuItem", ["require", "exports", "
             if (menuSlot) {
                 menuSlot.addEventListener("slotchange", () => {
                     const menuElem = menuSlot.assignedElements()[0];
-                    if (HTMLElement_6.isTagElement("e-menu", menuElem)) {
+                    if ((0, HTMLElement_6.isTagElement)("e-menu", menuElem)) {
                         this.childMenu = menuElem;
                         menuElem.parentItem = this;
                     }
@@ -2009,11 +2008,11 @@ define("editor/elements/lib/containers/menus/MenuItem", ["require", "exports", "
         }
     };
     HTMLEMenuItemElementBase = __decorate([
-        HTMLElement_6.RegisterCustomHTMLElement({
+        (0, HTMLElement_6.RegisterCustomHTMLElement)({
             name: "e-menuitem",
             observedAttributes: ["icon", "label", "checked", "type"]
         }),
-        HTMLElement_6.GenerateAttributeAccessors([
+        (0, HTMLElement_6.GenerateAttributeAccessors)([
             { name: "name", type: "string" },
             { name: "label", type: "string" },
             { name: "icon", type: "string" },
@@ -2031,7 +2030,7 @@ define("editor/elements/lib/containers/menus/Menu", ["require", "exports", "edit
     let HTMLEMenuElementBase = class HTMLEMenuElementBase extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_7.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_7.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     display: block;
@@ -2082,7 +2081,7 @@ define("editor/elements/lib/containers/menus/Menu", ["require", "exports", "edit
             const slot = (_a = this.shadowRoot) === null || _a === void 0 ? void 0 : _a.querySelector("slot");
             if (slot) {
                 slot.addEventListener("slotchange", () => {
-                    const items = slot.assignedElements().filter(elem => HTMLElement_7.isTagElement("e-menuitem", elem) || HTMLElement_7.isTagElement("e-menuitemgroup", elem));
+                    const items = slot.assignedElements().filter(elem => (0, HTMLElement_7.isTagElement)("e-menuitem", elem) || (0, HTMLElement_7.isTagElement)("e-menuitemgroup", elem));
                     this.items = items;
                     items.forEach((item) => {
                         item.parentMenu = this;
@@ -2091,7 +2090,7 @@ define("editor/elements/lib/containers/menus/Menu", ["require", "exports", "edit
             }
             this.addEventListener("mousedown", (event) => {
                 let target = event.target;
-                if (HTMLElement_7.isTagElement("e-menuitem", target)) {
+                if ((0, HTMLElement_7.isTagElement)("e-menuitem", target)) {
                     let thisIncludesTarget = this.items.includes(target);
                     if (thisIncludesTarget) {
                         target.trigger();
@@ -2106,7 +2105,7 @@ define("editor/elements/lib/containers/menus/Menu", ["require", "exports", "edit
                     this.focus();
                 }
                 else if (targetIndex >= 0) {
-                    if (HTMLElement_7.isTagElement("e-menuitem", target)) {
+                    if ((0, HTMLElement_7.isTagElement)("e-menuitem", target)) {
                         this.focusItemAt(targetIndex, true);
                     }
                     else {
@@ -2116,7 +2115,7 @@ define("editor/elements/lib/containers/menus/Menu", ["require", "exports", "edit
             });
             this.addEventListener("mouseout", (event) => {
                 let target = event.target;
-                let thisIntersectsWithMouse = Snippets_3.pointIntersectsWithDOMRect(event.clientX, event.clientY, this.getBoundingClientRect());
+                let thisIntersectsWithMouse = (0, Snippets_3.pointIntersectsWithDOMRect)(event.clientX, event.clientY, this.getBoundingClientRect());
                 if ((this === target || this.items.includes(target)) && !thisIntersectsWithMouse) {
                     this.reset();
                     this.focus();
@@ -2138,34 +2137,34 @@ define("editor/elements/lib/containers/menus/Menu", ["require", "exports", "edit
                 switch (event.key) {
                     case "ArrowUp":
                         this.focusItemAt((this.activeIndex <= 0) ? this.items.length - 1 : this.activeIndex - 1);
-                        if (HTMLElement_7.isTagElement("e-menuitemgroup", this.activeItem)) {
+                        if ((0, HTMLElement_7.isTagElement)("e-menuitemgroup", this.activeItem)) {
                             this.activeItem.focusItemAt(this.activeItem.items.length - 1);
                         }
                         event.stopPropagation();
                         break;
                     case "ArrowDown":
                         this.focusItemAt((this.activeIndex >= this.items.length - 1) ? 0 : this.activeIndex + 1);
-                        if (HTMLElement_7.isTagElement("e-menuitemgroup", this.activeItem)) {
+                        if ((0, HTMLElement_7.isTagElement)("e-menuitemgroup", this.activeItem)) {
                             this.activeItem.focusItemAt(0);
                         }
                         event.stopPropagation();
                         break;
                     case "Home":
                         this.focusItemAt(0);
-                        if (HTMLElement_7.isTagElement("e-menuitemgroup", this.activeItem)) {
+                        if ((0, HTMLElement_7.isTagElement)("e-menuitemgroup", this.activeItem)) {
                             this.activeItem.focusItemAt(0);
                         }
                         event.stopPropagation();
                         break;
                     case "End":
                         this.focusItemAt(this.items.length - 1);
-                        if (HTMLElement_7.isTagElement("e-menuitemgroup", this.activeItem)) {
+                        if ((0, HTMLElement_7.isTagElement)("e-menuitemgroup", this.activeItem)) {
                             this.activeItem.focusItemAt(this.activeItem.items.length - 1);
                         }
                         event.stopPropagation();
                         break;
                     case "Enter":
-                        if (HTMLElement_7.isTagElement("e-menuitem", this.activeItem)) {
+                        if ((0, HTMLElement_7.isTagElement)("e-menuitem", this.activeItem)) {
                             this.activeItem.trigger();
                             event.stopPropagation();
                         }
@@ -2174,7 +2173,7 @@ define("editor/elements/lib/containers/menus/Menu", ["require", "exports", "edit
                         if (this.parentItem) {
                             let parentGroup = this.parentItem.group;
                             let parentMenu = parentGroup ? parentGroup.parentMenu : this.parentItem.parentMenu;
-                            if (HTMLElement_7.isTagElement("e-menu", parentMenu)) {
+                            if ((0, HTMLElement_7.isTagElement)("e-menu", parentMenu)) {
                                 if (parentGroup) {
                                     parentGroup.focusItemAt(parentGroup.activeIndex);
                                 }
@@ -2193,7 +2192,7 @@ define("editor/elements/lib/containers/menus/Menu", ["require", "exports", "edit
                         if (this.parentItem) {
                             let parentGroup = this.parentItem.group;
                             let parentMenu = parentGroup ? parentGroup.parentMenu : this.parentItem.parentMenu;
-                            if (HTMLElement_7.isTagElement("e-menu", parentMenu)) {
+                            if ((0, HTMLElement_7.isTagElement)("e-menu", parentMenu)) {
                                 if (parentGroup) {
                                     parentGroup.focusItemAt(parentGroup.activeIndex);
                                 }
@@ -2207,7 +2206,7 @@ define("editor/elements/lib/containers/menus/Menu", ["require", "exports", "edit
                         break;
                     case "ArrowRight":
                         if (this.items.includes(event.target)) {
-                            if (HTMLElement_7.isTagElement("e-menuitem", this.activeItem) && this.activeItem.childMenu) {
+                            if ((0, HTMLElement_7.isTagElement)("e-menuitem", this.activeItem) && this.activeItem.childMenu) {
                                 this.activeItem.childMenu.focusItemAt(0);
                                 event.stopPropagation();
                             }
@@ -2239,7 +2238,7 @@ define("editor/elements/lib/containers/menus/Menu", ["require", "exports", "edit
             if (item) {
                 this._activeIndex = index;
                 item.focus();
-                if (HTMLElement_7.isTagElement("e-menuitem", item)) {
+                if ((0, HTMLElement_7.isTagElement)("e-menuitem", item)) {
                     if (childMenu && item.childMenu) {
                         item.childMenu.focus();
                     }
@@ -2258,7 +2257,7 @@ define("editor/elements/lib/containers/menus/Menu", ["require", "exports", "edit
         reset() {
             let item = this.activeItem;
             this._activeIndex = -1;
-            if (HTMLElement_7.isTagElement("e-menuitem", item) && item.childMenu) {
+            if ((0, HTMLElement_7.isTagElement)("e-menuitem", item) && item.childMenu) {
                 item.childMenu.reset();
             }
         }
@@ -2266,7 +2265,7 @@ define("editor/elements/lib/containers/menus/Menu", ["require", "exports", "edit
             let foundItem = null;
             for (let idx = 0; idx < this.items.length; idx++) {
                 let item = this.items[idx];
-                if (HTMLElement_7.isTagElement("e-menuitem", item)) {
+                if ((0, HTMLElement_7.isTagElement)("e-menuitem", item)) {
                     if (predicate(item)) {
                         return item;
                     }
@@ -2277,7 +2276,7 @@ define("editor/elements/lib/containers/menus/Menu", ["require", "exports", "edit
                         }
                     }
                 }
-                else if (HTMLElement_7.isTagElement("e-menuitemgroup", item)) {
+                else if ((0, HTMLElement_7.isTagElement)("e-menuitemgroup", item)) {
                     foundItem = item.findItem(predicate, subitems);
                     if (foundItem) {
                         return foundItem;
@@ -2288,11 +2287,11 @@ define("editor/elements/lib/containers/menus/Menu", ["require", "exports", "edit
         }
     };
     HTMLEMenuElementBase = __decorate([
-        HTMLElement_7.RegisterCustomHTMLElement({
+        (0, HTMLElement_7.RegisterCustomHTMLElement)({
             name: "e-menu",
             observedAttributes: ["expanded"]
         }),
-        HTMLElement_7.GenerateAttributeAccessors([
+        (0, HTMLElement_7.GenerateAttributeAccessors)([
             { name: "name", type: "string" },
             { name: "expanded", type: "boolean" },
             { name: "overflowing", type: "boolean" }
@@ -2307,7 +2306,7 @@ define("editor/elements/lib/containers/menus/MenuButton", ["require", "exports",
     let HTMLEMenuButtonElementBase = class HTMLEMenuButtonElementBase extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_8.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_8.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     position: relative;
@@ -2471,7 +2470,7 @@ define("editor/elements/lib/containers/menus/MenuButton", ["require", "exports",
             if (menuSlot) {
                 menuSlot.addEventListener("slotchange", () => {
                     const menuElem = menuSlot.assignedElements()[0];
-                    if (HTMLElement_8.isTagElement("e-menu", menuElem)) {
+                    if ((0, HTMLElement_8.isTagElement)("e-menu", menuElem)) {
                         this.childMenu = menuElem;
                     }
                 });
@@ -2479,11 +2478,11 @@ define("editor/elements/lib/containers/menus/MenuButton", ["require", "exports",
         }
     };
     HTMLEMenuButtonElementBase = __decorate([
-        HTMLElement_8.RegisterCustomHTMLElement({
+        (0, HTMLElement_8.RegisterCustomHTMLElement)({
             name: "e-menubutton",
             observedAttributes: ["icon", "label", "checked"]
         }),
-        HTMLElement_8.GenerateAttributeAccessors([
+        (0, HTMLElement_8.GenerateAttributeAccessors)([
             { name: "name", type: "string" },
             { name: "active", type: "boolean" },
             { name: "label", type: "string" },
@@ -2504,7 +2503,7 @@ define("editor/elements/lib/containers/tabs/TabPanel", ["require", "exports", "e
     let BaseHTMLETabPanelElement = class BaseHTMLETabPanelElement extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_9.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_9.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     display: block;
@@ -2522,10 +2521,10 @@ define("editor/elements/lib/containers/tabs/TabPanel", ["require", "exports", "e
         }
     };
     BaseHTMLETabPanelElement = __decorate([
-        HTMLElement_9.RegisterCustomHTMLElement({
+        (0, HTMLElement_9.RegisterCustomHTMLElement)({
             name: "e-tabpanel"
         }),
-        HTMLElement_9.GenerateAttributeAccessors([
+        (0, HTMLElement_9.GenerateAttributeAccessors)([
             { name: "name", type: "string" }
         ])
     ], BaseHTMLETabPanelElement);
@@ -2538,7 +2537,7 @@ define("editor/elements/lib/containers/tabs/Tab", ["require", "exports", "editor
     let BaseHTMLETabElement = class BaseHTMLETabElement extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_10.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_10.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     display: block;
@@ -2569,7 +2568,7 @@ define("editor/elements/lib/containers/tabs/Tab", ["require", "exports", "editor
         connectedCallback() {
             this.tabIndex = this.tabIndex;
             let panel = document.getElementById(this.controls);
-            if (HTMLElement_10.isTagElement("e-tabpanel", panel)) {
+            if ((0, HTMLElement_10.isTagElement)("e-tabpanel", panel)) {
                 this.panel = panel;
                 this.panel.hidden = !this.active;
             }
@@ -2579,7 +2578,7 @@ define("editor/elements/lib/containers/tabs/Tab", ["require", "exports", "editor
                 case "controls":
                     if (oldValue !== newValue) {
                         let panel = document.getElementById(this.controls);
-                        if (TabPanel_1.isHTMLETabPanelElement(panel)) {
+                        if ((0, TabPanel_1.isHTMLETabPanelElement)(panel)) {
                             this.panel = panel;
                         }
                     }
@@ -2596,11 +2595,11 @@ define("editor/elements/lib/containers/tabs/Tab", ["require", "exports", "editor
         }
     };
     BaseHTMLETabElement = __decorate([
-        HTMLElement_10.RegisterCustomHTMLElement({
+        (0, HTMLElement_10.RegisterCustomHTMLElement)({
             name: "e-tab",
             observedAttributes: ["active", "controls"]
         }),
-        HTMLElement_10.GenerateAttributeAccessors([
+        (0, HTMLElement_10.GenerateAttributeAccessors)([
             { name: "name", type: "string" },
             { name: "active", type: "boolean" },
             { name: "disabled", type: "boolean" },
@@ -2616,7 +2615,7 @@ define("editor/elements/lib/containers/tabs/TabList", ["require", "exports", "ed
     let BaseHTMLETabListElement = class BaseHTMLETabListElement extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_11.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_11.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     display: block;
@@ -2638,14 +2637,14 @@ define("editor/elements/lib/containers/tabs/TabList", ["require", "exports", "ed
                 slot.addEventListener("slotchange", (event) => {
                     const tabs = event.target
                         .assignedElements()
-                        .filter(tab => HTMLElement_11.isTagElement("e-tab", tab));
+                        .filter(tab => (0, HTMLElement_11.isTagElement)("e-tab", tab));
                     this.tabs = tabs;
                     this._activeIndex = this.tabs.findIndex(tab => tab.active);
                 });
             }
             this.addEventListener("click", (event) => {
                 let target = event.target;
-                if (HTMLElement_11.isTagElement("e-tab", target)) {
+                if ((0, HTMLElement_11.isTagElement)("e-tab", target)) {
                     target.active = true;
                 }
             });
@@ -2670,7 +2669,7 @@ define("editor/elements/lib/containers/tabs/TabList", ["require", "exports", "ed
         }
     };
     BaseHTMLETabListElement = __decorate([
-        HTMLElement_11.RegisterCustomHTMLElement({
+        (0, HTMLElement_11.RegisterCustomHTMLElement)({
             name: "e-tablist"
         })
     ], BaseHTMLETabListElement);
@@ -2682,7 +2681,7 @@ define("editor/elements/lib/controls/draggable/DropzoneInput", ["require", "expo
     let HTMLEDropzoneInputElementBase = class HTMLEDropzoneInputElementBase extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_12.bindShadowRoot(this, /*html*/ `
+            (0, HTMLElement_12.bindShadowRoot)(this, /*html*/ `
             <style>
                 :host {
                     display: block;
@@ -2730,7 +2729,7 @@ define("editor/elements/lib/controls/draggable/DropzoneInput", ["require", "expo
             const dropzoneSlot = (_a = this.shadowRoot) === null || _a === void 0 ? void 0 : _a.querySelector("slot[name='dropzone']");
             if (dropzoneSlot) {
                 dropzoneSlot.addEventListener("slotchange", () => {
-                    const dropzone = dropzoneSlot.assignedElements().filter(elem => HTMLElement_12.isTagElement("e-dropzone", elem));
+                    const dropzone = dropzoneSlot.assignedElements().filter(elem => (0, HTMLElement_12.isTagElement)("e-dropzone", elem));
                     if (dropzone.length > 0) {
                         this.dropzone = dropzone[0];
                     }
@@ -2739,7 +2738,7 @@ define("editor/elements/lib/controls/draggable/DropzoneInput", ["require", "expo
             const inputSlot = (_b = this.shadowRoot) === null || _b === void 0 ? void 0 : _b.querySelector("slot[name='input']");
             if (inputSlot) {
                 inputSlot.addEventListener("slotchange", () => {
-                    const input = inputSlot.assignedElements().filter(elem => HTMLElement_12.isTagElement("input", elem));
+                    const input = inputSlot.assignedElements().filter(elem => (0, HTMLElement_12.isTagElement)("input", elem));
                     if (input.length > 0) {
                         this.input = input[0];
                     }
@@ -2748,7 +2747,7 @@ define("editor/elements/lib/controls/draggable/DropzoneInput", ["require", "expo
         }
     };
     HTMLEDropzoneInputElementBase = __decorate([
-        HTMLElement_12.RegisterCustomHTMLElement({
+        (0, HTMLElement_12.RegisterCustomHTMLElement)({
             name: "e-dropzoneinput"
         })
     ], HTMLEDropzoneInputElementBase);
@@ -2779,10 +2778,10 @@ define("editor/elements/lib/utils/Import", ["require", "exports", "editor/elemen
         }
     };
     HTMLEImportElementBase = __decorate([
-        HTMLElement_13.RegisterCustomHTMLElement({
+        (0, HTMLElement_13.RegisterCustomHTMLElement)({
             name: "e-import"
         }),
-        HTMLElement_13.GenerateAttributeAccessors([
+        (0, HTMLElement_13.GenerateAttributeAccessors)([
             { name: "src", type: "string" }
         ])
     ], HTMLEImportElementBase);
@@ -2795,7 +2794,7 @@ define("editor/elements/lib/utils/Loader", ["require", "exports", "editor/elemen
     let HTMLELoaderElementBase = class HTMLELoaderElementBase extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_14.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_14.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     display: inline-block;
@@ -2909,10 +2908,10 @@ define("editor/elements/lib/utils/Loader", ["require", "exports", "editor/elemen
         }
     };
     HTMLELoaderElementBase = __decorate([
-        HTMLElement_14.RegisterCustomHTMLElement({
+        (0, HTMLElement_14.RegisterCustomHTMLElement)({
             name: "e-loader"
         }),
-        HTMLElement_14.GenerateAttributeAccessors([
+        (0, HTMLElement_14.GenerateAttributeAccessors)([
             { name: "type", type: "string" }
         ])
     ], HTMLELoaderElementBase);
@@ -2925,7 +2924,7 @@ define("editor/elements/lib/utils/WidthSash", ["require", "exports", "editor/ele
     let HTMLEWidthSashElementBase = class HTMLEWidthSashElementBase extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_15.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_15.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     display: block;
@@ -2995,11 +2994,11 @@ define("editor/elements/lib/utils/WidthSash", ["require", "exports", "editor/ele
         }
     };
     HTMLEWidthSashElementBase = __decorate([
-        HTMLElement_15.RegisterCustomHTMLElement({
+        (0, HTMLElement_15.RegisterCustomHTMLElement)({
             name: "e-wsash",
             observedAttributes: ["controls"]
         }),
-        HTMLElement_15.GenerateAttributeAccessors([
+        (0, HTMLElement_15.GenerateAttributeAccessors)([
             { name: "controls", type: "string" },
         ])
     ], HTMLEWidthSashElementBase);
@@ -3012,7 +3011,7 @@ define("editor/elements/lib/utils/HeightSash", ["require", "exports", "editor/el
     let HTMLEHeightSashElementBase = class HTMLEHeightSashElementBase extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_16.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_16.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     display: block;
@@ -3082,11 +3081,11 @@ define("editor/elements/lib/utils/HeightSash", ["require", "exports", "editor/el
         }
     };
     HTMLEHeightSashElementBase = __decorate([
-        HTMLElement_16.RegisterCustomHTMLElement({
+        (0, HTMLElement_16.RegisterCustomHTMLElement)({
             name: "e-hsash",
             observedAttributes: ["controls"]
         }),
-        HTMLElement_16.GenerateAttributeAccessors([
+        (0, HTMLElement_16.GenerateAttributeAccessors)([
             { name: "controls", type: "string" },
         ])
     ], HTMLEHeightSashElementBase);
@@ -3101,7 +3100,7 @@ define("editor/elements/lib/containers/treeview/TreeViewItem", ["require", "expo
             super();
             let collapseArrowUrl = JSON.stringify("../assets/editor/icons/chevron_right_black_18dp.svg");
             let expandArrowUrl = JSON.stringify("../assets/editor/icons/expand_more_black_18dp.svg");
-            HTMLElement_17.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_17.bindShadowRoot)(this, /*template*/ `
             <link rel="preload" href=${collapseArrowUrl} as="image" crossorigin>
             <link rel="preload" href=${expandArrowUrl} as="image" crossorigin>
             <style>
@@ -3222,7 +3221,7 @@ define("editor/elements/lib/containers/treeview/TreeViewItem", ["require", "expo
             if (slot) {
                 slot.addEventListener("slotchange", () => {
                     const items = slot.assignedElements()
-                        .filter(item => HTMLElement_17.isTagElement("e-treeviewitem", item));
+                        .filter(item => (0, HTMLElement_17.isTagElement)("e-treeviewitem", item));
                     this.items = items;
                     this.items.forEach((item) => {
                         item.parent = this;
@@ -3280,7 +3279,7 @@ define("editor/elements/lib/containers/treeview/TreeViewItem", ["require", "expo
                     let previousItem = this.parent.items[indexOfThis - 1];
                     return previousItem.deepestVisibleChildItem();
                 }
-                return HTMLElement_17.isTagElement("e-treeviewitem", this.parent) ? this.parent : this;
+                return (0, HTMLElement_17.isTagElement)("e-treeviewitem", this.parent) ? this.parent : this;
             }
             return this;
         }
@@ -3298,7 +3297,7 @@ define("editor/elements/lib/containers/treeview/TreeViewItem", ["require", "expo
             return this;
         }
         nearestParentItem() {
-            if (HTMLElement_17.isTagElement("e-treeviewitem", this.parent)) {
+            if ((0, HTMLElement_17.isTagElement)("e-treeviewitem", this.parent)) {
                 let indexOfThis = this.parent.items.indexOf(this);
                 if (indexOfThis === this.parent.items.length - 1) {
                     return this.parent.nearestParentItem();
@@ -3315,11 +3314,11 @@ define("editor/elements/lib/containers/treeview/TreeViewItem", ["require", "expo
         }
     };
     HTMLETreeViewItemElementBase = __decorate([
-        HTMLElement_17.RegisterCustomHTMLElement({
+        (0, HTMLElement_17.RegisterCustomHTMLElement)({
             name: "e-treeviewitem",
             observedAttributes: ["icon", "label", "expanded", "indent"]
         }),
-        HTMLElement_17.GenerateAttributeAccessors([
+        (0, HTMLElement_17.GenerateAttributeAccessors)([
             { name: "name", type: "string" },
             { name: "label", type: "string" },
             { name: "icon", type: "string" },
@@ -3338,7 +3337,7 @@ define("editor/elements/lib/containers/treeview/TreeViewList", ["require", "expo
     let HTMLETreeViewListElementBase = class HTMLETreeViewListElementBase extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_18.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_18.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     display: block;
@@ -3370,7 +3369,7 @@ define("editor/elements/lib/containers/treeview/TreeViewList", ["require", "expo
             if (slot) {
                 slot.addEventListener("slotchange", () => {
                     const items = slot.assignedElements()
-                        .filter(item => HTMLElement_18.isTagElement("e-treeviewitem", item));
+                        .filter(item => (0, HTMLElement_18.isTagElement)("e-treeviewitem", item));
                     this.items = items;
                     items.forEach((item) => {
                         item.parent = this;
@@ -3386,7 +3385,7 @@ define("editor/elements/lib/containers/treeview/TreeViewList", ["require", "expo
                                 this.activeItem.toggle();
                             }
                             else {
-                                if (HTMLElement_18.isTagElement("e-treeviewitem", this.activeItem.parent)) {
+                                if ((0, HTMLElement_18.isTagElement)("e-treeviewitem", this.activeItem.parent)) {
                                     this.activeItem.parent.focus();
                                 }
                             }
@@ -3452,7 +3451,7 @@ define("editor/elements/lib/containers/treeview/TreeViewList", ["require", "expo
             });
             this.addEventListener("mousedown", (event) => {
                 let target = event.target;
-                if (HTMLElement_18.isTagElement("e-treeviewitem", target)) {
+                if ((0, HTMLElement_18.isTagElement)("e-treeviewitem", target)) {
                     target.trigger();
                 }
             });
@@ -3461,7 +3460,7 @@ define("editor/elements/lib/containers/treeview/TreeViewList", ["require", "expo
                 if (!this.active) {
                     this.active = true;
                 }
-                if (HTMLElement_18.isTagElement("e-treeviewitem", target)) {
+                if ((0, HTMLElement_18.isTagElement)("e-treeviewitem", target)) {
                     if (this._activeItem) {
                         this._activeItem.active = false;
                     }
@@ -3478,10 +3477,10 @@ define("editor/elements/lib/containers/treeview/TreeViewList", ["require", "expo
         }
     };
     HTMLETreeViewListElementBase = __decorate([
-        HTMLElement_18.RegisterCustomHTMLElement({
+        (0, HTMLElement_18.RegisterCustomHTMLElement)({
             name: "e-treeviewlist"
         }),
-        HTMLElement_18.GenerateAttributeAccessors([
+        (0, HTMLElement_18.GenerateAttributeAccessors)([
             { name: "active", type: "boolean" },
             { name: "name", type: "string" }
         ])
@@ -3496,7 +3495,7 @@ define("editor/elements/lib/controls/breadcrumb/BreadcrumbItem", ["require", "ex
         constructor() {
             super();
             let separatorArrowUrl = JSON.stringify("../assets/editor/icons/chevron_right_black_18dp.svg");
-            HTMLElement_19.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_19.bindShadowRoot)(this, /*template*/ `
             <link rel="preload" href=${separatorArrowUrl} as="image" crossorigin>
             <style>
                 :host {
@@ -3559,11 +3558,11 @@ define("editor/elements/lib/controls/breadcrumb/BreadcrumbItem", ["require", "ex
         }
     };
     HTMLEBreadcrumbItemElementBase = __decorate([
-        HTMLElement_19.RegisterCustomHTMLElement({
+        (0, HTMLElement_19.RegisterCustomHTMLElement)({
             name: "e-breadcrumbitem",
             observedAttributes: ["label"]
         }),
-        HTMLElement_19.GenerateAttributeAccessors([
+        (0, HTMLElement_19.GenerateAttributeAccessors)([
             { name: "label", type: "string" },
             { name: "active", type: "boolean" }
         ])
@@ -3577,7 +3576,7 @@ define("editor/elements/lib/controls/breadcrumb/BreadcrumbTrail", ["require", "e
     let HTMLEBreadcrumbTrailElementBase = class HTMLEBreadcrumbTrailElementBase extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_20.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_20.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     display: block;
@@ -3613,7 +3612,7 @@ define("editor/elements/lib/controls/breadcrumb/BreadcrumbTrail", ["require", "e
             const slot = (_a = this.shadowRoot) === null || _a === void 0 ? void 0 : _a.querySelector("slot");
             if (slot) {
                 slot.addEventListener("slotchange", () => {
-                    const items = slot.assignedElements().filter(item => HTMLElement_20.isTagElement("e-breadcrumbitem", item));
+                    const items = slot.assignedElements().filter(item => (0, HTMLElement_20.isTagElement)("e-breadcrumbitem", item));
                     this.items = items;
                     items.forEach((item, index) => {
                         item.active = (index === items.length - 1);
@@ -3622,14 +3621,14 @@ define("editor/elements/lib/controls/breadcrumb/BreadcrumbTrail", ["require", "e
             }
             this.addEventListener("mousedown", (event) => {
                 let target = event.target;
-                if (HTMLElement_20.isTagElement("e-breadcrumbitem", target)) {
+                if ((0, HTMLElement_20.isTagElement)("e-breadcrumbitem", target)) {
                     this.activateItem(target);
                 }
             });
         }
     };
     HTMLEBreadcrumbTrailElementBase = __decorate([
-        HTMLElement_20.RegisterCustomHTMLElement({
+        (0, HTMLElement_20.RegisterCustomHTMLElement)({
             name: "e-breadcrumbtrail"
         })
     ], HTMLEBreadcrumbTrailElementBase);
@@ -3671,23 +3670,23 @@ define("editor/elements/view/View", ["require", "exports", "editor/elements/HTML
             return this._model;
         }
         _addReactiveListeners(node) {
-            if (HTMLElement_21.isReactiveParentNode(node) || HTMLElement_21.isReactiveNode(node)) {
+            if ((0, HTMLElement_21.isReactiveParentNode)(node) || (0, HTMLElement_21.isReactiveNode)(node)) {
                 const { _reactModel, _reactEvent, _reactListener } = node._reactAttributes;
                 _reactModel.addEventListener(_reactEvent, _reactListener);
             }
-            if (HTMLElement_21.isParentNode(node)) {
-                Snippets_4.forAllSubtreeNodes(node, (childNode) => {
+            if ((0, HTMLElement_21.isParentNode)(node)) {
+                (0, Snippets_4.forAllSubtreeNodes)(node, (childNode) => {
                     this._addReactiveListeners(childNode);
                 });
             }
         }
         _removeReactiveListeners(node) {
-            if (HTMLElement_21.isReactiveParentNode(node) || HTMLElement_21.isReactiveNode(node)) {
+            if ((0, HTMLElement_21.isReactiveParentNode)(node) || (0, HTMLElement_21.isReactiveNode)(node)) {
                 const { _reactModel, _reactEvent, _reactListener } = node._reactAttributes;
                 _reactModel.removeEventListener(_reactEvent, _reactListener);
             }
-            if (HTMLElement_21.isParentNode(node)) {
-                Snippets_4.forAllSubtreeNodes(node, (childNode) => {
+            if ((0, HTMLElement_21.isParentNode)(node)) {
+                (0, Snippets_4.forAllSubtreeNodes)(node, (childNode) => {
                     this._removeReactiveListeners(childNode);
                 });
             }
@@ -3821,9 +3820,9 @@ define("samples/temp", ["require", "exports", "editor/elements/HTMLElement", "ed
                 }
             ]
         });
-        const FieldFragment = (fieldset, field) => HTMLElement_22.Fragment(HTMLElement_22.Element("div", {
+        const FieldFragment = (fieldset, field) => (0, HTMLElement_22.Fragment)((0, HTMLElement_22.Element)("div", {
             children: [
-                HTMLElement_22.ReactiveNode(HTMLElement_22.Element(/*html*/ "label"), field, (div, property, oldValue, newValue) => {
+                (0, HTMLElement_22.ReactiveNode)((0, HTMLElement_22.Element)(/*html*/ "label"), field, (div, property, oldValue, newValue) => {
                     switch (property) {
                         case "label":
                             if (newValue !== oldValue) {
@@ -3835,9 +3834,9 @@ define("samples/temp", ["require", "exports", "editor/elements/HTMLElement", "ed
                 DropzoneInputFragment(fieldset, field)
             ]
         }));
-        const DropzoneInputFragment = (host, field) => HTMLElement_22.Fragment(HTMLElement_22.Element(/*html*/ "e-dropzoneinput", {
+        const DropzoneInputFragment = (host, field) => (0, HTMLElement_22.Fragment)((0, HTMLElement_22.Element)(/*html*/ "e-dropzoneinput", {
             children: [
-                HTMLElement_22.ReactiveNode(HTMLElement_22.Element("e-dropzone", {
+                (0, HTMLElement_22.ReactiveNode)((0, HTMLElement_22.Element)("e-dropzone", {
                     props: {
                         className: "field__dropzone",
                         slot: "dropzone",
@@ -3892,7 +3891,7 @@ define("samples/temp", ["require", "exports", "editor/elements/HTMLElement", "ed
                             break;
                     }
                 }),
-                HTMLElement_22.Element("input", {
+                (0, HTMLElement_22.Element)("input", {
                     props: {
                         className: "field__input",
                         slot: "input"
@@ -3905,11 +3904,11 @@ define("samples/temp", ["require", "exports", "editor/elements/HTMLElement", "ed
                 super(model);
             }
             render() {
-                return HTMLElement_22.Element("fieldset", {
+                return (0, HTMLElement_22.Element)("fieldset", {
                     props: {
                         className: "statement-fieldset"
                     },
-                    children: HTMLElement_22.ReactiveChildNodes(this.model.fields, (item) => FieldFragment(this.element, item))
+                    children: (0, HTMLElement_22.ReactiveChildNodes)(this.model.fields, (item) => FieldFragment(this.element, item))
                 });
             }
         }
@@ -3918,9 +3917,9 @@ define("samples/temp", ["require", "exports", "editor/elements/HTMLElement", "ed
                 super(model);
             }
             render() {
-                return HTMLElement_22.Element("div", {
+                return (0, HTMLElement_22.Element)("div", {
                     children: [
-                        HTMLElement_22.ReactiveNode(document.createTextNode(`Last execution date : ${this.model.data.datetime}`), this.model, (node, property, oldValue, newValue) => {
+                        (0, HTMLElement_22.ReactiveNode)(document.createTextNode(`Last execution date : ${this.model.data.datetime}`), this.model, (node, property, oldValue, newValue) => {
                             if (property === "datetime") {
                                 node.textContent = `Last execution date : ${newValue}`;
                             }
@@ -3934,8 +3933,8 @@ define("samples/temp", ["require", "exports", "editor/elements/HTMLElement", "ed
                 super(model);
             }
             render() {
-                return HTMLElement_22.Element("e-dragzone", {
-                    children: HTMLElement_22.ReactiveChildNodes(this.model.columns, (item) => HTMLElement_22.Element("e-draggable", {
+                return (0, HTMLElement_22.Element)("e-dragzone", {
+                    children: (0, HTMLElement_22.ReactiveChildNodes)(this.model.columns, (item) => (0, HTMLElement_22.Element)("e-draggable", {
                         props: {
                             textContent: item.data.name
                         }
@@ -3948,11 +3947,11 @@ define("samples/temp", ["require", "exports", "editor/elements/HTMLElement", "ed
                 super(model);
             }
             render() {
-                return HTMLElement_22.ReactiveNode(HTMLElement_22.Element("e-draggable"), this.model, (draggable, property, oldValue, newValue) => {
+                return (0, HTMLElement_22.ReactiveNode)((0, HTMLElement_22.Element)("e-draggable"), this.model, (draggable, property, oldValue, newValue) => {
                     switch (property) {
                         case "label":
                             if (newValue !== oldValue) {
-                                HTMLElement_22.setElementChildren(draggable, HTMLElement_22.parseStringTemplate(this.model.data.label, this.model.fields.items.reduce((obj, item) => ({
+                                (0, HTMLElement_22.setElementChildren)(draggable, (0, HTMLElement_22.parseStringTemplate)(this.model.data.label, this.model.fields.items.reduce((obj, item) => ({
                                     ...obj,
                                     [item.data.name]: DropzoneInputFragment(this.element, item)
                                 }), {})).childNodes);
@@ -4001,7 +4000,7 @@ define("editor/elements/lib/containers/status/StatusItem", ["require", "exports"
         // TODO: Add sync with Promise (icons, etc.)
         constructor() {
             super();
-            HTMLElement_23.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_23.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     position: relative;
@@ -4058,10 +4057,10 @@ define("editor/elements/lib/containers/status/StatusItem", ["require", "exports"
         }
     };
     HTMLEStatusItemElementBase = __decorate([
-        HTMLElement_23.RegisterCustomHTMLElement({
+        (0, HTMLElement_23.RegisterCustomHTMLElement)({
             name: "e-statusitem",
         }),
-        HTMLElement_23.GenerateAttributeAccessors([
+        (0, HTMLElement_23.GenerateAttributeAccessors)([
             { name: "name", type: "string" },
             { name: "icon", type: "string" },
             { name: "type", type: "string" },
@@ -4076,7 +4075,7 @@ define("editor/elements/lib/containers/status/StatusBar", ["require", "exports",
     let HTMLEStatusBarElementBase = class HTMLEStatusBarElementBase extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_24.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_24.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     display: flex;
@@ -4116,7 +4115,7 @@ define("editor/elements/lib/containers/status/StatusBar", ["require", "exports",
             if (slot) {
                 slot.addEventListener("slotchange", (event) => {
                     const items = event.target.assignedElements()
-                        .filter(item => HTMLElement_24.isTagElement("e-statusitem", item));
+                        .filter(item => (0, HTMLElement_24.isTagElement)("e-statusitem", item));
                     this.items = items;
                 }, { once: true });
             }
@@ -4170,10 +4169,10 @@ define("editor/elements/lib/containers/status/StatusBar", ["require", "exports",
         }
     };
     HTMLEStatusBarElementBase = __decorate([
-        HTMLElement_24.RegisterCustomHTMLElement({
+        (0, HTMLElement_24.RegisterCustomHTMLElement)({
             name: "e-statusbar"
         }),
-        HTMLElement_24.GenerateAttributeAccessors([
+        (0, HTMLElement_24.GenerateAttributeAccessors)([
             { name: "name", type: "string" },
             { name: "active", type: "boolean" },
         ])
@@ -4185,8 +4184,8 @@ define("editor/templates/menus/MenuItemGroupTemplate", ["require", "exports", "e
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HTMLEMenuItemGroupTemplate = void 0;
     const HTMLEMenuItemGroupTemplate = (desc) => {
-        const items = desc.items.map((descArgs) => MenuItemTemplate_1.HTMLEMenuItemTemplate(descArgs));
-        return HTMLElement_25.HTMLElementConstructor("e-menuitemgroup", {
+        const items = desc.items.map((descArgs) => (0, MenuItemTemplate_1.HTMLEMenuItemTemplate)(descArgs));
+        return (0, HTMLElement_25.HTMLElementConstructor)("e-menuitemgroup", {
             props: {
                 id: desc.id,
                 className: desc.className,
@@ -4204,13 +4203,13 @@ define("editor/templates/menus/MenuTemplate", ["require", "exports", "editor/ele
     const HTMLEMenuTemplate = (desc) => {
         const items = desc.items.map((itemDesc) => {
             if ("isGroup" in itemDesc) {
-                return MenuItemGroupTemplate_1.HTMLEMenuItemGroupTemplate(itemDesc);
+                return (0, MenuItemGroupTemplate_1.HTMLEMenuItemGroupTemplate)(itemDesc);
             }
             else {
-                return MenuItemTemplate_2.HTMLEMenuItemTemplate(itemDesc);
+                return (0, MenuItemTemplate_2.HTMLEMenuItemTemplate)(itemDesc);
             }
         });
-        return HTMLElement_26.HTMLElementConstructor("e-menu", {
+        return (0, HTMLElement_26.HTMLElementConstructor)("e-menu", {
             props: {
                 id: desc.id,
                 className: desc.className,
@@ -4228,11 +4227,11 @@ define("editor/templates/menus/MenuItemTemplate", ["require", "exports", "editor
     const HTMLEMenuItemTemplate = (desc) => {
         let slotted = [];
         if (desc.menu) {
-            let menu = MenuTemplate_1.HTMLEMenuTemplate(desc.menu);
+            let menu = (0, MenuTemplate_1.HTMLEMenuTemplate)(desc.menu);
             menu.slot = "menu";
             slotted.push(menu);
         }
-        const menuItem = HTMLElement_27.HTMLElementConstructor("e-menuitem", {
+        const menuItem = (0, HTMLElement_27.HTMLElementConstructor)("e-menuitem", {
             props: {
                 id: desc.id,
                 className: desc.className,
@@ -4262,9 +4261,9 @@ define("editor/templates/menus/MenubarTemplate", ["require", "exports", "editor/
     exports.HTMLEMenubarTemplate = void 0;
     const HTMLEMenubarTemplate = (desc) => {
         const items = desc.items.map((itemDesc) => {
-            return MenuItemTemplate_3.HTMLEMenuItemTemplate(itemDesc);
+            return (0, MenuItemTemplate_3.HTMLEMenuItemTemplate)(itemDesc);
         });
-        return HTMLElement_28.HTMLElementConstructor("e-menubar", {
+        return (0, HTMLElement_28.HTMLElementConstructor)("e-menubar", {
             props: {
                 id: desc.id,
                 className: desc.className,
@@ -4333,7 +4332,7 @@ define("editor/Editor", ["require", "exports", "libs/commands/Command", "libs/ev
             });
             document.body.addEventListener("hotkeychange", (event) => {
                 let target = event.target;
-                if (HTMLElement_29.isTagElement("e-menuitem", target)) {
+                if ((0, HTMLElement_29.isTagElement)("e-menuitem", target)) {
                     if (event.detail.oldHotKey) {
                         this.removeHotkeyExec(event.detail.oldHotKey, target.trigger.bind(target));
                     }
@@ -4356,7 +4355,7 @@ define("editor/Editor", ["require", "exports", "libs/commands/Command", "libs/ev
                         fetch("assets/editor/editor.json").then((response) => {
                             if (response.ok) {
                                 response.json().then((json) => {
-                                    const menubar = MenubarTemplate_1.HTMLEMenubarTemplate(json);
+                                    const menubar = (0, MenubarTemplate_1.HTMLEMenubarTemplate)(json);
                                     this.menubar = menubar;
                                     menubarContainer.append(menubar);
                                     resolve();
@@ -4385,11 +4384,11 @@ define("editor/Editor", ["require", "exports", "libs/commands/Command", "libs/ev
             }
         }
         getState(key) {
-            return Snippets_5.getPropertyFromPath(this._state, key);
+            return (0, Snippets_5.getPropertyFromPath)(this._state, key);
         }
         //TODO: Create a listeners object with the same structure as the state object
         setState(key, value) {
-            Snippets_5.setPropertyFromPath(this._state, key, value);
+            (0, Snippets_5.setPropertyFromPath)(this._state, key, value);
             const listenedStates = Array.from(this._stateListeners.keys());
             listenedStates.filter((state) => {
                 return (state.startsWith(key) && (state.charAt(key.length) === "." || state.charAt(key.length) === "")) ||
@@ -4398,8 +4397,8 @@ define("editor/Editor", ["require", "exports", "libs/commands/Command", "libs/ev
                 let stateListeners = this._stateListeners.get(state);
                 if (stateListeners) {
                     let newStateValue = (state.length === key.length) ? value :
-                        (state.length >= key.length) ? Snippets_5.getPropertyFromPath(value, state.substring(key.length + 1)) :
-                            Snippets_5.getPropertyFromPath(this._state, state);
+                        (state.length >= key.length) ? (0, Snippets_5.getPropertyFromPath)(value, state.substring(key.length + 1)) :
+                            (0, Snippets_5.getPropertyFromPath)(this._state, state);
                     stateListeners.forEach((stateListener) => {
                         stateListener(newStateValue);
                     });
@@ -4434,13 +4433,13 @@ define("editor/Editor", ["require", "exports", "libs/commands/Command", "libs/ev
         executeCommand(name, args, opts) {
             const command = this._commands.get(name);
             if (command && command.context === this._context) {
-                if (opts && opts.undo && Command_1.isUndoCommand(command)) {
+                if (opts && opts.undo && (0, Command_1.isUndoCommand)(command)) {
                     command.undo(args);
                     this._redoCommandsCallStack.push({ ...command, args: args });
                 }
                 else {
                     command.exec(args);
-                    if (Command_1.isUndoCommand(command)) {
+                    if ((0, Command_1.isUndoCommand)(command)) {
                         this._undoCommandsCallStack.push({ ...command, args: args });
                     }
                 }
@@ -4449,7 +4448,7 @@ define("editor/Editor", ["require", "exports", "libs/commands/Command", "libs/ev
         undoLastCommand() {
             const lastCommand = this._undoCommandsCallStack.pop();
             if (lastCommand) {
-                if (Command_1.isUndoCommand(lastCommand) && lastCommand.context === this._context) {
+                if ((0, Command_1.isUndoCommand)(lastCommand) && lastCommand.context === this._context) {
                     lastCommand.undo();
                     this._redoCommandsCallStack.push(lastCommand);
                 }
@@ -4460,7 +4459,7 @@ define("editor/Editor", ["require", "exports", "libs/commands/Command", "libs/ev
             if (lastCommand) {
                 if (lastCommand.context === this._context) {
                     lastCommand.exec();
-                    if (Command_1.isUndoCommand(lastCommand)) {
+                    if ((0, Command_1.isUndoCommand)(lastCommand)) {
                         this._undoCommandsCallStack.push(lastCommand);
                     }
                 }
@@ -4865,18 +4864,18 @@ define("samples/Mockup", ["require", "exports", "editor/Editor", "editor/element
             treeviewlist.addEventListener("contextmenu", (event) => {
                 let target = event.target;
                 console.log(target);
-                if (HTMLElement_30.isTagElement("e-treeviewitem", target)) {
-                    let menu = HTMLElement_30.Element("e-menu", {
+                if ((0, HTMLElement_30.isTagElement)("e-treeviewitem", target)) {
+                    let menu = (0, HTMLElement_30.Element)("e-menu", {
                         props: {
                             name: "My menu"
                         },
                         children: [
-                            HTMLElement_30.Element("e-menuitem", {
+                            (0, HTMLElement_30.Element)("e-menuitem", {
                                 props: {
                                     label: "Remove me!"
                                 },
                                 children: [
-                                    HTMLElement_30.Element("span", {
+                                    (0, HTMLElement_30.Element)("span", {
                                         props: {
                                             slot: "label",
                                             className: "menuitem__icon"
@@ -4918,7 +4917,8 @@ define("samples/Mockup", ["require", "exports", "editor/Editor", "editor/element
         //(window as any)["StructuredFormData"] = StructuredFormData;
         function kebabize(str) {
             var _a;
-            return str && ((_a = str.match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)) === null || _a === void 0 ? void 0 : _a.map(x => x.toLowerCase()).join('-')) || "";
+            return str &&
+                ((_a = str.match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)) === null || _a === void 0 ? void 0 : _a.map(x => x.toLowerCase()).join('-')) || "";
         }
         function camelize(str) {
             return str.toLowerCase()
@@ -5058,13 +5058,13 @@ define("samples/Sandbox", ["require", "exports", "editor/elements/HTMLElement", 
             super("input-dropzone");
             this.datatransferEventListener = ((event) => {
                 let target = event.target;
-                if (HTMLElement_31.isTagElement("e-dropzone", target)) {
+                if ((0, HTMLElement_31.isTagElement)("e-dropzone", target)) {
                     this.handlePostdatatransferInputNaming(target);
                 }
             });
         }
         attach(element) {
-            if (HTMLElement_31.isTagElement("e-dropzone", element)) {
+            if ((0, HTMLElement_31.isTagElement)("e-dropzone", element)) {
                 this.handlePostdatatransferInputNaming(element);
             }
             element.addEventListener("datachange", this.datatransferEventListener);
@@ -5095,7 +5095,7 @@ define("samples/Sandbox", ["require", "exports", "editor/elements/HTMLElement", 
             super("toggler-select");
             this.changeEventListener = (event) => {
                 let target = event.target;
-                if (HTMLElement_31.isTagElement("select", target)) {
+                if ((0, HTMLElement_31.isTagElement)("select", target)) {
                     this.handlePostchangeToggle(target);
                 }
             };
@@ -5125,7 +5125,7 @@ define("samples/Sandbox", ["require", "exports", "editor/elements/HTMLElement", 
             super("duplicater-input");
             this.changeEventListener = (event) => {
                 let target = event.target;
-                if (HTMLElement_31.isTagElement("input", target)) {
+                if ((0, HTMLElement_31.isTagElement)("input", target)) {
                     this.handlePostchangeDuplicate(target);
                 }
             };
@@ -5169,7 +5169,7 @@ define("samples/Sandbox", ["require", "exports", "editor/elements/HTMLElement", 
             super("enabler-input");
             this.changeEventListener = (event) => {
                 let target = event.target;
-                if (HTMLElement_31.isTagElement("input", target)) {
+                if ((0, HTMLElement_31.isTagElement)("input", target)) {
                     this.handlePostchangeDuplicate(target);
                 }
             };
@@ -5221,13 +5221,13 @@ define("samples/Sandbox", ["require", "exports", "editor/elements/HTMLElement", 
             element.style.width = `${length * parseFloat(window.getComputedStyle(element).getPropertyValue("font-size")) * 0.60}px`;
         }
         attach(element) {
-            if (HTMLElement_31.isTagElement("input", element)) {
+            if ((0, HTMLElement_31.isTagElement)("input", element)) {
                 element.addEventListener("input", this.onInputEventCallback);
                 DynamicInputMixin.resizeInputElement(element);
             }
         }
         detach(element) {
-            if (HTMLElement_31.isTagElement("input", element)) {
+            if ((0, HTMLElement_31.isTagElement)("input", element)) {
                 element.removeEventListener("input", this.onInputEventCallback);
             }
         }
@@ -5239,7 +5239,7 @@ define("samples/Sandbox", ["require", "exports", "editor/elements/HTMLElement", 
         new DuplicaterInputDataClassMixin(),
         new DynamicInputMixin()
     ];
-    const mainObserver = new MutationObserver(HTMLElement_31.createMutationObserverCallback(attributeMutationMixins));
+    const mainObserver = new MutationObserver((0, HTMLElement_31.createMutationObserverCallback)(attributeMutationMixins));
     mainObserver.observe(document.body, {
         childList: true,
         subtree: true,
@@ -5253,9 +5253,9 @@ define("samples/Sandbox", ["require", "exports", "editor/elements/HTMLElement", 
         // console.log(tree);
         // tree.setItemProperty({row: 0}, "label", "lol");
         // console.log(tree.getItemProperty({row: 0}, "label"));
-        await Mockup_1.mockup();
+        await (0, Mockup_1.mockup)();
         //await start();
-        temp_1.temp();
+        (0, temp_1.temp)();
         /*editor.registerCommand("test", {
           exec: () => {
             alert("test");
@@ -5284,7 +5284,7 @@ define("boot", ["require", "exports", "samples/Sandbox"], function (require, exp
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.boot = void 0;
     async function boot() {
-        await Sandbox_1.sandbox();
+        await (0, Sandbox_1.sandbox)();
     }
     exports.boot = boot;
 });
@@ -5297,188 +5297,6 @@ define("editor/Application", ["require", "exports", "editor/model/Model"], funct
         }
     }
 });
-/*
-class WebComponent extends HTMLElement {
-    
-    constructor() {
-        super();
-    }
-
-    public connectedCallback(): void {
-
-    }
-
-    public disconnectedCallback(): void {
-
-    }
-
-    public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
-
-    }
-
-    public beforeUpdate() {
-        
-    }
-
-    public update(): void  {
-
-    }
-
-    public afterUpdate() {
-
-    }
-
-    public requestUpdate(): void  {
-
-    }
-
-    public render(): void  {
-
-    }
-}
-
-interface CustomHTMLElementDecorator {
-    (args: {
-        name: string;
-        options?: ElementDefinitionOptions
-    }): <C extends CustomElementConstructor>(elementCtor: C) => C;
-}
-
-const CustomHTMLElement: CustomHTMLElementDecorator = function(args: {
-    name: string;
-    options?: ElementDefinitionOptions
-}) {
-    return <C extends CustomElementConstructor>(
-        elementCtor: C
-    ) => {
-
-        customElements.define(
-            args.name,
-            elementCtor,
-            args.options
-        );
-
-        return elementCtor;
-    }
-}
-
-class HTMLEELement extends HTMLElement {
-
-    constructor() {
-        super();
-        let prototype = (Object.getPrototypeOf(this) as typeof HTMLEELement);
-        this.attachShadow({mode: "open"});
-    }
-
-    connectedCallback() {
-        this.dispatchEvent(new CustomEvent("connected"));
-    }
-
-    disconnectedCallback() {
-        this.dispatchEvent(new CustomEvent("disconnected"));
-    }
-
-    render(): Node {
-        return this.shadowRoot!;
-    }
-}
-
-interface ReactiveDecorator {
-    (args?: {
-        hasChanged?: (oldValue: any, newValue: any) => boolean;
-        type?: "string" | "number" | "boolean" | "array" | "object";
-        reflect?: boolean;
-    }): <E extends HTMLEELement>(elementPrototype: E, propertyKey: string) => void;
-}
-
-const Reactive: ReactiveDecorator = function(args?: {
-    hasChanged?: (oldValue: any, newValue: any) => boolean;
-    type?: "string" | "number" | "boolean" | "array" | "object";
-    reflect?: boolean;
-}) {
-    return <E extends HTMLEELement>(
-        elementPrototype: E, propertyKey: string
-    ) => {
-        if (args) {
-            Object.defineProperty(elementPrototype, propertyKey, {
-                set: function(this: E, value) {
-                    let propertyHasChanged = true;
-                    if (typeof args !== "undefined" && typeof args.hasChanged === "function") {
-                        propertyHasChanged = args.hasChanged((this as {[k: string]: any})[propertyKey], value)
-                    }
-                    else {
-                        propertyHasChanged = ((this as {[k: string]: any})[propertyKey] !== value);
-                    }
-                    (this as {[k: string]: any})[propertyKey] = value;
-                    if (args.reflect) {
-                        switch (args.type) {
-                            case "boolean":
-                                if (value) {
-                                    this.setAttribute(propertyKey, "");
-                                }
-                                else {
-                                    this.removeAttribute(propertyKey);
-                                }
-                                break;
-                            case "number":
-                            case "string":
-                                if (typeof value !== "undefined" && value !== null) {
-                                    this.setAttribute(propertyKey, value);
-                                }
-                                else {
-                                    this.removeAttribute(propertyKey);
-                                }
-                                break;
-                            case "object":
-                            case "array":
-                                if (typeof value !== "undefined" && value !== null) {
-                                    this.setAttribute(propertyKey, JSON.stringify(value));
-                                }
-                                else {
-                                    this.removeAttribute(propertyKey);
-                                }
-                                break;
-                        }
-                    }
-                    if (propertyHasChanged) {
-                        this.update();
-                    }
-                }
-            });
-        }
-    }
-}
-
-let html = function(parts: TemplateStringsArray, ...expr: any[]) {
-    let events: [string, EventListener][] = [];
-    let parsedParts = [];
-    for (let i = 0; i < parts.length; i++) {
-      let part = parts[i];
-      let eventAttribute = /@(.*)=/.exec(part);
-      if (eventAttribute !== null) {
-        if (typeof expr[i] === "function") {
-          events.push([eventAttribute[1], expr[i]]);
-          parsedParts.push(part.substr(0, part.indexOf("@")).trimRight());
-        }
-      }
-      else {
-        parsedParts.push(part);
-      }
-    }
-    const template = document.createElement("template");
-    template.innerHTML = parsedParts.join();
-    const parsedHTML = new DOMParser().parseFromString(parsedParts.join(), "text/html").body.firstChild;
-    if (!parsedHTML) {
-      throw new Error();
-    }
-    if (parsedHTML.nodeType === parsedHTML.ELEMENT_NODE) {
-      events.forEach((event) => {
-        parsedHTML.addEventListener(event[0], event[1]);
-      });
-    }
-    return parsedHTML;
-  }
-*/ 
 define("editor/elements/forms/Snippets", ["require", "exports", "editor/elements/HTMLElement"], function (require, exports, HTMLElement_32) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -5488,7 +5306,7 @@ define("editor/elements/forms/Snippets", ["require", "exports", "editor/elements
         const elements = Array.from(form.elements);
         let state = {};
         elements.forEach((element) => {
-            if (HTMLElement_32.isTagElement("input", element)) {
+            if ((0, HTMLElement_32.isTagElement)("input", element)) {
                 if (element.type === "radio") {
                     if (!(element.name in state)) {
                         state[element.name] = {
@@ -5521,12 +5339,12 @@ define("editor/elements/forms/Snippets", ["require", "exports", "editor/elements
                     };
                 }
             }
-            else if (HTMLElement_32.isTagElement("select", element)) {
+            else if ((0, HTMLElement_32.isTagElement)("select", element)) {
                 state[element.name] = {
                     value: element.value,
                 };
             }
-            else if (HTMLElement_32.isTagElement("textarea", element)) {
+            else if ((0, HTMLElement_32.isTagElement)("textarea", element)) {
                 state[element.name] = {
                     value: element.value,
                 };
@@ -5543,14 +5361,14 @@ define("editor/elements/forms/Snippets", ["require", "exports", "editor/elements
             if ("type" in elemState) {
                 if (elemState.type === "checkbox") {
                     let element = elements.find((elem) => elem.name === name);
-                    if (element && HTMLElement_32.isTagElement("input", element)) {
+                    if (element && (0, HTMLElement_32.isTagElement)("input", element)) {
                         element.checked = elemState.checked;
                     }
                 }
                 else if (elemState.type === "radio") {
                     elemState.nodes.forEach((radioNode) => {
                         let element = elements.find((elem) => elem.name === name && elem.value === radioNode.value);
-                        if (element && HTMLElement_32.isTagElement("input", element)) {
+                        if (element && (0, HTMLElement_32.isTagElement)("input", element)) {
                             element.checked = radioNode.checked;
                         }
                     });
@@ -5558,7 +5376,7 @@ define("editor/elements/forms/Snippets", ["require", "exports", "editor/elements
             }
             else {
                 let element = elements.find((elem) => elem.name === name);
-                if (element && (HTMLElement_32.isTagElement("input", element) || HTMLElement_32.isTagElement("select", element) || HTMLElement_32.isTagElement("textarea", element))) {
+                if (element && ((0, HTMLElement_32.isTagElement)("input", element) || (0, HTMLElement_32.isTagElement)("select", element) || (0, HTMLElement_32.isTagElement)("textarea", element))) {
                     element.value = elemState.value;
                 }
             }
@@ -5590,10 +5408,10 @@ define("editor/elements/forms/StructuredFormData", ["require", "exports", "edito
             let elements = Array.from(this.form.elements);
             let data = {};
             elements.forEach((element) => {
-                if (HTMLElement_33.isTagElement("input", element) || HTMLElement_33.isTagElement("select", element) || HTMLElement_33.isTagElement("textarea", element)) {
+                if ((0, HTMLElement_33.isTagElement)("input", element) || (0, HTMLElement_33.isTagElement)("select", element) || (0, HTMLElement_33.isTagElement)("textarea", element)) {
                     if (element.name) {
                         let value = null;
-                        if (HTMLElement_33.isTagElement("input", element)) {
+                        if ((0, HTMLElement_33.isTagElement)("input", element)) {
                             if (element.value) {
                                 switch (element.type) {
                                     case "text":
@@ -5614,7 +5432,7 @@ define("editor/elements/forms/StructuredFormData", ["require", "exports", "edito
                         }
                         if (value !== null) {
                             let fullname = this.resolveElementScope(element);
-                            Snippets_6.setPropertyFromPath(data, fullname, value);
+                            (0, Snippets_6.setPropertyFromPath)(data, fullname, value);
                         }
                     }
                 }
@@ -5661,13 +5479,13 @@ define("editor/elements/lib/builtins/inputs/NumberInput", ["require", "exports",
         }
     };
     NumberInputElement = __decorate([
-        HTMLElement_34.RegisterCustomHTMLElement({
+        (0, HTMLElement_34.RegisterCustomHTMLElement)({
             name: 'number-input',
             options: {
                 extends: 'input'
             }
         }),
-        HTMLElement_34.GenerateAttributeAccessors([
+        (0, HTMLElement_34.GenerateAttributeAccessors)([
             { name: 'cache' }
         ])
     ], NumberInputElement);
@@ -5680,7 +5498,7 @@ define("editor/elements/lib/containers/panels/Panel", ["require", "exports", "ed
     let PanelElement = class PanelElement extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_35.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_35.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     display: block;
@@ -5756,11 +5574,11 @@ define("editor/elements/lib/containers/panels/Panel", ["require", "exports", "ed
         }
     };
     PanelElement = __decorate([
-        HTMLElement_35.RegisterCustomHTMLElement({
+        (0, HTMLElement_35.RegisterCustomHTMLElement)({
             name: 'e-panel',
             observedAttributes: ['state']
         }),
-        HTMLElement_35.GenerateAttributeAccessors([
+        (0, HTMLElement_35.GenerateAttributeAccessors)([
             { name: 'label', type: 'string' },
             { name: 'state', type: 'string' },
         ])
@@ -5774,7 +5592,7 @@ define("editor/elements/lib/containers/panels/PanelGroup", ["require", "exports"
     let PanelGroupElement = class PanelGroupElement extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_36.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_36.bindShadowRoot)(this, /*template*/ `
             <link rel="stylesheet" href="css/theme.css"/>
             <style>
                 :host {
@@ -5835,10 +5653,10 @@ define("editor/elements/lib/containers/panels/PanelGroup", ["require", "exports"
     };
     PanelGroupElement.observedAttributes = ['state'];
     PanelGroupElement = __decorate([
-        HTMLElement_36.RegisterCustomHTMLElement({
+        (0, HTMLElement_36.RegisterCustomHTMLElement)({
             name: 'e-panel-group'
         }),
-        HTMLElement_36.GenerateAttributeAccessors([
+        (0, HTMLElement_36.GenerateAttributeAccessors)([
             { name: 'label', type: 'string' },
             { name: 'state', type: 'string' },
         ])
@@ -5856,11 +5674,11 @@ define("editor/elements/lib/containers/toolbar/Toolbar", ["require", "exports", 
     let HTMLEMenuBarElement = class HTMLEMenuBarElement extends HTMLElement {
     };
     HTMLEMenuBarElement = __decorate([
-        HTMLElement_37.RegisterCustomHTMLElement({
+        (0, HTMLElement_37.RegisterCustomHTMLElement)({
             name: "e-menubar",
             observedAttributes: ["active"]
         }),
-        HTMLElement_37.GenerateAttributeAccessors([
+        (0, HTMLElement_37.GenerateAttributeAccessors)([
             { name: "name", type: "string" },
             { name: "active", type: "boolean" },
         ])
@@ -5878,11 +5696,11 @@ define("editor/elements/lib/containers/toolbar/ToolbarItem", ["require", "export
     let HTMLEMenuItemElement = class HTMLEMenuItemElement extends HTMLElement {
     };
     HTMLEMenuItemElement = __decorate([
-        HTMLElement_38.RegisterCustomHTMLElement({
+        (0, HTMLElement_38.RegisterCustomHTMLElement)({
             name: "e-menuitem",
             observedAttributes: ["icon", "label", "checked"]
         }),
-        HTMLElement_38.GenerateAttributeAccessors([
+        (0, HTMLElement_38.GenerateAttributeAccessors)([
             { name: "name", type: "string" },
             { name: "label", type: "string" },
             { name: "icon", type: "string" },
@@ -5905,11 +5723,11 @@ define("editor/elements/lib/containers/toolbar/ToolbarItemGroup", ["require", "e
     let HTMLEMenuItemGroupElement = class HTMLEMenuItemGroupElement extends HTMLElement {
     };
     HTMLEMenuItemGroupElement = __decorate([
-        HTMLElement_39.RegisterCustomHTMLElement({
+        (0, HTMLElement_39.RegisterCustomHTMLElement)({
             name: "e-menuitemgroup",
             observedAttributes: ["label", "active"]
         }),
-        HTMLElement_39.GenerateAttributeAccessors([
+        (0, HTMLElement_39.GenerateAttributeAccessors)([
             { name: "active", type: "boolean" },
             { name: "label", type: "string" },
             { name: "type", type: "string" },
@@ -5927,7 +5745,7 @@ define("editor/elements/lib/misc/Palette", ["require", "exports", "editor/elemen
     let PaletteElement = class PaletteElement extends HTMLElement {
         constructor() {
             super();
-            HTMLElement_40.bindShadowRoot(this, /*template*/ `
+            (0, HTMLElement_40.bindShadowRoot)(this, /*template*/ `
             <style>
                 :host {
                     display: block;
@@ -5956,10 +5774,10 @@ define("editor/elements/lib/misc/Palette", ["require", "exports", "editor/elemen
         }
     };
     PaletteElement = __decorate([
-        HTMLElement_40.RegisterCustomHTMLElement({
+        (0, HTMLElement_40.RegisterCustomHTMLElement)({
             name: 'e-palette'
         }),
-        HTMLElement_40.GenerateAttributeAccessors([{ name: 'colors', type: 'json' }])
+        (0, HTMLElement_40.GenerateAttributeAccessors)([{ name: 'colors', type: 'json' }])
     ], PaletteElement);
     exports.PaletteElement = PaletteElement;
 });
@@ -5978,7 +5796,7 @@ define("editor/objects/StructuredFormData", ["require", "exports", "editor/eleme
             keys.forEach((key) => {
                 let value = formData.get(key);
                 if (value) {
-                    Snippets_7.setPropertyFromPath(structuredData, key, JSON.parse(value.toString()));
+                    (0, Snippets_7.setPropertyFromPath)(structuredData, key, JSON.parse(value.toString()));
                 }
             });
             return structuredData;
@@ -5991,13 +5809,13 @@ define("editor/templates/other/DraggableInputTemplate", ["require", "exports", "
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HTMLDraggableInputTemplate = void 0;
     const HTMLDraggableInputTemplate = (desc) => {
-        return HTMLElement_41.HTMLElementConstructor("e-draggable", {
+        return (0, HTMLElement_41.HTMLElementConstructor)("e-draggable", {
             props: {
                 id: desc.id,
                 className: desc.className
             },
             children: [
-                HTMLElement_41.HTMLElementConstructor("input", {
+                (0, HTMLElement_41.HTMLElementConstructor)("input", {
                     props: {
                         name: desc.name,
                         hidden: true
@@ -6013,15 +5831,15 @@ define("editor/templates/table/TableTemplate", ["require", "exports", "editor/el
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HTMLTableTemplate = void 0;
     const HTMLTableTemplate = (desc) => {
-        const thead = HTMLElement_42.HTMLElementConstructor("thead", {
+        const thead = (0, HTMLElement_42.HTMLElementConstructor)("thead", {
             children: [
-                HTMLElement_42.HTMLElementConstructor("tr", {
+                (0, HTMLElement_42.HTMLElementConstructor)("tr", {
                     props: {
                         id: desc.id,
                         className: desc.className,
                     },
                     children: desc.headerCells.map((cell) => {
-                        return HTMLElement_42.HTMLElementConstructor("th", {
+                        return (0, HTMLElement_42.HTMLElementConstructor)("th", {
                             props: {
                                 scope: "col"
                             },
@@ -6033,9 +5851,9 @@ define("editor/templates/table/TableTemplate", ["require", "exports", "editor/el
                 })
             ]
         });
-        const tbody = HTMLElement_42.HTMLElementConstructor("tbody", {
+        const tbody = (0, HTMLElement_42.HTMLElementConstructor)("tbody", {
             children: desc.bodyCells.map((row) => {
-                return HTMLElement_42.HTMLElementConstructor("tr", {
+                return (0, HTMLElement_42.HTMLElementConstructor)("tr", {
                     props: {
                         id: desc.id,
                         className: desc.className,
@@ -6045,13 +5863,13 @@ define("editor/templates/table/TableTemplate", ["require", "exports", "editor/el
                             switch (cell.type) {
                                 case "data":
                                 default:
-                                    return HTMLElement_42.HTMLElementConstructor("td", {
+                                    return (0, HTMLElement_42.HTMLElementConstructor)("td", {
                                         children: [
                                             cell.content
                                         ]
                                     });
                                 case "header":
-                                    return HTMLElement_42.HTMLElementConstructor("th", {
+                                    return (0, HTMLElement_42.HTMLElementConstructor)("th", {
                                         props: {
                                             scope: "row"
                                         },
@@ -6062,7 +5880,7 @@ define("editor/templates/table/TableTemplate", ["require", "exports", "editor/el
                             }
                         }
                         else {
-                            return HTMLElement_42.HTMLElementConstructor("td", {
+                            return (0, HTMLElement_42.HTMLElementConstructor)("td", {
                                 children: [
                                     cell
                                 ]
@@ -6072,9 +5890,9 @@ define("editor/templates/table/TableTemplate", ["require", "exports", "editor/el
                 });
             })
         });
-        const tfoot = HTMLElement_42.HTMLElementConstructor("tfoot", {
+        const tfoot = (0, HTMLElement_42.HTMLElementConstructor)("tfoot", {
             children: [
-                HTMLElement_42.HTMLElementConstructor("tr", {
+                (0, HTMLElement_42.HTMLElementConstructor)("tr", {
                     props: {
                         id: desc.id,
                         className: desc.className,
@@ -6084,13 +5902,13 @@ define("editor/templates/table/TableTemplate", ["require", "exports", "editor/el
                             switch (cell.type) {
                                 case "data":
                                 default:
-                                    return HTMLElement_42.HTMLElementConstructor("td", {
+                                    return (0, HTMLElement_42.HTMLElementConstructor)("td", {
                                         children: [
                                             cell.content
                                         ]
                                     });
                                 case "header":
-                                    return HTMLElement_42.HTMLElementConstructor("th", {
+                                    return (0, HTMLElement_42.HTMLElementConstructor)("th", {
                                         props: {
                                             scope: "row"
                                         },
@@ -6101,7 +5919,7 @@ define("editor/templates/table/TableTemplate", ["require", "exports", "editor/el
                             }
                         }
                         else {
-                            return HTMLElement_42.HTMLElementConstructor("td", {
+                            return (0, HTMLElement_42.HTMLElementConstructor)("td", {
                                 children: [
                                     cell
                                 ]
@@ -6111,7 +5929,7 @@ define("editor/templates/table/TableTemplate", ["require", "exports", "editor/el
                 })
             ]
         });
-        const table = HTMLElement_42.HTMLElementConstructor("table", {
+        const table = (0, HTMLElement_42.HTMLElementConstructor)("table", {
             props: {
                 id: desc.id,
                 className: desc.className,

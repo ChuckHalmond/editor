@@ -1,35 +1,35 @@
-import "editor/elements/lib/containers/menus/Menu";
-import "editor/elements/lib/containers/menus/MenuButton";
-import "editor/elements/lib/containers/menus/MenuBar";
-import "editor/elements/lib/containers/menus/MenuItem";
-import "editor/elements/lib/containers/menus/MenuItemGroup";
-import "editor/elements/lib/containers/tabs/Tab";
-import { HTMLETabElement } from "editor/elements/lib/containers/tabs/Tab";
-import "editor/elements/lib/containers/tabs/TabList";
-import "editor/elements/lib/containers/tabs/TabPanel";
-import "editor/elements/lib/controls/draggable/Draggable";
-import "editor/elements/lib/controls/draggable/Dragzone";
-import "editor/elements/lib/controls/draggable/Dropzone";
-import "editor/elements/lib/controls/draggable/DropzoneInput";
-import "editor/elements/lib/utils/Import";
-import "editor/elements/lib/utils/Loader";
-import "editor/elements/lib/utils/WidthSash";
-import "editor/elements/lib/utils/HeightSash";
-import "editor/elements/lib/containers/treeview/TreeViewList";
-import "editor/elements/lib/containers/treeview/TreeViewItem";
+import "src/editor/elements/lib/containers/menus/Menu";
+import "src/editor/elements/lib/containers/menus/MenuButton";
+import "src/editor/elements/lib/containers/menus/MenuBar";
+import "src/editor/elements/lib/containers/menus/MenuItem";
+import "src/editor/elements/lib/containers/menus/MenuItemGroup";
+import "src/editor/elements/lib/containers/tabs/Tab";
+import { HTMLETabElement } from "src/editor/elements/lib/containers/tabs/Tab";
+import "src/editor/elements/lib/containers/tabs/TabList";
+import "src/editor/elements/lib/containers/tabs/TabPanel";
+import "src/editor/elements/lib/controls/draggable/Draggable";
+import "src/editor/elements/lib/controls/draggable/Dragzone";
+import "src/editor/elements/lib/controls/draggable/Dropzone";
+import "src/editor/elements/lib/controls/draggable/DropzoneInput";
+import "src/editor/elements/lib/utils/Import";
+import "src/editor/elements/lib/utils/Loader";
+import "src/editor/elements/lib/utils/WidthSash";
+import "src/editor/elements/lib/utils/HeightSash";
+import "src/editor/elements/lib/containers/treeview/TreeViewList";
+import "src/editor/elements/lib/containers/treeview/TreeViewItem";
 
-import "editor/elements/lib/controls/breadcrumb/BreadcrumbItem"
-import "editor/elements/lib/controls/breadcrumb/BreadcrumbTrail"
+import "src/editor/elements/lib/controls/breadcrumb/BreadcrumbItem"
+import "src/editor/elements/lib/controls/breadcrumb/BreadcrumbTrail"
 
-import { HTMLEDropzoneElement } from "editor/elements/lib/controls/draggable/Dropzone";
+import { HTMLEDropzoneElement } from "src/editor/elements/lib/controls/draggable/Dropzone";
 import { temp } from "./temp";
-import { HTMLEMenuItemElement } from "editor/elements/lib/containers/menus/MenuItem";
-import { Editor, EditorBase } from "editor/Editor";
-import { Element, isTagElement } from "editor/elements/HTMLElement";
-import { HTMLEMenuElement } from "editor/elements/lib/containers/menus/Menu";
-import { HTMLETreeViewListElement } from "editor/elements/lib/containers/treeview/TreeViewList";
-import { HTMLETreeViewItemElement } from "editor/elements/lib/containers/treeview/TreeViewItem";
-import { HotKey, Key, KeyModifier } from "editor/Input";
+import { HTMLEMenuItemElement } from "src/editor/elements/lib/containers/menus/MenuItem";
+import { Editor, EditorBase } from "src/editor/Editor";
+import { Element, isTagElement } from "src/editor/elements/HTMLElement";
+import { HTMLEMenuElement } from "src/editor/elements/lib/containers/menus/Menu";
+import { HTMLETreeViewListElement } from "src/editor/elements/lib/containers/treeview/TreeViewList";
+import { HTMLETreeViewItemElement } from "src/editor/elements/lib/containers/treeview/TreeViewItem";
+import { HotKey, Key, KeyModifier } from "src/editor/Input";
 
 
 const body = /*template*/`

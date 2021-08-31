@@ -1,4 +1,4 @@
-import { RegisterCustomHTMLElement, bindShadowRoot, GenerateAttributeAccessors } from "editor/elements/HTMLElement";
+import { RegisterCustomHTMLElement, bindShadowRoot, GenerateAttributeAccessors } from "src/editor/elements/HTMLElement";
 
 export { HTMLEDraggableElement };
 export { HTMLEDraggableElementBase };

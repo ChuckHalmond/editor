@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
-        "outFile": "web/dist/index.js",
         "outDir": "web/dist",
+        "outFile": "web/dist/index.js",
         "target": "es2019",
         "experimentalDecorators": true,
         "module": "amd",
@@ -10,10 +10,12 @@
         "strict": true,
         "declaration": true,
         "rootDir": "./src",
-        "baseUrl": "./src",
-        "types": ["web/dist/index.ts.js"]
+        "baseUrl": "./"
     },
     "include": [
         "./src/**/*.ts"
+    ],
+    "exclude": [
+        "./node_modules/"
     ]
 }
