@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "web/dist/index.js",
   "types": "web/dist/index.d.ts",
-  "files": [],
+  "files": [
+    "web/dist/index.js",
+    "web/dist/index.d.ts"
+  ],
   "devDependencies": {
     "typescript": "^4.4.2"
   }
