@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "outDir": "./lib",
+        "outFile": "./lib/index.js",
         "target": "es2019",
         "experimentalDecorators": true,
         "module": "amd",
