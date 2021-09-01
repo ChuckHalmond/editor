@@ -16,7 +16,7 @@
         "composite": true,
         "paths": {
           "@editor/elements": [
-            "./lib/src/elements"
+            "./elements"
           ],
         }
     },
