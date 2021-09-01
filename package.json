@@ -8,7 +8,7 @@
     ],
     "type": "module",
     "exports": {
-        "./elements": "./lib/src/elements/index.js"
+        "./*": "./lib/*"
     },
     "private": true,
     "repository": {
