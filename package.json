@@ -1,8 +1,11 @@
 {
   "name": "editor",
   "version": "1.0.0",
-  "main": "./web/dist/index.js",
-  "types": "./web/dist/index.d.ts",
+  "main": "./lib/boot.js",
+  "types": "./lib/boot.d.ts",
+  "files": [
+    "./lib/**/*"
+  ],
   "devDependencies": {
     "typescript": "^4.4.2"
   }
