@@ -1,5 +1,5 @@
-import { HTMLEMenuItemElement } from "editor/elements/containers/menus/MenuItem";
 import { HTMLEMenuElement } from "./Menu";
+import { HTMLEMenuItemElement } from "./MenuItem";
 export { HTMLEMenuItemGroupElement };
 export { HTMLEMenuItemGroupElementBase };
 interface HTMLEMenuItemGroupElement extends HTMLElement {

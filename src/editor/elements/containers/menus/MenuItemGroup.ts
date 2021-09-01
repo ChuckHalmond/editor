@@ -1,7 +1,8 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, isTagElement, Fragment, bindShadowRoot } from "editor/elements/HTMLElement";
-import { HTMLEMenuItemElement } from "editor/elements/containers/menus/MenuItem";
-import { pointIntersectsWithDOMRect } from "editor/elements/Snippets";
+
+import { pointIntersectsWithDOMRect } from "../../Snippets";
+import { bindShadowRoot, GenerateAttributeAccessors, isTagElement, RegisterCustomHTMLElement } from "../../HTMLElement";
 import { HTMLEMenuElement } from "./Menu";
+import { HTMLEMenuItemElement } from "./MenuItem";
 
 export { HTMLEMenuItemGroupElement };
 export { HTMLEMenuItemGroupElementBase };

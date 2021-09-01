@@ -1,7 +1,8 @@
 
-import { HTMLElementConstructor } from "editor/elements/HTMLElement";
-import { HTMLEMenuBarElement } from "editor/elements/containers/menus/MenuBar";
-import { HTMLEMenuItemTemplate, HTMLEMenuItemTemplateDescription } from "./MenuItemTemplate";
+import { HTMLEMenuBarElement } from "../../elements/containers/menus/MenuBar";
+import { HTMLElementConstructor } from "../../elements/HTMLElement";
+import { HTMLEMenuItemTemplateDescription, HTMLEMenuItemTemplate } from "./MenuItemTemplate";
+
 
 export { HTMLEMenubarTemplateDescription };
 export { HTMLEMenubarTemplate };

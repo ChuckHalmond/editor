@@ -1,4 +1,4 @@
-import { HTMLEMenuBarElement } from "editor/elements/containers/menus/MenuBar";
+import { HTMLEMenuBarElement } from "../../elements/containers/menus/MenuBar";
 import { HTMLEMenuItemTemplateDescription } from "./MenuItemTemplate";
 export { HTMLEMenubarTemplateDescription };
 export { HTMLEMenubarTemplate };

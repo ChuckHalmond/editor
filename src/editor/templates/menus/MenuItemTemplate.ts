@@ -1,6 +1,7 @@
-import { HTMLElementConstructor } from "editor/elements/HTMLElement";
-import { HTMLEMenuItemElement } from "editor/elements/containers/menus/MenuItem";
-import { Key, KeyModifier, HotKey } from "editor/Input";
+
+import { HTMLEMenuItemElement } from "../../elements/containers/menus/MenuItem";
+import { HTMLElementConstructor } from "../../elements/HTMLElement";
+import { Key, KeyModifier, HotKey } from "../../Input";
 import { HTMLEMenuTemplate, HTMLEMenuTemplateDescription } from "./MenuTemplate";
 
 export { HTMLEMenuItemTemplateDescription };

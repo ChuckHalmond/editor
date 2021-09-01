@@ -1,4 +1,4 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "editor/elements/HTMLElement";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "../../HTMLElement";
 import { HotKey } from "editor/Input";
 import { HTMLEMenuElement } from "./Menu";
 import { HTMLEMenuBarElement } from "./MenuBar";
