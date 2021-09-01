@@ -1,8 +1,8 @@
 {
   "name": "editor",
   "version": "1.0.0",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "./web/dist/index.js",
+  "types": "./web/dist/index.d.ts",
   "files": [
     "./web/dist/*"
   ],
