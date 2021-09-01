@@ -1,4 +1,4 @@
-import { ObjectModel, ObjectModelBase } from "./model/Model";
+import { ObjectModel, ObjectModelBase } from "./models/Model";
 
 interface Application {
 

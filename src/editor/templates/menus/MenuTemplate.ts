@@ -1,5 +1,5 @@
 import { HTMLElementConstructor } from "editor/elements/HTMLElement";
-import { HTMLEMenuElement } from "editor/elements/lib/containers/menus/Menu";
+import { HTMLEMenuElement } from "editor/elements/containers/menus/Menu";
 import { HTMLEMenuItemGroupTemplate, HTMLEMenuItemGroupTemplateDescription } from "./MenuItemGroupTemplate";
 import { HTMLEMenuItemTemplate, HTMLEMenuItemTemplateDescription } from "./MenuItemTemplate";
 

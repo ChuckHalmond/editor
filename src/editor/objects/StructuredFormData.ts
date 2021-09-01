@@ -1,3 +1,4 @@
+import { isTagElement } from "../elements/HTMLElement";
 import { setPropertyFromPath } from "../elements/Snippets";
 
 export { StructuredFormData };
@@ -5,48 +6,56 @@ export { StructuredFormData };
 class StructuredFormData {
     form: HTMLFormElement;
 
-    constructor(form: HTMLFormElement) {
+    constructor (form: HTMLFormElement) {
         this.form = form;
     }
 
-    public getStructuredFormData(): {} {
-        let structuredData = {};
+    private resolveElementScope(element: HTMLElement & {name: string}): string {
+        let fullname = element.name;
+        let parent: HTMLElement | null = element.parentElement
+        while (parent && parent !== this.form) {
+            let scope = parent.dataset.scope;
+            if (typeof scope !== "undefined") {
+                fullname = `${scope}.${fullname}`;
+            }
+            parent = parent?.parentElement;
+        }
+        return fullname;
+    }
 
-        let formData = new FormData(this.form);
-        let keys = Array.from(formData.keys());
-        
-        keys.forEach((key) => {
-            let value = formData.get(key);
-            if (value) {
-                setPropertyFromPath(structuredData, key, JSON.parse(value.toString()));
+    public getScopedData(): object {
+        let elements = Array.from(this.form.elements);
+        let data = {};
+        elements.forEach((element) => {
+            if (isTagElement("input", element) || isTagElement("select", element) || isTagElement("textarea", element)) {
+                if (element.name) {
+                    let value: any = null;
+                    if (isTagElement("input", element)) {
+                        if (element.value) {
+                            switch (element.type) {
+                                case "text":
+                                    value = element.value;
+                                    break;
+                                case "date":
+                                case "datetime-local":
+                                    value = element.value;
+                                    break;
+                                case "checkbox":
+                                case "radio":
+                                    value = (element.value == "on");
+                                    break;
+                                default:
+                                    value = element.value;
+                            }
+                        }
+                    }
+                    if (value !== null) {
+                        let fullname = this.resolveElementScope(element);
+                        setPropertyFromPath(data, fullname, value);
+                    }
+                }
             }
         });
-
-        return structuredData;
+        return data;
     }
-
-    /*public setFormElementsNameScope(rootElement: Element, scope: string) {
-        let elements = Array.from(rootElement.querySelectorAll<HTMLElement>("*[name]"));
-        elements.forEach((element) => {
-            let name = element.getAttribute("name");
-            element.setAttribute("data-scope", scope);
-            element.setAttribute("name", `${scope}.${name}`);
-        });
-    }
-
-    public resetFormElementsNameScope(rootElement: Element) {
-        let elements = Array.from(rootElement.querySelectorAll<HTMLElement>("*[data-scope]"));
-        elements.forEach((element) => {
-            let name = element.getAttribute("name");
-            let scope = element.getAttribute("data-scope") + ".";
-            if (name && scope && name.includes(scope)) {
-                element.setAttribute("name", name.substring(name.indexOf(scope)));
-                element.removeAttribute("data-scope");
-            }
-        });
-    }
-
-    public set() {
-        
-    }*/
 }

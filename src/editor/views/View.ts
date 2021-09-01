@@ -1,5 +1,5 @@
-import { isParentNode, isReactiveParentNode, isReactiveNode } from "../HTMLElement";
-import { forAllSubtreeNodes } from "../Snippets";
+import { isParentNode, isReactiveParentNode, isReactiveNode } from "../elements/HTMLElement";
+import { forAllSubtreeNodes } from "../elements/Snippets";
 
 export { ViewBase };
 export { View };

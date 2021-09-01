@@ -1,10 +1,10 @@
 
-import { Command, isUndoCommand } from "./libs/commands/Command";
-import { Event, EventDispatcher } from "./libs/events/EventDispatcher";
+import { Command, isUndoCommand } from "./commands/Command";
+import { Event, EventDispatcher } from "./events/EventDispatcher";
 import { isTagElement } from "./elements/HTMLElement";
-import { HTMLEMenuBarElement } from "./elements/lib/containers/menus/MenuBar";
-import { HotKeyChangeEvent } from "./elements/lib/containers/menus/MenuItem";
-import { HTMLEStatusBarElement } from "./elements/lib/containers/status/StatusBar";
+import { HTMLEMenuBarElement } from "./elements/containers/menus/MenuBar";
+import { HotKeyChangeEvent } from "./elements/containers/menus/MenuItem";
+import { HTMLEStatusBarElement } from "./elements/containers/status/StatusBar";
 import { getPropertyFromPath, setPropertyFromPath } from "./elements/Snippets";
 import { HotKey } from "./Input";
 import { HTMLEMenubarTemplate } from "./templates/menus/MenubarTemplate";
