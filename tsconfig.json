@@ -11,11 +11,13 @@
         "rootDir": "./src",
         "baseUrl": "./",
         "skipLibCheck": true,
+        "paths": {
+            "@editor": [
+              "web/dist"
+            ]
+        }
     },
     "include": [
         "./src/**/*.ts"
-    ],
-    "exclude": [
-        "./node_modules/"
     ]
 }
