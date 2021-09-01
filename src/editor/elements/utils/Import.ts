@@ -1,4 +1,4 @@
-import { GenerateAttributeAccessors, RegisterCustomHTMLElement } from "editor/elements/HTMLElement";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors } from "../HTMLElement";
 
 export { HTMLEImportElement };
 export { HTMLEImportElementBase };

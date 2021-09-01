@@ -1,5 +1,4 @@
-
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "editor/elements/HTMLElement";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "../../HTMLElement";
 import { HTMLEMenuElement } from "./Menu";
 
 export { HTMLEMenuButtonElement };

@@ -1,4 +1,4 @@
-import { HTMLElementConstructor } from "editor/elements/HTMLElement";
+import { HTMLElementConstructor } from "../../elements/HTMLElement";
 
 export { HTMLTableTemplateDescription };
 export { HTMLTableTemplate };

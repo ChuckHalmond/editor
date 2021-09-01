@@ -1,4 +1,4 @@
-import { bindShadowRoot, GenerateAttributeAccessors, RegisterCustomHTMLElement } from "editor/elements/HTMLElement";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
 
 export { PanelElement };
 

@@ -1,4 +1,4 @@
-import { EventDispatcher, Event } from "editor/events/EventDispatcher";
+import { EventDispatcher, Event } from "../events/EventDispatcher";
 
 export { ObjectModelChangeEvent };
 export { ObjectModel };
