@@ -6,10 +6,6 @@
     "files": [
         "lib"
     ],
-    "exports": {
-        ".": "./lib/main.js",
-        "./elements/*": "./lib/src/elements/*.js"
-    },
     "private": true,
     "repository": {
         "type": "git",

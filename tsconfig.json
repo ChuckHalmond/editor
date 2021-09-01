@@ -13,10 +13,11 @@
         "skipLibCheck": true,
         "esModuleInterop" : true,
         "allowSyntheticDefaultImports" : true,
+        "composite": true,
         "paths": {
-            "@": [
-                "src/*"
-            ]
+          "@editor/elements": [
+            "./lib/src/elements"
+          ],
         }
     },
     "exclude": [
