@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outDir": "web/dist",
+        "outDir": "./lib",
         "target": "es2019",
         "experimentalDecorators": true,
         "module": "amd",
@@ -13,7 +13,7 @@
         "skipLibCheck": true,
         "paths": {
             "@editor": [
-              "web/dist"
+              "./lib"
             ]
         }
     },
