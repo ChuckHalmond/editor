@@ -11,11 +11,6 @@
         "rootDir": "./",
         "baseUrl": "./src",
         "skipLibCheck": true,
-        "paths": {
-            "@editor": [
-              "./lib"
-            ]
-        },
         "esModuleInterop" : true,
         "allowSyntheticDefaultImports" : true
     },
