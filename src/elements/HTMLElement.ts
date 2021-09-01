@@ -101,11 +101,13 @@ const RegisterCustomHTMLElement: RegisterCustomHTMLElementDecorator = function(a
             });
         }
 
-        customElements.define(
-            name,
-            elementCtor,
-            options
-        );
+        if (!customElements.get(name)) {
+            customElements.define(
+                name,
+                elementCtor,
+                options
+            );
+        }
 
         return elementCtor;
     }
