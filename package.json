@@ -6,8 +6,9 @@
     "files": [
         "lib"
     ],
+    "type": "module",
     "exports": {
-        "@/elements": "./lib/src/elements/index.js"
+        "./elements": "./lib/src/elements/index.js"
     },
     "private": true,
     "repository": {
