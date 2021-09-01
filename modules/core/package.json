@@ -1,9 +1,0 @@
-{
-    "name": "@editor/core",
-    "version": "1.0.0",
-    "main": "./index.js",
-    "types": "./index.d.ts",
-    "devDependencies": {
-        "typescript": "^4.4.2"
-    }
-}
