@@ -1,6 +1,8 @@
 {
     "name": "editor",
     "version": "1.0.0",
+    "main": "./lib/index.js",
+    "types": "./lib/index.js",
     "private": true,
     "repository": {
         "type": "git",
