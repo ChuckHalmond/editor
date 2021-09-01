@@ -1,1 +1,1 @@
-export * from "src/editor/Input";
+export * from "./editor/Input";
