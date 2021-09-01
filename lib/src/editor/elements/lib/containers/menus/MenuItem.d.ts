@@ -1,4 +1,4 @@
-import { HotKey } from "src/editor/Input";
+import { HotKey } from "editor/Input";
 import { HTMLEMenuElement } from "./Menu";
 import { HTMLEMenuBarElement } from "./MenuBar";
 import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";

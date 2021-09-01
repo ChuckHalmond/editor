@@ -1,5 +1,5 @@
-import { bindShadowRoot, isTagElement, RegisterCustomHTMLElement } from "src/editor/elements/HTMLElement";
-import { HTMLETabElement } from "src/editor/elements/lib/containers/tabs/Tab";
+import { bindShadowRoot, isTagElement, RegisterCustomHTMLElement } from "editor/elements/HTMLElement";
+import { HTMLETabElement } from "editor/elements/lib/containers/tabs/Tab";
 
 export { TabChangeEvent };
 export { HTMLETabListElement };

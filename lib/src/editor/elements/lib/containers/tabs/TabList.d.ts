@@ -1,4 +1,4 @@
-import { HTMLETabElement } from "src/editor/elements/lib/containers/tabs/Tab";
+import { HTMLETabElement } from "editor/elements/lib/containers/tabs/Tab";
 export { TabChangeEvent };
 export { HTMLETabListElement };
 export { BaseHTMLETabListElement };

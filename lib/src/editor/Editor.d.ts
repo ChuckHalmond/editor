@@ -1,5 +1,5 @@
-import { Command } from "src/editor/libs/commands/Command";
-import { Event, EventDispatcher } from "src/editor/libs/events/EventDispatcher";
+import { Command } from "./libs/commands/Command";
+import { Event, EventDispatcher } from "./libs/events/EventDispatcher";
 import { HTMLEMenuBarElement } from "./elements/lib/containers/menus/MenuBar";
 import { HTMLEStatusBarElement } from "./elements/lib/containers/status/StatusBar";
 import { HotKey } from "./Input";

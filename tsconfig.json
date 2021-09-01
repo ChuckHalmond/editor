@@ -9,7 +9,7 @@
         "strict": true,
         "declaration": true,
         "rootDir": "./",
-        "baseUrl": "./",
+        "baseUrl": "./src",
         "skipLibCheck": true,
         "paths": {
             "@editor": [

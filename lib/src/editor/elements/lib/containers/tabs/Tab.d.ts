@@ -1,4 +1,4 @@
-import { HTMLETabPanelElement } from "src/editor/elements/lib/containers/tabs/TabPanel";
+import { HTMLETabPanelElement } from "editor/elements/lib/containers/tabs/TabPanel";
 export { HTMLETabElement };
 export { BaseHTMLETabElement };
 interface HTMLETabElement extends HTMLElement {

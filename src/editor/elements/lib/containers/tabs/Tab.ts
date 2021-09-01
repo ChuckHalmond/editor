@@ -1,5 +1,5 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "src/editor/elements/HTMLElement";
-import { HTMLETabPanelElement, isHTMLETabPanelElement } from "src/editor/elements/lib/containers/tabs/TabPanel";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "editor/elements/HTMLElement";
+import { HTMLETabPanelElement, isHTMLETabPanelElement } from "editor/elements/lib/containers/tabs/TabPanel";
 
 export { HTMLETabElement };
 export { BaseHTMLETabElement };

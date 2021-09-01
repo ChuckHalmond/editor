@@ -1,4 +1,4 @@
-import { RegisterCustomHTMLElement, bindShadowRoot, isTagElement } from "src/editor/elements/HTMLElement";
+import { RegisterCustomHTMLElement, bindShadowRoot, isTagElement } from "editor/elements/HTMLElement";
 import { HTMLEBreadcrumbItemElement } from "./BreadcrumbItem";
 
 export { HTMLEBreadcrumbTrailElement };

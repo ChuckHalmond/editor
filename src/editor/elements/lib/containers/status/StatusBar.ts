@@ -1,4 +1,4 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "src/editor/elements/HTMLElement";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "editor/elements/HTMLElement";
 import { HTMLEStatusItemElement } from "./StatusItem";
 
 export { HTMLEStatusBarElement };
