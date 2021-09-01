@@ -1,4 +1,4 @@
-import { HTMLEMenuItemElement } from "editor/elements/lib/containers/menus/MenuItem";
+import { HTMLEMenuItemElement } from "editor/elements/containers/menus/MenuItem";
 import { Key, KeyModifier } from "editor/Input";
 import { HTMLEMenuTemplateDescription } from "./MenuTemplate";
 export { HTMLEMenuItemTemplateDescription };

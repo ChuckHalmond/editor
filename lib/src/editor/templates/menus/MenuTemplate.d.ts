@@ -1,4 +1,4 @@
-import { HTMLEMenuElement } from "editor/elements/lib/containers/menus/Menu";
+import { HTMLEMenuElement } from "editor/elements/containers/menus/Menu";
 import { HTMLEMenuItemGroupTemplateDescription } from "./MenuItemGroupTemplate";
 import { HTMLEMenuItemTemplateDescription } from "./MenuItemTemplate";
 export { HTMLEMenuTemplateDescription };

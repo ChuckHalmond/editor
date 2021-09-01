@@ -1,7 +1,7 @@
-import { Command } from "./libs/commands/Command";
-import { Event, EventDispatcher } from "./libs/events/EventDispatcher";
-import { HTMLEMenuBarElement } from "./elements/lib/containers/menus/MenuBar";
-import { HTMLEStatusBarElement } from "./elements/lib/containers/status/StatusBar";
+import { Command } from "./commands/Command";
+import { Event, EventDispatcher } from "./events/EventDispatcher";
+import { HTMLEMenuBarElement } from "./elements/containers/menus/MenuBar";
+import { HTMLEStatusBarElement } from "./elements/containers/status/StatusBar";
 import { HotKey } from "./Input";
 export { Editor };
 export { EditorBase };

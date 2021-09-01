@@ -1,4 +1,4 @@
-import { ListModel, ListModelChangeEvent, ObjectModel, ObjectModelChangeEvent } from "../model/Model";
+import { ListModel, ListModelChangeEvent, ObjectModel, ObjectModelChangeEvent } from "../models/Model";
 export { isTagElement };
 export { RegisterCustomHTMLElement };
 export { GenerateAttributeAccessors };
