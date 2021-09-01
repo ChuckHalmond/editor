@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "./lib/boot.js",
   "types": "./lib/boot.d.ts",
-  "files": [
-    "./lib/**/*"
-  ],
+  "exports": {
+    ".": "./lib"
+  },
   "devDependencies": {
     "typescript": "^4.4.2"
   }
