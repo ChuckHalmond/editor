@@ -1,0 +1,6 @@
+{
+    "name": "@editor/core",
+    "main": "./index.js",
+    "types": "./index.d.ts"
+  }
+  

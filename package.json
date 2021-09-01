@@ -1,8 +1,6 @@
 {
   "name": "editor",
   "version": "1.0.0",
-  "main": "./lib/src/modules/index.js",
-  "types": "./lib/src/modules/index.d.ts",
   "files": [
     "lib"
   ],
