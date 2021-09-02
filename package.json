@@ -7,10 +7,6 @@
         "lib"
     ],
     "type": "module",
-    "exports": {
-        ".": "./lib/index.js",
-        "./elements": "./lib/elements/index.js"
-    },
     "private": true,
     "repository": {
         "type": "git",

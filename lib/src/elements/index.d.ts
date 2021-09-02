@@ -1,2 +1,2 @@
-declare const _default: 1;
-export default _default;
+declare const MyVar = 1;
+export { MyVar };
