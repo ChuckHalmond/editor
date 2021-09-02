@@ -6,7 +6,6 @@
     "files": [
         "lib"
     ],
-    "type": "module",
     "private": true,
     "repository": {
         "type": "git",
