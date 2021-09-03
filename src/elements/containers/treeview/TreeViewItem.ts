@@ -187,7 +187,6 @@ class HTMLETreeViewItemElementBase extends HTMLElement implements HTMLETreeViewI
                     item.parent = this;
                     item.indent = this.indent + 1;
                 });
-                this.dataset.empty = (this.items.length > 0) ? "" : void 0;
             });
         }
 

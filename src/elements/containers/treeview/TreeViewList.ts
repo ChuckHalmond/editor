@@ -153,15 +153,16 @@ class HTMLETreeViewListElementBase extends HTMLElement implements HTMLETreeViewL
         });
 
         this.addEventListener("focusin", (event: FocusEvent) => {
-            let target = event.target as any;
+            let target = event.target as Element;
             if (!this.active) {
                 this.active = true;
             }
-            if (isTagElement("e-treeviewitem", target)) {
+            let closestItem = target.closest("e-treeviewitem");
+            if (closestItem && this.contains(closestItem)) {
                 if (this._activeItem) {
                     this._activeItem.active = false;
                 }
-                this._activeItem = target;
+                this._activeItem = closestItem;
                 this._activeItem.active = true;
             }
         });
