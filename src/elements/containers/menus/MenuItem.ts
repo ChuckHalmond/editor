@@ -190,11 +190,13 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                 }
                 
                 :host(:not([type="checkbox"]):not([type="radio"])) [part~="input"] {
-                    display: none;
+                    visibility: hidden;
+                    pointer-events: none;
                 }
                 
                 :host(:not([type="submenu"])) [part~="arrow"] {
                     visibility: hidden;
+                    pointer-events: none;
                 }
             </style>
             <li part="li">
