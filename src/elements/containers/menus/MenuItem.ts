@@ -204,7 +204,6 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                     <input part="input" type="button" tabindex="-1"></input>
                     <span part="label"></span>
                     <span part="hotkey"></span>
-                    <span part="description"></span>
                     <span part="arrow"></span>
                 </span>
                 <slot name="menu"></slot>
