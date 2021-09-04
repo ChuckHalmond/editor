@@ -1,0 +1,25 @@
+<e-menubar tabindex="0">
+    <e-menuitem name="file-menu" type="menu" label="File" tabindex="-1" aria-label="File">
+        <e-menu slot="menu" tabindex="-1">
+                <e-menuitem id="file-import-menu-button" name="file-import-menu-button" type="button" label="Import file"
+                    tabindex="-1" aria-label="Import file"></e-menuitem>
+                <e-menuitem id="file-export-menu-button" name="file-export-menu-button" type="button" label="Export file"
+                tabindex="-1" aria-label="Export file"></e-menuitem>
+        </e-menu>
+    </e-menuitem>
+    <e-menuitem name="view-menu" type="menu" label="Preferences" tabindex="-1" aria-label="Preferences">
+        <e-menu slot="menu" tabindex="-1">
+            <e-menuitem name="view-boolean-menuitem" type="checkbox" label="Advanced User"
+            tabindex="-1" aria-label="Advanced User"></e-menuitem>
+            <e-menuitem name="view-layout-menuitem" type="submenu" label="Layout"
+            tabindex="-1" aria-label="Layout">
+                <e-menu slot="menu" name="view-layout-menu">
+                    <e-menuitemgroup>
+                        <e-menuitem name="view-layout-standard-menuitem" type="radio" label="Standard"
+                        tabindex="-1" aria-label="Standard" checked></e-menuitem>
+                    </e-menuitemgroup>
+                </e-menu>
+            </e-menuitem>
+        </e-menu>
+    </e-menuitem>
+</e-menubar>
