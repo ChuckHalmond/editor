@@ -171,12 +171,12 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                 }
 
                 [part~="arrow"]::after {
-                    position: absolute;
-                    content: "›";
                     display: inline-block;
                     width: 18px;
                     height: 18px;
-                    transform: scale(1.2) translateY(-15%);
+                    position: absolute;
+                    content: "►";
+                    color: dimgray;
                 }
 
                 :host([type="menu"]) [part~="arrow"],

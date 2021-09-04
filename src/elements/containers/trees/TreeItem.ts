@@ -1,10 +1,10 @@
 import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "../../HTMLElement";
-import { HTMLETreeViewListElement } from "./TreeViewList";
+import { HTMLETreeElement } from "./Tree";
 
-export { HTMLETreeViewItemElement };
-export { HTMLETreeViewItemElementBase };
+export { HTMLETreeItemElement };
+export { HTMLETreeItemElementBase };
 
-interface HTMLETreeViewItemElement extends HTMLElement {
+interface HTMLETreeItemElement extends HTMLElement {
     name: string;
     label: string;
     expanded: boolean;
@@ -12,20 +12,20 @@ interface HTMLETreeViewItemElement extends HTMLElement {
     icon: string;
     active: boolean;
 
-    items: HTMLETreeViewItemElement[];
-    parent: HTMLETreeViewItemElement | HTMLETreeViewListElement | null;
+    items: HTMLETreeItemElement[];
+    parent: HTMLETreeItemElement | HTMLETreeElement | null;
 
-    deepestVisibleChildItem(): HTMLETreeViewItemElement;
-    previousVisibleItem(): HTMLETreeViewItemElement;
-    nextVisibleItem(): HTMLETreeViewItemElement;
-    nearestParentItem(): HTMLETreeViewItemElement;
+    deepestVisibleChildItem(): HTMLETreeItemElement;
+    previousVisibleItem(): HTMLETreeItemElement;
+    nextVisibleItem(): HTMLETreeItemElement;
+    nearestParentItem(): HTMLETreeItemElement;
 
     toggle(): void;
     trigger(): void;
 }
 
 @RegisterCustomHTMLElement({
-    name: "e-treeviewitem",
+    name: "e-treeitem",
     observedAttributes: ["icon", "label", "expanded", "indent"]
 })
 @GenerateAttributeAccessors([
@@ -37,7 +37,7 @@ interface HTMLETreeViewItemElement extends HTMLElement {
     {name: "expanded", type: "boolean"},
     {name: "leaf", type: "boolean"}
 ])
-class HTMLETreeViewItemElementBase extends HTMLElement implements HTMLETreeViewItemElement {
+class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemElement {
 
     public name!: string;
     public label!: string;
@@ -48,19 +48,14 @@ class HTMLETreeViewItemElementBase extends HTMLElement implements HTMLETreeViewI
     public active!: boolean;
     public leaf!: boolean;
 
-    public items: HTMLETreeViewItemElement[];
-    public parent: HTMLETreeViewItemElement | HTMLETreeViewListElement | null;
+    public items: HTMLETreeItemElement[];
+    public parent: HTMLETreeItemElement | HTMLETreeElement | null;
     private _toggleArrow: Element;
 
     constructor() {
         super();
 
-        let collapseArrowUrl = JSON.stringify("../assets/editor/icons/chevron_right_black_18dp.svg");
-        let expandArrowUrl = JSON.stringify("../assets/editor/icons/expand_more_black_18dp.svg");
-
         bindShadowRoot(this, /*template*/`
-            <link rel="preload" href=${collapseArrowUrl} as="image" crossorigin>
-            <link rel="preload" href=${expandArrowUrl} as="image" crossorigin>
             <style>
                 :host {
                     display: inline-block;
@@ -72,8 +67,6 @@ class HTMLETreeViewItemElementBase extends HTMLElement implements HTMLETreeViewI
                     cursor: pointer;
 
                     --indent-width: 6px;
-                    --collapsed-arrow-url: url(${collapseArrowUrl});
-                    --expanded-arrow-url: url(${expandArrowUrl});
                 }
                 
                 :host([active]) [part~="content"],
@@ -128,22 +121,19 @@ class HTMLETreeViewItemElementBase extends HTMLElement implements HTMLETreeViewI
                 }
 
                 [part~="toggle_arrow"]::after {
-                    content: "";
                     display: inline-block;
                     width: 18px;
                     height: 18px;
                     position: absolute;
-                    background-color: dimgray;
+                    color: dimgray;
+                }
+
+                :host(:not([expanded])) [part~="toggle_arrow"]::after {
+                    content: "►";
                 }
 
                 :host([expanded]) [part~="toggle_arrow"]::after {
-                    -webkit-mask-image: var(--expanded-arrow-url);
-                    mask-image: var(--expanded-arrow-url);
-                }
-                
-                :host(:not([expanded])) [part~="toggle_arrow"]::after {
-                    -webkit-mask-image: var(--collapsed-arrow-url);
-                    mask-image: var(--collapsed-arrow-url);
+                    content: "▼";
                 }
 
                 [part~="state"] {
@@ -181,7 +171,7 @@ class HTMLETreeViewItemElementBase extends HTMLElement implements HTMLETreeViewI
         if (slot) {
             slot.addEventListener("slotchange", () => {
                 const items = slot.assignedElements()
-                    .filter(item => isTagElement("e-treeviewitem", item)) as HTMLETreeViewItemElement[];
+                    .filter(item => isTagElement("e-treeitem", item)) as HTMLETreeItemElement[];
                 this.items = items;
                 this.items.forEach((item) => {
                     item.parent = this;
@@ -226,7 +216,7 @@ class HTMLETreeViewItemElementBase extends HTMLElement implements HTMLETreeViewI
         }
     }
 
-    public deepestVisibleChildItem(): HTMLETreeViewItemElement {
+    public deepestVisibleChildItem(): HTMLETreeItemElement {
         if (this.expanded && this.items.length > 0) {
             let lastChildItem = this.items[this.items.length - 1];
             return lastChildItem.deepestVisibleChildItem();
@@ -234,19 +224,19 @@ class HTMLETreeViewItemElementBase extends HTMLElement implements HTMLETreeViewI
         return this;
     }
 
-    public previousVisibleItem(): HTMLETreeViewItemElement {
+    public previousVisibleItem(): HTMLETreeItemElement {
         if (this.parent) {
             let indexOfThis = this.parent.items.indexOf(this);
             if (indexOfThis > 0) {
                 let previousItem = this.parent.items[indexOfThis - 1];
                 return previousItem.deepestVisibleChildItem();
             }
-            return isTagElement("e-treeviewitem", this.parent) ? this.parent : this;
+            return isTagElement("e-treeitem", this.parent) ? this.parent : this;
         }
         return this;
     }
 
-    public nextVisibleItem(): HTMLETreeViewItemElement {
+    public nextVisibleItem(): HTMLETreeItemElement {
         if (this.expanded && this.items.length > 0) {
             return this.items[0];
         }
@@ -260,8 +250,8 @@ class HTMLETreeViewItemElementBase extends HTMLElement implements HTMLETreeViewI
         return this;
     }
 
-    public nearestParentItem(): HTMLETreeViewItemElement {
-        if (isTagElement("e-treeviewitem", this.parent)) {
+    public nearestParentItem(): HTMLETreeItemElement {
+        if (isTagElement("e-treeitem", this.parent)) {
             let indexOfThis = this.parent.items.indexOf(this);
             if (indexOfThis === this.parent.items.length - 1) {
                 return this.parent.nearestParentItem();
@@ -282,7 +272,7 @@ class HTMLETreeViewItemElementBase extends HTMLElement implements HTMLETreeViewI
 
 declare global {
     interface HTMLElementTagNameMap {
-        "e-treeviewitem": HTMLETreeViewItemElement,
+        "e-treeitem": HTMLETreeItemElement,
     }
 }
 

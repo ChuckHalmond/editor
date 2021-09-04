@@ -1,30 +1,30 @@
 import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "../../HTMLElement";
-import { HTMLETreeViewItemElement } from "./TreeViewItem";
+import { HTMLETreeItemElement } from "./TreeItem";
 
-export { HTMLETreeViewListElement };
-export { HTMLETreeViewListElementBase };
+export { HTMLETreeElement };
+export { HTMLETreeElementBase };
 
-interface HTMLETreeViewListElement extends HTMLElement {
+interface HTMLETreeElement extends HTMLElement {
     name: string;
-    items: HTMLETreeViewItemElement[];
-    readonly activeItem: HTMLETreeViewItemElement | null;
+    items: HTMLETreeItemElement[];
+    readonly activeItem: HTMLETreeItemElement | null;
 }
 
 @RegisterCustomHTMLElement({
-    name: "e-treeviewlist"
+    name: "e-tree"
 })
 @GenerateAttributeAccessors([
     {name: "active", type: "boolean"},
     {name: "name", type: "string"}
 ])
-class HTMLETreeViewListElementBase extends HTMLElement implements HTMLETreeViewListElement {
+class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
 
     public active!: boolean;
     public name!: string;
     
-    public items: HTMLETreeViewItemElement[];
+    public items: HTMLETreeItemElement[];
 
-    private _activeItem: HTMLETreeViewItemElement | null;
+    private _activeItem: HTMLETreeItemElement | null;
 
     constructor() {
         super();
@@ -52,7 +52,7 @@ class HTMLETreeViewListElementBase extends HTMLElement implements HTMLETreeViewL
         this._activeItem = null;
     }
 
-    public get activeItem(): HTMLETreeViewItemElement | null {
+    public get activeItem(): HTMLETreeItemElement | null {
         return this._activeItem;
     }
 
@@ -63,7 +63,7 @@ class HTMLETreeViewListElementBase extends HTMLElement implements HTMLETreeViewL
         if (slot) {
             slot.addEventListener("slotchange", () => {
                 const items = slot.assignedElements()
-                    .filter(item => isTagElement("e-treeviewitem", item)) as HTMLETreeViewItemElement[];
+                    .filter(item => isTagElement("e-treeitem", item)) as HTMLETreeItemElement[];
                 this.items = items;
                 items.forEach((item) => {
                     item.parent = this;
@@ -80,7 +80,7 @@ class HTMLETreeViewListElementBase extends HTMLElement implements HTMLETreeViewL
                             this.activeItem.toggle();
                         }
                         else {
-                            if (isTagElement("e-treeviewitem", this.activeItem.parent)) {
+                            if (isTagElement("e-treeitem", this.activeItem.parent)) {
                                 this.activeItem.parent.focus();
                             }
                         }
@@ -147,7 +147,7 @@ class HTMLETreeViewListElementBase extends HTMLElement implements HTMLETreeViewL
 
         this.addEventListener("mousedown", (event: MouseEvent) => {
             let target = event.target as any;
-            if (isTagElement("e-treeviewitem", target)) {
+            if (isTagElement("e-treeitem", target)) {
                 target.trigger();
             }
         });
@@ -157,7 +157,7 @@ class HTMLETreeViewListElementBase extends HTMLElement implements HTMLETreeViewL
             if (!this.active) {
                 this.active = true;
             }
-            let closestItem = target.closest("e-treeviewitem");
+            let closestItem = target.closest("e-treeitem");
             if (closestItem && this.contains(closestItem)) {
                 if (this._activeItem) {
                     this._activeItem.active = false;
@@ -178,6 +178,6 @@ class HTMLETreeViewListElementBase extends HTMLElement implements HTMLETreeViewL
 
 declare global {
     interface HTMLElementTagNameMap {
-        "e-treeviewlist": HTMLETreeViewListElement,
+        "e-tree": HTMLETreeElement,
     }
 }
