@@ -14,7 +14,6 @@ interface HTMLEMenuItemElement extends HTMLElement {
     disabled: boolean;
     checked: boolean;
     value: string;
-    icon: string;
     group: HTMLEMenuItemGroupElement | null;
     parentMenu: HTMLEMenuElement | HTMLEMenuBarElement | null;
     childMenu: HTMLEMenuElement | null;
@@ -30,7 +29,6 @@ declare class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuI
     disabled: boolean;
     checked: boolean;
     value: string;
-    icon: string;
     group: HTMLEMenuItemGroupElement | null;
     parentMenu: HTMLEMenuElement | HTMLEMenuBarElement | null;
     childMenu: HTMLEMenuElement | null;

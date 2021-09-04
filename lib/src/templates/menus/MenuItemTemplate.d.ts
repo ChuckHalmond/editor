@@ -5,7 +5,6 @@ export { HTMLEMenuItemTemplateDescription };
 export { HTMLEMenuItemTemplate };
 declare type HTMLEMenuItemTemplateDescription = Pick<HTMLEMenuItemElement, 'name'> & Partial<Pick<HTMLEMenuItemElement, 'id' | 'className' | 'title' | 'type' | 'disabled'>> & {
     label?: string;
-    icon?: string;
     command?: string;
     commandArgs?: any;
     hotkey?: {

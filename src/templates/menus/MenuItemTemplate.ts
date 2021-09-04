@@ -9,7 +9,6 @@ export { HTMLEMenuItemTemplate };
 
 type HTMLEMenuItemTemplateDescription = Pick<HTMLEMenuItemElement, 'name'> & Partial<Pick<HTMLEMenuItemElement, 'id' | 'className' | 'title' | 'type' | 'disabled'>> & {
     label?: string;
-    icon?: string;
     command?: string;
     commandArgs?: any;
     hotkey?: {
@@ -47,7 +46,6 @@ const HTMLEMenuItemTemplate: HTMLEMenuItemTemplate = (desc: HTMLEMenuItemTemplat
                 type: desc.type,
                 label: desc.label,
                 disabled: desc.disabled,
-                icon: desc.icon,
                 value: desc.value,
                 checked: desc.checked,
                 command: desc.command,

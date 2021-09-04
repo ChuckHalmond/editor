@@ -19,7 +19,6 @@ interface HTMLEMenuItemElement extends HTMLElement {
     disabled: boolean;
     checked: boolean;
     value: string;
-    icon: string;
 
     group: HTMLEMenuItemGroupElement | null;
     parentMenu: HTMLEMenuElement | HTMLEMenuBarElement | null;
@@ -34,12 +33,11 @@ interface HTMLEMenuItemElement extends HTMLElement {
 
 @RegisterCustomHTMLElement({
     name: "e-menuitem",
-    observedAttributes: ["icon", "label", "checked", "type"]
+    observedAttributes: ["label", "checked", "type"]
 })
 @GenerateAttributeAccessors([
     {name: "name", type: "string"},
     {name: "label", type: "string"},
-    {name: "icon", type: "string"},
     {name: "type", type: "string"},
     {name: "disabled", type: "boolean"},
     {name: "checked", type: "boolean"},
@@ -52,7 +50,6 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
     public disabled!: boolean;
     public checked!: boolean;
     public value!: string;
-    public icon!: string;
 
     public group: HTMLEMenuItemGroupElement | null;
     public parentMenu: HTMLEMenuElement | HTMLEMenuBarElement | null;
@@ -183,7 +180,6 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                 }
 
                 :host([type="menu"]) [part~="arrow"],
-                :host([type="menu"]) [part~="icon"],
                 :host([type="menu"]) [part~="input"] {
                     display: none;
                 }
@@ -193,14 +189,8 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                     padding-right: 12px;
                 }
                 
-                :host([type="checkbox"]) [part~="icon"],
-                :host([type="radio"]) [part~="icon"],
                 :host(:not([type="checkbox"]):not([type="radio"])) [part~="input"] {
                     display: none;
-                }
-
-                :host([type="submenu"]) [part~="icon"] {
-                    visibility: hidden;
                 }
                 
                 :host(:not([type="submenu"])) [part~="arrow"] {
@@ -209,8 +199,6 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
             </style>
             <li part="li">
                 <span part="content">
-                    <slot name="label"></slot>
-                    <span part="icon"></span>
                     <input part="input" type="button" tabindex="-1"></input>
                     <span part="label"></span>
                     <span part="hotkey"></span>
@@ -275,14 +263,6 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                         const labelPart = this.shadowRoot?.querySelector("[part~=label]");
                         if (labelPart) {
                             labelPart.textContent = newValue;
-                        }
-                    }
-                    break;
-                case "icon":
-                    if (oldValue !== newValue) {
-                        const iconPart = this.shadowRoot?.querySelector<HTMLElement>("[part~=icon]");
-                        if (iconPart) {
-                            iconPart.dataset.value = newValue;
                         }
                     }
                     break;
