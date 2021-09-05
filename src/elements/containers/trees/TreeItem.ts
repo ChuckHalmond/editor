@@ -78,12 +78,6 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                     display: none;
                 }
 
-                [part~="li"] {
-                    display: block;
-                    height: 100%;
-                    list-style-type: none;
-                }
-
                 [part~="content"] {
                     font-size: 1em;
                     display: flex;
@@ -101,7 +95,7 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                 }
 
                 [part~="toggle_arrow"]:hover {
-                    background-color: lightgray;
+                    background-color: whitesmoke;
                 }
 
                 :host([leaf]) [part~="container"],
@@ -126,6 +120,7 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                     height: 18px;
                     position: absolute;
                     color: dimgray;
+                    text-align: center;
                 }
 
                 :host(:not([expanded])) [part~="toggle_arrow"]::after {
@@ -143,19 +138,15 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                 [part~="container"] {
                     display: flex;
                     flex-direction: column;
-                    padding: 0;
-                    margin: 0;
                 }
             </style>
-            <li part="li">
-                <span part="content">
-                    <span part="toggle_arrow"></span>
-                    <slot name="label"><span part="label"></span></slot>
-                </span>
-                <ul part="container">
-                    <slot></slot>
-                </ul>
-            </li>
+            <span part="content">
+                <span part="toggle_arrow"></span>
+                <slot name="label"><span part="label"></span></slot>
+            </span>
+            <div part="container">
+                <slot></slot>
+            </div>
         `);
         this.items = [];
         this.parent = null;

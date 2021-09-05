@@ -14,7 +14,6 @@ interface HTMLEMenuItemGroupElement extends HTMLElement {
     readonly activeItem: HTMLEMenuItemElement | null;
     focusItemAt(index: number, childMenu?: boolean): void;
     reset(): void;
-    focusItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null;
 }
 declare class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItemGroupElement {
@@ -33,7 +32,6 @@ declare class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLE
     attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
     focusItemAt(index: number, childMenu?: boolean): void;
     reset(): void;
-    focusItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null;
 }
 declare global {

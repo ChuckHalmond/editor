@@ -15,7 +15,6 @@ interface HTMLEMenuElement extends HTMLElement {
     readonly activeIndex: number;
     readonly activeItem: HTMLEMenuItemElement | HTMLEMenuItemGroupElement | null;
     focusItemAt(index: number, childMenu?: boolean): void;
-    focusItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): void;
     reset(): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null;
 }
@@ -39,6 +38,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     public items: (HTMLEMenuItemElement | HTMLEMenuItemGroupElement)[];
 
     private _activeIndex: number;
+    private _style: CSSStyleDeclaration | null;
 
     constructor() {
         super();
@@ -46,42 +46,37 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         bindShadowRoot(this, /*template*/`
             <style>
                 :host {
-                    display: block;
-                    position: relative;
+                    display: inline-block;
                     user-select: none;
 
                     padding: 6px 0;
                     background-color: white;
                     cursor: initial;
+                    width: max-content;
 
                     -webkit-box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
                     -moz-box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
                     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
                 }
-                
-                :host(:focus) {
-                    outline: none;
-                }
 
-                [part~="ul"] {
+                [part~="container"] {
                     display: flex;
                     flex-direction: column;
-                    list-style-type: none;
-                    padding: 0; margin: 0;
                 }
 
                 ::slotted(hr) {
                     margin: 6px 0;
                 }
             </style>
-            <ul part="ul">
+            <div part="container">
                 <slot></slot>
-            </ul>
+            </div>
         `);
 
         this.parentItem = null;
         this.items = [];
         this._activeIndex = -1;
+        this._style = null;
     }
 
     public get activeIndex(): number {
@@ -94,6 +89,8 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     
     public connectedCallback() {
         this.tabIndex = this.tabIndex;
+
+        this._style = window.getComputedStyle(this);
         
         const slot = this.shadowRoot?.querySelector("slot");
         if (slot) {
@@ -148,6 +145,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         });
 
         this.addEventListener("focusin", (event: FocusEvent) => {
+            console.log("focusin");
             let target = event.target as any;
             this._activeIndex = this.items.findIndex(
                 (item) => item.contains(target)
@@ -251,14 +249,42 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
             switch (name) {
                 case "expanded":
                     if (newValue != null) {
-                        let thisRect = this.getBoundingClientRect();
-                        let thisIsOverflowing = thisRect.right > document.body.clientWidth;
-                        if (thisIsOverflowing) {
-                            this.overflowing = true;
+                        if (this.parentItem) {
+                            let thisParentRect = this.parentItem.getBoundingClientRect();
+                            let thisRect = this.getBoundingClientRect();
+                            let thisPaddingTop = parseFloat(this._style!.paddingTop);
+                            let thisIsOverflowing = false;
+                            switch (this.parentItem.type) {
+                                case "menu":
+                                    this.style.top = `${thisParentRect.bottom}px`;
+                                    this.style.left = `${thisParentRect.left}px`;
+                                    thisIsOverflowing = (thisParentRect.left + thisRect.width) > document.body.clientWidth;
+                                    break;
+                                case "submenu":
+                                    this.style.top = `${thisParentRect.top - thisPaddingTop}px`;
+                                    this.style.left = `${thisParentRect.right}px`;
+                                    thisIsOverflowing = (thisParentRect.right + thisRect.width) > document.body.clientWidth;
+                                    break;
+                            }
+                            if (thisIsOverflowing) {
+                                this.overflowing = true;
+                                switch (this.parentItem.type) {
+                                    case "menu":
+                                        this.style.left = `${thisParentRect.right - thisRect.width}px`;
+                                        break;
+                                    case "submenu":
+                                        this.style.left = `${thisParentRect.left - thisRect.width}px`;
+                                        break;
+                                }
+                            }
+                            else {
+                                this.overflowing = false;
+                            }
                         }
                     }
                     else {
-                        this.overflowing = false;
+                        this.style.left = "";
+                        this.style.top = "";
                     }
                     break;
             }
@@ -278,13 +304,6 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
             else {
                 item.focusItemAt(0);
             } 
-        }
-    }
-
-    public focusItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): void {
-        let item = this.findItem(predicate, subitems);
-        if (item) {
-            item.focus();
         }
     }
 

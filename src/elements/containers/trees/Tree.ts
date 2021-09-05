@@ -40,13 +40,11 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
                 [part~="container"] {
                     display: flex;
                     flex-direction: column;
-                    padding: 0;
-                    margin: 0;
                 }
             </style>
-            <ul part="container">
+            <div part="container">
                 <slot></slot>
-            </ul>
+            </div>
         `);
         this.items = [];
         this._activeItem = null;

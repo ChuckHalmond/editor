@@ -8,7 +8,6 @@ interface HTMLEMenuBarElement extends HTMLElement {
     readonly activeIndex: number;
     readonly activeItem: HTMLEMenuItemElement | null;
     focusItemAt(index: number, childMenu?: boolean): void;
-    focusItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): void;
     reset(): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): HTMLEMenuItemElement | null;
 }
@@ -22,7 +21,6 @@ declare class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBa
     get activeItem(): HTMLEMenuItemElement | null;
     connectedCallback(): void;
     focusItemAt(index: number, childMenu?: boolean): void;
-    focusItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): void;
     reset(): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): HTMLEMenuItemElement | null;
 }

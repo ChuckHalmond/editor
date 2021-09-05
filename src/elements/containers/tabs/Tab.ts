@@ -40,8 +40,8 @@ class BaseHTMLETabElement extends HTMLElement implements HTMLETabElement {
                     display: block;
                     user-select: none;
                     white-space: nowrap;
-                    padding: 6px;
-                    border-left: 4px solid transparent;
+                    padding: 2px 6px;
+                    border-left: 3px solid transparent;
                     cursor: pointer;
                 }
                 
@@ -51,7 +51,8 @@ class BaseHTMLETabElement extends HTMLElement implements HTMLETabElement {
                 }
 
                 :host([active]) {
-                    border-left: 4px solid black;
+                    border-left: 3px solid dimgray;
+                    background-color: whitesmoke;
                 }
 
                 ::slotted(*) {

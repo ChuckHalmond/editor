@@ -22,7 +22,6 @@ interface HTMLEMenuItemGroupElement extends HTMLElement {
     
     focusItemAt(index: number, childMenu?: boolean): void;
     reset(): void;
-    focusItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null;
 }
 
@@ -56,7 +55,6 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
             <style>
                 :host {
                     display: inline-block;
-                    position: relative;
                     user-select: none;
                 }
 
@@ -64,24 +62,20 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
                     outline: none;
                 }
                 
-                :host(:not([label])) [part~="li"] {
+                :host(:not([label])) [part~="label"] {
                     display: none;
                 }
 
                 [part~="label"] {
-                    position: relative;
-                    display: inline-block;
-                    width: 100%;
-
                     user-select: none;
                     white-space: nowrap;
-
                     padding: 2px 6px 6px 6px;
                     font-weight: bold;
                 }
 
-                [part~="li"] {
-                    list-style-type: none;
+                [part~="container"] {
+                    display: flex;
+                    flex-direction: column;
                 }
 
                 [part~="separator"] {
@@ -93,10 +87,10 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
                 }
             </style>
             <hr part="separator"/>
-            <li part="li">
-                <span part="label"></span>
-            </li>
-            <slot></slot>
+            <span part="label"></span>
+            <div part="container">
+                <slot></slot> 
+            </div>
         `);
 
         this._activeIndex = -1;
@@ -261,13 +255,6 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
         this._activeIndex = -1;
         if (item?.childMenu) {
             item.childMenu.reset();
-        }
-    }
-
-    public focusItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): void {
-        let item = this.findItem(predicate, subitems);
-        if (item) {
-            item.focus();
         }
     }
 

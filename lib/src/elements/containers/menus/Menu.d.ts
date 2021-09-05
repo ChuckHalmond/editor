@@ -11,7 +11,6 @@ interface HTMLEMenuElement extends HTMLElement {
     readonly activeIndex: number;
     readonly activeItem: HTMLEMenuItemElement | HTMLEMenuItemGroupElement | null;
     focusItemAt(index: number, childMenu?: boolean): void;
-    focusItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): void;
     reset(): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null;
 }
@@ -22,13 +21,13 @@ declare class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuEleme
     parentItem: HTMLEMenuItemElement | null;
     items: (HTMLEMenuItemElement | HTMLEMenuItemGroupElement)[];
     private _activeIndex;
+    private _style;
     constructor();
     get activeIndex(): number;
     get activeItem(): HTMLEMenuItemElement | HTMLEMenuItemGroupElement | null;
     connectedCallback(): void;
     attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
     focusItemAt(index: number, childMenu?: boolean): void;
-    focusItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): void;
     reset(): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null;
 }

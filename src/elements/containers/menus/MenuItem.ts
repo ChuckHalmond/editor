@@ -66,7 +66,6 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
         bindShadowRoot(this, /*template*/`
             <style>
                 :host {
-                    position: relative;
                     display: inline-block;
 
                     user-select: none;
@@ -87,34 +86,14 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                 }
 
                 :host([disabled]) {
-                    color: lightgray;
+                    color: dimgray;
                 }
 
                 :host([type="submenu"]) ::slotted([slot="menu"]),
                 :host([type="menu"]) ::slotted([slot="menu"]) {
                     z-index: 1;
-                    position: absolute;
+                    position: fixed;
                     color: initial;
-                }
-
-                :host([type="menu"]) ::slotted([slot="menu"]) {
-                    top: 100%;
-                    left: 0;
-                }
-
-                :host([type="submenu"]) ::slotted([slot="menu"]) {
-                    left: 100%;
-                    top: -6px;
-                }
-                
-                :host([type="submenu"]) ::slotted([slot="menu"][overflowing]) {
-                    right: 100%;
-                    left: auto;
-                }
-                
-                :host([type="menu"]) ::slotted([slot="menu"][overflowing]) {
-                    right: 0;
-                    left: auto;
                 }
 
                 :host([type="menu"]) ::slotted([slot="menu"]:not([expanded])),
@@ -123,9 +102,9 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                     pointer-events: none !important;
                 }
 
-                [part~="li"] {
+                [part~="container"] {
                     display: flex;
-                    list-style-type: none;
+                    flex-direction: row; 
                 }
 
                 [part~="content"] {
@@ -172,6 +151,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
 
                 [part~="arrow"]::after {
                     display: inline-block;
+                    text-align: center;
                     width: 18px;
                     height: 18px;
                     position: absolute;
@@ -199,7 +179,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                     pointer-events: none;
                 }
             </style>
-            <li part="li">
+            <div part="container">
                 <span part="content">
                     <input part="input" type="button" tabindex="-1"></input>
                     <span part="label"></span>
@@ -207,7 +187,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                     <span part="arrow"></span>
                 </span>
                 <slot name="menu"></slot>
-            </li>
+            </div>
         `);
         this.childMenu = null;
         this.parentMenu = null;

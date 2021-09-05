@@ -9,11 +9,16 @@
             body {
                 font-family: consolas;
             }
+
+            /**:focus-visible {
+                outline: none;
+            }*/
         </style>
     </head>
     <body tabindex="0">
         <e-import src="containers/menubar.html"></e-import>
         <e-import src="containers/tree.html"></e-import>
+        <e-import src="containers/tablist.html"></e-import>
         <script src="./dist/main.js"></script>
         <script>
             window.main.main();

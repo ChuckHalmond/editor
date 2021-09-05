@@ -12,7 +12,6 @@ interface HTMLEMenuBarElement extends HTMLElement {
     readonly activeIndex: number;
     readonly activeItem: HTMLEMenuItemElement | null;
     focusItemAt(index: number, childMenu?: boolean): void;
-    focusItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): void;
     reset(): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): HTMLEMenuItemElement | null;
 }
@@ -43,13 +42,11 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
                     user-select: none;
                 }
                 
-                :host(:focus) {
-                    /*outline: 1px solid -webkit-focus-ring-color;*/
+                :host(:focus) ::slotted(:first-child) {
                     color: black;
                     background-color: gainsboro;
                 }
 
-                /*:host(:focus) ::slotted(:first-child),*/
                 :host(:not(:focus-within)) ::slotted(:hover) {
                     color: black;
                     background-color: gainsboro;
@@ -169,13 +166,6 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
             if (childMenu && item.childMenu) {
                 item.childMenu.focus();
             }
-        }
-    }
-
-    public focusItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): void {
-        let item = this.findItem(predicate, subtree);
-        if (item) {
-            item.focus();
         }
     }
 
