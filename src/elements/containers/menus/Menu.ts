@@ -247,7 +247,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         if (newValue !== oldValue) {
             switch (name) {
                 case "expanded":
-                    if (newValue != null) {
+                    if (newValue !== null) {
                         let thisRect = this.getBoundingClientRect();
                         let thisIsOverflowing = thisRect.right > document.body.clientWidth;
                         if (thisIsOverflowing) {
@@ -261,53 +261,6 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
             }
         }
     }
-
-    /*public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
-        if (newValue !== oldValue) {
-            switch (name) {
-                case "expanded":
-                    if (newValue != null) {
-                        if (this.parentItem) {
-                            let thisParentRect = this.parentItem.getBoundingClientRect();
-                            let thisRect = this.getBoundingClientRect();
-                            let thisPaddingTop = parseFloat(this._style!.paddingTop);
-                            let thisIsOverflowing = false;
-                            switch (this.parentItem.type) {
-                                case "menu":
-                                    this.style.top = `${thisParentRect.bottom}px`;
-                                    this.style.left = `${thisParentRect.left}px`;
-                                    thisIsOverflowing = (thisParentRect.left + thisRect.width) > document.body.clientWidth;
-                                    break;
-                                case "submenu":
-                                    this.style.top = `${thisParentRect.top - thisPaddingTop}px`;
-                                    this.style.left = `${thisParentRect.right}px`;
-                                    thisIsOverflowing = (thisParentRect.right + thisRect.width) > document.body.clientWidth;
-                                    break;
-                            }
-                            if (thisIsOverflowing) {
-                                this.overflowing = true;
-                                switch (this.parentItem.type) {
-                                    case "menu":
-                                        this.style.left = `${thisParentRect.right - thisRect.width}px`;
-                                        break;
-                                    case "submenu":
-                                        this.style.left = `${thisParentRect.left - thisRect.width}px`;
-                                        break;
-                                }
-                            }
-                            else {
-                                this.overflowing = false;
-                            }
-                        }
-                    }
-                    else {
-                        this.style.left = "";
-                        this.style.top = "";
-                    }
-                    break;
-            }
-        }
-    }*/
 
     public focusItemAt(index: number, childMenu?: boolean): void {
         let item = this.items[index];

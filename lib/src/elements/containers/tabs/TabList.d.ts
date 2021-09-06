@@ -13,10 +13,12 @@ declare class BaseHTMLETabListElement extends HTMLElement implements HTMLETabLis
     tabs: HTMLETabElement[];
     private _activeIndex;
     constructor();
+    get activeIndex(): number;
     get activeTab(): HTMLETabElement | null;
     connectedCallback(): void;
+    focusTabAt(index: number): void;
     findTab(predicate: (tab: HTMLETabElement) => boolean): HTMLETabElement | null;
-    activateTab(predicate: (tab: HTMLETabElement) => boolean): void;
+    activateTab(tab: HTMLETabElement): void;
 }
 declare global {
     interface HTMLElementTagNameMap {

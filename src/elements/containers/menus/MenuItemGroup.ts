@@ -57,17 +57,12 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
                     display: inline-block;
                     user-select: none;
                 }
-
-                :host(:focus) {
-                    outline: none;
-                }
                 
                 :host(:not([label])) [part~="label"] {
                     display: none;
                 }
 
                 [part~="label"] {
-                    user-select: none;
                     white-space: nowrap;
                     padding: 2px 6px 6px 6px;
                     font-weight: bold;

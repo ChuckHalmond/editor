@@ -48,16 +48,14 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
                     background-color: gainsboro;
                 }
 
-                [part~="ul"] {
+                [part~="container"] {
                     display: flex;
                     flex-direction: row;
-                    list-style-type: none;
-                    padding: 0; margin: 0;
                 }
             </style>
-            <ul part="ul">
+            <div part="container">
                 <slot></slot>
-            </ul>
+            </div>
         `);
 
         this.items = [];
@@ -87,7 +85,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
             });
         }
 
-        this.addEventListener("mouseover", (event: MouseEvent) => {
+        this.addEventListener("mouseover", (event) => {
             let targetIndex = this.items.indexOf(event.target as any);
             if (targetIndex >= 0) {
                 if (this.contains(document.activeElement)) {
@@ -101,7 +99,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
             }
         });
         
-        this.addEventListener("keydown", (event: KeyboardEvent) => {
+        this.addEventListener("keydown", (event) => {
             switch (event.key) {
                 case "ArrowLeft":
                     this.focusItemAt((this.activeIndex <= 0) ? this.items.length - 1 : this.activeIndex - 1);
@@ -134,7 +132,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
             }
         });
 
-        this.addEventListener("mousedown", (event: MouseEvent) => {
+        this.addEventListener("mousedown", (event) => {
             let targetIndex = this.items.indexOf(event.target as any);
             if (targetIndex >= 0) {
                 if (!this.contains(document.activeElement)) {

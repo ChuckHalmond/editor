@@ -39,6 +39,10 @@ class BaseHTMLETabListElement extends HTMLElement implements HTMLETabListElement
         this._activeIndex = 1;
     }
 
+    public get activeIndex(): number {
+        return this._activeIndex;
+    }
+
     public get activeTab(): HTMLETabElement | null {
         return this.tabs[this._activeIndex] || null;
     }
@@ -48,7 +52,7 @@ class BaseHTMLETabListElement extends HTMLElement implements HTMLETabListElement
 
         const slot = this.shadowRoot!.querySelector("slot");
         if (slot) {
-            slot.addEventListener("slotchange", (event: Event) => {
+            slot.addEventListener("slotchange", (event) => {
                 const tabs = (event.target as HTMLSlotElement)
                     .assignedElements()
                     .filter(tab => isTagElement("e-tab", tab)) as HTMLETabElement[];
@@ -56,6 +60,24 @@ class BaseHTMLETabListElement extends HTMLElement implements HTMLETabListElement
                 this._activeIndex = this.tabs.findIndex(tab => tab.active);
             });
         }
+
+        this.addEventListener("keydown", (event) => {
+            switch (event.key) {
+                case "ArrowUp":
+                    this.focusTabAt((this.activeIndex <= 0) ? this.tabs.length - 1 : this.activeIndex - 1);
+                    event.stopPropagation();
+                    break;
+                case "ArrowDown":
+                    this.focusTabAt((this.activeIndex >= this.tabs.length - 1) ? 0 : this.activeIndex + 1);
+                    event.stopPropagation();
+                    break;
+                case "Enter":
+                    if (this.activeTab) {
+                        this.activateTab(this.activeTab);
+                    }
+                    break;
+            }
+        });
         
         this.addEventListener("click", (event) => {
             let target = event.target as any;
@@ -64,7 +86,7 @@ class BaseHTMLETabListElement extends HTMLElement implements HTMLETabListElement
             }
         });
 
-        this.addEventListener("tabchange", (event: TabChangeEvent) => {
+        this.addEventListener("tabchange", (event) => {
             let targetIndex = this.tabs.indexOf(event.detail.tab);
             this._activeIndex = targetIndex;
             this.tabs.forEach((thisTab, thisTabIndex) => {
@@ -75,13 +97,20 @@ class BaseHTMLETabListElement extends HTMLElement implements HTMLETabListElement
         });
     }
 
+    public focusTabAt(index: number): void {
+        let tab = this.tabs[index];
+        if (tab) {
+            this._activeIndex = index;
+            tab.focus();
+        }
+    }
+
     public findTab(predicate: (tab: HTMLETabElement) => boolean): HTMLETabElement | null {
         return this.tabs.find(predicate) || null;
     }
 
-    public activateTab(predicate: (tab: HTMLETabElement) => boolean) {
-        let tab = this.tabs.find(predicate);
-        if (tab) {
+    public activateTab(tab: HTMLETabElement) {
+        if (this.tabs.includes(tab)) {
             tab.active = true;
         }
     }

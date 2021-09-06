@@ -127,13 +127,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                     pointer-events: none !important;
                 }
 
-                [part~="container"] {
-                    display: flex;
-                    flex-direction: row; 
-                }
-
                 [part~="content"] {
-                    font-size: 1em;
                     flex: auto;
                     display: flex;
                     overflow: hidden;
@@ -204,15 +198,13 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                     pointer-events: none;
                 }
             </style>
-            <div part="container">
-                <span part="content">
-                    <input part="input" type="button" tabindex="-1"></input>
-                    <span part="label"></span>
-                    <span part="hotkey"></span>
-                    <span part="arrow"></span>
-                </span>
-                <slot name="menu"></slot>
-            </div>
+            <span part="content">
+                <input part="input" type="button" tabindex="-1"></input>
+                <span part="label"></span>
+                <span part="hotkey"></span>
+                <span part="arrow"></span>
+            </span>
+            <slot name="menu"></slot>
         `);
         this.childMenu = null;
         this.parentMenu = null;
