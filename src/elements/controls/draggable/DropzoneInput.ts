@@ -64,6 +64,7 @@ class HTMLEDropzoneInputElementBase extends HTMLElement implements HTMLEDropzone
             let target = event.target;
             if (target == this.dropzone && this.dropzone && this.input && this.converter) {
                 this.input.value = this.converter(this.dropzone);
+                this.input.dispatchEvent(new CustomEvent("input"));
             }
         });
 
