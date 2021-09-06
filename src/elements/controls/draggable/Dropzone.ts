@@ -363,7 +363,7 @@ class HTMLEDropzoneElementBase extends HTMLElement implements HTMLEDropzoneEleme
             if (dataTransferSuccess) {
                 if (this.multiple) {
                     draggables.forEach((draggable) => {
-                        let newDraggable = draggable.cloneNode(true) as HTMLEDraggableElement;
+                        let newDraggable = draggable.clone();
                         if (position > -1 && position < this.draggables.length) {
                             this.draggables[position].insertAdjacentElement("beforebegin", newDraggable);
                             insertionPosition = (insertionPosition < 0) ? position : insertionPosition;
@@ -376,7 +376,7 @@ class HTMLEDropzoneElementBase extends HTMLElement implements HTMLEDropzoneEleme
                     });
                 }
                 else {
-                    let newDraggable = draggables[0].cloneNode(true) as HTMLEDraggableElement;
+                    let newDraggable = draggables[0].clone();
                     if (this.draggables.length > 0) {
                         this.replaceChild(newDraggable, this.draggables[0]);
                     }

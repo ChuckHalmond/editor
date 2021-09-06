@@ -6,6 +6,7 @@ interface HTMLEDraggableElement extends HTMLElement {
     type: string;
     dragovered: boolean;
     data: string;
+    clone(): HTMLEDraggableElement;
 }
 declare class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableElement {
     selected: boolean;
@@ -16,6 +17,7 @@ declare class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDrag
     data: string;
     constructor();
     connectedCallback(): void;
+    clone(): HTMLEDraggableElement;
 }
 declare global {
     interface HTMLElementTagNameMap {

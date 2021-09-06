@@ -9,6 +9,7 @@ interface HTMLEDraggableElement extends HTMLElement {
     type: string;
     dragovered: boolean;
     data: string;
+    clone(): HTMLEDraggableElement;
 }
 
 @RegisterCustomHTMLElement({
@@ -81,6 +82,12 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
     public connectedCallback() {
         this.tabIndex = this.tabIndex;
         this.draggable = true;
+    }
+
+    public clone(): HTMLEDraggableElement {
+        let clone = this.cloneNode(true) as HTMLEDraggableElement;
+        clone.data = this.data;
+        return clone;
     }
 }
 
