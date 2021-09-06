@@ -107,7 +107,10 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                     flex: none;
                     display: inline-block;
                     width: 18px;
+                    height: 18px;
+                    margin: 1px;
                     margin-right: 4px;
+                    border-radius: 2px;
                 }
 
                 :host([leaf]) [part~="toggle_arrow"] {

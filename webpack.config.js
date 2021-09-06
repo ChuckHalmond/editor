@@ -14,8 +14,7 @@ exports.default = {
   resolve: {
     extensions: [".ts", ".js"],
     modules: [
-        path.join(__dirname, "./"),
-        path.join(__dirname, "./node_modules")
+      path.join(__dirname, "./")
     ]
   },
   output: {
