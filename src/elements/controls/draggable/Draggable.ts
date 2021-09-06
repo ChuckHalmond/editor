@@ -8,8 +8,7 @@ interface HTMLEDraggableElement extends HTMLElement {
     dragged: boolean;
     type: string;
     dragovered: boolean;
-    data: object | null;
-    clone(): HTMLEDraggableElement;
+    data: string;
 }
 
 @RegisterCustomHTMLElement({
@@ -21,6 +20,7 @@ interface HTMLEDraggableElement extends HTMLElement {
     {name: "dragovered", type: "boolean"},
     {name: "disabled", type: "boolean"},
     {name: "type", type: "string"},
+    {name: "data", type: "string"}
 ])
 class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableElement {
     
@@ -30,7 +30,7 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
     public disabled!: boolean;
 
     public type!: string;
-    public data: object | null;
+    public data!: string;
 
     constructor() {
         super();
@@ -76,18 +76,11 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
                 <slot>&nbsp;</slot>
             </div>
         `);
-        this.data = null;
     }
     
     public connectedCallback() {
         this.tabIndex = this.tabIndex;
         this.draggable = true;
-    }
-
-    public clone(): HTMLEDraggableElement {
-        let clone = this.cloneNode(true) as HTMLEDraggableElement;
-        clone.data = this.data;
-        return clone;
     }
 }
 

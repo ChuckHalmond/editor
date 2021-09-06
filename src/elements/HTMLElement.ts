@@ -26,6 +26,7 @@ export { areAttributesMatching };
 export { AttributeMutationMixinBase };
 export { createMutationObserverCallback };
 export { Fragment };
+export { setHTMLElementEventListeners };
 export { parseStringTemplate };
 
 function isTagElement<K extends keyof HTMLElementTagNameMap>(tagName: K, obj: any): obj is HTMLElementTagNameMap[K] {

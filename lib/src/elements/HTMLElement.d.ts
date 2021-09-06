@@ -24,6 +24,7 @@ export { areAttributesMatching };
 export { AttributeMutationMixinBase };
 export { createMutationObserverCallback };
 export { Fragment };
+export { setHTMLElementEventListeners };
 export { parseStringTemplate };
 declare function isTagElement<K extends keyof HTMLElementTagNameMap>(tagName: K, obj: any): obj is HTMLElementTagNameMap[K];
 interface RegisterCustomHTMLElementDecorator {
@@ -109,6 +110,9 @@ interface ReactiveChildNodes {
     (parent: Node & ParentNode): (Node | string)[];
 }
 declare function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string): ReactiveChildNodes;
+declare function setHTMLElementEventListeners<K extends keyof HTMLElementTagNameMap>(element: HTMLElementTagNameMap[K], listeners: {
+    [K in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[K]) => any | [(event: HTMLElementEventMap[K]) => any, Partial<boolean | AddEventListenerOptions>];
+}): HTMLElementTagNameMap[K];
 declare function setElementChildren<E extends Element>(element: E, children: (Node | string)[] | NodeList): E;
 declare function setElementProperties<E extends Element>(element: E, properties?: Partial<Pick<E, WritableKeys<E>>>): E;
 declare function setElementAttributes<E extends Element>(element: E, attributes?: {
