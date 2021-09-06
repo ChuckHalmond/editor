@@ -8,7 +8,7 @@ interface HTMLEDraggableElement extends HTMLElement {
     dragged: boolean;
     type: string;
     dragovered: boolean;
-    data: string;
+    data: object | null;
     clone(): HTMLEDraggableElement;
 }
 
@@ -30,7 +30,7 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
     public disabled!: boolean;
 
     public type!: string;
-    public data: string;
+    public data: object | null;
 
     constructor() {
         super();
@@ -76,7 +76,7 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
                 <slot>&nbsp;</slot>
             </div>
         `);
-        this.data = "";
+        this.data = null;
     }
     
     public connectedCallback() {
