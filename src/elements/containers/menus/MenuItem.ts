@@ -139,7 +139,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                     flex: none;
                     width: 16px;
                     height: 16px;
-                    margin: auto 1px;
+                    margin: 2px;
                 }
 
                 [part~="label"] {

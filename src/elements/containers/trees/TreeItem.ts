@@ -108,8 +108,8 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                     display: inline-block;
                     width: 18px;
                     height: 18px;
-                    margin: 1px;
-                    margin-right: 4px;
+                    margin: 2px;
+                    margin-right: 6px;
                     border-radius: 2px;
                 }
 
