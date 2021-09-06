@@ -145,7 +145,6 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         });
 
         this.addEventListener("focusin", (event: FocusEvent) => {
-            console.log("focusin");
             let target = event.target as any;
             this._activeIndex = this.items.findIndex(
                 (item) => item.contains(target)
@@ -249,6 +248,25 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
             switch (name) {
                 case "expanded":
                     if (newValue != null) {
+                        let thisRect = this.getBoundingClientRect();
+                        let thisIsOverflowing = thisRect.right > document.body.clientWidth;
+                        if (thisIsOverflowing) {
+                            this.overflowing = true;
+                        }
+                    }
+                    else {
+                        this.overflowing = false;
+                    }
+                    break;
+            }
+        }
+    }
+
+    /*public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
+        if (newValue !== oldValue) {
+            switch (name) {
+                case "expanded":
+                    if (newValue != null) {
                         if (this.parentItem) {
                             let thisParentRect = this.parentItem.getBoundingClientRect();
                             let thisRect = this.getBoundingClientRect();
@@ -289,7 +307,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                     break;
             }
         }
-    }
+    }*/
 
     public focusItemAt(index: number, childMenu?: boolean): void {
         let item = this.items[index];

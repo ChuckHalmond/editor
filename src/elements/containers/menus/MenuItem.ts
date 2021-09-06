@@ -75,6 +75,11 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                     cursor: pointer;
                 }
 
+                :host([type="menu"]),
+                :host([type="submenu"]) {
+                    position: relative;
+                }
+
                 :host(:not([type="menu"])) {
                     padding-left: 12px;
                     padding-right: 12px;
@@ -92,8 +97,28 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                 :host([type="submenu"]) ::slotted([slot="menu"]),
                 :host([type="menu"]) ::slotted([slot="menu"]) {
                     z-index: 1;
-                    position: fixed;
+                    position: absolute;
                     color: initial;
+                }
+
+                :host([type="menu"]) ::slotted([slot="menu"]) {
+                    top: 100%;
+                    left: 0;
+                }
+                
+                :host([type="submenu"]) ::slotted([slot="menu"]) {
+                    left: 100%;
+                    top: -6px;
+                }
+                
+                :host([type="submenu"]) ::slotted([slot="menu"][overflowing]) {
+                    right: 100%;
+                    left: auto;
+                }
+                
+                :host([type="menu"]) ::slotted([slot="menu"][overflowing]) {
+                    right: 0;
+                    left: auto;
                 }
 
                 :host([type="menu"]) ::slotted([slot="menu"]:not([expanded])),

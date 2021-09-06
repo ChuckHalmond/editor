@@ -172,7 +172,7 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
         }
 
         this.shadowRoot!.addEventListener("mousedown", (event) => {
-            let target = event.target as any;
+            let target = event.target as Element;
             if (target === this._toggleArrow) {
                 this.toggle();
             }

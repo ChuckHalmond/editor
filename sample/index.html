@@ -10,6 +10,10 @@
                 font-family: consolas;
             }
 
+            *:focus {
+                z-index: 1;
+            }
+
             /**:focus-visible {
                 outline: none;
             }*/
@@ -17,6 +21,7 @@
     </head>
     <body tabindex="0">
         <e-import src="containers/menubar.html"></e-import>
+        <button type="button">Button</button><e-import src="containers/menubutton.html"></e-import>
         <e-import src="containers/tree.html"></e-import>
         <e-import src="containers/tablist.html"></e-import>
         <script src="./dist/main.js"></script>

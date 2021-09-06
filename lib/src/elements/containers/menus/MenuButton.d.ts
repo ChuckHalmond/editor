@@ -5,7 +5,6 @@ interface HTMLEMenuButtonElement extends HTMLElement {
     name: string;
     label: string;
     disabled: boolean;
-    icon: string;
     active: boolean;
     childMenu: HTMLEMenuElement | null;
     trigger(): void;
@@ -14,11 +13,11 @@ declare class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMen
     name: string;
     label: string;
     disabled: boolean;
-    icon: string;
     active: boolean;
     childMenu: HTMLEMenuElement | null;
     constructor();
+    connectedCallback(): void;
+    toggle(): void;
     trigger(): void;
     attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
-    connectedCallback(): void;
 }

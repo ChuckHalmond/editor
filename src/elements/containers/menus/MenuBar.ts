@@ -38,13 +38,9 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
         bindShadowRoot(this, /*template*/`
             <style>
                 :host {
+                    position: relative;
                     display: block;
                     user-select: none;
-                }
-                
-                :host(:focus) ::slotted(:first-child) {
-                    color: black;
-                    background-color: gainsboro;
                 }
 
                 :host(:not(:focus-within)) ::slotted(:hover) {
