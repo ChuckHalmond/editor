@@ -443,3 +443,16 @@ declare global {
         "datachange": DataChangeEvent,
     }
 }
+
+class DropzoneData {
+    private _dropzone: HTMLEDropzoneElement;
+
+    constructor(dropzone: HTMLEDropzoneElement) {
+        this._dropzone = dropzone;    
+    }
+
+    public getData(): object | null {
+        const drozpones = this._dropzone.querySelectorAll("e-dropzone *:not(e-dropzone)");
+        return null;
+    }
+}
