@@ -76,7 +76,6 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
                 <slot>&nbsp;</slot>
             </div>
         `);
-        this.data = null;
     }
     
     public connectedCallback() {
