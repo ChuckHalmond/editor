@@ -154,7 +154,7 @@ const GenerateAttributeAccessors: GenerateAttributeAccessorsDecorator = function
                     Object.defineProperty(elementCtor.prototype, name, {
                         get: function(this: HTMLElement) {
                             const val = this.getAttribute(name);
-                            return (val !== null) ? JSON.parse(val) : void 0;
+                            return (val !== null) ? JSON.parse(val) : null;
                         },
                         set: function(this: HTMLElement, value) {
                             if (value !== null) {

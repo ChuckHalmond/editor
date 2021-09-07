@@ -62,7 +62,7 @@ function setPropertyFromPath(src: object, path: string, value: any): object {
     if (prop.includes("[")) {
       let index = parseInt(prop.substring(prop.indexOf("[") + 1, prop.indexOf("]")));
       if (Number.isNaN(index)) {
-          console.error(`Wrong indexed path: ${prop}`);
+        console.error(`Wrong indexed path: ${prop}`);
       }
       prop = prop.substring(0, prop.indexOf("["));
       if (!Array.isArray(obj[prop])) {
@@ -80,13 +80,13 @@ function setPropertyFromPath(src: object, path: string, value: any): object {
     }
     else {
       if (typeof obj[prop] !== "object") {
-          obj[prop] = {}
+        obj[prop] = {}
       }
       if (idx === lastPropIdx) {
-          obj[prop] = value;
+        obj[prop] = value;
       }
       else {
-          obj = obj[prop];
+        obj = obj[prop];
       }
     }
   });
