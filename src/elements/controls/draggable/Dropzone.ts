@@ -1,4 +1,5 @@
 import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "../../HTMLElement";
+import { setPropertyFromPath } from "../../Snippets";
 import { HTMLEDraggableElement } from "./Draggable";
 import { HTMLEDragzoneElement } from "./Dragzone";
 
@@ -444,7 +445,7 @@ declare global {
     }
 }
 
-class DropzoneData {
+export class DropzoneData {
     private _dropzone: HTMLEDropzoneElement;
 
     constructor(dropzone: HTMLEDropzoneElement) {
@@ -452,7 +453,25 @@ class DropzoneData {
     }
 
     public getData(): object | null {
-        const drozpones = this._dropzone.querySelectorAll("e-dropzone *:not(e-dropzone)");
+        const data = {};
+        const descendantDrozpones = Array.from(this._dropzone.querySelectorAll("e-dropzone"));
+        descendantDrozpones.forEach((descendantDrozpone) => {
+            const dropzonePathName = this._getDescendantDropzoneFullName(descendantDrozpone);
+
+            let descendantDropzoneData =
+                descendantDrozpone.multiple ? descendantDrozpone.draggables.map(draggable => draggable.data) :
+                descendantDrozpone.draggables.length > 0 ? descendantDrozpone.draggables[0].data : null;
+
+            setPropertyFromPath(data, dropzonePathName, descendantDropzoneData);
+        })
         return null;
     }
+
+    private _getDescendantDropzoneFullName(dropzone: HTMLEDropzoneElement): string {
+        if (dropzone === this._dropzone) {
+            return dropzone.name;
+        }
+        const parentDropzone = dropzone.parentElement!.closest("e-dropzone")!;
+        return `${this._getDescendantDropzoneFullName(parentDropzone)}.${dropzone.name}`;
+    };
 }

@@ -55,3 +55,9 @@ declare global {
         "datachange": DataChangeEvent;
     }
 }
+export declare class DropzoneData {
+    private _dropzone;
+    constructor(dropzone: HTMLEDropzoneElement);
+    getData(): object | null;
+    private _getDescendantDropzoneFullName;
+}

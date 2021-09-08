@@ -58,6 +58,9 @@ function setPropertyFromPath(src: object, path: string, value: any): object {
   const props = path.split(".");
   let obj: {[key: string]: any} = src;
   let lastPropIdx = props.length - 1;
+  if (src === null) {
+    console.error("Source data can't be null");
+  }
   props.forEach((prop, idx) => {
     if (prop.includes("[")) {
       let index = parseInt(prop.substring(prop.indexOf("[") + 1, prop.indexOf("]")));
