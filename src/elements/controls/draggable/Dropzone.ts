@@ -6,6 +6,8 @@ import { HTMLEDragzoneElement } from "./Dragzone";
 export { DataChangeEvent };
 export { HTMLEDropzoneElement };
 export { HTMLEDropzoneElementBase };
+export { DropzoneDataBase };
+export { DropzoneData };
 
 interface HTMLEDropzoneElement extends HTMLElement {
     selectedDraggables: HTMLEDraggableElement[]
@@ -445,18 +447,27 @@ declare global {
     }
 }
 
-export class DropzoneData {
+interface DropzoneData {
+    getData(): object | null;
+}
+
+interface DropzoneDataConstructor {
+    readonly prototype: DropzoneData;
+    new(dropzone: HTMLEDropzoneElement): DropzoneData;
+}
+
+class DropzoneDataBase {
     private _dropzone: HTMLEDropzoneElement;
 
     constructor(dropzone: HTMLEDropzoneElement) {
-        this._dropzone = dropzone;    
+        this._dropzone = dropzone;
     }
 
     public getData(): object | null {
         const data = {};
         const descendantDrozpones = Array.from(this._dropzone.querySelectorAll("e-dropzone"));
         descendantDrozpones.forEach((descendantDrozpone) => {
-            const dropzonePathName = this._getDescendantDropzoneFullName(descendantDrozpone);
+            const dropzonePathName = this._getDescendantDropzonePathName(descendantDrozpone);
 
             let descendantDropzoneData =
                 descendantDrozpone.multiple ? descendantDrozpone.draggables.map(draggable => draggable.data) :
@@ -467,11 +478,13 @@ export class DropzoneData {
         return data;
     }
 
-    private _getDescendantDropzoneFullName(dropzone: HTMLEDropzoneElement): string {
+    private _getDescendantDropzonePathName(dropzone: HTMLEDropzoneElement): string {
         if (dropzone === this._dropzone) {
             return dropzone.name;
         }
         const parentDropzone = dropzone.parentElement!.closest("e-dropzone")!;
-        return `${this._getDescendantDropzoneFullName(parentDropzone)}.${dropzone.name}`;
+        return `${this._getDescendantDropzonePathName(parentDropzone)}.${dropzone.name}`;
     };
 }
+
+var DropzoneData: DropzoneDataConstructor = DropzoneDataBase;

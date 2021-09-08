@@ -2,6 +2,8 @@ import { HTMLEDraggableElement } from "./Draggable";
 export { DataChangeEvent };
 export { HTMLEDropzoneElement };
 export { HTMLEDropzoneElementBase };
+export { DropzoneDataBase };
+export { DropzoneData };
 interface HTMLEDropzoneElement extends HTMLElement {
     selectedDraggables: HTMLEDraggableElement[];
     draggables: HTMLEDraggableElement[];
@@ -55,9 +57,17 @@ declare global {
         "datachange": DataChangeEvent;
     }
 }
-export declare class DropzoneData {
+interface DropzoneData {
+    getData(): object | null;
+}
+interface DropzoneDataConstructor {
+    readonly prototype: DropzoneData;
+    new (dropzone: HTMLEDropzoneElement): DropzoneData;
+}
+declare class DropzoneDataBase {
     private _dropzone;
     constructor(dropzone: HTMLEDropzoneElement);
     getData(): object | null;
-    private _getDescendantDropzoneFullName;
+    private _getDescendantDropzonePathName;
 }
+declare var DropzoneData: DropzoneDataConstructor;
