@@ -464,7 +464,7 @@ export class DropzoneData {
 
             setPropertyFromPath(data, dropzonePathName, descendantDropzoneData);
         })
-        return null;
+        return data;
     }
 
     private _getDescendantDropzoneFullName(dropzone: HTMLEDropzoneElement): string {
