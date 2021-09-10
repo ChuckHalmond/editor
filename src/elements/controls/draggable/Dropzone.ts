@@ -465,6 +465,11 @@ class DropzoneDataBase {
 
     public getData(): object | null {
         const data = {};
+        /*const form = document.createElement("form");
+        form.append(this._dropzone.cloneNode(true));
+        const formData = new FormData(form);*/
+        
+
         const descendantDrozpones = Array.from(this._dropzone.querySelectorAll("e-dropzone"));
         descendantDrozpones.forEach((descendantDrozpone) => {
             const dropzonePathName = this._getDescendantDropzonePathName(descendantDrozpone);

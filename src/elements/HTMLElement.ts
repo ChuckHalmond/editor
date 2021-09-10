@@ -49,7 +49,7 @@ function parseStringTemplate(template: string, items: {[key: string]: Node | str
     let lastResultIndex = 0;
     while ((result = regexp.exec(template)) !== null) {
         if (result.index >= lastResultIndex) {
-            resultNodes.push(template.substring(lastResultIndex, result.index));
+            resultNodes.push(document.createTextNode(template.substring(lastResultIndex, result.index)));
         }
         if (itemsKeys.indexOf(result[1]) > -1) {
             resultNodes.push(items[result[1]]);

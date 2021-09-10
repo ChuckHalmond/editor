@@ -5,66 +5,48 @@ export { getFormState };
 export { setFormState };
 
 interface FormState {
-    [name: string]: ({
-        type: "checkbox",
-        checked: boolean
-    } | {
-        type: "radio",
-        nodes: [{
-            value: string,
-            checked: boolean
-        }]
-    } | {
-        value: string
-    });
+    [name: string]: {
+        value: string | number | boolean | null
+    }
 };
 
 const getFormState = (form: HTMLFormElement) => {
     const elements = Array.from(form.elements);
-    let state: FormState = {};
-
+    const state: FormState = {};
     elements.forEach((element) => {
         if (isTagElement("input", element)) {
             if (element.type === "radio") {
-                if (!(element.name in state)) {
+                if (typeof state[element.name] === "undefined") {
                     state[element.name] = {
-                        type: "radio",
-                        nodes: [{
-                            value: element.value,
-                            checked: element.checked
-                        }]
+                        value: null
                     };
                 }
-                else {
-                    const elem = state[element.name];
-                    if ("nodes" in elem) {
-                        elem.nodes.push({
-                            value: element.value,
-                            checked: element.checked
-                        });
-                    }
+                if (element.checked) {
+                    state[element.name] = {
+                        value: element.value
+                    };
                 }
             }
             else if (element.type === "checkbox") {
                 state[element.name] = {
-                    type: "checkbox",
-                    checked: element.checked
+                    value: element.checked
+                };
+            }
+            else if (element.type === "number") {
+                let floatValue = parseFloat(element.value);
+                state[element.name] = {
+                    value: !isNaN(floatValue) ? floatValue : null
                 };
             }
             else {
                 state[element.name] = {
-                    value: element.value,
+                    value: (element.value !== "") ? element.value : null
                 };
             }
         }
-        else if (isTagElement("select", element)) {
+        else if (isTagElement("select", element) || isTagElement("textarea", element)) {
             state[element.name] = {
-                value: element.value,
-            };
-        }
-        else if (isTagElement("textarea", element)) {
-            state[element.name] = {
-                value: element.value,
+                value: (element.value !== "") ? element.value : null
             };
         }
     });
@@ -73,32 +55,29 @@ const getFormState = (form: HTMLFormElement) => {
 }
 
 const setFormState = (form: HTMLFormElement, state: FormState) => {
-    const elements = Array.from(form.elements) as (HTMLInputElement | HTMLSelectElement)[];
+    const elements = Array.from(form.elements);
     const names = Object.keys(state);
-
     names.forEach((name) => {
-        const elemState = state[name];
-        if ("type" in elemState) {
-            if (elemState.type === "checkbox") {
-                let element = elements.find((elem) => (elem as any).name === name);
-                if (element && isTagElement("input", element)) {
-                    element.checked = elemState.checked;
+        let namedElements = elements.filter((element) => (element as any).name === name);
+        namedElements.forEach((element) => {
+            let stateValue = state[name].value;
+            if (isTagElement("input", element)) {
+                if (element.type === "radio") {
+                    element.checked = (stateValue !== null && element.value === stateValue.toString());
+                }
+                else if (element.type === "checkbox") {
+                    element.checked = !!stateValue;
+                }
+                else if (element.type === "number") {
+                    element.value = (stateValue !== null) ? stateValue.toString() : "";
+                }
+                else {
+                    element.value = (stateValue !== null) ? stateValue.toString() : "";
                 }
             }
-            else if (elemState.type === "radio") {
-                elemState.nodes.forEach((radioNode) => {
-                    let element = elements.find((elem) => (elem as any).name === name && (elem as any).value === radioNode.value);
-                    if (element && isTagElement("input", element)) {
-                        element.checked = radioNode.checked;
-                    }
-                });
+            else if (isTagElement("select", element) || isTagElement("textarea", element)) {
+                element.value = (stateValue !== null) ? stateValue.toString() : "";
             }
-        }
-        else {
-            let element = elements.find((elem) => (elem as any).name === name);
-            if (element && (isTagElement("input", element) || isTagElement("select", element) || isTagElement("textarea", element))) {
-                element.value = elemState.value;
-            }
-        }
+        });
     });
 }

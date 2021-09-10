@@ -22,7 +22,6 @@ export * from "./src/elements/controls/breadcrumb/BreadcrumbTrail";
 export * from "./src/elements/controls/draggable/Draggable";
 export * from "./src/elements/controls/draggable/Dragzone";
 export * from "./src/elements/controls/draggable/Dropzone";
-export * from "./src/elements/controls/draggable/DropzoneInput";
 export * from "./src/elements/forms/Snippets";
 export * from "./src/elements/utils/HeightSash";
 export * from "./src/elements/utils/Import";
