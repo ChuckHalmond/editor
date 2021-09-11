@@ -1,8 +1,9 @@
 import { isParentNode, isReactiveParentNode, isReactiveNode } from "../elements/HTMLElement";
 import { forAllSubtreeNodes } from "../elements/Snippets";
 
-export { ViewBase };
 export { View };
+export { ViewBase };
+export { ReactiveViewBase };
 
 interface View<M extends object, E extends HTMLElement> {
     readonly element: E;
@@ -14,11 +15,32 @@ interface View<M extends object, E extends HTMLElement> {
 abstract class ViewBase<M extends object, E extends HTMLElement> implements View<M, E> {
     private _element: E;
     private _model: M;
-    private _observer: MutationObserver;
 
     constructor(model: M) {
         this._model = model;
         this._element = this.render();
+    }
+
+    public get element(): E {
+        return this._element;
+    }
+
+    public close(): void {
+        this._element.remove();
+    }
+
+    public get model(): M {
+        return this._model;
+    }
+
+    public abstract render(): E;
+}
+
+abstract class ReactiveViewBase<M extends object, E extends HTMLElement> extends ViewBase<M, E> implements View<M, E> {
+    private _observer: MutationObserver;
+
+    constructor(model: M) {
+        super(model);
         this._observer = new MutationObserver((mutations: MutationRecord[]) => {
             mutations.forEach((record: MutationRecord) => {
                 Array.from(record.removedNodes).map((node) => {
@@ -29,28 +51,18 @@ abstract class ViewBase<M extends object, E extends HTMLElement> implements View
                 });
             });
         });
-        this._observer.observe(this._element, {
+        this._observer.observe(this.element, {
             subtree: true,
             childList: true
         });
-        this._addReactiveListeners(this._element);
-    }
-
-    public get element(): E {
-        return this._element;
+        this._addReactiveListeners(this.element);
     }
 
     public close(): void {
-        this._element.remove();
+        super.close();
         this._observer.disconnect();
-        this._removeReactiveListeners(this._element);
+        this._removeReactiveListeners(this.element);
     }
-
-    public get model(): M {
-        return this._model;
-    }
-
-    public abstract render(): E;
 
     private _addReactiveListeners(node: Node): void {
         if (isReactiveParentNode(node) || isReactiveNode(node)) {
