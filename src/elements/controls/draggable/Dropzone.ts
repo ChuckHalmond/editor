@@ -465,21 +465,22 @@ class DropzoneDataBase {
 
     public getData(): object | null {
         const data = {};
+
+        let dropzoneData =
+            this._dropzone.multiple ? this._dropzone.draggables.map(draggable => draggable.data) :
+            this._dropzone.draggables.length > 0 ? this._dropzone.draggables[0].data : null;
+
+        Object.assign(data, {
+            [this._dropzone.name]: dropzoneData
+        });
+
         const descendantDrozpones = Array.from(this._dropzone.querySelectorAll("e-dropzone"));
         descendantDrozpones.forEach((descendantDrozpone) => {
-            let pathName = "";
-            let dropzone = descendantDrozpone;
-            do {
-                pathName = (dropzone.name) ? (pathName) ? `${dropzone.name}.${pathName}` : dropzone.name : pathName;
-                dropzone = dropzone.parentElement!.closest("e-dropzone")!;
-            }
-            while (!(dropzone == this._dropzone || dropzone == null));
-
-            let descendantDropzoneData =
-                descendantDrozpone.multiple ? descendantDrozpone.draggables.map(draggable => draggable.data) :
-                descendantDrozpone.draggables.length > 0 ? descendantDrozpone.draggables[0].data : null;
-
-            setPropertyFromPath(data, pathName, descendantDropzoneData);
+            Object.assign(data, {
+                [this._dropzone.name]: {
+                    ...new DropzoneDataBase(descendantDrozpone).getData()
+                }
+            });
         })
         return data;
     }
