@@ -473,7 +473,7 @@ class DropzoneDataBase {
                 pathName = (dropzone.name) ? (pathName) ? `${dropzone.name}.${pathName}` : dropzone.name : pathName;
                 dropzone = dropzone.parentElement!.closest("e-dropzone")!;
             }
-            while (dropzone !== this._dropzone);
+            while (dropzone !== this._dropzone && dropzone !== null);
 
             let descendantDropzoneData =
                 descendantDrozpone.multiple ? descendantDrozpone.draggables.map(draggable => draggable.data) :
