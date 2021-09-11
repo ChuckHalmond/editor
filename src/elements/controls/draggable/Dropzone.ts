@@ -470,8 +470,8 @@ class DropzoneDataBase {
             let pathName = "";
             let dropzone = descendantDrozpone;
             while (dropzone !== this._dropzone) {
-                dropzone = dropzone.parentElement!.closest("e-dropzone")!;
                 pathName = (pathName) ? `${dropzone.name}.${pathName}` : dropzone.name;
+                dropzone = dropzone.parentElement!.closest("e-dropzone")!;
             }
 
             let descendantDropzoneData =
