@@ -467,12 +467,13 @@ class DropzoneDataBase {
         const data = {};
         const descendantDrozpones = Array.from(this._dropzone.querySelectorAll("e-dropzone"));
         descendantDrozpones.forEach((descendantDrozpone) => {
-            let pathName = this._dropzone.name;
+            let pathName = "";
             let dropzone = descendantDrozpone;
-            while (dropzone !== this._dropzone) {
-                pathName = (pathName) ? `${dropzone.name}.${pathName}` : dropzone.name;
+            do {
+                pathName = (dropzone.name) ? (pathName) ? `${dropzone.name}.${pathName}` : dropzone.name : pathName;
                 dropzone = dropzone.parentElement!.closest("e-dropzone")!;
             }
+            while (dropzone !== this._dropzone);
 
             let descendantDropzoneData =
                 descendantDrozpone.multiple ? descendantDrozpone.draggables.map(draggable => draggable.data) :
