@@ -68,6 +68,5 @@ declare class DropzoneDataBase {
     private _dropzone;
     constructor(dropzone: HTMLEDropzoneElement);
     getData(): object | null;
-    private _getDescendantDropzonePathName;
 }
 declare var DropzoneData: DropzoneDataConstructor;
