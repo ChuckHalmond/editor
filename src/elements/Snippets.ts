@@ -57,8 +57,7 @@ function getPropertyFromPath(src: object, path: string): any {
 function setPropertyFromPath(src: object, path: string, value: any): object {
   const props = path.split(".");
   let obj: {[key: string]: any} = src;
-  let lastPropIdx = props.length - 1;
-  if (src === null) {
+  if (src == null) {
     console.error("Source data can't be null");
   }
   props.forEach((prop, idx) => {
@@ -71,7 +70,7 @@ function setPropertyFromPath(src: object, path: string, value: any): object {
       if (!Array.isArray(obj[prop])) {
         obj[prop] = [];
       }
-      if (idx === lastPropIdx) {
+      if (idx === props.length - 1) {
         obj[prop][index] = value;
       }
       else {
@@ -82,14 +81,16 @@ function setPropertyFromPath(src: object, path: string, value: any): object {
       }
     }
     else {
-      if (typeof obj[prop] !== "object") {
-        obj[prop] = {}
-      }
-      if (idx === lastPropIdx) {
+      if (idx === props.length - 1) {
         obj[prop] = value;
       }
       else {
+        if (typeof obj[prop] !== "object") {
+          obj[prop] = {}
+        }
+        //else {
         obj = obj[prop];
+        //}
       }
     }
   });

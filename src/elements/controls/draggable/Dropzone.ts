@@ -467,7 +467,7 @@ class DropzoneDataBase {
         const data = {};
         const descendantDrozpones = Array.from(this._dropzone.querySelectorAll("e-dropzone"));
         descendantDrozpones.forEach((descendantDrozpone) => {
-            let pathName = "";
+            let pathName = this._dropzone.name;
             let dropzone = descendantDrozpone;
             while (dropzone !== this._dropzone) {
                 pathName = (pathName) ? `${dropzone.name}.${pathName}` : dropzone.name;
