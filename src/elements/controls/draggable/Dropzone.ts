@@ -473,12 +473,10 @@ class DropzoneDataBase {
         const childDropzones = Array.from(this._dropzone.querySelectorAll("e-dropzone")).filter(
             dropzone => dropzone.parentElement!.closest("e-dropzone") === this._dropzone
         );
-        
+
         childDropzones.forEach((childDropzone) => {
             Object.assign(dropzoneData, {
-                [childDropzone.name]: {
-                    ...new DropzoneDataBase(childDropzone).getData()
-                }
+                ...new DropzoneDataBase(childDropzone).getData()
             });
         })
 
