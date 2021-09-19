@@ -76,6 +76,7 @@ class HTMLEDropzoneElementBase extends HTMLElement implements HTMLEDropzoneEleme
 
                 :host([disabled]) {
                     pointer-events: none;
+                    border-color: gainsboro;
                 }
 
                 :host(:empty) [part~="container"] {
