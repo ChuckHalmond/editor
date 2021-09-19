@@ -465,8 +465,6 @@ class DropzoneDataBase {
     }
 
     public getData(): object | null {
-        const data = {};
-
         let dropzoneData =
             this._dropzone.multiple ? this._dropzone.draggables.map(draggable => draggable.data) :
             this._dropzone.draggables.length > 0 ? this._dropzone.draggables[0].data : null;
@@ -481,11 +479,7 @@ class DropzoneDataBase {
             });
         });
 
-        Object.assign(data, {
-            [this._dropzone.name]: dropzoneData
-        });
-
-        return data;
+        return dropzoneData;
     }
 }
 
