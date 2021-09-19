@@ -1,5 +1,5 @@
 <form>
-    <label for="text">Text</label><input id="text" name="text" type="text"/><br/>
+    <label for="text">Text</label><input id="text" name="text" type="text" required/><br/>
     <label for="select">Select</label>
     <select id="select" name="select">
         <option label="Option 1" value="option1"></option>
@@ -9,7 +9,9 @@
     <label for="radio-1">Radio 1</label><input id="radio-1" name="radio" value="radio-1" type="radio"/><br/>
     <label for="radio-2">Radio 2</label><input id="radio-2" name="radio" value="radio-2" type="radio"/><br/>
     <label for="checkbox">Checkbox</label><input id="checkbox" name="checkbox" type="checkbox"/><br/>
+    <label for="file">File</label><input id="file" name="file" type="file"/><br/>
     <button type="reset">Reset</button>
+    <button type="submit">Submit</button>
     <button id="export-button" type="button">Export form state</button>
     <button id="load-button" type="button">Load form state</button>
 </form>

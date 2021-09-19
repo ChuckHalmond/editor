@@ -9,6 +9,7 @@ interface View<M extends object, E extends HTMLElement> {
     readonly element: E;
     readonly model: M;
     close(): void;
+    prerender(): void;
     render(): E;
 }
 
@@ -18,6 +19,7 @@ abstract class ViewBase<M extends object, E extends HTMLElement> implements View
 
     constructor(model: M) {
         this._model = model;
+        this.prerender();
         this._element = this.render();
     }
 
@@ -33,6 +35,7 @@ abstract class ViewBase<M extends object, E extends HTMLElement> implements View
         return this._model;
     }
 
+    public abstract prerender(): void;
     public abstract render(): E;
 }
 

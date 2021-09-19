@@ -478,7 +478,7 @@ class DropzoneDataBase {
             Object.assign(dropzoneData, {
                 ...new DropzoneDataBase(childDropzone).getData()
             });
-        })
+        });
 
         Object.assign(data, {
             [this._dropzone.name]: dropzoneData
