@@ -478,7 +478,7 @@ class DropzoneDataBase {
             });
         });
 
-        return JSON.stringify(dropzoneData);
+        return dropzoneData !== "" ? JSON.stringify(dropzoneData) : dropzoneData;
     }
 }
 
