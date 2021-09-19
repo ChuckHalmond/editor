@@ -6,27 +6,27 @@ export { ViewBase };
 export { ReactiveViewBase };
 
 interface View<M extends object, E extends HTMLElement> {
-    readonly element: E;
+    readonly root: E;
     readonly model: M;
     close(): void;
     render(): E;
 }
 
 abstract class ViewBase<M extends object, E extends HTMLElement> implements View<M, E> {
-    private _element: E;
+    private _root: E;
     private _model: M;
 
     constructor(model: M) {
         this._model = model;
-        this._element = this.render();
+        this._root = this.render();
     }
 
-    public get element(): E {
-        return this._element;
+    public get root(): E {
+        return this._root;
     }
 
     public close(): void {
-        this._element.remove();
+        this._root.remove();
     }
 
     public get model(): M {
@@ -51,17 +51,17 @@ abstract class ReactiveViewBase<M extends object, E extends HTMLElement> extends
                 });
             });
         });
-        this._observer.observe(this.element, {
+        this._observer.observe(this.root, {
             subtree: true,
             childList: true
         });
-        this._addReactiveListeners(this.element);
+        this._addReactiveListeners(this.root);
     }
 
     public close(): void {
         super.close();
         this._observer.disconnect();
-        this._removeReactiveListeners(this.element);
+        this._removeReactiveListeners(this.root);
     }
 
     private _addReactiveListeners(node: Node): void {
