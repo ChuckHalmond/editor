@@ -1,4 +1,5 @@
 import * as editor from "../index";
+import { ReactiveViewBase } from "../index";
 import { formdata } from "./formdata";
 
 export async function main() {
@@ -10,4 +11,24 @@ export async function main() {
             formdata();
         });
     }
+    class MyView extends ReactiveViewBase {
+        public render() {
+            return editor.Element("div", {
+                props: {
+                    textContent: "div content"
+                },
+                children: [
+                    editor.Element("div", {
+                        props: {
+                            textContent: "child"
+                        }
+                    })
+                ]
+            });
+        }
+    }
+
+    document.body.append(
+        new MyView({}).root
+    )
 }
