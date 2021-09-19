@@ -35,7 +35,7 @@ abstract class ViewBase<M extends object, E extends HTMLElement> implements View
         return this._model;
     }
 
-    public abstract prerender(): void;
+    public prerender(): void {};
     public abstract render(): E;
 }
 
