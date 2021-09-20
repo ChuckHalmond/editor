@@ -1,6 +1,6 @@
 
 import { HTMLEMenuBarElement } from "../../elements/containers/menus/MenuBar";
-import { HTMLElementConstructor } from "../../elements/HTMLElement";
+import { Element } from "../../elements/HTMLElement";
 import { HTMLEMenuItemTemplateDescription, HTMLEMenuItemTemplate } from "./MenuItemTemplate";
 
 
@@ -21,7 +21,7 @@ const HTMLEMenubarTemplate: HTMLEMenubarTemplate = (desc: HTMLEMenubarTemplateDe
         return HTMLEMenuItemTemplate(itemDesc);
     });
 
-    return HTMLElementConstructor(
+    return Element(
         "e-menubar", {
             props: {
                 id: desc.id,

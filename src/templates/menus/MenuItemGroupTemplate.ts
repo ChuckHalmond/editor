@@ -1,5 +1,5 @@
 import { HTMLEMenuItemGroupElement } from "../../elements/containers/menus/MenuItemGroup";
-import { HTMLElementConstructor } from "../../elements/HTMLElement";
+import { Element } from "../../elements/HTMLElement";
 import { HTMLEMenuItemTemplateDescription, HTMLEMenuItemTemplate } from "./MenuItemTemplate";
 
 export { HTMLEMenuItemGroupTemplateDescription };
@@ -18,7 +18,7 @@ const HTMLEMenuItemGroupTemplate: HTMLEMenuItemGroupTemplate = (desc: HTMLEMenuI
     
     const items = desc.items.map((descArgs) => HTMLEMenuItemTemplate(descArgs));
 
-    return HTMLElementConstructor(
+    return Element(
         "e-menuitemgroup", {
             props: {
                 id: desc.id,

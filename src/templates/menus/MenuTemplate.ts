@@ -1,6 +1,6 @@
 
 import { HTMLEMenuElement } from "../../elements/containers/menus/Menu";
-import { HTMLElementConstructor } from "../../elements/HTMLElement";
+import { Element } from "../../elements/HTMLElement";
 import { HTMLEMenuItemGroupTemplate, HTMLEMenuItemGroupTemplateDescription } from "./MenuItemGroupTemplate";
 import { HTMLEMenuItemTemplate, HTMLEMenuItemTemplateDescription } from "./MenuItemTemplate";
 
@@ -26,7 +26,7 @@ const HTMLEMenuTemplate: HTMLEMenuTemplate = (desc: HTMLEMenuTemplateDescription
         }
     });
 
-    return HTMLElementConstructor(
+    return Element(
         "e-menu", {
             props: {
                 id: desc.id,

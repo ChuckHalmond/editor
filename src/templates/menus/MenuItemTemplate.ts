@@ -1,6 +1,6 @@
 
 import { HTMLEMenuItemElement } from "../../elements/containers/menus/MenuItem";
-import { HTMLElementConstructor } from "../../elements/HTMLElement";
+import { Element, TextNode } from "../../elements/HTMLElement";
 import { Key, KeyModifier, HotKey } from "../../Input";
 import { HTMLEMenuTemplate, HTMLEMenuTemplateDescription } from "./MenuTemplate";
 
@@ -36,7 +36,7 @@ const HTMLEMenuItemTemplate: HTMLEMenuItemTemplate = (desc: HTMLEMenuItemTemplat
         slotted.push(menu);
     }
 
-    const menuItem = HTMLElementConstructor(
+    const menuItem = Element(
         "e-menuitem", {
             props: {
                 id: desc.id,
@@ -52,9 +52,7 @@ const HTMLEMenuItemTemplate: HTMLEMenuItemTemplate = (desc: HTMLEMenuItemTemplat
                 commandArgs: desc.commandArgs,
                 hotkey: desc.hotkey ? new HotKey(desc.hotkey.key, desc.hotkey.mod1, desc.hotkey.mod2) : void 0
             },
-            children: [
-                ...slotted
-            ]
+            children: slotted.map((slotted) => (typeof slotted === "string") ? TextNode(slotted) : slotted)
         }
     );
 

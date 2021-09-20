@@ -1,4 +1,4 @@
-import { HTMLElementConstructor } from "../../elements/HTMLElement";
+import { Element, TextNode } from "../../elements/HTMLElement";
 
 export { HTMLTableTemplateDescription };
 export { HTMLTableTemplate };
@@ -23,23 +23,23 @@ interface HTMLTableTemplate {
 
 const HTMLTableTemplate: HTMLTableTemplate = (desc: HTMLTableTemplateDescription) => {
     
-    const thead = HTMLElementConstructor(
+    const thead = Element(
         "thead", {
             children: [
-                HTMLElementConstructor(
+                Element(
                 "tr", {
                     props: {
                         id: desc.id,
                         className: desc.className,
                     },
                     children: desc.headerCells.map((cell) => {
-                        return HTMLElementConstructor(
+                        return Element(
                             "th", {
                                 props: {
                                     scope: "col" 
                                 },
                                 children: [
-                                    cell
+                                    (typeof cell === "string") ? TextNode(cell) : cell
                                 ]
                             }
                         );
@@ -49,10 +49,10 @@ const HTMLTableTemplate: HTMLTableTemplate = (desc: HTMLTableTemplateDescription
         }
     );
 
-    const tbody = HTMLElementConstructor(
+    const tbody = Element(
         "tbody", {
             children: desc.bodyCells.map((row) => {
-                return HTMLElementConstructor(
+                return Element(
                 "tr", {
                     props: {
                         id: desc.id,
@@ -63,31 +63,31 @@ const HTMLTableTemplate: HTMLTableTemplate = (desc: HTMLTableTemplateDescription
                             switch (cell.type) {
                                 case "data":
                                 default:
-                                    return HTMLElementConstructor(
+                                    return Element(
                                         "td", {
                                             children: [
-                                                cell.content
+                                                (typeof cell.content === "string") ? TextNode(cell.content) : cell.content
                                             ]
                                         }
                                     );
                                 case "header":
-                                    return HTMLElementConstructor(
+                                    return Element(
                                         "th", {
                                             props: {
                                                 scope: "row" 
                                             },
                                             children: [
-                                                cell.content
+                                                (typeof cell.content === "string") ? TextNode(cell.content) : cell.content
                                             ]
                                         }
                                     );
                             }
                         }
                         else {
-                            return HTMLElementConstructor(
+                            return Element(
                                 "td", {
                                     children: [
-                                        cell
+                                        (typeof cell === "string") ? TextNode(cell) : cell
                                     ]
                                 }
                             );
@@ -98,10 +98,10 @@ const HTMLTableTemplate: HTMLTableTemplate = (desc: HTMLTableTemplateDescription
         }
     );
 
-    const tfoot = HTMLElementConstructor(
+    const tfoot = Element(
         "tfoot", {
             children: [
-                HTMLElementConstructor(
+                Element(
                 "tr", {
                     props: {
                         id: desc.id,
@@ -112,31 +112,31 @@ const HTMLTableTemplate: HTMLTableTemplate = (desc: HTMLTableTemplateDescription
                             switch (cell.type) {
                                 case "data":
                                 default:
-                                    return HTMLElementConstructor(
+                                    return Element(
                                         "td", {
                                             children: [
-                                                cell.content
+                                                (typeof cell.content === "string") ? TextNode(cell.content) : cell.content
                                             ]
                                         }
                                     );
                                 case "header":
-                                    return HTMLElementConstructor(
+                                    return Element(
                                         "th", {
                                             props: {
                                                 scope: "row" 
                                             },
                                             children: [
-                                                cell.content
+                                                (typeof cell.content === "string") ? TextNode(cell.content) : cell.content
                                             ]
                                         }
                                     );
                             }
                         }
                         else {
-                            return HTMLElementConstructor(
+                            return Element(
                                 "td", {
                                     children: [
-                                        cell
+                                        (typeof cell === "string") ? TextNode(cell) : cell
                                     ]
                                 }
                             );
@@ -147,7 +147,7 @@ const HTMLTableTemplate: HTMLTableTemplate = (desc: HTMLTableTemplateDescription
         }
     );
 
-    const table = HTMLElementConstructor(
+    const table = Element(
         "table", {
             props: {
                 id: desc.id,

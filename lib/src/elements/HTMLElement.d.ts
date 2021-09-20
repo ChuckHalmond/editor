@@ -2,13 +2,10 @@ import { ListModel, ListModelChangeEvent, ObjectModel, ObjectModelChangeEvent } 
 export { isTagElement };
 export { RegisterCustomHTMLElement };
 export { GenerateAttributeAccessors };
-export { createTemplate };
 export { bindShadowRoot };
-export { HTMLElementDescription };
 export { setElementProperties };
 export { setElementAttributes };
 export { setElementChildren };
-export { HTMLElementConstructor };
 export { isParentNode };
 export { isReactiveNode };
 export { isReactiveParentNode };
@@ -17,7 +14,6 @@ export { ReactiveParentNode };
 export { ReactiveChildNodes };
 export { isElement };
 export { Element };
-export { HTMLElementInit };
 export { AttributeMutationMixin };
 export { AttributeType };
 export { areAttributesMatching };
@@ -46,14 +42,9 @@ interface GenerateAttributeAccessorsDecorator {
     }[]): <C extends CustomElementConstructor>(elementCtor: C) => C;
 }
 declare const GenerateAttributeAccessors: GenerateAttributeAccessorsDecorator;
-declare function createTemplate<E extends Element | DocumentFragment>(templateContent?: string): E;
 declare function bindShadowRoot(element: HTMLElement, templateContent?: string): ShadowRoot;
 declare function Fragment(...nodes: (Node | string)[]): DocumentFragment;
 declare function TextNode(text?: string): Node;
-declare type HTMLElementDescription<K extends keyof HTMLElementTagNameMap> = {
-    tagName: K;
-    init?: HTMLElementInit<K>;
-};
 declare type _IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? A : B;
 declare type WritableKeys<T> = {
     [P in keyof T]-?: _IfEquals<{
@@ -62,24 +53,6 @@ declare type WritableKeys<T> = {
         -readonly [Q in P]: T[P];
     }, P>;
 }[keyof T];
-interface HTMLElementInit<K extends keyof HTMLElementTagNameMap> {
-    options?: ElementCreationOptions;
-    props?: Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>;
-    attrs?: {
-        [name: string]: number | string | boolean;
-    };
-    children?: (Node | string)[];
-    listeners?: {
-        [EventName in keyof HTMLElementEventMap]?: EventName extends keyof HTMLElementEventMap ? ((event: HTMLElementEventMap[EventName]) => void | [(event: HTMLElementEventMap[EventName]) => void, Partial<boolean | AddEventListenerOptions>]) : ((event: Event) => void | [(event: Event) => void, Partial<boolean | AddEventListenerOptions>]);
-    };
-    customListeners?: {
-        [key: string]: (event: Event) => void | [(event: Event) => void, Partial<boolean | AddEventListenerOptions>];
-    };
-    styles?: {
-        [property: string]: string | [string, string];
-    };
-}
-declare function HTMLElementConstructor<K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLElementInit<K>): HTMLElementTagNameMap[K];
 interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     options?: ElementCreationOptions;
     props?: Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>;
@@ -89,9 +62,6 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     children?: Node[] | NodeList | ReactiveChildNodes;
     listeners?: {
         [EventName in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[EventName]) => void | [(event: HTMLElementEventMap[EventName]) => void, Partial<boolean | AddEventListenerOptions>];
-    };
-    customListeners?: {
-        [key: string]: (event: Event) => void | [(event: Event) => void, Partial<boolean | AddEventListenerOptions>];
     };
     styles?: {
         [property: string]: string | [string, string];

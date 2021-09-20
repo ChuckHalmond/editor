@@ -35,7 +35,6 @@ export * from "./src/templates/menus/MenubarTemplate";
 export * from "./src/templates/menus/MenuItemGroupTemplate";
 export * from "./src/templates/menus/MenuItemTemplate";
 export * from "./src/templates/menus/MenuTemplate";
-export * from "./src/templates/other/DraggableInputTemplate";
 export * from "./src/templates/table/TableTemplate";
 export * from "./src/views/View";
 export * from "./index";

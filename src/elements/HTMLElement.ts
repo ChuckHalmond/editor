@@ -4,13 +4,10 @@ import { forAllSubtreeElements } from "./Snippets";
 export { isTagElement };
 export { RegisterCustomHTMLElement };
 export { GenerateAttributeAccessors };
-export { createTemplate };
 export { bindShadowRoot };
-export { HTMLElementDescription };
 export { setElementProperties };
 export { setElementAttributes };
 export { setElementChildren };
-export { HTMLElementConstructor };
 export { isParentNode };
 export { isReactiveNode };
 export { isReactiveParentNode };
@@ -19,7 +16,6 @@ export { ReactiveParentNode };
 export { ReactiveChildNodes };
 export { isElement };
 export { Element };
-export { HTMLElementInit };
 export { AttributeMutationMixin };
 export { AttributeType };
 export { areAttributesMatching };
@@ -185,14 +181,6 @@ const GenerateAttributeAccessors: GenerateAttributeAccessorsDecorator = function
     }
 }
 
-function createTemplate<E extends Element | DocumentFragment>(templateContent?: string): E {
-    const template = document.createElement("template");
-    if (typeof templateContent !== "undefined") {
-        template.innerHTML = templateContent;
-    }
-    return template.content as E;
-}
-
 function bindShadowRoot(element: HTMLElement, templateContent?: string): ShadowRoot {
     const root = element.attachShadow({mode: "open"});
     const template = document.createElement("template");
@@ -213,11 +201,6 @@ function TextNode(text: string = ""): Node {
     return document.createTextNode(text);
 }
 
-type HTMLElementDescription<K extends keyof HTMLElementTagNameMap> = {
-    tagName: K,
-    init?: HTMLElementInit<K>
-};
-
 type _IfEquals<X, Y, A = X, B = never> =
   (<T>() => T extends X ? 1 : 2) extends
   (<T>() => T extends Y ? 1 : 2) ? A : B;
@@ -226,51 +209,6 @@ type WritableKeys<T> = {
     [P in keyof T]-?: _IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, P>
 }[keyof T];
 
-interface HTMLElementInit<K extends keyof HTMLElementTagNameMap> {
-    options?: ElementCreationOptions,
-    props?: Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>,
-    attrs?: {[name: string]: number | string | boolean},
-    children?: (Node | string)[],
-    listeners?: {
-        [EventName in keyof HTMLElementEventMap]?: EventName extends keyof HTMLElementEventMap ? 
-            ((event: HTMLElementEventMap[EventName]) => void | [(event: HTMLElementEventMap[EventName]) => void, Partial<boolean | AddEventListenerOptions>])
-            : ((event: Event) => void | [(event: Event) => void, Partial<boolean | AddEventListenerOptions>]);
-    },
-    customListeners?: {
-        [key: string]: (event: Event) => void | [(event: Event) => void, Partial<boolean | AddEventListenerOptions>]
-    },
-    styles?: {
-        [property: string]: string | [string, string]
-    }
-}
-
-function HTMLElementConstructor<K extends keyof HTMLElementTagNameMap>(
-    tagName: K, init?: HTMLElementInit<K>
-    ): HTMLElementTagNameMap[K] {
-    const element = document.createElement(tagName, init?.options);
-    if (init) {
-        if (init.props) {
-            setElementProperties(element, init.props);
-        }
-        if (init.attrs) {
-            setElementAttributes(element, init.attrs);
-        }
-        if (init.children) {
-            setElementChildren(element, init.children);
-        }
-        if (init.listeners) {
-            setHTMLElementEventListeners(element, init.listeners);
-        }
-        if (init.customListeners) {
-            setHTMLElementEventListeners(element, init.customListeners);
-        }
-        if (init.styles) {
-            setHTMLElementStyles(element, init.styles);
-        }
-    }
-    return element;
-};
-
 interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     options?: ElementCreationOptions,
     props?: Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>,
@@ -278,9 +216,6 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     children?: Node[] | NodeList | ReactiveChildNodes,
     listeners?: {
         [EventName in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[EventName]) => void | [(event: HTMLElementEventMap[EventName]) => void, Partial<boolean | AddEventListenerOptions>]
-    },
-    customListeners?: {
-        [key: string]: (event: Event) => void | [(event: Event) => void, Partial<boolean | AddEventListenerOptions>]
     },
     styles?: {
         [property: string]: string | [string, string]
@@ -307,9 +242,6 @@ function Element<K extends keyof HTMLElementTagNameMap>(
             }
             if (init.listeners) {
                 setHTMLElementEventListeners(element, init.listeners);
-            }
-            if (init.customListeners) {
-                setHTMLElementEventListeners(element, init.customListeners);
             }
             if (init.styles) {
                 setHTMLElementStyles(element, init.styles);
