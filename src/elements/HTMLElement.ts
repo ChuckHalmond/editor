@@ -232,7 +232,15 @@ interface HTMLElementInit<K extends keyof HTMLElementTagNameMap> {
     attrs?: {[name: string]: number | string | boolean},
     children?: (Node | string)[],
     listeners?: {
-        [ListenerEvent in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[ListenerEvent]) => any | [(event: HTMLElementEventMap[ListenerEvent]) => any, Partial<boolean | AddEventListenerOptions>]
+        [EventName in keyof HTMLElementEventMap]?: EventName extends keyof HTMLElementEventMap ? 
+            ((event: HTMLElementEventMap[EventName]) => void | [(event: HTMLElementEventMap[EventName]) => void, Partial<boolean | AddEventListenerOptions>])
+            : ((event: Event) => void | [(event: Event) => void, Partial<boolean | AddEventListenerOptions>]);
+    },
+    customListeners?: {
+        [key: string]: (event: Event) => void | [(event: Event) => void, Partial<boolean | AddEventListenerOptions>]
+    },
+    styles?: {
+        [property: string]: string | [string, string]
     }
 }
 
@@ -253,6 +261,12 @@ function HTMLElementConstructor<K extends keyof HTMLElementTagNameMap>(
         if (init.listeners) {
             setHTMLElementEventListeners(element, init.listeners);
         }
+        if (init.customListeners) {
+            setHTMLElementEventListeners(element, init.customListeners);
+        }
+        if (init.styles) {
+            setHTMLElementStyles(element, init.styles);
+        }
     }
     return element;
 };
@@ -263,11 +277,14 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     attrs?: {[name: string]: number | string | boolean},
     children?: Node[] | NodeList | ReactiveChildNodes,
     listeners?: {
-        [ListenerEvent in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[ListenerEvent]) => any | [(event: HTMLElementEventMap[ListenerEvent]) => any, Partial<boolean | AddEventListenerOptions>]
+        [EventName in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[EventName]) => void | [(event: HTMLElementEventMap[EventName]) => void, Partial<boolean | AddEventListenerOptions>]
+    },
+    customListeners?: {
+        [key: string]: (event: Event) => void | [(event: Event) => void, Partial<boolean | AddEventListenerOptions>]
     },
     styles?: {
         [property: string]: string | [string, string]
-    };
+    }
 }
 
 function Element<K extends keyof HTMLElementTagNameMap>(
@@ -290,6 +307,9 @@ function Element<K extends keyof HTMLElementTagNameMap>(
             }
             if (init.listeners) {
                 setHTMLElementEventListeners(element, init.listeners);
+            }
+            if (init.customListeners) {
+                setHTMLElementEventListeners(element, init.customListeners);
             }
             if (init.styles) {
                 setHTMLElementStyles(element, init.styles);
@@ -390,7 +410,7 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
 function setHTMLElementEventListeners<K extends keyof HTMLElementTagNameMap>(
     element: HTMLElementTagNameMap[K],
     listeners: {
-        [K in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[K]) => any | [(event: HTMLElementEventMap[K]) => any, Partial<boolean | AddEventListenerOptions>]
+        [K in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[K]) => void | [(event: HTMLElementEventMap[K]) => void, Partial<boolean | AddEventListenerOptions>]
     }
 ): HTMLElementTagNameMap[K] {
     Object.entries(listeners).forEach((entry) => {

@@ -70,7 +70,13 @@ interface HTMLElementInit<K extends keyof HTMLElementTagNameMap> {
     };
     children?: (Node | string)[];
     listeners?: {
-        [ListenerEvent in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[ListenerEvent]) => any | [(event: HTMLElementEventMap[ListenerEvent]) => any, Partial<boolean | AddEventListenerOptions>];
+        [EventName in keyof HTMLElementEventMap]?: EventName extends keyof HTMLElementEventMap ? ((event: HTMLElementEventMap[EventName]) => void | [(event: HTMLElementEventMap[EventName]) => void, Partial<boolean | AddEventListenerOptions>]) : ((event: Event) => void | [(event: Event) => void, Partial<boolean | AddEventListenerOptions>]);
+    };
+    customListeners?: {
+        [key: string]: (event: Event) => void | [(event: Event) => void, Partial<boolean | AddEventListenerOptions>];
+    };
+    styles?: {
+        [property: string]: string | [string, string];
     };
 }
 declare function HTMLElementConstructor<K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLElementInit<K>): HTMLElementTagNameMap[K];
@@ -82,7 +88,10 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     };
     children?: Node[] | NodeList | ReactiveChildNodes;
     listeners?: {
-        [ListenerEvent in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[ListenerEvent]) => any | [(event: HTMLElementEventMap[ListenerEvent]) => any, Partial<boolean | AddEventListenerOptions>];
+        [EventName in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[EventName]) => void | [(event: HTMLElementEventMap[EventName]) => void, Partial<boolean | AddEventListenerOptions>];
+    };
+    customListeners?: {
+        [key: string]: (event: Event) => void | [(event: Event) => void, Partial<boolean | AddEventListenerOptions>];
     };
     styles?: {
         [property: string]: string | [string, string];
@@ -113,7 +122,7 @@ interface ReactiveChildNodes {
 }
 declare function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string): ReactiveChildNodes;
 declare function setHTMLElementEventListeners<K extends keyof HTMLElementTagNameMap>(element: HTMLElementTagNameMap[K], listeners: {
-    [K in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[K]) => any | [(event: HTMLElementEventMap[K]) => any, Partial<boolean | AddEventListenerOptions>];
+    [K in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[K]) => void | [(event: HTMLElementEventMap[K]) => void, Partial<boolean | AddEventListenerOptions>];
 }): HTMLElementTagNameMap[K];
 declare function setElementChildren<E extends Element>(element: E, children: (Node | string)[] | NodeList): E;
 declare function setElementProperties<E extends Element>(element: E, properties?: Partial<Pick<E, WritableKeys<E>>>): E;
