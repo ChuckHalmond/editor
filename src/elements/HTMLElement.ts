@@ -324,7 +324,7 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                         }
                         if (event.data.addedItems.length) {
                             let addedElements = event.data.addedItems.map(item => map(item));
-                            if (event.data.index >= list.items.length) {
+                            if (event.data.index >= list.items.length - event.data.addedItems.length) {
                                 parent!.append(...addedElements);
                             }
                             else {
