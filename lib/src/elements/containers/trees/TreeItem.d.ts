@@ -8,6 +8,7 @@ interface HTMLETreeItemElement extends HTMLElement {
     indent: number;
     icon: string;
     active: boolean;
+    leaf: boolean;
     items: HTMLETreeItemElement[];
     parent: HTMLETreeItemElement | HTMLETreeElement | null;
     deepestVisibleChildItem(): HTMLETreeItemElement;
