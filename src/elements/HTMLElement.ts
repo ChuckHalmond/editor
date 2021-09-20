@@ -1,5 +1,5 @@
 import { ListModel, ListModelChangeEvent, ObjectModel, ObjectModelChangeEvent } from "../models/Model";
-import { forAllSubtreeElements } from "./Snippets";
+import { camelToTrain, forAllSubtreeElements } from "./Snippets";
 
 export { isTagElement };
 export { RegisterCustomHTMLElement };
@@ -403,11 +403,11 @@ function setElementAttributes<E extends Element>(
         const value = attributes[key];
         if (typeof value === "boolean") {
             if (value) {
-                element.setAttribute(key, "");
+                element.setAttribute(camelToTrain(key), "");
             }
         }
         else {
-            element.setAttribute(key, value.toString());
+            element.setAttribute(camelToTrain(key), value.toString());
         }
     }
     return element;
