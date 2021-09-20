@@ -26,6 +26,7 @@ export { areAttributesMatching };
 export { AttributeMutationMixinBase };
 export { createMutationObserverCallback };
 export { Fragment };
+export { TextNode };
 export { setHTMLElementEventListeners };
 export { parseStringTemplate };
 
@@ -60,29 +61,7 @@ function parseStringTemplate(template: string, items: {[key: string]: Node | str
     fragment.append(...resultNodes, template.substring(lastResultIndex, template.length));
     return fragment;
 }
-/*
-function fragment(parts: TemplateStringsArray, ...slots: (Node | string)[]): DocumentFragment {
-    let timestamp = new Date().getTime();
-    let html = parts.reduce((html, part, index) => {
-        return `${html}${part}${(index < slots.length) ? `<div id="${timestamp}-${index}"></div>` : ""}`;
-    }, "");
-    let parser = new DOMParser();
-    let fragment = new DocumentFragment();
-    fragment.append(...parser.parseFromString(html, "text/html").body.children);
-    slots.forEach((slot, index) => {
-        let placeholder = fragment.getElementById(`${timestamp}-${index}`);
-        if (placeholder) {
-            if (slot instanceof Node) {
-                placeholder.replaceWith(slot);
-            }
-            else {
-                placeholder.replaceWith(document.createTextNode(slot));
-            }
-        }
-    });
-    return fragment;
-}
-*/
+
 const RegisterCustomHTMLElement: RegisterCustomHTMLElementDecorator = function(args: {
     name: string;
     attributes?: string[],
@@ -224,16 +203,14 @@ function bindShadowRoot(element: HTMLElement, templateContent?: string): ShadowR
     return root;
 }
 
-function HTMLFragment(content: string): DocumentFragment {
-    let template = document.createElement("template");
-    template.innerHTML = content;
-    return template.content;
-}
-
 function Fragment(...nodes: (Node | string)[]): DocumentFragment {
-    let fragment = new DocumentFragment();
+    let fragment = document.createDocumentFragment();
     fragment.append(...nodes);
     return fragment;
+}
+
+function TextNode(text: string = ""): Node {
+    return document.createTextNode(text);
 }
 
 type HTMLElementDescription<K extends keyof HTMLElementTagNameMap> = {

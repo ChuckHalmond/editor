@@ -24,6 +24,7 @@ export { areAttributesMatching };
 export { AttributeMutationMixinBase };
 export { createMutationObserverCallback };
 export { Fragment };
+export { TextNode };
 export { setHTMLElementEventListeners };
 export { parseStringTemplate };
 declare function isTagElement<K extends keyof HTMLElementTagNameMap>(tagName: K, obj: any): obj is HTMLElementTagNameMap[K];
@@ -48,6 +49,7 @@ declare const GenerateAttributeAccessors: GenerateAttributeAccessorsDecorator;
 declare function createTemplate<E extends Element | DocumentFragment>(templateContent?: string): E;
 declare function bindShadowRoot(element: HTMLElement, templateContent?: string): ShadowRoot;
 declare function Fragment(...nodes: (Node | string)[]): DocumentFragment;
+declare function TextNode(text?: string): Node;
 declare type HTMLElementDescription<K extends keyof HTMLElementTagNameMap> = {
     tagName: K;
     init?: HTMLElementInit<K>;
