@@ -268,7 +268,7 @@ function isElement(node: Node): node is Element {
 
 function isReactiveNode(node: Node): node is ReactiveNode {
     let testNode = node as ReactiveNode;
-    return (typeof testNode._reactAttributes !== "undefined") && testNode._reactAttributes._reactEvent === "objectmodelchange";
+    return (typeof testNode._reactAttributes === "object") && testNode._reactAttributes._reactEvent === "objectmodelchange";
 }
 
 type ReactiveParentNode = (Node & ParentNode) & {
@@ -281,7 +281,7 @@ type ReactiveParentNode = (Node & ParentNode) & {
 
 function isReactiveParentNode(node: Node): node is ReactiveParentNode {
     let testNode = node as ReactiveParentNode;
-    return (isParentNode(node) && typeof testNode._reactAttributes !== "undefined") && testNode._reactAttributes._reactEvent === "listmodelchange";
+    return typeof testNode._reactAttributes === "object" && testNode._reactAttributes._reactEvent === "listmodelchange";
 }
 
 function ReactiveNode<Data extends object, N extends Node>
