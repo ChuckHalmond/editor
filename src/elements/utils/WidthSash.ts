@@ -68,7 +68,7 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
                     newWidth = Math.min(newWidth, maxWidth);
                 }
                 this._target.style.setProperty("width", `${newWidth}px`);
-                this.dispatchEvent(new CustomEvent("resize"));
+                this.dispatchEvent(new CustomEvent("e_resize"));
             }
         };
 
@@ -107,6 +107,6 @@ declare global {
 
 declare global {
     interface HTMLElementEventMap {
-        "resize": CustomEvent,
+        "e_resize": CustomEvent,
     }
 }

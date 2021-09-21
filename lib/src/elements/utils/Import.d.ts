@@ -15,6 +15,6 @@ declare global {
 }
 declare global {
     interface HTMLElementEventMap {
-        "load": CustomEvent;
+        "e_load": CustomEvent;
     }
 }

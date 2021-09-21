@@ -18,6 +18,6 @@ declare global {
 }
 declare global {
     interface HTMLElementEventMap {
-        "resize": CustomEvent;
+        "e_resize": CustomEvent;
     }
 }

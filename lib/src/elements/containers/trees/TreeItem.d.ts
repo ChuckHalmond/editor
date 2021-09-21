@@ -47,11 +47,11 @@ declare global {
 }
 declare global {
     interface HTMLElementEventMap {
-        "e-toggle": Event;
+        "e_toggle": Event;
     }
 }
 declare global {
     interface HTMLElementEventMap {
-        "e-trigger": Event;
+        "e_trigger": Event;
     }
 }

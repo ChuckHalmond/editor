@@ -68,7 +68,7 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
                     newHeight = Math.min(newHeight, maxHeight);
                 }
                 this._target.style.setProperty("height", `${newHeight}px`);
-                this.dispatchEvent(new CustomEvent("resize"));
+                this.dispatchEvent(new CustomEvent("e_resize"));
             }
         };
 
@@ -107,6 +107,6 @@ declare global {
 
 declare global {
     interface HTMLElementEventMap {
-        "resize": CustomEvent,
+        "e_resize": CustomEvent,
     }
 }

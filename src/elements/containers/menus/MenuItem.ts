@@ -219,7 +219,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
 
     public set hotkey(hotkey: HotKey | null) {
         this.dispatchEvent(
-            new CustomEvent("e-hotkeychange", {
+            new CustomEvent("e_hotkeychange", {
                 bubbles: true,
                 detail: {
                     oldHotKey: this._hotkey,
@@ -302,7 +302,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                     this.checked = !this.checked;
                     break;
                 case "radio":
-                    this.dispatchEvent(new CustomEvent("e-radiochangerequest", {bubbles: true}));
+                    this.dispatchEvent(new CustomEvent("e_radiochangerequest", {bubbles: true}));
                     break;
                 case "menu":
                     if (this.childMenu) {
@@ -310,7 +310,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                     }
                     break;
             }
-            this.dispatchEvent(new CustomEvent("e-trigger", {bubbles: true}));
+            this.dispatchEvent(new CustomEvent("e_trigger", {bubbles: true}));
         }
     }
 }
@@ -328,24 +328,24 @@ type HotKeyChangeEvent = CustomEvent<{
 
 declare global {
     interface HTMLElementEventMap {
-        "e-hotkeychange": HotKeyChangeEvent,
+        "e_hotkeychange": HotKeyChangeEvent,
     }
 }
 
 declare global {
     interface HTMLElementEventMap {
-        "e-trigger": Event,
+        "e_trigger": Event,
     }
 }
 
 declare global {
     interface HTMLElementEventMap {
-        "e-radiochangerequest": Event,
+        "e_radiochangerequest": Event,
     }
 }
 
 declare global {
     interface HTMLElementEventMap {
-        "e-change": Event,
+        "e_change": Event,
     }
 }

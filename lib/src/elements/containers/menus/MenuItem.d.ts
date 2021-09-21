@@ -53,21 +53,21 @@ declare type HotKeyChangeEvent = CustomEvent<{
 }>;
 declare global {
     interface HTMLElementEventMap {
-        "e-hotkeychange": HotKeyChangeEvent;
+        "e_hotkeychange": HotKeyChangeEvent;
     }
 }
 declare global {
     interface HTMLElementEventMap {
-        "e-trigger": Event;
+        "e_trigger": Event;
     }
 }
 declare global {
     interface HTMLElementEventMap {
-        "e-radiochangerequest": Event;
+        "e_radiochangerequest": Event;
     }
 }
 declare global {
     interface HTMLElementEventMap {
-        "e-change": Event;
+        "e_change": Event;
     }
 }

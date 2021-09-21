@@ -8,7 +8,7 @@ export { EditorBase };
 export { EditorCommand };
 export { EditorHotKey };
 declare type EditorEventsMap = {
-    "e-context-change": Event<"e-context-change">;
+    "e_contextchange": Event<"e_contextchange">;
 };
 interface Editor extends EventDispatcher<EditorEventsMap> {
     getState(key: string): any;

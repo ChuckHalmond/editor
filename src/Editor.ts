@@ -15,7 +15,7 @@ export { EditorCommand };
 export { EditorHotKey };
 
 type EditorEventsMap = {
-    "e-context-change": Event<"e-context-change">;
+    "e_contextchange": Event<"e_contextchange">;
 }
 
 interface Editor extends EventDispatcher<EditorEventsMap> {
@@ -136,7 +136,7 @@ class EditorBase<State extends object> extends EventDispatcher<EditorEventsMap> 
             });
         });
 
-        document.body.addEventListener("e-hotkeychange", (event: HotKeyChangeEvent) => {
+        document.body.addEventListener("e_hotkeychange", (event: HotKeyChangeEvent) => {
             let target = event.target as any;
             if (isTagElement("e-menuitem", target)) {
                 if (event.detail.oldHotKey) {

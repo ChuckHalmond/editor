@@ -257,11 +257,11 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
 
     public toggle(): void {
         this.expanded = !this.expanded;
-        this.dispatchEvent(new CustomEvent("e-toggle", {bubbles: true}));
+        this.dispatchEvent(new CustomEvent("e_toggle", {bubbles: true}));
     }
 
     public trigger(): void {
-        this.dispatchEvent(new CustomEvent("e-trigger", {bubbles: true}));
+        this.dispatchEvent(new CustomEvent("e_trigger", {bubbles: true}));
     }
 }
 
@@ -273,12 +273,12 @@ declare global {
 
 declare global {
     interface HTMLElementEventMap {
-        "e-toggle": Event,
+        "e_toggle": Event,
     }
 }
 
 declare global {
     interface HTMLElementEventMap {
-        "e-trigger": Event,
+        "e_trigger": Event,
     }
 }

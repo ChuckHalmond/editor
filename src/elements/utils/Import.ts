@@ -31,7 +31,7 @@ class HTMLEImportElementBase extends HTMLElement {
                     throw new Error(response.statusText);
                 }
             });
-            this.dispatchEvent(new CustomEvent("load"));
+            this.dispatchEvent(new CustomEvent("e_load"));
         }
         if (this.src) {
             importRequest(this.src);
@@ -47,6 +47,6 @@ declare global {
 
 declare global {
     interface HTMLElementEventMap {
-        "load": CustomEvent
+        "e_load": CustomEvent
     }
 }

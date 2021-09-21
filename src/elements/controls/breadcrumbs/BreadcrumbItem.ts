@@ -24,49 +24,37 @@ class HTMLEBreadcrumbItemElementBase extends HTMLElement implements HTMLEBreadcr
     constructor() {
         super();
 
-        let separatorArrowUrl = JSON.stringify("../assets/editor/icons/chevron_right_black_18dp.svg");
-
         bindShadowRoot(this, /*template*/`
-            <link rel="preload" href=${separatorArrowUrl} as="image" crossorigin>
             <style>
                 :host {
                     display: inline-block;
                     cursor: pointer;
-
-                    --separator-arrow-url: url(${separatorArrowUrl});
                 }
 
                 :host([active]) {
                     font-weight: bold;
                 }
 
-                :host([active]) [part~="li"]::after {
+                :host([active]) [part~="container"]::after {
                     display: none;
                 }
 
-                [part~="li"]::after {
-                    content: "";
-                    display: inline-block;
-                    width: 18px;
-                    height: 18px;
-                    background-color: dimgray;
-                    transform: scale(1.2) translateY(4%);
-                    -webkit-mask-image: var(--separator-arrow-url);
-                    mask-image: var(--separator-arrow-url);
+                [part~="container"]::after {
+                    content: "►";
                 }
 
                 :host([hidden]) {
                     display: none;
                 }
 
-                [part~="li"] {
+                [part~="container"] {
                     display: flex;
-                    list-style-type: none;
                 }
             </style>
-            <li part="li">
+            <div part="container">
+                <span part="label"></span>
                 <slot></slot>
-            </li>
+            </div>
         `);
     }
     
