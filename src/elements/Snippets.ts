@@ -7,6 +7,7 @@ export { snakeToCamel };
 export { camelToSnake };
 export { trainToCamel };
 export { camelToTrain };
+export { titlize };
 
 function forAllSubtreeElements(element: Element, func: (element: Element) => void) {
   let index = 0;
@@ -106,6 +107,10 @@ function pointIntersectsWithDOMRect(x: number, y: number, rect: DOMRect) {
     rect.right < x || 
     rect.top > y ||
     rect.bottom < y);
+}
+
+function titlize(str: string) {
+  return `${str.charAt(0).toUpperCase()}${str.substr(1).toLowerCase()}`;
 }
 
 function snakeToCamel(str: string) {
