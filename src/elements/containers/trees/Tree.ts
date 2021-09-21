@@ -143,7 +143,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
             }
         });
 
-        this.addEventListener("mousedown", (event: MouseEvent) => {
+        this.addEventListener("click", (event: MouseEvent) => {
             let target = event.target as any;
             if (isTagElement("e-treeitem", target)) {
                 target.trigger();
