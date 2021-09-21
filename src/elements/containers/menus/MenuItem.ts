@@ -302,7 +302,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                     this.checked = !this.checked;
                     break;
                 case "radio":
-                    this.dispatchEvent(new CustomEvent("radiochangerequest", {bubbles: true}));
+                    this.dispatchEvent(new CustomEvent("e-radiochangerequest", {bubbles: true}));
                     break;
                 case "menu":
                     if (this.childMenu) {
@@ -310,7 +310,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                     }
                     break;
             }
-            this.dispatchEvent(new CustomEvent("trigger", {bubbles: true}));
+            this.dispatchEvent(new CustomEvent("e-trigger", {bubbles: true}));
         }
     }
 }
@@ -328,24 +328,24 @@ type HotKeyChangeEvent = CustomEvent<{
 
 declare global {
     interface HTMLElementEventMap {
-        "hotkeychange": HotKeyChangeEvent,
+        "e-hotkeychange": HotKeyChangeEvent,
     }
 }
 
 declare global {
     interface HTMLElementEventMap {
-        "trigger": Event,
+        "e-trigger": Event,
     }
 }
 
 declare global {
     interface HTMLElementEventMap {
-        "radiochangerequest": Event,
+        "e-radiochangerequest": Event,
     }
 }
 
 declare global {
     interface HTMLElementEventMap {
-        "change": Event,
+        "e-change": Event,
     }
 }

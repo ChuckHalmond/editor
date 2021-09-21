@@ -161,7 +161,7 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
             }
         });
         
-        this.addEventListener("radiochangerequest", (event: Event) => {
+        this.addEventListener("e-radiochangerequest", (event: Event) => {
             let target = event.target as any;
             if (isTagElement("e-menuitem", target)) {
                 let item = target;

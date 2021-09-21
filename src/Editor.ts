@@ -136,7 +136,7 @@ class EditorBase<State extends object> extends EventDispatcher<EditorEventsMap> 
             });
         });
 
-        document.body.addEventListener("hotkeychange", (event: HotKeyChangeEvent) => {
+        document.body.addEventListener("e-hotkeychange", (event: HotKeyChangeEvent) => {
             let target = event.target as any;
             if (isTagElement("e-menuitem", target)) {
                 if (event.detail.oldHotKey) {
