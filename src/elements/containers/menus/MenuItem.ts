@@ -4,7 +4,6 @@ import { HTMLEMenuElement } from "./Menu";
 import { HTMLEMenuBarElement } from "./MenuBar";
 import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
 
-
 export { EMenuItemElementType };
 export { HTMLEMenuItemElement };
 export { HTMLEMenuItemElementBase };
@@ -269,7 +268,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                         const inputPart = this.shadowRoot?.querySelector<HTMLInputElement>("[part~=input]");
                         if (inputPart) {
                             inputPart.checked = (newValue !== null);
-                            this.dispatchEvent(new CustomEvent("e-change", {bubbles: true}));
+                            this.dispatchEvent(new CustomEvent("e_change", {bubbles: true}));
                         }
                     }
                     break;

@@ -1,7 +1,6 @@
 import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "../../HTMLElement";
 import { HTMLEMenuItemElement } from "./MenuItem";
 
-
 export { HTMLEMenuBarElement };
 export { HTMLEMenuBarElementBase };
 

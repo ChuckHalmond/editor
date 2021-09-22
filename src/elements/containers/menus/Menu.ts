@@ -38,7 +38,6 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     public items: (HTMLEMenuItemElement | HTMLEMenuItemGroupElement)[];
 
     private _activeIndex: number;
-    private _style: CSSStyleDeclaration | null;
 
     constructor() {
         super();
@@ -76,7 +75,6 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         this.parentItem = null;
         this.items = [];
         this._activeIndex = -1;
-        this._style = null;
     }
 
     public get activeIndex(): number {
@@ -89,8 +87,6 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     
     public connectedCallback() {
         this.tabIndex = this.tabIndex;
-
-        this._style = window.getComputedStyle(this);
         
         const slot = this.shadowRoot?.querySelector("slot");
         if (slot) {

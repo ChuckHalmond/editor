@@ -21,7 +21,6 @@ declare class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuEleme
     parentItem: HTMLEMenuItemElement | null;
     items: (HTMLEMenuItemElement | HTMLEMenuItemGroupElement)[];
     private _activeIndex;
-    private _style;
     constructor();
     get activeIndex(): number;
     get activeItem(): HTMLEMenuItemElement | HTMLEMenuItemGroupElement | null;
