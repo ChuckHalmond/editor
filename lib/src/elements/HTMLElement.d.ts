@@ -68,13 +68,19 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     };
 }
 declare function Element<K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLInit<K>): HTMLElementTagNameMap[K];
-declare type ReactiveNode = Node & {
+declare type ReactiveNode = Node & ({
     _reactAttributes: {
         _reactModel: ObjectModel<object>;
         _reactEvent: "objectmodelchange";
         _reactListener: (event: ObjectModelChangeEvent) => void;
     };
-};
+} | {
+    _reactAttributes: {
+        _reactModel: ListModel<object>;
+        _reactEvent: "listmodelchange";
+        _reactListener: (event: ListModelChangeEvent) => void;
+    };
+});
 declare function isParentNode(node: Node): node is Node & ParentNode;
 declare function isElement(node: Node): node is Element;
 declare function isReactiveNode(node: Node): node is ReactiveNode;
@@ -86,6 +92,7 @@ declare type ReactiveParentNode = (Node & ParentNode) & {
     };
 };
 declare function isReactiveParentNode(node: Node): node is ReactiveParentNode;
+declare function ReactiveNode<Data extends object, N extends Node>(node: N, list: ListModel<Data>, react: (node: N, oldItems: Data[], newItems: Data[]) => void): N;
 declare function ReactiveNode<Data extends object, N extends Node>(node: N, object: ObjectModel<Data>, react: <K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void): N;
 interface ReactiveChildNodes {
     (parent: Node & ParentNode): (Node | string)[];
