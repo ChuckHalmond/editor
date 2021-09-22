@@ -250,13 +250,19 @@ function Element<K extends keyof HTMLElementTagNameMap>(
         return element;
 }
 
-type ReactiveNode = Node & {
+type ReactiveNode = Node & ({
     _reactAttributes: {
         _reactModel: ObjectModel<object>,
         _reactEvent: "objectmodelchange",
         _reactListener: (event: ObjectModelChangeEvent) => void;
     }
-}
+ } | {
+    _reactAttributes: {
+        _reactModel: ListModel<object>,
+        _reactEvent: "listmodelchange",
+        _reactListener: (event: ListModelChangeEvent) => void;
+    }
+})
 
 function isParentNode(node: Node): node is Node & ParentNode {
     return node.hasChildNodes();
@@ -285,22 +291,43 @@ function isReactiveParentNode(node: Node): node is ReactiveParentNode {
 }
 
 function ReactiveNode<Data extends object, N extends Node>
-    (node: N, object: ObjectModel<Data>, react: <K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void): N {
-        Object.assign(
-            node, {
-                _reactAttributes: {
-                    _reactModel: object,
-                    _reactEvent: "objectmodelchange",
-                    _reactListener: (event: ObjectModelChangeEvent) => {
-                        react(node, event.data.property as keyof Data, event.data.oldValue, event.data.newValue);
+    (node: N, list: ListModel<Data>, react: (node: N, oldItems: Data[], newItems: Data[]) => void): N
+function ReactiveNode<Data extends object, N extends Node>
+    (node: N, object: ObjectModel<Data>, react: <K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void): N
+function ReactiveNode<Data extends object, N extends Node>
+    (node: N, objectOrList: ObjectModel<Data> | ListModel<Data>, react: (<K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void)
+    | ((node: N, oldItems: Data[], newItems: Data[]) => void)): N {
+        if ("items" in objectOrList) {
+            Object.assign(
+                node, {
+                    _reactAttributes: {
+                        _reactModel: objectOrList,
+                        _reactEvent: "listmodelchange",
+                        _reactListener: (event: ListModelChangeEvent) => {
+                            react(node, event.data.newItems as any, event.data.newItems as any, void 0);
+                        }
                     }
                 }
-            }
-        ) as ReactiveNode;
-        const keys = Object.keys(object.data) as (keyof Data)[];
-        keys.forEach((key) => {
-            react(node, key, void 0 as any, object.data[key]);
-        });
+            ) as ReactiveNode;
+            react(node, 0 as any, objectOrList.items as any, []);
+        }
+        else {
+            Object.assign(
+                node, {
+                    _reactAttributes: {
+                        _reactModel: objectOrList,
+                        _reactEvent: "objectmodelchange",
+                        _reactListener: (event: ObjectModelChangeEvent) => {
+                            react(node, event.data.property as any, event.data.oldValue, event.data.newValue);
+                        }
+                    }
+                }
+            ) as ReactiveNode;
+            const keys = Object.keys(objectOrList.data) as (keyof Data)[];
+            keys.forEach((key) => {
+                react(node, key as any, void 0 as any, objectOrList.data[key] as any);
+            });
+        }
         return node;
 }
 
@@ -308,6 +335,24 @@ interface ReactiveChildNodes {
     (parent: Node & ParentNode): (Node | string)[]
 }
 
+function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string): ReactiveChildNodes {
+    return (parent: Node & ParentNode) => {
+        Object.assign(
+            parent, {
+                _reactAttributes: {
+                    _reactModel: list,
+                    _reactEvent: "listmodelchange",
+                    _reactListener: (event: ListModelChangeEvent) => {
+                        parent.textContent = "";
+                        parent.append(...event.data.newItems.map(map));
+                    }
+                }
+            }
+        ) as ReactiveParentNode;
+        return list.items.map(map);
+    }
+}
+/*
 function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string): ReactiveChildNodes {
     return (parent: Node & ParentNode) => {
         Object.assign(
@@ -337,7 +382,7 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
         ) as ReactiveParentNode;
         return list.items.map(map);
     }
-}
+}*/
 
 function setHTMLElementEventListeners<K extends keyof HTMLElementTagNameMap>(
     element: HTMLElementTagNameMap[K],

@@ -23,7 +23,7 @@ interface ObjectModelChangeEvents {
 
 interface ObjectModel<Data extends object> extends EventDispatcher<ObjectModelChangeEvents> {
     readonly data: Readonly<Data>;
-    setData<K extends keyof Data>(key: K, value: Data[K]): void;
+    set<K extends keyof Data>(key: K, value: Data[K]): void;
 }
 
 class ObjectModelBase<Data extends object> extends EventDispatcher<ObjectModelChangeEvents> implements ObjectModel<Data> {
@@ -38,8 +38,8 @@ class ObjectModelBase<Data extends object> extends EventDispatcher<ObjectModelCh
         return this._data;
     }
 
-    public setData<K extends keyof Data>(key: K, value: Data[K]): void {
-        let oldValue = this._data[key];
+    public set<K extends keyof Data>(key: K, value: Data[K]): void {
+        const oldValue = this._data[key];
         this._data[key] = value;
         this.dispatchEvent(new Event("objectmodelchange", {property: key, oldValue: oldValue, newValue: value}));
     }
@@ -50,9 +50,8 @@ type ListModelChangeType = "insert" | "remove" | "clear";
 interface ListModelChangeEvent {
     type: "listmodelchange";
     data: {
-        index: number;
-        addedItems: any[];
-        removedItems: any[];
+        oldItems: any[];
+        newItems: any[];
     };
 }
 
@@ -62,9 +61,12 @@ interface ListModelEvents {
 
 interface ListModel<Item> extends EventDispatcher<ListModelEvents> {
     readonly items: ReadonlyArray<Item>;
-    insertItem(index: number, item: Item): void;
-    removeItem(index: number): void;
-    clearItems(): void;
+    set(items: Item[]): void;
+    push(...items: Item[]): number;
+    insert(index: number, ...items: Item[]): void;
+    splice(start: number, deleteCount: number, ...items: Item[]): Item[];
+    filter(predicate: (value: Item, index: number, array: Item[]) => boolean): void;
+    clear(): void;
 }
 
 class ListModelBase<Item> extends EventDispatcher<ListModelEvents> implements ListModel<Item> {
@@ -79,23 +81,49 @@ class ListModelBase<Item> extends EventDispatcher<ListModelEvents> implements Li
         return this._items;
     }
 
-    public insertItem(index: number, item: Item): void {
+    public set(items: Item[]): void {
+        const oldItems = this._items.slice();
+        this._items = items.slice();
+        const newItems = this._items.slice();
+        this.dispatchEvent(new Event("listmodelchange", {oldItems: oldItems, newItems: newItems}));
+    }
+
+    public push(...items: Item[]): number {
+        const oldItems = this._items.slice();
+        const result = this._items.push(...items);
+        const newItems = this._items.slice();
+        this.dispatchEvent(new Event("listmodelchange", {oldItems: oldItems, newItems: newItems}));
+        return result;
+    }
+
+    public insert(index: number, ...items: Item[]): void {
         if (index >= 0 && index <= this._items.length) {
-            this._items.splice(index, 0, item);
-            this.dispatchEvent(new Event("listmodelchange", {addedItems: [item], removedItems: [], index: index}));
+            const oldItems = this._items.slice();
+            this._items.splice(index, 0, ...items);
+            const newItems = this._items.slice();
+            this.dispatchEvent(new Event("listmodelchange", {oldItems: oldItems, newItems: newItems}));
         }
     }
 
-    public removeItem(index: number): void {
-        if (index >= 0 && index < this._items.length) {
-            let item = this._items.splice(index, 1)[0];
-            this.dispatchEvent(new Event("listmodelchange", {addedItems: [], removedItems: [item], index: index}));
-        }
+    public splice(start: number, deleteCount: number, ...items: Item[]): Item[] {
+        const oldItems = this._items.slice();
+        const result = this._items.splice(start, deleteCount, ...items);
+        const newItems = this._items.slice();
+        this.dispatchEvent(new Event("listmodelchange", {oldItems: oldItems, newItems: newItems}));
+        return result;
     }
 
-    public clearItems(): void {
-        let items = this._items;
+    public filter(predicate: (value: Item, index: number, array: Item[]) => boolean): void {
+        const oldItems = this._items.slice();
+        this._items = this._items.filter(predicate);
+        const newItems = this._items.slice();
+        this.dispatchEvent(new Event("listmodelchange", {oldItems: oldItems, newItems: newItems}));
+    }
+
+    public clear(): void {
+        const oldItems = this._items.slice();
         this._items = [];
-        this.dispatchEvent(new Event("listmodelchange", {addedItems: [], removedItems: items, index: 0}));
+        const newItems = this._items.slice();
+        this.dispatchEvent(new Event("listmodelchange", {oldItems: oldItems, newItems: newItems}));
     }
 }
