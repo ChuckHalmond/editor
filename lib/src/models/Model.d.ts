@@ -23,7 +23,7 @@ interface ObjectModel<Data extends object> extends EventDispatcher<ObjectModelCh
 }
 declare class ObjectModelBase<Data extends object> extends EventDispatcher<ObjectModelChangeEvents> implements ObjectModel<Data> {
     private _data;
-    constructor(data: Data);
+    constructor(data?: Data);
     get data(): Readonly<Data>;
     set<K extends keyof Data>(key: K, value: Data[K]): void;
 }
@@ -31,8 +31,9 @@ declare type ListModelChangeType = "insert" | "remove" | "clear";
 interface ListModelChangeEvent {
     type: "listmodelchange";
     data: {
-        removedItems: [index: number, items: any[]][];
-        addedItems: [index: number, items: any[]][];
+        index: number;
+        removedItems: any[];
+        addedItems: any[];
     };
 }
 interface ListModelEvents {
@@ -40,21 +41,21 @@ interface ListModelEvents {
 }
 interface ListModel<Item> extends EventDispatcher<ListModelEvents> {
     readonly items: ReadonlyArray<Item>;
-    set(items: Item[]): void;
-    push(...items: Item[]): number;
+    set(index: number, item: Item): void;
     insert(index: number, ...items: Item[]): void;
-    splice(start: number, deleteCount: number, ...items: Item[]): Item[];
-    filter(predicate: (value: Item, index: number, array: Item[]) => boolean): void;
+    push(...items: Item[]): number;
+    pop(): Item | undefined;
+    remove(item: Item): void;
     clear(): void;
 }
 declare class ListModelBase<Item> extends EventDispatcher<ListModelEvents> implements ListModel<Item> {
     private _items;
-    constructor(items: Item[]);
+    constructor(items?: Item[]);
     get items(): ReadonlyArray<Item>;
-    set(items: Item[]): void;
+    set(index: number, item: Item): void;
     push(...items: Item[]): number;
+    pop(): Item | undefined;
     insert(index: number, ...items: Item[]): void;
-    splice(start: number, deleteCount: number, ...items: Item[]): Item[];
-    filter(predicate: (value: Item, index: number, array: Item[]) => boolean): void;
+    remove(item: Item): void;
     clear(): void;
 }

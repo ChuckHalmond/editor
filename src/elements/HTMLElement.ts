@@ -304,7 +304,7 @@ function ReactiveNode<Data extends object, N extends Node>
                         _reactModel: objectOrList,
                         _reactEvent: "listmodelchange",
                         _reactListener: (event: ListModelChangeEvent) => {
-                            react(node, event.data.removedItems as any, event.data.addedItems as any, void 0);
+                            react(node, event.data.index as any, event.data.removedItems as any, event.data.addedItems as any);
                         }
                     }
                 }
@@ -343,44 +343,6 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                     _reactModel: list,
                     _reactEvent: "listmodelchange",
                     _reactListener: (event: ListModelChangeEvent) => {
-                        event.data.removedItems.forEach((removedItemsSlice) => {
-                            removedItemsSlice[1].forEach((_) => {
-                                const child = parent.children.item(removedItemsSlice[0]);
-                                if (child) {
-                                    child.remove();
-                                }
-                            });
-                        });
-                        event.data.addedItems.forEach((addedItemsSlice) => {
-                            addedItemsSlice[1].forEach((addedItems) => {
-                                if (addedItemsSlice[0] === 0) {
-                                    parent.append(...addedItems.map(map))
-                                }
-                                else {
-                                    const child = parent.children.item(addedItemsSlice[0]);
-                                    if (child) {
-                                        child.before(...addedItems.map(map))
-                                    }
-                                }
-                            });
-                        });
-                    }
-                }
-            }
-        ) as ReactiveParentNode;
-        return list.items.map(map);
-    }
-}
-/*
-function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string): ReactiveChildNodes {
-    return (parent: Node & ParentNode) => {
-        Object.assign(
-            parent, {
-                _reactAttributes: {
-                    _reactModel: list,
-                    _reactEvent: "listmodelchange",
-                    _reactListener: (event: ListModelChangeEvent) => {
-                        //TODO: Create a direct map between model items and child nodes to get rid of index
                         if (event.data.removedItems.length) {
                             for (let i = 0; i < event.data.removedItems.length; i++) {
                                 parent!.children.item(event.data.index)!.remove();
@@ -401,7 +363,7 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
         ) as ReactiveParentNode;
         return list.items.map(map);
     }
-}*/
+}
 
 function setHTMLElementEventListeners<K extends keyof HTMLElementTagNameMap>(
     element: HTMLElementTagNameMap[K],

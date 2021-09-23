@@ -1,5 +1,6 @@
 import * as editor from "../index";
 import { formdata } from "./formdata";
+import { list } from "./view";
 
 export async function main() {
     console.log("Main loaded!");
@@ -10,4 +11,5 @@ export async function main() {
             formdata();
         });
     }
+    list;
 }
