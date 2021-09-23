@@ -291,7 +291,7 @@ function isReactiveParentNode(node: Node): node is ReactiveParentNode {
 }
 
 function ReactiveNode<Data extends object, N extends Node>
-    (node: N, list: ListModel<Data>, react: (node: N, oldItems: Data[], newItems: Data[]) => void): N
+    (node: N, list: ListModel<Data>, react: (node: N, removedItems: [index: number, items: Data[]][], addedItems: [index: number, items: Data[]][]) => void): N
 function ReactiveNode<Data extends object, N extends Node>
     (node: N, object: ObjectModel<Data>, react: <K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void): N
 function ReactiveNode<Data extends object, N extends Node>
@@ -304,7 +304,7 @@ function ReactiveNode<Data extends object, N extends Node>
                         _reactModel: objectOrList,
                         _reactEvent: "listmodelchange",
                         _reactListener: (event: ListModelChangeEvent) => {
-                            react(node, event.data.newItems as any, event.data.newItems as any, void 0);
+                            react(node, event.data.removedItems as any, event.data.addedItems as any, void 0);
                         }
                     }
                 }
@@ -343,8 +343,27 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                     _reactModel: list,
                     _reactEvent: "listmodelchange",
                     _reactListener: (event: ListModelChangeEvent) => {
-                        parent.textContent = "";
-                        parent.append(...event.data.newItems.map(map));
+                        event.data.removedItems.forEach((removedItemsSlice) => {
+                            removedItemsSlice[1].forEach((_) => {
+                                const child = parent.children.item(removedItemsSlice[0]);
+                                if (child) {
+                                    child.remove();
+                                }
+                            });
+                        });
+                        event.data.addedItems.forEach((addedItemsSlice) => {
+                            addedItemsSlice[1].forEach((addedItems) => {
+                                if (addedItemsSlice[0] === 0) {
+                                    parent.append(...addedItems.map(map))
+                                }
+                                else {
+                                    const child = parent.children.item(addedItemsSlice[0]);
+                                    if (child) {
+                                        child.before(...addedItems.map(map))
+                                    }
+                                }
+                            });
+                        });
                     }
                 }
             }
