@@ -291,12 +291,12 @@ function isReactiveParentNode(node: Node): node is ReactiveParentNode {
 }
 
 function ReactiveNode<Data extends object, N extends Node>
-    (node: N, list: ListModel<Data>, react: (node: N, removedItems: [index: number, items: Data[]][], addedItems: [index: number, items: Data[]][]) => void): N
+    (node: N, list: ListModel<Data>, react: (node: N, index: number, removedItems: Data[], addedItems: Data[]) => void): N
 function ReactiveNode<Data extends object, N extends Node>
     (node: N, object: ObjectModel<Data>, react: <K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void): N
 function ReactiveNode<Data extends object, N extends Node>
     (node: N, objectOrList: ObjectModel<Data> | ListModel<Data>, react: (<K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void)
-    | ((node: N, oldItems: Data[], newItems: Data[]) => void)): N {
+    | ((node: N, index: number, removedItems: Data[], addedItems: Data[]) => void)): N {
         if ("items" in objectOrList) {
             Object.assign(
                 node, {

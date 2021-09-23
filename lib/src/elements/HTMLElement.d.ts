@@ -92,7 +92,7 @@ declare type ReactiveParentNode = (Node & ParentNode) & {
     };
 };
 declare function isReactiveParentNode(node: Node): node is ReactiveParentNode;
-declare function ReactiveNode<Data extends object, N extends Node>(node: N, list: ListModel<Data>, react: (node: N, removedItems: [index: number, items: Data[]][], addedItems: [index: number, items: Data[]][]) => void): N;
+declare function ReactiveNode<Data extends object, N extends Node>(node: N, list: ListModel<Data>, react: (node: N, index: number, removedItems: Data[], addedItems: Data[]) => void): N;
 declare function ReactiveNode<Data extends object, N extends Node>(node: N, object: ObjectModel<Data>, react: <K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void): N;
 interface ReactiveChildNodes {
     (parent: Node & ParentNode): (Node | string)[];
