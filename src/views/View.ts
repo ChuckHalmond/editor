@@ -1,4 +1,4 @@
-import { isParentNode, isReactiveParentNode, isReactiveNode } from "../elements/HTMLElement";
+import { isParentNode, isReactiveNode } from "../elements/HTMLElement";
 import { forAllSubtreeNodes } from "../elements/Snippets";
 
 export { View };
@@ -56,9 +56,8 @@ abstract class ReactiveViewBase<M extends object = object, E extends Element = E
     }
 
     public addReactiveListeners(node: Node): void {
-        if (isReactiveParentNode(node) || isReactiveNode(node)) {
-            const { _reactModel, _reactEvent, _reactListener } = node._reactAttributes; 
-            _reactModel.addEventListener(_reactEvent as any, _reactListener as any);
+        if (isReactiveNode(node)) {
+            node._reactAttributes.addReactListener();
         }
         if (isParentNode(node)) {
             forAllSubtreeNodes(node, (childNode) => {
@@ -68,9 +67,8 @@ abstract class ReactiveViewBase<M extends object = object, E extends Element = E
     }
 
     public removeReactiveListeners(node: Node): void {
-        if (isReactiveParentNode(node) || isReactiveNode(node)) {
-            const { _reactModel, _reactEvent, _reactListener } = node._reactAttributes; 
-            _reactModel.removeEventListener(_reactEvent as any, _reactListener as any);
+        if (isReactiveNode(node)) {
+            node._reactAttributes.removeReactListener();
         }
         if (isParentNode(node)) {
             forAllSubtreeNodes(node, (childNode) => {
