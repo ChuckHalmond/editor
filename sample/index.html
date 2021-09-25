@@ -10,8 +10,14 @@
                 font-family: consolas;
             }
 
-            *:focus {
+            *:focus-visible,
+            e-menu:focus-visible {
+                outline: none;
+            }
+
+            e-treeitem:focus {
                 z-index: 1;
+                outline: 1px solid black;
             }
 
             /**:focus-visible {

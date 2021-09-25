@@ -54,6 +54,7 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
         bindShadowRoot(this, /*template*/`
             <style>
                 :host {
+                    position: relative;
                     display: inline-block;
                     user-select: none;
                 }

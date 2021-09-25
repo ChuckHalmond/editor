@@ -3,6 +3,7 @@ import { forAllSubtreeNodes } from "../elements/Snippets";
 
 export { View };
 export { ViewBase };
+export { ReactiveView };
 export { ReactiveViewBase };
 
 interface View<M extends object = object, E extends Element = Element> {
@@ -12,31 +13,27 @@ interface View<M extends object = object, E extends Element = Element> {
 }
 
 abstract class ViewBase<M extends object = object, E extends Element = Element> implements View<M, E> {
-    private _root: E;
-    private _model: M;
+    public readonly root: E;
+    public readonly model: M;
 
     constructor(model: M) {
-        this._model = model;
-        this._root = this.render();
-    }
-
-    public get root(): E {
-        return this._root;
-    }
-
-    public get model(): M {
-        return this._model;
+        this.model = model;
+        this.root = this.render();
     }
 
     public abstract render(): E;
 }
 
-abstract class ReactiveViewBase<M extends object = object, E extends Element = Element> extends ViewBase<M, E> implements View<M, E> {
-    private _observer: MutationObserver;
+interface ReactiveView<M extends object = object, E extends Element = Element> extends View<M, E> {
+    disconnect(): void;
+}
+
+abstract class ReactiveViewBase<M extends object = object, E extends Element = Element> extends ViewBase<M, E> implements ReactiveView<M, E> {
+    readonly observer: MutationObserver;
 
     constructor(model: M) {
         super(model);
-        this._observer = new MutationObserver((mutations: MutationRecord[]) => {
+        this.observer = new MutationObserver((mutations: MutationRecord[]) => {
             mutations.forEach((record: MutationRecord) => {
                 Array.from(record.removedNodes).map((node) => {
                     this.removeReactiveListeners(node);
@@ -46,14 +43,19 @@ abstract class ReactiveViewBase<M extends object = object, E extends Element = E
                 });
             });
         });
-        this._observer.observe(this.root, {
+        this.observer.observe(this.root, {
             subtree: true,
             childList: true
         });
         this.addReactiveListeners(this.root);
     }
 
-    private addReactiveListeners(node: Node): void {
+    public disconnect(): void {
+        this.observer.disconnect();
+        this.removeReactiveListeners(this.root);
+    }
+
+    public addReactiveListeners(node: Node): void {
         if (isReactiveParentNode(node) || isReactiveNode(node)) {
             const { _reactModel, _reactEvent, _reactListener } = node._reactAttributes; 
             _reactModel.addEventListener(_reactEvent as any, _reactListener as any);
@@ -65,7 +67,7 @@ abstract class ReactiveViewBase<M extends object = object, E extends Element = E
         }
     }
 
-    private removeReactiveListeners(node: Node): void {
+    public removeReactiveListeners(node: Node): void {
         if (isReactiveParentNode(node) || isReactiveNode(node)) {
             const { _reactModel, _reactEvent, _reactListener } = node._reactAttributes; 
             _reactModel.removeEventListener(_reactEvent as any, _reactListener as any);

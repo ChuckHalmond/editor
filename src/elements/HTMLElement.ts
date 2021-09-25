@@ -1,4 +1,4 @@
-import { ListModel, ListModelChangeEvent, ObjectModel, ObjectModelChangeEvent } from "../models/Model";
+import { isListModel, isObjectModel, ListModel, ListModelChangeEvent, ObjectModel, ObjectModelChangeEvent } from "../models/Model";
 import { camelToTrain, forAllSubtreeElements } from "./Snippets";
 
 export { isTagElement };
@@ -273,8 +273,11 @@ function isElement(node: Node): node is Element {
 }
 
 function isReactiveNode(node: Node): node is ReactiveNode {
-    let testNode = node as ReactiveNode;
-    return (typeof testNode._reactAttributes === "object") && testNode._reactAttributes._reactEvent === "objectmodelchange";
+    return typeof (node as ReactiveNode)._reactAttributes === "object" &&
+        (node as ReactiveNode)._reactAttributes._reactEvent === "objectmodelchange" &&
+        typeof (node as ReactiveNode)._reactAttributes._reactListener === "function" &&
+        isObjectModel((node as ReactiveNode)._reactAttributes._reactModel) ||
+        isListModel((node as ReactiveNode)._reactAttributes._reactModel);
 }
 
 type ReactiveParentNode = (Node & ParentNode) & {
@@ -286,8 +289,10 @@ type ReactiveParentNode = (Node & ParentNode) & {
 }
 
 function isReactiveParentNode(node: Node): node is ReactiveParentNode {
-    let testNode = node as ReactiveParentNode;
-    return typeof testNode._reactAttributes === "object" && testNode._reactAttributes._reactEvent === "listmodelchange";
+    return typeof (node as ReactiveParentNode)._reactAttributes === "object" &&
+        (node as ReactiveParentNode)._reactAttributes._reactEvent === "listmodelchange" &&
+        typeof (node as ReactiveParentNode)._reactAttributes._reactListener === "function" &&
+        isListModel((node as ReactiveParentNode)._reactAttributes._reactModel);
 }
 
 function ReactiveNode<Data extends object, N extends Node>

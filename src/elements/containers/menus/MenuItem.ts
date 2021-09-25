@@ -65,6 +65,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
         bindShadowRoot(this, /*template*/`
             <style>
                 :host {
+                    position: relative;
                     display: inline-block;
 
                     user-select: none;
@@ -74,10 +75,10 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                     cursor: pointer;
                 }
 
-                :host([type="menu"]),
+                /*:host([type="menu"]),
                 :host([type="submenu"]) {
                     position: relative;
-                }
+                }*/
 
                 :host(:not([type="menu"])) {
                     padding-left: 12px;

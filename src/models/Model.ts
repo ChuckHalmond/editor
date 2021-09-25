@@ -2,9 +2,11 @@ import { EventDispatcher, Event } from "../events/EventDispatcher";
 
 export { ObjectModelChangeEvent };
 export { ObjectModel };
+export { isObjectModel };
 export { ObjectModelBase };
 export { ListModelChangeEvent };
 export { ListModelChangeType };
+export { isListModel };
 export { ListModel };
 export { ListModelBase };
 
@@ -21,9 +23,15 @@ interface ObjectModelChangeEvents {
     "objectmodelchange": ObjectModelChangeEvent;
 }
 
-interface ObjectModel<Data extends object> extends EventDispatcher<ObjectModelChangeEvents> {
+interface ObjectModel<Data extends object = object> extends EventDispatcher<ObjectModelChangeEvents> {
     readonly data: Readonly<Data>;
     set<K extends keyof Data>(key: K, value: Data[K]): void;
+}
+
+function isObjectModel(obj: any): obj is ObjectModel {
+    return typeof (obj as ObjectModel) === "object" && 
+        typeof (obj as ObjectModel).data === "object" &&
+        typeof (obj as ObjectModel).set === "function";
 }
 
 class ObjectModelBase<Data extends object> extends EventDispatcher<ObjectModelChangeEvents> implements ObjectModel<Data> {
@@ -60,7 +68,7 @@ interface ListModelEvents {
     "listmodelchange": ListModelChangeEvent;
 }
 
-interface ListModel<Item> extends EventDispatcher<ListModelEvents> {
+interface ListModel<Item = {}> extends EventDispatcher<ListModelEvents> {
     readonly items: ReadonlyArray<Item>;
     set(index: number, item: Item): void;
     insert(index: number, ...items: Item[]): void;
@@ -68,6 +76,17 @@ interface ListModel<Item> extends EventDispatcher<ListModelEvents> {
     pop(): Item | undefined;
     remove(item: Item): void;
     clear(): void;
+}
+
+function isListModel(obj: any): obj is ListModel {
+    return typeof (obj as ListModel) === "object" && 
+        Array.isArray((obj as ListModel).items) &&
+        typeof (obj as ListModel).set === "function" &&
+        typeof (obj as ListModel).insert === "function" &&
+        typeof (obj as ListModel).push === "function" &&
+        typeof (obj as ListModel).pop === "function" &&
+        typeof (obj as ListModel).remove === "function" &&
+        typeof (obj as ListModel).clear === "function";
 }
 
 class ListModelBase<Item> extends EventDispatcher<ListModelEvents> implements ListModel<Item> {

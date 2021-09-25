@@ -1,5 +1,6 @@
 export { View };
 export { ViewBase };
+export { ReactiveView };
 export { ReactiveViewBase };
 interface View<M extends object = object, E extends Element = Element> {
     readonly root: E;
@@ -7,16 +8,18 @@ interface View<M extends object = object, E extends Element = Element> {
     render(): E;
 }
 declare abstract class ViewBase<M extends object = object, E extends Element = Element> implements View<M, E> {
-    private _root;
-    private _model;
+    readonly root: E;
+    readonly model: M;
     constructor(model: M);
-    get root(): E;
-    get model(): M;
     abstract render(): E;
 }
-declare abstract class ReactiveViewBase<M extends object = object, E extends Element = Element> extends ViewBase<M, E> implements View<M, E> {
-    private _observer;
+interface ReactiveView<M extends object = object, E extends Element = Element> extends View<M, E> {
+    disconnect(): void;
+}
+declare abstract class ReactiveViewBase<M extends object = object, E extends Element = Element> extends ViewBase<M, E> implements ReactiveView<M, E> {
+    readonly observer: MutationObserver;
     constructor(model: M);
-    private addReactiveListeners;
-    private removeReactiveListeners;
+    disconnect(): void;
+    addReactiveListeners(node: Node): void;
+    removeReactiveListeners(node: Node): void;
 }

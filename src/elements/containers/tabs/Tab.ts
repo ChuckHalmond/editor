@@ -37,7 +37,9 @@ class BaseHTMLETabElement extends HTMLElement implements HTMLETabElement {
         bindShadowRoot(this, /*template*/`
             <style>
                 :host {
-                    display: block;
+                    display: inline-block;
+                    position: relative;
+                    
                     user-select: none;
                     white-space: nowrap;
                     padding: 2px 6px;

@@ -60,6 +60,7 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
             <style>
                 :host {
                     display: inline-block;
+                    position: relative;
 
                     user-select: none;
                     white-space: nowrap;
