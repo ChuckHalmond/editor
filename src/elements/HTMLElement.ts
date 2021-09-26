@@ -293,7 +293,7 @@ function ReactiveNode<Data extends object, N extends Node>
     | ((node: N, addedItems: Data[], removedItems: Data[], index: number) => void)): N {
         if ("items" in objectOrList) {
             const listener = (event: ListModelChangeEvent) => {
-                react(node, event.data.index as any, event.data.removedItems as any, event.data.addedItems as any);
+                react(node,  event.data.addedItems as any, event.data.removedItems as any, event.data.index as any);
             };
             Object.assign(
                 node, {
