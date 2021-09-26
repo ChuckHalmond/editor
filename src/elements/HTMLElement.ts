@@ -375,7 +375,7 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                     const child = childNodes.find(child => child._reactiveChildIndex === event.data.index);
                     if (child) {
                         const addedElements = event.data.addedItems.map((item, index) => advancedMap(
-                            item, list.items.length - event.data.addedItems.length + index)
+                            item, event.data.index + index)
                         );
                         child.before(...addedElements);
                     }
