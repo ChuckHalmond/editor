@@ -58,9 +58,9 @@ type ListModelChangeType = "insert" | "remove" | "clear";
 interface ListModelChangeEvent {
     type: "listmodelchange";
     data: {
-        index: number;
-        removedItems: any[];
         addedItems: any[];
+        removedItems: any[];
+        index: number;
     };
 }
 
@@ -104,20 +104,20 @@ class ListModelBase<Item> extends EventDispatcher<ListModelEvents> implements Li
     public set(index: number, item: Item): void {
         if (index >= 0 && index < this._items.length) {
             this._items[index] = item;
-            this.dispatchEvent(new Event("listmodelchange", {index: index, removedItems: [], addedItems: [item]}));
+            this.dispatchEvent(new Event("listmodelchange", {addedItems: [item], removedItems: [], index: index}));
         }
     }
 
     public push(...items: Item[]): number {
         const newLength = this._items.push(...items);
-        this.dispatchEvent(new Event("listmodelchange", {index: newLength - items.length, removedItems: [], addedItems: items}));
+        this.dispatchEvent(new Event("listmodelchange", {addedItems: items, removedItems: [], index: newLength - items.length}));
         return newLength;
     }
 
     public pop(): Item | undefined {
         const item = this._items.pop();
         if (item) {
-            this.dispatchEvent(new Event("listmodelchange", {index: this._items.length, removedItems: [item], addedItems: []}));
+            this.dispatchEvent(new Event("listmodelchange", {addedItems: [], removedItems: [item], index: this._items.length}));
         }
         return item;
     }
@@ -135,20 +135,20 @@ class ListModelBase<Item> extends EventDispatcher<ListModelEvents> implements Li
             }
         }
         this._items.splice(index, 0, ...items);
-        this.dispatchEvent(new Event("listmodelchange", {index: index, removedItems: [], addedItems: items}));
+        this.dispatchEvent(new Event("listmodelchange", {addedItems: items, removedItems: [], index: index}));
     }
 
     public remove(item: Item): void {
         const itemIndex = this._items.indexOf(item);
         if (itemIndex > -1) {
             this._items.splice(itemIndex, 1);
-            this.dispatchEvent(new Event("listmodelchange", {index: itemIndex, removedItems: [item], addedItems: []}));
+            this.dispatchEvent(new Event("listmodelchange", {addedItems: [], removedItems: [item], index: itemIndex}));
         }
     }
 
     public clear(): void {
         const removedItems = this._items.slice();
         this._items.splice(0, this._items.length);
-        this.dispatchEvent(new Event("listmodelchange", {index: 0, removedItems: removedItems, addedItems: []}));
+        this.dispatchEvent(new Event("listmodelchange", {addedItems: [], removedItems: removedItems, index: 0}));
     }
 }

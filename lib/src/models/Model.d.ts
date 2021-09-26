@@ -34,9 +34,9 @@ declare type ListModelChangeType = "insert" | "remove" | "clear";
 interface ListModelChangeEvent {
     type: "listmodelchange";
     data: {
-        index: number;
-        removedItems: any[];
         addedItems: any[];
+        removedItems: any[];
+        index: number;
     };
 }
 interface ListModelEvents {
