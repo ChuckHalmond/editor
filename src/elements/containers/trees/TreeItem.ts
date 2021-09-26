@@ -71,9 +71,12 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                     --indent-width: 6px;
                 }
                 
-                :host([active]) [part~="content"],
-                [part~="content"]:hover {
+                :host([active]) [part~="content"] {
                     background-color: gainsboro;
+                }
+
+                [part~="content"]:hover {
+                    background-color: whitesmoke;
                 }
 
                 :host(:not([expanded])) [part~="container"] {
