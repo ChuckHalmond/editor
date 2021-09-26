@@ -213,7 +213,7 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     options?: ElementCreationOptions,
     props?: Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>,
     attrs?: {[name: string]: number | string | boolean},
-    children?: Node[] | NodeList | ReactiveChildNodes,
+    children?: Node[] | NodeList | ((parent: Node & ParentNode) => ReactiveChildNode[]),
     listeners?: {
         [EventName in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[EventName]) => void | [(event: HTMLElementEventMap[EventName]) => void, Partial<boolean | AddEventListenerOptions>]
     },
@@ -333,27 +333,52 @@ function ReactiveNode<Data extends object, N extends Node>
         return node;
 }
 
-interface ReactiveChildNodes {
-    (parent: Node & ParentNode): (Node | string)[]
-}
+interface ReactiveChildNode extends ChildNode {
+    _reactiveChildIndex: number
+};
 
-function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string): ReactiveChildNodes {
+function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string): (parent: Node & ParentNode) => ReactiveChildNode[] {
     return (parent: Node & ParentNode) => {
+        const advancedMap = (item: Item, index: number) => {
+            const itemNode = map(item);
+            Object.assign(
+                itemNode, {
+                    _reactiveChildIndex: index
+                }
+            );
+            return itemNode as ReactiveChildNode;
+        };
         const listener = (event: ListModelChangeEvent) => {
+            const childNodes = Array.from(parent.childNodes)
+                .filter(node => typeof (node as any)._reactiveChildIndex === "number") as ReactiveChildNode[];
             if (event.data.removedItems.length) {
                 for (let i = 0; i < event.data.removedItems.length; i++) {
-                    if (parent.childNodes.length > event.data.index) {
-                        parent.childNodes.item(event.data.index)!.remove();
+                    if (childNodes.length > event.data.index) {
+                        const child = childNodes.find(child => child._reactiveChildIndex === event.data.index);
+                        if (child) {
+                            child.remove();
+                        }
                     }
                 }
             }
             if (event.data.addedItems.length) {
-                let addedElements = event.data.addedItems.map(item => map(item));
                 if (event.data.index >= list.items.length - event.data.addedItems.length) {
-                    parent.append(...addedElements);
+                    const lastChild = childNodes.find(child => child._reactiveChildIndex === (list.items.length - event.data.addedItems.length - 1));
+                    if (lastChild) {
+                        const addedElements = event.data.addedItems.map((item, index) => advancedMap(
+                            item, list.items.length - event.data.addedItems.length + index)
+                        );
+                        lastChild.after(...addedElements);
+                    }
                 }
                 else {
-                    parent.childNodes.item(event.data.index - event.data.removedItems.length)!.before(...addedElements);
+                    const child = childNodes.find(child => child._reactiveChildIndex === event.data.index);
+                    if (child) {
+                        const addedElements = event.data.addedItems.map((item, index) => advancedMap(
+                            item, list.items.length - event.data.addedItems.length + index)
+                        );
+                        child.before(...addedElements);
+                    }
                 }
             }
         };
@@ -369,7 +394,7 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                 }
             }
         ) as ReactiveParentNode;
-        return list.items.map(map);
+        return list.items.map(advancedMap);
     }
 }
 
