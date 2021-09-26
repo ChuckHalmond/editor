@@ -322,22 +322,25 @@ interface ReactiveChildNodes {
     (parent: Node & ParentNode): (Node | string)[]
 }
 
-function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string): ReactiveChildNodes {
+function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string, emptyNode?: Node): ReactiveChildNodes {
     return (parent: Node & ParentNode) => {
         const listener = (event: ListModelChangeEvent) => {
             if (event.data.removedItems.length) {
                 for (let i = 0; i < event.data.removedItems.length; i++) {
-                    parent!.children.item(event.data.index)!.remove();
+                    parent.children.item(event.data.index)!.remove();
                 }
             }
             if (event.data.addedItems.length) {
                 let addedElements = event.data.addedItems.map(item => map(item));
                 if (event.data.index >= list.items.length - event.data.addedItems.length) {
-                    parent!.append(...addedElements);
+                    parent.append(...addedElements);
                 }
                 else {
-                    parent!.children.item(event.data.index - event.data.removedItems.length)!.before(...addedElements);
+                    parent.children.item(event.data.index - event.data.removedItems.length)!.before(...addedElements);
                 }
+            }
+            if (parent.children.length === 0 && emptyNode) {
+                parent.append(emptyNode);
             }
         };
         Object.assign(

@@ -80,7 +80,7 @@ declare function ReactiveNode<Data extends object, N extends Node>(node: N, obje
 interface ReactiveChildNodes {
     (parent: Node & ParentNode): (Node | string)[];
 }
-declare function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string): ReactiveChildNodes;
+declare function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string, emptyNode?: Node): ReactiveChildNodes;
 declare function setHTMLElementEventListeners<K extends keyof HTMLElementTagNameMap>(element: HTMLElementTagNameMap[K], listeners: {
     [K in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[K]) => void | [(event: HTMLElementEventMap[K]) => void, Partial<boolean | AddEventListenerOptions>];
 }): HTMLElementTagNameMap[K];
