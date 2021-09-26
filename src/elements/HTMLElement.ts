@@ -364,11 +364,14 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
             if (event.data.addedItems.length) {
                 if (event.data.index >= list.items.length - event.data.addedItems.length) {
                     const lastChild = childNodes.find(child => child._reactiveChildIndex === (list.items.length - event.data.addedItems.length - 1));
+                    const addedElements = event.data.addedItems.map((item, index) => advancedMap(
+                        item, list.items.length - event.data.addedItems.length + index)
+                    );
                     if (lastChild) {
-                        const addedElements = event.data.addedItems.map((item, index) => advancedMap(
-                            item, list.items.length - event.data.addedItems.length + index)
-                        );
                         lastChild.after(...addedElements);
+                    }
+                    else {
+                        parent.append(...addedElements);
                     }
                 }
                 else {
