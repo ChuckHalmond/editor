@@ -342,8 +342,8 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
         const listener = (event: ListModelChangeEvent) => {
             if (event.data.removedItems.length) {
                 for (let i = 0; i < event.data.removedItems.length; i++) {
-                    if (parent.children.length > event.data.index) {
-                        parent.children.item(event.data.index)!.remove();
+                    if (parent.childNodes.length > event.data.index) {
+                        parent.childNodes.item(event.data.index)!.remove();
                     }
                 }
             }
@@ -353,7 +353,7 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                     parent.append(...addedElements);
                 }
                 else {
-                    parent.children.item(event.data.index - event.data.removedItems.length)!.before(...addedElements);
+                    parent.childNodes.item(event.data.index - event.data.removedItems.length)!.before(...addedElements);
                 }
             }
         };
