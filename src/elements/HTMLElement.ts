@@ -368,7 +368,7 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                 if (event.data.index >= list.items.length - event.data.addedItems.length) {
                     const lastChild = reactiveChildNodes.find(child => child._reactiveChildIndex === (list.items.length - event.data.addedItems.length - 1));
                     const addedElements = event.data.addedItems.map((item, index) => advancedMap(
-                        item, list.items.length - event.data.addedItems.length + index)
+                        item, (list.items.length - 1) + index)
                     );
                     if (lastChild) {
                         lastChild.after(...addedElements);
