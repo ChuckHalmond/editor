@@ -340,6 +340,9 @@ interface ReactiveChildNodes {
 function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string): ReactiveChildNodes {
     return (parent: Node & ParentNode) => {
         const listener = (event: ListModelChangeEvent) => {
+            if ((list.items.length + event.data.removedItems.length - event.data.addedItems.length) === 0) {
+                parent.textContent = "";
+            }
             if (event.data.removedItems.length) {
                 for (let i = 0; i < event.data.removedItems.length; i++) {
                     parent.children.item(event.data.index)!.remove();
