@@ -1,4 +1,4 @@
-import { isParentNode, isReactiveNode } from "../elements/HTMLElement";
+import { isParentNode, isReactiveNode, isReactiveParentNode } from "../elements/HTMLElement";
 import { forAllSubtreeNodes } from "../elements/Snippets";
 
 export { View };
@@ -57,7 +57,10 @@ abstract class ReactiveViewBase<M extends object = object, E extends Element = E
 
     public addReactiveListeners(node: Node): void {
         if (isReactiveNode(node)) {
-            node._reactAttributes.addReactListener();
+            node._reactiveNodeAttributes.addReactListener();
+        }
+        if (isReactiveParentNode(node)) {
+            node._reactiveParentNodeAttributes.addReactListener();
         }
         if (isParentNode(node)) {
             forAllSubtreeNodes(node, (childNode) => {
@@ -68,7 +71,10 @@ abstract class ReactiveViewBase<M extends object = object, E extends Element = E
 
     public removeReactiveListeners(node: Node): void {
         if (isReactiveNode(node)) {
-            node._reactAttributes.removeReactListener();
+            node._reactiveNodeAttributes.addReactListener();
+        }
+        if (isReactiveParentNode(node)) {
+            node._reactiveParentNodeAttributes.addReactListener();
         }
         if (isParentNode(node)) {
             forAllSubtreeNodes(node, (childNode) => {

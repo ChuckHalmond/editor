@@ -10,7 +10,9 @@ export { setElementAttributes };
 export { setElementChildren };
 export { isParentNode };
 export { isReactiveNode };
+export { isReactiveParentNode };
 export { ReactiveNode };
+export { ReactiveParentNode };
 export { ReactiveChildNodes };
 export { isElement };
 export { Element };
@@ -249,7 +251,14 @@ function Element<K extends keyof HTMLElementTagNameMap>(
 }
 
 type ReactiveNode = Node & {
-    _reactAttributes: {
+    _reactiveNodeAttributes: {
+        addReactListener: () => void;
+        removeReactListener: () => void;
+    }
+};
+
+type ReactiveParentNode = Node & {
+    _reactiveParentNodeAttributes: {
         addReactListener: () => void;
         removeReactListener: () => void;
     }
@@ -264,9 +273,15 @@ function isElement(node: Node): node is Element {
 }
 
 function isReactiveNode(node: Node): node is ReactiveNode {
-    return typeof (node as ReactiveNode)._reactAttributes === "object" &&
-        typeof (node as ReactiveNode)._reactAttributes.addReactListener === "function" &&
-        typeof (node as ReactiveNode)._reactAttributes.removeReactListener === "function";
+    return typeof (node as ReactiveNode)._reactiveNodeAttributes === "object" &&
+        typeof (node as ReactiveNode)._reactiveNodeAttributes.addReactListener === "function" &&
+        typeof (node as ReactiveNode)._reactiveNodeAttributes.removeReactListener === "function";
+}
+
+function isReactiveParentNode(node: Node): node is ReactiveParentNode {
+    return typeof (node as ReactiveParentNode)._reactiveParentNodeAttributes === "object" &&
+        typeof (node as ReactiveParentNode)._reactiveParentNodeAttributes.addReactListener === "function" &&
+        typeof (node as ReactiveParentNode)._reactiveParentNodeAttributes.removeReactListener === "function";
 }
 
 function ReactiveNode<Data extends object, N extends Node>
@@ -282,7 +297,7 @@ function ReactiveNode<Data extends object, N extends Node>
             };
             Object.assign(
                 node, {
-                    _reactAttributes: {
+                    _reactiveNodeAttributes: {
                         addReactListener: () => {
                             objectOrList.addEventListener("listmodelchange", listener);
                         },
@@ -300,7 +315,7 @@ function ReactiveNode<Data extends object, N extends Node>
             };
             Object.assign(
                 node, {
-                    _reactAttributes: {
+                    _reactiveNodeAttributes: {
                         addReactListener: () => {
                             objectOrList.addEventListener("objectmodelchange", listener);
                         },
@@ -322,7 +337,7 @@ interface ReactiveChildNodes {
     (parent: Node & ParentNode): (Node | string)[]
 }
 
-function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string, emptyNode?: Node): ReactiveChildNodes {
+function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string): ReactiveChildNodes {
     return (parent: Node & ParentNode) => {
         const listener = (event: ListModelChangeEvent) => {
             if (event.data.removedItems.length) {
@@ -339,13 +354,10 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                     parent.children.item(event.data.index - event.data.removedItems.length)!.before(...addedElements);
                 }
             }
-            if (parent.children.length === 0 && emptyNode) {
-                parent.append(emptyNode);
-            }
         };
         Object.assign(
             parent, {
-                _reactAttributes: {
+                _reactiveParentNodeAttributes: {
                     addReactListener: () => {
                         list.addEventListener("listmodelchange", listener);
                     },
@@ -354,7 +366,7 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                     }
                 }
             }
-        ) as ReactiveNode;
+        ) as ReactiveParentNode;
         return list.items.map(map);
     }
 }
