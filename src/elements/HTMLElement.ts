@@ -344,46 +344,44 @@ function isReactiveChildNode(node: Node): node is ReactiveChildNode {
 function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string): (parent: Node & ParentNode) => ReactiveChildNode[] {
     return (parent: Node & ParentNode) => {
         const reactiveChildMap = (item: Item, index: number) => {
-            console.log(index);
             return Object.assign(
                 map(item), {
                     _reactiveChildIndex: index
                 }
             ) as ReactiveChildNode;
         };
+
         const listener = (event: ListModelChangeEvent) => {
             const reactiveChildNodes = Array.from(parent.childNodes).filter(isReactiveChildNode);
             if (event.data.removedItems.length) {
                 for (let i = 0; i < event.data.removedItems.length; i++) {
                     if (reactiveChildNodes.length > event.data.index) {
-                        const child = reactiveChildNodes.find(child => child._reactiveChildIndex === event.data.index);
-                        if (child) {
-                            child.remove();
-                        }
+                        reactiveChildNodes.forEach((reactiveChildNode) => {
+                            if (reactiveChildNode._reactiveChildIndex === event.data.index) {
+                                reactiveChildNode.remove();
+                            }
+                            else if (reactiveChildNode._reactiveChildIndex > event.data.index) {
+                                reactiveChildNode._reactiveChildIndex = reactiveChildNode._reactiveChildIndex - 1;
+                            }
+                        });
                     }
                 }
             }
             if (event.data.addedItems.length) {
-                if (event.data.index >= list.items.length - event.data.addedItems.length) {
-                    const lastChild = reactiveChildNodes.find(child => child._reactiveChildIndex === list.items.length - event.data.addedItems.length);
-                    const addedElements = event.data.addedItems.map((item, index) => reactiveChildMap(
-                        item, list.items.length - event.data.addedItems.length + index)
-                    );
-                    if (lastChild) {
-                        lastChild.after(...addedElements);
-                    }
-                    else {
-                        parent.append(...addedElements);
-                    }
+                if (event.data.index < list.items.length - event.data.addedItems.length) {
+                    const addedElements = event.data.addedItems.map((item, index) => reactiveChildMap(item, event.data.index + index));
+                    reactiveChildNodes.forEach((reactiveChildNode) => {
+                        if (reactiveChildNode._reactiveChildIndex === event.data.index) {
+                            reactiveChildNode.before(...addedElements);
+                        }
+                        else if (reactiveChildNode._reactiveChildIndex > event.data.index) {
+                            reactiveChildNode._reactiveChildIndex = reactiveChildNode._reactiveChildIndex + event.data.addedItems.length;
+                        }
+                    });
                 }
                 else {
-                    const child = reactiveChildNodes.find(child => child._reactiveChildIndex === event.data.index);
-                    if (child) {
-                        const addedElements = event.data.addedItems.map((item, index) => reactiveChildMap(
-                            item, event.data.index + index)
-                        );
-                        child.before(...addedElements);
-                    }
+                    const addedElements = event.data.addedItems.map((item, index) => reactiveChildMap(item, event.data.index + index));
+                    parent.append(...addedElements);
                 }
             }
         };
