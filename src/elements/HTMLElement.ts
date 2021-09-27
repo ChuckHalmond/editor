@@ -375,7 +375,10 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                 }
             }
         ) as ReactiveParentNode;
-        return list.items.map(map);
+        const children = placeholder && list.items.length === 0 ?
+            [placeholder] :
+            list.items.map(map);
+        return children;
     }
 }
 
