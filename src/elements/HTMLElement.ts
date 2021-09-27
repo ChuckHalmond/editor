@@ -350,7 +350,6 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                 }
             ) as ReactiveChildNode;
         };
-
         const listener = (event: ListModelChangeEvent) => {
             const reactiveChildNodes = Array.from(parent.childNodes).filter(isReactiveChildNode);
             if (event.data.removedItems.length) {
@@ -361,7 +360,7 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                                 reactiveChildNode._reactiveChildIndex <= event.data.index + event.data.removedItems.length) {
                                 reactiveChildNode.remove();
                             }
-                            else if (reactiveChildNode._reactiveChildIndex >= event.data.index) {
+                            if (reactiveChildNode._reactiveChildIndex >= event.data.index) {
                                 reactiveChildNode._reactiveChildIndex = reactiveChildNode._reactiveChildIndex - event.data.removedItems.length;
                             }
                         });
@@ -369,20 +368,19 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                 }
             }
             if (event.data.addedItems.length) {
+                const addedReactiveChildNodes = event.data.addedItems.map((item, index) => reactiveChildMap(item, event.data.index + index));
                 if (event.data.index < list.items.length - event.data.addedItems.length) {
-                    const addedElements = event.data.addedItems.map((item, index) => reactiveChildMap(item, event.data.index + index));
                     reactiveChildNodes.forEach((reactiveChildNode) => {
                         if (reactiveChildNode._reactiveChildIndex === event.data.index) {
-                            reactiveChildNode.before(...addedElements);
+                            reactiveChildNode.before(...addedReactiveChildNodes);
                         }
-                        else if (reactiveChildNode._reactiveChildIndex >= event.data.index) {
+                        if (reactiveChildNode._reactiveChildIndex >= event.data.index) {
                             reactiveChildNode._reactiveChildIndex = reactiveChildNode._reactiveChildIndex + event.data.addedItems.length;
                         }
                     });
                 }
                 else {
-                    const addedElements = event.data.addedItems.map((item, index) => reactiveChildMap(item, event.data.index + index));
-                    parent.append(...addedElements);
+                    parent.append(...addedReactiveChildNodes);
                 }
             }
         };
