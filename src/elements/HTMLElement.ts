@@ -213,7 +213,7 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     options?: ElementCreationOptions,
     props?: Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>,
     attrs?: {[name: string]: number | string | boolean},
-    children?: Node[] | NodeList | ((parent: Node & ParentNode) => ReactiveChildNode[]),
+    children?: Node[] | NodeList | ReactiveChildNodes,
     listeners?: {
         [EventName in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[EventName]) => void | [(event: HTMLElementEventMap[EventName]) => void, Partial<boolean | AddEventListenerOptions>]
     },
@@ -333,55 +333,34 @@ function ReactiveNode<Data extends object, N extends Node>
         return node;
 }
 
-interface ReactiveChildNode extends ChildNode {
-    _reactiveChildIndex: number
-};
-
-function isReactiveChildNode(node: Node): node is ReactiveChildNode {
-    return typeof (node as ReactiveChildNode)._reactiveChildIndex === "number";
+interface ReactiveChildNodes {
+    (parent: Node & ParentNode): (Node | string)[]
 }
 
-function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string): (parent: Node & ParentNode) => ReactiveChildNode[] {
+function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string, placeholder?: Node): ReactiveChildNodes {
     return (parent: Node & ParentNode) => {
-        const reactiveChildMap = (item: Item, index: number) => {
-            return Object.assign(
-                map(item), {
-                    _reactiveChildIndex: index
-                }
-            ) as ReactiveChildNode;
-        };
         const listener = (event: ListModelChangeEvent) => {
-            const reactiveChildNodes = Array.from(parent.childNodes).filter(isReactiveChildNode);
+            if (event.data.addedItems.length === list.items.length) {
+                parent.textContent = "";
+            }
             if (event.data.removedItems.length) {
                 for (let i = 0; i < event.data.removedItems.length; i++) {
-                    if (reactiveChildNodes.length > event.data.index) {
-                        reactiveChildNodes.forEach((reactiveChildNode) => {
-                            if (reactiveChildNode._reactiveChildIndex >= event.data.index &&
-                                reactiveChildNode._reactiveChildIndex <= event.data.index + event.data.removedItems.length) {
-                                reactiveChildNode.remove();
-                            }
-                            if (reactiveChildNode._reactiveChildIndex >= event.data.index) {
-                                reactiveChildNode._reactiveChildIndex = reactiveChildNode._reactiveChildIndex - event.data.removedItems.length;
-                            }
-                        });
+                    if (parent.childNodes.length > event.data.index) {
+                        parent.childNodes.item(event.data.index).remove();
                     }
                 }
             }
             if (event.data.addedItems.length) {
-                const addedReactiveChildNodes = event.data.addedItems.map((item, index) => reactiveChildMap(item, event.data.index + index));
-                if (event.data.index < list.items.length - event.data.addedItems.length) {
-                    reactiveChildNodes.forEach((reactiveChildNode) => {
-                        if (reactiveChildNode._reactiveChildIndex === event.data.index) {
-                            reactiveChildNode.before(...addedReactiveChildNodes);
-                        }
-                        if (reactiveChildNode._reactiveChildIndex >= event.data.index) {
-                            reactiveChildNode._reactiveChildIndex = reactiveChildNode._reactiveChildIndex + event.data.addedItems.length;
-                        }
-                    });
+                let addedElements = event.data.addedItems.map(item => map(item));
+                if (event.data.index >= list.items.length - event.data.addedItems.length) {
+                    parent.append(...addedElements);
                 }
                 else {
-                    parent.append(...addedReactiveChildNodes);
+                    parent.childNodes.item(event.data.index - event.data.removedItems.length)!.before(...addedElements);
                 }
+            }
+            if (list.items.length === 0 && placeholder) {
+                parent.append(placeholder);
             }
         };
         Object.assign(
@@ -396,7 +375,7 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                 }
             }
         ) as ReactiveParentNode;
-        return list.items.map(reactiveChildMap);
+        return list.items.map(map);
     }
 }
 

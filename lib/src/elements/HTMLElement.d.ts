@@ -59,7 +59,7 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     attrs?: {
         [name: string]: number | string | boolean;
     };
-    children?: Node[] | NodeList | ((parent: Node & ParentNode) => ReactiveChildNode[]);
+    children?: Node[] | NodeList | ReactiveChildNodes;
     listeners?: {
         [EventName in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[EventName]) => void | [(event: HTMLElementEventMap[EventName]) => void, Partial<boolean | AddEventListenerOptions>];
     };
@@ -86,10 +86,10 @@ declare function isReactiveNode(node: Node): node is ReactiveNode;
 declare function isReactiveParentNode(node: Node): node is ReactiveParentNode;
 declare function ReactiveNode<Data extends object, N extends Node>(node: N, list: ListModel<Data>, react: (node: N, addedItems: Data[], removedItems: Data[], index: number) => void): N;
 declare function ReactiveNode<Data extends object, N extends Node>(node: N, object: ObjectModel<Data>, react: <K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void): N;
-interface ReactiveChildNode extends ChildNode {
-    _reactiveChildIndex: number;
+interface ReactiveChildNodes {
+    (parent: Node & ParentNode): (Node | string)[];
 }
-declare function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string): (parent: Node & ParentNode) => ReactiveChildNode[];
+declare function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string, placeholder?: Node): ReactiveChildNodes;
 declare function setHTMLElementEventListeners<K extends keyof HTMLElementTagNameMap>(element: HTMLElementTagNameMap[K], listeners: {
     [K in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[K]) => void | [(event: HTMLElementEventMap[K]) => void, Partial<boolean | AddEventListenerOptions>];
 }): HTMLElementTagNameMap[K];
