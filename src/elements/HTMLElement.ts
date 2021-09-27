@@ -357,11 +357,12 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                 for (let i = 0; i < event.data.removedItems.length; i++) {
                     if (reactiveChildNodes.length > event.data.index) {
                         reactiveChildNodes.forEach((reactiveChildNode) => {
-                            if (reactiveChildNode._reactiveChildIndex === event.data.index) {
+                            if (reactiveChildNode._reactiveChildIndex >= event.data.index &&
+                                reactiveChildNode._reactiveChildIndex <= event.data.index + event.data.removedItems.length) {
                                 reactiveChildNode.remove();
                             }
                             else if (reactiveChildNode._reactiveChildIndex > event.data.index) {
-                                reactiveChildNode._reactiveChildIndex = reactiveChildNode._reactiveChildIndex - 1;
+                                reactiveChildNode._reactiveChildIndex = reactiveChildNode._reactiveChildIndex - event.data.removedItems.length;
                             }
                         });
                     }
