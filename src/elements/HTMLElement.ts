@@ -361,7 +361,7 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                                 reactiveChildNode._reactiveChildIndex <= event.data.index + event.data.removedItems.length) {
                                 reactiveChildNode.remove();
                             }
-                            else if (reactiveChildNode._reactiveChildIndex > event.data.index) {
+                            else if (reactiveChildNode._reactiveChildIndex >= event.data.index) {
                                 reactiveChildNode._reactiveChildIndex = reactiveChildNode._reactiveChildIndex - event.data.removedItems.length;
                             }
                         });
@@ -375,7 +375,7 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
                         if (reactiveChildNode._reactiveChildIndex === event.data.index) {
                             reactiveChildNode.before(...addedElements);
                         }
-                        else if (reactiveChildNode._reactiveChildIndex > event.data.index) {
+                        else if (reactiveChildNode._reactiveChildIndex >= event.data.index) {
                             reactiveChildNode._reactiveChildIndex = reactiveChildNode._reactiveChildIndex + event.data.addedItems.length;
                         }
                     });
