@@ -1,5 +1,5 @@
 import { HTMLEDraggableElement } from "./Draggable";
-export { DataChangeEvent };
+export { EDataChangeEvent };
 export { HTMLEDropzoneElement };
 export { HTMLEDropzoneElementBase };
 export { DropzoneDataBase };
@@ -21,7 +21,7 @@ interface HTMLEDropzoneElement extends HTMLElement {
     clearSelection(): void;
 }
 declare type DropzoneDragoveredType = "self" | "draggable" | "appendarea";
-declare type DataChangeEvent = CustomEvent<{
+declare type EDataChangeEvent = CustomEvent<{
     action: "insert" | "remove";
     draggables: HTMLEDraggableElement[];
     position: number;
@@ -54,7 +54,7 @@ declare global {
 }
 declare global {
     interface HTMLElementEventMap {
-        "datachange": DataChangeEvent;
+        "e_datachange": EDataChangeEvent;
     }
 }
 interface DropzoneData {

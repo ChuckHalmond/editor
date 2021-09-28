@@ -2,7 +2,7 @@ import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, 
 import { HTMLEDraggableElement } from "./Draggable";
 import { HTMLEDragzoneElement } from "./Dragzone";
 
-export { DataChangeEvent };
+export { EDataChangeEvent };
 export { HTMLEDropzoneElement };
 export { HTMLEDropzoneElementBase };
 export { DropzoneDataBase };
@@ -27,7 +27,7 @@ interface HTMLEDropzoneElement extends HTMLElement {
 
 type DropzoneDragoveredType = "self" | "draggable" | "appendarea";
 
-type DataChangeEvent = CustomEvent<{
+type EDataChangeEvent = CustomEvent<{
     action: "insert" | "remove";
     draggables: HTMLEDraggableElement[];
     position: number;
@@ -394,7 +394,7 @@ class HTMLEDropzoneElementBase extends HTMLElement implements HTMLEDropzoneEleme
             const slot = this.shadowRoot?.querySelector("slot");
             if (slot) {
                 slot.addEventListener("slotchange", () => {
-                    this.dispatchEvent(new CustomEvent("datachange", {
+                    this.dispatchEvent(new CustomEvent("e_datachange", {
                         bubbles: true,
                         detail: {
                             action: "insert",
@@ -422,7 +422,7 @@ class HTMLEDropzoneElementBase extends HTMLElement implements HTMLEDropzoneEleme
         const slot = this.shadowRoot?.querySelector("slot");
         if (slot) {
             slot.addEventListener("slotchange", () => {
-                this.dispatchEvent(new CustomEvent("datachange", {
+                this.dispatchEvent(new CustomEvent("e_datachange", {
                     bubbles: true,
                     detail: {
                         action: "remove",
@@ -443,7 +443,7 @@ declare global {
 
 declare global {
     interface HTMLElementEventMap {
-        "datachange": DataChangeEvent,
+        "e_datachange": EDataChangeEvent,
     }
 }
 
