@@ -8,9 +8,10 @@ interface View<M extends object = object, E extends Element = Element> {
     render(): E;
 }
 declare abstract class ViewBase<M extends object = object, E extends Element = Element> implements View<M, E> {
-    readonly root: E;
+    protected _root: E;
     readonly model: M;
     constructor(model: M);
+    get root(): E;
     abstract render(): E;
 }
 interface ReactiveView<M extends object = object, E extends Element = Element> extends View<M, E> {

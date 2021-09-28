@@ -13,14 +13,18 @@ interface View<M extends object = object, E extends Element = Element> {
 }
 
 abstract class ViewBase<M extends object = object, E extends Element = Element> implements View<M, E> {
-    public readonly root: E;
+    protected _root: E;
     public readonly model: M;
 
     constructor(model: M) {
         this.model = model;
-        this.root = this.render();
+        this._root = this.render();
     }
 
+    public get root(): E {
+        return this._root;
+    }
+    
     public abstract render(): E;
 }
 
