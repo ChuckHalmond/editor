@@ -5,7 +5,7 @@ interface HTMLEDraggableElement extends HTMLElement {
     dragged: boolean;
     type: string;
     dragovered: boolean;
-    data: object;
+    data: object | null;
 }
 declare class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableElement {
     selected: boolean;
@@ -13,7 +13,7 @@ declare class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDrag
     dragged: boolean;
     disabled: boolean;
     type: string;
-    data: object;
+    data: object | null;
     constructor();
     connectedCallback(): void;
 }

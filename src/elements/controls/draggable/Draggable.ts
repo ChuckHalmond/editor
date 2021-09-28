@@ -8,7 +8,7 @@ interface HTMLEDraggableElement extends HTMLElement {
     dragged: boolean;
     type: string;
     dragovered: boolean;
-    data: object;
+    data: object | null;
 }
 
 @RegisterCustomHTMLElement({
@@ -30,7 +30,7 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
     public disabled!: boolean;
 
     public type!: string;
-    public data!: object;
+    public data!: object | null;
 
     constructor() {
         super();
@@ -49,7 +49,8 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
 
                 :host([disabled]) {
                     pointer-events: none;
-                    opacity: 0.3;
+                    color: gray;
+                    border-color: gray;
                 }
 
                 :host([selected]:active) {
