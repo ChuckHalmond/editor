@@ -442,13 +442,14 @@ function setElementAttributes<E extends Element>(
     ): E {
     for (const key in attributes) {
         const value = attributes[key];
+        const attributeName = camelToTrain(key);
         if (typeof value === "boolean") {
             if (value) {
-                element.setAttribute(camelToTrain(key), "");
+                element.setAttribute(attributeName, "");
             }
         }
         else {
-            element.setAttribute(camelToTrain(key), value.toString());
+            element.setAttribute(attributeName, value.toString());
         }
     }
     return element;
@@ -461,7 +462,7 @@ interface AttributeMutationMixin {
     attach(element: Element): void;
     detach(element: Element): void;
 }
-  
+
 type AttributeType = "string" | "boolean" | "listitem";
 
 function areAttributesMatching(refAttributeType: AttributeType, refAttrName: string, refAttrValue: string, attrName: string, attrValue: string | null): boolean {

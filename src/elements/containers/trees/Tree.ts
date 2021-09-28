@@ -8,6 +8,8 @@ interface HTMLETreeElement extends HTMLElement {
     name: string;
     items: HTMLETreeItemElement[];
     readonly activeItem: HTMLETreeItemElement | null;
+
+    findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null;
 }
 
 @RegisterCustomHTMLElement({
@@ -118,7 +120,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
                     break;
                 case "Home":
                     if (this.items.length > 0) {
-                        this.items[0].focus({preventScroll: true});
+                        this.items[0].focus();
                     }
                     event.preventDefault();
                     break;
@@ -171,6 +173,24 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
                 this.active = false;
             }
         });
+    }
+
+    public findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null {
+        let foundItem: HTMLETreeItemElement | null = null;
+        for (let item of this.items) {
+            if (predicate(item)) {
+                return item;
+            }
+            if (subtree && item.items) {
+                for (let subitem of item.items) {
+                    foundItem = subitem.findItem(predicate, subtree);
+                    if (foundItem) {
+                        return foundItem;
+                    }
+                }
+            }
+        }
+        return foundItem;
     }
 }
 

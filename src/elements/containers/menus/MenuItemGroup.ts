@@ -256,8 +256,7 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
 
     public findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null {
         let foundItem: HTMLEMenuItemElement | null = null;
-        for (let idx = 0; idx < this.items.length; idx++) {
-            let item = this.items[idx];
+        for (let item of this.items) {
             if (predicate(item)) {
                 return item;
             }

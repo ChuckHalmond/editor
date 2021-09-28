@@ -17,6 +17,7 @@ interface HTMLETreeItemElement extends HTMLElement {
     nearestParentItem(): HTMLETreeItemElement;
     toggle(): void;
     trigger(): void;
+    findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null;
 }
 declare class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemElement {
     name: string;
@@ -39,6 +40,7 @@ declare class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeI
     nearestParentItem(): HTMLETreeItemElement;
     toggle(): void;
     trigger(): void;
+    findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null;
 }
 declare global {
     interface HTMLElementTagNameMap {

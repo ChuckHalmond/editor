@@ -8,8 +8,10 @@ type EDialogElementType = "confirm" | "alert";
 interface HTMLEDialogElement extends HTMLElement {
     name: string;
     type: EDialogElementType;
-    confirm(): void;
+    open(): void;
+    close(): void;
     cancel(): void;
+    confirm(): void;
 }
 
 @RegisterCustomHTMLElement({
@@ -23,6 +25,7 @@ class HTMLEDialogElementBase extends HTMLElement implements HTMLEDialogElement {
     public name!: string;
     public type!: EDialogElementType;
 
+    private _closeButton: HTMLButtonElement;
     private _cancelButton: HTMLButtonElement;
     private _confirmButton: HTMLButtonElement;
     private _okButton: HTMLButtonElement;
@@ -53,6 +56,12 @@ class HTMLEDialogElementBase extends HTMLElement implements HTMLEDialogElement {
                     justify-content: flex-end;
                 }
 
+                [part~="header"] {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: flex-end;
+                }
+
                 [part~="button"]:not(:first-child) {
                     margin-left: 4px;
                 }
@@ -66,6 +75,10 @@ class HTMLEDialogElementBase extends HTMLElement implements HTMLEDialogElement {
                     display: none !important;
                 }
             </style>
+            <div part="header">
+                <button type="button" tabindex="0" part="button close-button">x</button>
+            </div>
+            <hr part="separator"/>
             <div part="body">
                 <slot></slot>
             </div>
@@ -77,6 +90,7 @@ class HTMLEDialogElementBase extends HTMLElement implements HTMLEDialogElement {
             </div>
         `);
 
+        this._closeButton = this.shadowRoot!.querySelector("[part~='close-button']")!;
         this._cancelButton = this.shadowRoot!.querySelector("[part~='cancel-button']")!;
         this._confirmButton = this.shadowRoot!.querySelector("[part~='confirm-button']")!;
         this._okButton = this.shadowRoot!.querySelector("[part~='ok-button']")!;
@@ -87,7 +101,7 @@ class HTMLEDialogElementBase extends HTMLElement implements HTMLEDialogElement {
 
         this.shadowRoot!.addEventListener("mousedown", (event) => {
             let target = event.target as Element;
-            if (target === this._cancelButton) {
+            if (target === this._closeButton || target === this._cancelButton) {
                 this.cancel();
             }
             else if (target === this._confirmButton || target === this._okButton) {
@@ -96,14 +110,22 @@ class HTMLEDialogElementBase extends HTMLElement implements HTMLEDialogElement {
         });
     }
 
-    public confirm(): void {
-        this.dispatchEvent(new CustomEvent("e_confirm"));
-        this.remove();
+    public open(): void {
+        this.dispatchEvent(new CustomEvent("e_open"));
+    }
+
+    public close(): void {
+        this.dispatchEvent(new CustomEvent("e_close"));
     }
 
     public cancel(): void {
         this.dispatchEvent(new CustomEvent("e_cancel"));
-        this.remove();
+        this.close();
+    }
+
+    public confirm(): void {
+        this.dispatchEvent(new CustomEvent("e_confirm"));
+        this.close();
     }
 }
 
@@ -115,12 +137,24 @@ declare global {
 
 declare global {
     interface HTMLElementEventMap {
-        "e_confirm": Event,
+        "e_open": Event,
+    }
+}
+
+declare global {
+    interface HTMLElementEventMap {
+        "e_close": Event,
     }
 }
 
 declare global {
     interface HTMLElementEventMap {
         "e_cancel": Event,
+    }
+}
+
+declare global {
+    interface HTMLElementEventMap {
+        "e_confirm": Event,
     }
 }

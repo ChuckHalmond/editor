@@ -172,8 +172,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
 
     public findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): HTMLEMenuItemElement | null {
         let foundItem: HTMLEMenuItemElement | null = null;
-        for (let idx = 0; idx < this.items.length; idx++) {
-            let item = this.items[idx];
+        for (let item of this.items) {
             if (predicate(item)) {
                 return item;
             }

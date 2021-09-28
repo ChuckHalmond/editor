@@ -75,11 +75,6 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                     cursor: pointer;
                 }
 
-                /*:host([type="menu"]),
-                :host([type="submenu"]) {
-                    position: relative;
-                }*/
-
                 :host(:not([type="menu"])) {
                     padding-left: 12px;
                     padding-right: 12px;

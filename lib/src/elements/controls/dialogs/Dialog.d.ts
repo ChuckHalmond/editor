@@ -4,19 +4,24 @@ declare type EDialogElementType = "confirm" | "alert";
 interface HTMLEDialogElement extends HTMLElement {
     name: string;
     type: EDialogElementType;
-    confirm(): void;
+    open(): void;
+    close(): void;
     cancel(): void;
+    confirm(): void;
 }
 declare class HTMLEDialogElementBase extends HTMLElement implements HTMLEDialogElement {
     name: string;
     type: EDialogElementType;
+    private _closeButton;
     private _cancelButton;
     private _confirmButton;
     private _okButton;
     constructor();
     connectedCallback(): void;
-    confirm(): void;
+    open(): void;
+    close(): void;
     cancel(): void;
+    confirm(): void;
 }
 declare global {
     interface HTMLElementTagNameMap {
@@ -25,11 +30,21 @@ declare global {
 }
 declare global {
     interface HTMLElementEventMap {
-        "e_confirm": Event;
+        "e_open": Event;
+    }
+}
+declare global {
+    interface HTMLElementEventMap {
+        "e_close": Event;
     }
 }
 declare global {
     interface HTMLElementEventMap {
         "e_cancel": Event;
+    }
+}
+declare global {
+    interface HTMLElementEventMap {
+        "e_confirm": Event;
     }
 }

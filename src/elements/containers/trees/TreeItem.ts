@@ -23,6 +23,8 @@ interface HTMLETreeItemElement extends HTMLElement {
 
     toggle(): void;
     trigger(): void;
+
+    findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null;
 }
 
 @RegisterCustomHTMLElement({
@@ -266,6 +268,24 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
 
     public trigger(): void {
         this.dispatchEvent(new CustomEvent("e_trigger", {bubbles: true}));
+    }
+
+    public findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null {
+        let foundItem: HTMLETreeItemElement | null = null;
+        for (let item of this.items) {
+            if (predicate(item)) {
+                return item;
+            }
+            if (subtree && item.items) {
+                for (let subitem of item.items) {
+                    foundItem = subitem.findItem(predicate, subtree);
+                    if (foundItem) {
+                        return foundItem;
+                    }
+                }
+            }
+        }
+        return foundItem;
     }
 }
 

@@ -284,8 +284,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
 
     public findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null {
         let foundItem: HTMLEMenuItemElement | HTMLEMenuItemGroupElement | null = null;
-        for (let idx = 0; idx < this.items.length; idx++) {
-            let item = this.items[idx];
+        for (let item of this.items) {
             if (isTagElement("e-menuitem", item)) {
                 if (predicate(item)) {
                     return item;
