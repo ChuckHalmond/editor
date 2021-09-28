@@ -26,7 +26,7 @@ interface ObjectModel<Data extends object = object> extends EventDispatcher<Obje
 declare function isObjectModel(obj: any): obj is ObjectModel;
 declare class ObjectModelBase<Data extends object> extends EventDispatcher<ObjectModelChangeEvents> implements ObjectModel<Data> {
     private _data;
-    constructor(data?: Data);
+    constructor(data: Data);
     get data(): Readonly<Data>;
     set<K extends keyof Data>(key: K, value: Data[K]): void;
 }

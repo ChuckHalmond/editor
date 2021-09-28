@@ -36,8 +36,8 @@ function isObjectModel(obj: any): obj is ObjectModel {
 
 class ObjectModelBase<Data extends object> extends EventDispatcher<ObjectModelChangeEvents> implements ObjectModel<Data> {
     private _data: Data;
-
-    constructor(data: Data = {} as Data) {
+    
+    constructor(data: Data) {
         super();
         this._data = data;
     }
