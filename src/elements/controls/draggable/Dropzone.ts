@@ -464,7 +464,7 @@ class DropzoneDataBase {
     }
 
     public getData(): object | null {
-        let dropzoneData = 
+        const dropzoneData = 
             this._dropzone.multiple ? this._dropzone.draggables.map(draggable => draggable.data) :
             this._dropzone.draggables.length > 0 ? this._dropzone.draggables[0].data : null;
 
