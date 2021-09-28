@@ -473,8 +473,9 @@ class DropzoneDataBase {
         );
 
         childDropzones.forEach((childDropzone) => {
+            const childDropzoneData = new DropzoneDataBase(childDropzone).getData();
             Object.assign(dropzoneData, {
-                ...(new DropzoneDataBase(childDropzone).getData())
+                ...childDropzoneData
             });
         });
 
