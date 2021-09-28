@@ -474,7 +474,7 @@ class DropzoneDataBase {
 
         childDropzones.forEach((childDropzone) => {
             Object.assign(dropzoneData, {
-                ...new DropzoneDataBase(childDropzone).getData()
+                ...(new DropzoneDataBase(childDropzone).getData())
             });
         });
 
