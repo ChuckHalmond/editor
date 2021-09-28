@@ -448,7 +448,7 @@ declare global {
 }
 
 interface DropzoneData {
-    getData(): string;
+    getData(): object | null;
 }
 
 interface DropzoneDataConstructor {
@@ -463,10 +463,10 @@ class DropzoneDataBase {
         this._dropzone = dropzone;
     }
 
-    public getData(): string {
+    public getData(): object | null {
         let dropzoneData = 
             this._dropzone.multiple ? this._dropzone.draggables.map(draggable => draggable.data) :
-            this._dropzone.draggables.length > 0 ? this._dropzone.draggables[0].data : "";
+            this._dropzone.draggables.length > 0 ? this._dropzone.draggables[0].data : null;
 
         const childDropzones = Array.from(this._dropzone.querySelectorAll("e-dropzone")).filter(
             dropzone => dropzone.parentElement!.closest("e-dropzone") === this._dropzone
@@ -474,11 +474,11 @@ class DropzoneDataBase {
 
         childDropzones.forEach((childDropzone) => {
             Object.assign(dropzoneData, {
-                ...JSON.parse(new DropzoneDataBase(childDropzone).getData())
+                ...new DropzoneDataBase(childDropzone).getData()
             });
         });
 
-        return JSON.stringify(dropzoneData);
+        return dropzoneData;
     }
 }
 

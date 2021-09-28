@@ -58,7 +58,7 @@ declare global {
     }
 }
 interface DropzoneData {
-    getData(): string;
+    getData(): object | null;
 }
 interface DropzoneDataConstructor {
     readonly prototype: DropzoneData;
@@ -67,6 +67,6 @@ interface DropzoneDataConstructor {
 declare class DropzoneDataBase {
     private _dropzone;
     constructor(dropzone: HTMLEDropzoneElement);
-    getData(): string;
+    getData(): object | null;
 }
 declare var DropzoneData: DropzoneDataConstructor;
