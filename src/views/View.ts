@@ -9,19 +9,19 @@ export { ViewBase };
 export { ReactiveView };
 export { ReactiveViewBase };
 
-type ViewRoot = Element & {
+type ViewRoot<E extends Element> = E & {
     _view: View;
 }
 
 interface View<M extends object = object, E extends Element = Element> {
-    root: ViewRoot;
+    root: ViewRoot<E>;
     readonly model: M;
     name(): string;
     render(): E;
 }
 
-function isViewRoot(root: Element): root is ViewRoot {
-    return typeof (root as ViewRoot)._view !== "undefined";
+function isViewRoot<E extends Element>(root: E): root is ViewRoot<E> {
+    return typeof (root as ViewRoot<E>)._view !== "undefined";
 }
 
 function isView<K extends keyof ViewNameMap>(name: K, view: View): view is ViewNameMap[K] {
@@ -29,7 +29,7 @@ function isView<K extends keyof ViewNameMap>(name: K, view: View): view is ViewN
 }
 
 abstract class ViewBase<M extends object = object, E extends Element = Element> implements View<M, E> {
-    private _root!: ViewRoot;
+    private _root!: ViewRoot<E>;
     public readonly model: M;
 
     constructor(model: M) {
@@ -41,12 +41,12 @@ abstract class ViewBase<M extends object = object, E extends Element = Element> 
         );
     }
 
-    get root(): ViewRoot {
+    get root(): ViewRoot<E> {
         return this._root;
     }
 
-    set root(root: ViewRoot) {
-        const oldRoot = this._root as Partial<ViewRoot>;
+    set root(root: ViewRoot<E>) {
+        const oldRoot = this._root as Partial<ViewRoot<E>>;
         if (oldRoot) {
             delete oldRoot._view;
         }
@@ -86,11 +86,11 @@ abstract class ReactiveViewBase<M extends object = object, E extends Element = E
         this.addReactiveListeners(this.root);
     }
 
-    public get root(): ViewRoot {
+    public get root(): ViewRoot<E> {
         return super.root;
     }
 
-    public set root(root: ViewRoot) {
+    public set root(root: ViewRoot<E>) {
         if (this.root) {
             this.removeReactiveListeners(this.root);
         }
