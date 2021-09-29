@@ -3,7 +3,6 @@ import { forAllSubtreeNodes } from "../elements/Snippets";
 
 export { ViewRoot };
 export { isViewRoot };
-export { isNameView };
 export { View };
 export { ViewBase };
 export { ReactiveView };
@@ -16,16 +15,11 @@ type ViewRoot<E extends Element> = E & {
 interface View<M extends object = object, E extends Element = Element> {
     root: ViewRoot<E>;
     readonly model: M;
-    viewName(): string;
     render(): E;
 }
 
 function isViewRoot<E extends Element>(root: E): root is ViewRoot<E> {
     return typeof (root as ViewRoot<E>)._view !== "undefined";
-}
-
-function isNameView<K extends keyof ViewNameMap>(name: K, view: View): view is ViewNameMap[K] {
-    return view.viewName() === name;
 }
 
 abstract class ViewBase<M extends object = object, E extends Element = Element> implements View<M, E> {
@@ -56,7 +50,6 @@ abstract class ViewBase<M extends object = object, E extends Element = Element> 
         });
     }
     
-    public abstract viewName(): string;
     public abstract render(): E;
 }
 
