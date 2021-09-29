@@ -3,43 +3,60 @@ import { forAllSubtreeNodes } from "../elements/Snippets";
 
 export { ViewRoot };
 export { isViewRoot };
+export { isView };
 export { View };
 export { ViewBase };
 export { ReactiveView };
 export { ReactiveViewBase };
 
-function isViewRoot<E extends Element>(elem: E): elem is ViewRoot<object, E> {
-    return typeof (elem as ViewRoot)._view !== "undefined";
+type ViewRoot = Element & {
+    _view: View;
 }
 
-type ViewRoot<M extends object = object, E extends Element = Element> = E & {_view?: View<M, E>};
-
 interface View<M extends object = object, E extends Element = Element> {
-    root: ViewRoot<M, E>;
+    root: ViewRoot;
     readonly model: M;
-    render(): ViewRoot<M, E>;
+    name(): string;
+    render(): E;
+}
+
+function isViewRoot(root: Element): root is ViewRoot {
+    return typeof (root as ViewRoot)._view !== "undefined";
+}
+
+function isView<K extends keyof ViewNameMap>(name: K, view: View): view is ViewNameMap[K] {
+    return view.name() === name;
 }
 
 abstract class ViewBase<M extends object = object, E extends Element = Element> implements View<M, E> {
-    private _root: ViewRoot<M, E>;
+    private _root!: ViewRoot;
     public readonly model: M;
 
     constructor(model: M) {
         this.model = model;
-        this._root = this.render();
+        this.root = Object.assign(
+            this.render(), {
+                _view: this
+            }
+        );
     }
 
-    public get root(): ViewRoot<M, E> {
+    get root(): ViewRoot {
         return this._root;
     }
 
-    public set root(root: ViewRoot<M, E>) {
+    set root(root: ViewRoot) {
+        const oldRoot = this._root as Partial<ViewRoot>;
+        if (oldRoot) {
+            delete oldRoot._view;
+        }
         this._root = root;
         Object.assign(this._root, {
             _view: this
         });
     }
     
+    public abstract name(): string;
     public abstract render(): E;
 }
 
@@ -49,7 +66,7 @@ interface ReactiveView<M extends object = object, E extends Element = Element> e
 
 abstract class ReactiveViewBase<M extends object = object, E extends Element = Element> extends ViewBase<M, E> implements ReactiveView<M, E> {
     readonly observer: MutationObserver;
-
+    
     constructor(model: M) {
         super(model);
         this.observer = new MutationObserver((mutations: MutationRecord[]) => {
@@ -69,7 +86,11 @@ abstract class ReactiveViewBase<M extends object = object, E extends Element = E
         this.addReactiveListeners(this.root);
     }
 
-    public set root(root: ViewRoot<M, E>) {
+    public get root(): ViewRoot {
+        return super.root;
+    }
+
+    public set root(root: ViewRoot) {
         if (this.root) {
             this.removeReactiveListeners(this.root);
         }
@@ -109,4 +130,8 @@ abstract class ReactiveViewBase<M extends object = object, E extends Element = E
             });
         }
     }
+}
+
+declare global {
+    interface ViewNameMap {}
 }

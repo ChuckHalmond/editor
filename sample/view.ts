@@ -1,6 +1,6 @@
 import { ReactiveChildNodes, Element } from "../src/elements/HTMLElement";
 import { ListModel, ListModelBase } from "../src/models/Model";
-import { ReactiveViewBase } from "../src/views/View";
+import { isView, isViewRoot, ReactiveViewBase } from "../src/views/View";
 
 
 interface ListItemData {
@@ -15,9 +15,13 @@ class SimpleListModel {
     }
 }
 
-export class SimpleListView extends ReactiveViewBase<SimpleListModel> {
+export class SimpleListView extends ReactiveViewBase<SimpleListModel, HTMLElement> {
     constructor(model: SimpleListModel) {
         super(model);
+    }
+
+    name() {
+        return "SimpleListView";
     }
     
     render() {
@@ -36,5 +40,19 @@ export class SimpleListView extends ReactiveViewBase<SimpleListModel> {
     }
 }
 
+declare global {
+    interface ViewNameMap {
+        "SimpleListView": SimpleListView
+    }
+}
+
 export const list = (window as any)["list"] = new SimpleListView(new SimpleListModel());
 document.body.append(list.root);
+console.log(list.root._view);
+const root = list.root;
+if (isViewRoot(root)) {
+    const view = root._view;
+    if (isView("SimpleListView", view)) {
+        
+    }
+}
