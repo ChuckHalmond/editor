@@ -1,8 +1,8 @@
 import { ReactiveChildNodes, Element } from "../src/elements/HTMLElement";
 import { ListModel, ListModelBase } from "../src/models/Model";
-import { isView, isViewRoot, ReactiveViewBase } from "../src/views/View";
+import { isNameView, isViewRoot, ReactiveViewBase } from "../src/views/View";
 
-
+/*
 interface ListItemData {
     label: string;
 }
@@ -55,4 +55,4 @@ if (isViewRoot(root)) {
     if (isView("SimpleListView", view)) {
         
     }
-}
+}*/
