@@ -1,11 +1,16 @@
 import { isParentNode, isReactiveNode, isReactiveParentNode } from "../elements/HTMLElement";
 import { forAllSubtreeNodes } from "../elements/Snippets";
 
-export { View };
 export { ViewRoot };
+export { isViewRoot };
+export { View };
 export { ViewBase };
 export { ReactiveView };
 export { ReactiveViewBase };
+
+function isViewRoot(elem: Element): elem is ViewRoot {
+    return typeof (elem as ViewRoot)._view !== "undefined";
+}
 
 type ViewRoot<M extends object = object, E extends Element = Element> = E & {_view?: View<M, E>};
 
@@ -44,7 +49,7 @@ interface ReactiveView<M extends object = object, E extends Element = Element> e
 
 abstract class ReactiveViewBase<M extends object = object, E extends Element = Element> extends ViewBase<M, E> implements ReactiveView<M, E> {
     readonly observer: MutationObserver;
-    
+
     constructor(model: M) {
         super(model);
         this.observer = new MutationObserver((mutations: MutationRecord[]) => {
