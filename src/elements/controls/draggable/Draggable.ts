@@ -80,7 +80,7 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
                 }
 
                 ::slotted(*) {
-                    flex: auto;
+                    flex: 1;
                 }
             </style>
             <div part="container">

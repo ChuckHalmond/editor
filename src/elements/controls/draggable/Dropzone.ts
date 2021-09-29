@@ -73,12 +73,6 @@ class HTMLEDropzoneElementBase extends HTMLElement implements HTMLEDropzoneEleme
                     border: 1px dashed gray;
                 }
 
-                :host(:focus) {
-                    border-style: solid;
-                    border-color: black;
-                    outline: 1px solid black;
-                }
-
                 :host([disabled]) {
                     pointer-events: none;
                     opacity: 0.3;
