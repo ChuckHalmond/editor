@@ -9,6 +9,10 @@ interface HTMLEDraggableElement extends HTMLElement {
     type: string;
     dragovered: boolean;
     data: object | null;
+
+    getReference(): HTMLEDraggableElement;
+    readonly referee: HTMLEDraggableElement | null;
+    readonly references: HTMLEDraggableElement[];
 }
 
 @RegisterCustomHTMLElement({
@@ -31,6 +35,9 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
 
     public type!: string;
     public data!: object | null;
+
+    private _referee: HTMLEDraggableElementBase | null;
+    public readonly references: HTMLEDraggableElementBase[];
 
     constructor() {
         super();
@@ -76,11 +83,33 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
                 <slot>&nbsp;</slot>
             </div>
         `);
+        this.references = [];
+        this._referee = null;
+    }
+
+    public get referee(): HTMLEDraggableElementBase | null {
+        return this._referee;
     }
     
     public connectedCallback() {
         this.tabIndex = this.tabIndex;
         this.draggable = true;
+    }
+
+    public disconnectedCallback() {
+        if (this.referee) {
+            const thisRefereeIndex = this.referee.references.indexOf(this);
+            if (thisRefereeIndex > -1) {
+                this.referee.references.splice(thisRefereeIndex, 1);
+            }
+        }
+    }
+
+    public getReference(): HTMLEDraggableElementBase {
+        const reference = this.cloneNode(true) as HTMLEDraggableElementBase;
+        reference._referee = this;
+        this.references.push(reference);
+        return reference;
     }
 }
 

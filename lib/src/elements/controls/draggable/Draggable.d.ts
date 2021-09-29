@@ -6,6 +6,9 @@ interface HTMLEDraggableElement extends HTMLElement {
     type: string;
     dragovered: boolean;
     data: object | null;
+    getReference(): HTMLEDraggableElement;
+    readonly referee: HTMLEDraggableElement | null;
+    readonly references: HTMLEDraggableElement[];
 }
 declare class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableElement {
     selected: boolean;
@@ -14,8 +17,13 @@ declare class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDrag
     disabled: boolean;
     type: string;
     data: object | null;
+    private _referee;
+    readonly references: HTMLEDraggableElementBase[];
     constructor();
+    get referee(): HTMLEDraggableElementBase | null;
     connectedCallback(): void;
+    disconnectedCallback(): void;
+    getReference(): HTMLEDraggableElementBase;
 }
 declare global {
     interface HTMLElementTagNameMap {
