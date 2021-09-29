@@ -102,9 +102,15 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
 
     public disconnectedCallback() {
         if (this.referee) {
-            const thisRefereeIndex = this.referee.references.indexOf(this);
-            if (thisRefereeIndex > -1) {
-                this.referee.references.splice(thisRefereeIndex, 1);
+            const thisRefIndex = this.referee.references.indexOf(this);
+            if (thisRefIndex > -1) {
+                this.referee.references.splice(thisRefIndex, 1);
+                const referenceId = this.id;
+                if (referenceId) {
+                    this.referee.references.slice(thisRefIndex).forEach((reference, index) => {
+                        reference.id = `${referenceId}-${thisRefIndex + index + 1}`;
+                    });
+                }
             }
         }
     }
