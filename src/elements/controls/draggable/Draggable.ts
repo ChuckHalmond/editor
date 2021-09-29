@@ -67,7 +67,7 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
                     border-style: dotted;
                 }
 
-                :host([dragovered]) > *:not(e-dropzone) {
+                :host([dragovered]) *:not(e-dropzone) {
                     pointer-events: none;
                 }
                 
