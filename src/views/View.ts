@@ -2,18 +2,21 @@ import { isParentNode, isReactiveNode, isReactiveParentNode } from "../elements/
 import { forAllSubtreeNodes } from "../elements/Snippets";
 
 export { View };
+export { ViewRoot };
 export { ViewBase };
 export { ReactiveView };
 export { ReactiveViewBase };
 
+type ViewRoot<M extends object = object, E extends Element = Element> = E & {_view?: View<M, E>};
+
 interface View<M extends object = object, E extends Element = Element> {
-    readonly root: E;
+    root: ViewRoot<M, E>;
     readonly model: M;
-    render(): E;
+    render(): ViewRoot<M, E>;
 }
 
 abstract class ViewBase<M extends object = object, E extends Element = Element> implements View<M, E> {
-    protected _root: E;
+    private _root: ViewRoot<M, E>;
     public readonly model: M;
 
     constructor(model: M) {
@@ -21,8 +24,15 @@ abstract class ViewBase<M extends object = object, E extends Element = Element> 
         this._root = this.render();
     }
 
-    public get root(): E {
+    public get root(): ViewRoot<M, E> {
         return this._root;
+    }
+
+    public set root(root: ViewRoot<M, E>) {
+        this._root = root;
+        Object.assign(this._root, {
+            _view: this
+        });
     }
     
     public abstract render(): E;
@@ -34,7 +44,7 @@ interface ReactiveView<M extends object = object, E extends Element = Element> e
 
 abstract class ReactiveViewBase<M extends object = object, E extends Element = Element> extends ViewBase<M, E> implements ReactiveView<M, E> {
     readonly observer: MutationObserver;
-
+    
     constructor(model: M) {
         super(model);
         this.observer = new MutationObserver((mutations: MutationRecord[]) => {
@@ -51,6 +61,14 @@ abstract class ReactiveViewBase<M extends object = object, E extends Element = E
             subtree: true,
             childList: true
         });
+        this.addReactiveListeners(this.root);
+    }
+
+    public set root(root: ViewRoot<M, E>) {
+        if (this.root) {
+            this.removeReactiveListeners(this.root);
+        }
+        super.root = root;
         this.addReactiveListeners(this.root);
     }
 
