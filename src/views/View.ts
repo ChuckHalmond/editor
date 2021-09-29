@@ -8,7 +8,7 @@ export { ViewBase };
 export { ReactiveView };
 export { ReactiveViewBase };
 
-function isViewRoot(elem: Element): elem is ViewRoot {
+function isViewRoot<E extends Element>(elem: E): elem is ViewRoot<object, E> {
     return typeof (elem as ViewRoot)._view !== "undefined";
 }
 

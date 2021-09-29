@@ -4,7 +4,7 @@ export { View };
 export { ViewBase };
 export { ReactiveView };
 export { ReactiveViewBase };
-declare function isViewRoot(elem: Element): elem is ViewRoot;
+declare function isViewRoot<E extends Element>(elem: E): elem is ViewRoot<object, E>;
 declare type ViewRoot<M extends object = object, E extends Element = Element> = E & {
     _view?: View<M, E>;
 };
