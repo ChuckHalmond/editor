@@ -111,8 +111,11 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
 
     public getReference(): HTMLEDraggableElementBase {
         const reference = this.cloneNode(true) as HTMLEDraggableElementBase;
+        const referenceIdx = this.references.push(reference);
         reference._referee = this;
-        this.references.push(reference);
+        if (this.id) {
+            reference.id = `${this.id}-${referenceIdx}`;
+        }
         return reference;
     }
 }
