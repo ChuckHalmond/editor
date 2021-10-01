@@ -4,36 +4,32 @@ export { View };
 export { ViewBase };
 export { ReactiveView };
 export { ReactiveViewBase };
-declare type ViewRoot<E extends Element> = E & {
+declare type ViewRoot = Element & {
     _view: View;
 };
-interface View<M extends object = object, E extends Element = Element> {
-    root: ViewRoot<E>;
-    readonly model: M;
-    render(): E;
+interface View {
+    root: ViewRoot;
+    readonly model: object;
+    render(): Element;
 }
-declare function isViewRoot<E extends Element>(root: E): root is ViewRoot<E>;
-declare abstract class ViewBase<M extends object = object, E extends Element = Element> implements View<M, E> {
+declare function isViewRoot(root: Element): root is ViewRoot;
+declare abstract class ViewBase implements View {
     private _root;
-    readonly model: M;
-    constructor(model: M);
-    get root(): ViewRoot<E>;
-    set root(root: ViewRoot<E>);
-    abstract render(): E;
+    readonly model: object;
+    constructor(model: object);
+    get root(): ViewRoot;
+    set root(root: ViewRoot);
+    abstract render(): Element;
 }
-interface ReactiveView<M extends object = object, E extends Element = Element> extends View<M, E> {
+interface ReactiveView extends View {
     disconnect(): void;
 }
-declare abstract class ReactiveViewBase<M extends object = object, E extends Element = Element> extends ViewBase<M, E> implements ReactiveView<M, E> {
+declare abstract class ReactiveViewBase extends ViewBase implements ReactiveView {
     readonly observer: MutationObserver;
-    constructor(model: M);
-    get root(): ViewRoot<E>;
-    set root(root: ViewRoot<E>);
+    constructor(model: object);
+    get root(): ViewRoot;
+    set root(root: ViewRoot);
     disconnect(): void;
     addReactiveListeners(node: Node): void;
     removeReactiveListeners(node: Node): void;
-}
-declare global {
-    interface ViewNameMap {
-    }
 }
