@@ -12,9 +12,9 @@ type ViewRoot = Element & {
     _view: View;
 }
 
-interface View {
+interface View<M extends object = object> {
     root: ViewRoot;
-    readonly model: object;
+    readonly model: M;
     render(): Element;
 }
 
@@ -22,11 +22,11 @@ function isViewRoot(root: Element): root is ViewRoot {
     return typeof (root as ViewRoot)._view !== "undefined";
 }
 
-abstract class ViewBase implements View {
+abstract class ViewBase<M extends object = object> implements View {
     private _root: ViewRoot;
-    public readonly model: object;
+    public readonly model: M;
 
-    constructor(model: object) {
+    constructor(model: M) {
         this.model = model;
         this._root = Object.assign(
             this.render(), {
@@ -54,14 +54,14 @@ abstract class ViewBase implements View {
     public abstract render(): Element;
 }
 
-interface ReactiveView extends View {
+interface ReactiveView<M extends object = object> extends View<M> {
     disconnect(): void;
 }
 
-abstract class ReactiveViewBase extends ViewBase implements ReactiveView {
+abstract class ReactiveViewBase<M extends object = object> extends ViewBase<M> implements ReactiveView<M> {
     readonly observer: MutationObserver;
     
-    constructor(model: object) {
+    constructor(model: M) {
         super(model);
         this.observer = new MutationObserver((mutations: MutationRecord[]) => {
             mutations.forEach((record: MutationRecord) => {

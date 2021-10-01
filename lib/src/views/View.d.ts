@@ -7,26 +7,26 @@ export { ReactiveViewBase };
 declare type ViewRoot = Element & {
     _view: View;
 };
-interface View {
+interface View<M extends object = object> {
     root: ViewRoot;
-    readonly model: object;
+    readonly model: M;
     render(): Element;
 }
 declare function isViewRoot(root: Element): root is ViewRoot;
-declare abstract class ViewBase implements View {
+declare abstract class ViewBase<M extends object = object> implements View {
     private _root;
-    readonly model: object;
-    constructor(model: object);
+    readonly model: M;
+    constructor(model: M);
     get root(): ViewRoot;
     set root(root: ViewRoot);
     abstract render(): Element;
 }
-interface ReactiveView extends View {
+interface ReactiveView<M extends object = object> extends View<M> {
     disconnect(): void;
 }
-declare abstract class ReactiveViewBase extends ViewBase implements ReactiveView {
+declare abstract class ReactiveViewBase<M extends object = object> extends ViewBase<M> implements ReactiveView<M> {
     readonly observer: MutationObserver;
-    constructor(model: object);
+    constructor(model: M);
     get root(): ViewRoot;
     set root(root: ViewRoot);
     disconnect(): void;
