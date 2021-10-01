@@ -1,0 +1,55 @@
+<style>
+    .boxes {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .box {
+        display: flex;
+        margin: 4px;
+        width: 100px;
+        height: 100px;
+        background-color: whitesmoke;
+    }
+
+    .x-box {
+        flex-direction: row;
+    }
+
+    .y-box {
+        flex-direction: column;
+    }
+
+    .resizable {
+        background: gainsboro;
+        width: 50px;
+        height: 50px;
+    }
+
+    .flex {
+        flex: 1;
+        background-color: dimgray;
+    }
+</style>
+<div class="boxes">
+    <div class="box x-box">
+        <div id="width-y" class="resizable">Resize me!</div>
+        <e-wsash controls="width-y"></e-wsash>
+        <div class="flex"></div>
+    </div>
+    <div class="box x-box">
+        <div class="flex"></div>
+        <e-wsash controls="width-x"></e-wsash>
+        <div id="width-x" class="resizable">Resize me!</div>
+    </div>
+    <div class="box y-box">
+        <div id="height-t" class="resizable">Resize me!</div>
+        <e-hsash controls="height-t"></e-hsash>
+        <div class="flex"></div>
+    </div>
+    <div class="box y-box">
+        <div class="flex"></div>
+        <e-hsash controls="height-b"></e-hsash>
+        <div id="height-b" class="resizable">Resize me!</div>
+    </div>
+</div>

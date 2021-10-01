@@ -7,6 +7,7 @@ declare class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidt
     controls: string;
     private _target;
     private _targetStyle;
+    private _directionToTarget;
     constructor();
     connectedCallback(): void;
     attributeChangedCallback(name: string, oldValue: string, newValue: string): void;

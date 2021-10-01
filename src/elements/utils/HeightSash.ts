@@ -20,6 +20,7 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
 
     private _target: HTMLElement | null;
     private _targetStyle: CSSStyleDeclaration | null;
+    private _directionToTarget: number;
 
     constructor() {
         super();
@@ -28,8 +29,11 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
             <style>
                 :host {
                     display: block;
+                    z-index: 1;
 
                     height: 4px;
+                    margin-top: -2px;
+                    margin-bottom: -2px;
                     background-color: rgb(0, 128, 255);
                     cursor: ns-resize;
 
@@ -48,25 +52,16 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
         `);
         this._target = null;
         this._targetStyle = null;
+        this._directionToTarget = 0;
     }
 
     public connectedCallback(): void {
+        this.tabIndex = this.tabIndex;
+
         let onPointerMove = (event: PointerEvent) => {
             if (this._target && this._targetStyle) {
-                let directionToTarget = Math.sign(
-                    ((this.getBoundingClientRect().top + this.getBoundingClientRect().bottom) / 2) -
-                    ((this._target.getBoundingClientRect().top + this._target.getBoundingClientRect().bottom) / 2)
-                );
                 let height = parseFloat(this._targetStyle.getPropertyValue("height"));
-                let minHeight = parseFloat(this._targetStyle.getPropertyValue("min-height"));
-                let maxHeight = parseFloat(this._targetStyle.getPropertyValue("max-height"));
-                let newHeight = Math.trunc(height + directionToTarget * event.movementY);
-                if (!isNaN(minHeight)) {
-                    newHeight = Math.max(newHeight, minHeight);
-                }
-                if (!isNaN(maxHeight)) {
-                    newHeight = Math.min(newHeight, maxHeight);
-                }
+                let newHeight = Math.trunc(height + this._directionToTarget * event.movementY);
                 this._target.style.setProperty("height", `${newHeight}px`);
                 this.dispatchEvent(new CustomEvent("e_resize"));
             }
@@ -91,6 +86,12 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
                         if (target) {
                             this._target = target;
                             this._targetStyle = window.getComputedStyle(target);
+                            const thisBoundingRect = this.getBoundingClientRect();
+                            const thisTargetBoundingRect = this._target.getBoundingClientRect();
+                            this._directionToTarget = Math.sign(
+                                ((thisBoundingRect.top + thisBoundingRect.bottom) / 2) -
+                                ((thisTargetBoundingRect.top + thisTargetBoundingRect.bottom) / 2)
+                            );
                         }
                     }
                     break;

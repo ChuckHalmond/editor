@@ -20,6 +20,7 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
 
     private _target: HTMLElement | null;
     private _targetStyle: CSSStyleDeclaration | null;
+    private _directionToTarget: number;
 
     constructor() {
         super();
@@ -28,8 +29,11 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
             <style>
                 :host {
                     display: block;
+                    z-index: 1;
 
                     width: 4px;
+                    margin-left: -2px;
+                    margin-right: -2px;
                     background-color: rgb(0, 128, 255);
                     cursor: ew-resize;
 
@@ -48,25 +52,16 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
         `);
         this._target = null;
         this._targetStyle = null;
+        this._directionToTarget = 0;
     }
 
     public connectedCallback(): void {
+        this.tabIndex = this.tabIndex;
+
         let onPointerMove = (event: PointerEvent) => {
             if (this._target && this._targetStyle) {
-                let directionToTarget = Math.sign(
-                    ((this.getBoundingClientRect().left + this.getBoundingClientRect().right) / 2) -
-                    ((this._target.getBoundingClientRect().right + this._target.getBoundingClientRect().right) / 2)
-                );
                 let width = parseFloat(this._targetStyle.getPropertyValue("width"));
-                let minWidth = parseFloat(this._targetStyle.getPropertyValue("min-width"));
-                let maxWidth = parseFloat(this._targetStyle.getPropertyValue("max-width"));
-                let newWidth = Math.trunc(width + directionToTarget * event.movementX);
-                if (!isNaN(minWidth)) {
-                    newWidth = Math.max(newWidth, minWidth);
-                }
-                if (!isNaN(maxWidth)) {
-                    newWidth = Math.min(newWidth, maxWidth);
-                }
+                let newWidth = Math.trunc(width + this._directionToTarget * event.movementX);
                 this._target.style.setProperty("width", `${newWidth}px`);
                 this.dispatchEvent(new CustomEvent("e_resize"));
             }
@@ -91,6 +86,12 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
                         if (target) {
                             this._target = target;
                             this._targetStyle = window.getComputedStyle(target);
+                            const thisBoundingRect = this.getBoundingClientRect();
+                            const thisTargetBoundingRect = this._target.getBoundingClientRect();
+                            this._directionToTarget = Math.sign(
+                                ((thisBoundingRect.left + thisBoundingRect.right) / 2) -
+                                ((thisTargetBoundingRect.left + thisTargetBoundingRect.right) / 2)
+                            );
                         }
                     }
                     break;
