@@ -22,25 +22,26 @@ function isViewRoot(root: Element): root is ViewRoot {
     return typeof (root as ViewRoot)._view !== "undefined";
 }
 
-abstract class ViewBase<M extends object = object, E extends Element = Element> implements View {
-    private _root!: ViewRoot & E;
-    public readonly model: M;
+abstract class ViewBase implements View {
+    private _root: ViewRoot;
+    public readonly model: object;
 
-    constructor(model: M) {
+    constructor(model: object) {
         this.model = model;
-        this.root = Object.assign(
+        this._root = Object.assign(
             this.render(), {
                 _view: this
             }
         );
+        this.root = this._root;
     }
 
-    get root(): ViewRoot & E {
+    get root(): ViewRoot {
         return this._root;
     }
 
-    set root(root: ViewRoot & E) {
-        const oldRoot = this._root as Partial<ViewRoot & E>;
+    set root(root: ViewRoot) {
+        const oldRoot = this._root as Partial<ViewRoot>;
         if (oldRoot) {
             delete oldRoot._view;
         }
@@ -50,17 +51,17 @@ abstract class ViewBase<M extends object = object, E extends Element = Element> 
         });
     }
     
-    public abstract render(): E;
+    public abstract render(): Element;
 }
 
 interface ReactiveView extends View {
     disconnect(): void;
 }
 
-abstract class ReactiveViewBase<M extends object = object, E extends Element = Element> extends ViewBase<M, E> implements ReactiveView {
+abstract class ReactiveViewBase extends ViewBase implements ReactiveView {
     readonly observer: MutationObserver;
     
-    constructor(model: M) {
+    constructor(model: object) {
         super(model);
         this.observer = new MutationObserver((mutations: MutationRecord[]) => {
             mutations.forEach((record: MutationRecord) => {
@@ -79,11 +80,11 @@ abstract class ReactiveViewBase<M extends object = object, E extends Element = E
         this.addReactiveListeners(this.root);
     }
 
-    public get root(): ViewRoot & E {
+    public get root(): ViewRoot {
         return super.root;
     }
 
-    public set root(root: ViewRoot & E) {
+    public set root(root: ViewRoot) {
         if (this.root) {
             this.removeReactiveListeners(this.root);
         }
@@ -123,8 +124,4 @@ abstract class ReactiveViewBase<M extends object = object, E extends Element = E
             });
         }
     }
-}
-
-declare global {
-    interface ViewNameMap {}
 }
