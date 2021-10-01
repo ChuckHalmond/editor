@@ -3,8 +3,11 @@ import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot }
 export { HTMLEHeightSashElement };
 export { HTMLEHeightSashElementBase };
 
+type EHeightSashDirection = "top" | "bottom";
+
 interface HTMLEHeightSashElement extends HTMLElement {
     controls: string;
+    growdir: EHeightSashDirection;
 }
 
 @RegisterCustomHTMLElement({
@@ -13,14 +16,15 @@ interface HTMLEHeightSashElement extends HTMLElement {
 })
 @GenerateAttributeAccessors([
     {name: "controls", type: "string"},
+    {name: "growdir", type: "string"},
 ])
 class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashElement {
 
     public controls!: string;
+    public growdir!: EHeightSashDirection;
 
     private _target: HTMLElement | null;
     private _targetStyle: CSSStyleDeclaration | null;
-    private _directionToTarget: number;
 
     constructor() {
         super();
@@ -52,7 +56,6 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
         `);
         this._target = null;
         this._targetStyle = null;
-        this._directionToTarget = 0;
     }
 
     public connectedCallback(): void {
@@ -61,7 +64,7 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
         let onPointerMove = (event: PointerEvent) => {
             if (this._target && this._targetStyle) {
                 let height = parseFloat(this._targetStyle.getPropertyValue("height"));
-                let newHeight = Math.trunc(height + this._directionToTarget * event.movementY);
+                let newHeight = Math.trunc(height + ((this.growdir === "top") ? -1 : 1) * event.movementY);
                 this._target.style.setProperty("height", `${newHeight}px`);
                 this.dispatchEvent(new CustomEvent("e_resize"));
             }
@@ -86,12 +89,6 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
                         if (target) {
                             this._target = target;
                             this._targetStyle = window.getComputedStyle(target);
-                            const thisBoundingRect = this.getBoundingClientRect();
-                            const thisTargetBoundingRect = this._target.getBoundingClientRect();
-                            this._directionToTarget = Math.sign(
-                                ((thisBoundingRect.top + thisBoundingRect.bottom) / 2) -
-                                ((thisTargetBoundingRect.top + thisTargetBoundingRect.bottom) / 2)
-                            );
                         }
                     }
                     break;

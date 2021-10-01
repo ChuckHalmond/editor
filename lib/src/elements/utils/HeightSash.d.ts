@@ -1,13 +1,15 @@
 export { HTMLEHeightSashElement };
 export { HTMLEHeightSashElementBase };
+declare type EHeightSashDirection = "top" | "bottom";
 interface HTMLEHeightSashElement extends HTMLElement {
     controls: string;
+    growdir: EHeightSashDirection;
 }
 declare class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashElement {
     controls: string;
+    growdir: EHeightSashDirection;
     private _target;
     private _targetStyle;
-    private _directionToTarget;
     constructor();
     connectedCallback(): void;
     attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
