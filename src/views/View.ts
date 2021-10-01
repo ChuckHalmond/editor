@@ -23,32 +23,16 @@ function isViewRoot(root: Element): root is ViewRoot {
 }
 
 abstract class ViewBase<M extends object = object> implements View {
-    private _root: ViewRoot;
+    public readonly root: ViewRoot;
     public readonly model: M;
 
     constructor(model: M) {
         this.model = model;
-        this._root = Object.assign(
+        this.root = Object.assign(
             this.render(), {
                 _view: this
             }
         );
-        this.root = this._root;
-    }
-
-    get root(): ViewRoot {
-        return this._root;
-    }
-
-    set root(root: ViewRoot) {
-        const oldRoot = this._root as Partial<ViewRoot>;
-        if (oldRoot) {
-            delete oldRoot._view;
-        }
-        this._root = root;
-        Object.assign(this._root, {
-            _view: this
-        });
     }
     
     public abstract render(): Element;
@@ -77,18 +61,6 @@ abstract class ReactiveViewBase<M extends object = object> extends ViewBase<M> i
             subtree: true,
             childList: true
         });
-        this.addReactiveListeners(this.root);
-    }
-
-    public get root(): ViewRoot {
-        return super.root;
-    }
-
-    public set root(root: ViewRoot) {
-        if (this.root) {
-            this.removeReactiveListeners(this.root);
-        }
-        super.root = root;
         this.addReactiveListeners(this.root);
     }
 
