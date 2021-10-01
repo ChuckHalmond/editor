@@ -78,10 +78,6 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
                     display: flex;
                     align-items: center;
                 }
-
-                ::slotted(*) {
-                    flex: 1;
-                }
             </style>
             <div part="container">
                 <slot>&nbsp;</slot>
