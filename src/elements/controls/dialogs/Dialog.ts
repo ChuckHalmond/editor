@@ -111,20 +111,20 @@ class HTMLEDialogElementBase extends HTMLElement implements HTMLEDialogElement {
     }
 
     public open(): void {
-        this.dispatchEvent(new CustomEvent("e_open"));
+        this.dispatchEvent(new CustomEvent("e_open", {bubbles: true}));
     }
 
     public close(): void {
-        this.dispatchEvent(new CustomEvent("e_close"));
+        this.dispatchEvent(new CustomEvent("e_close", {bubbles: true}));
     }
 
     public cancel(): void {
-        this.dispatchEvent(new CustomEvent("e_cancel"));
+        this.dispatchEvent(new CustomEvent("e_cancel", {bubbles: true}));
         this.close();
     }
 
     public confirm(): void {
-        this.dispatchEvent(new CustomEvent("e_confirm"));
+        this.dispatchEvent(new CustomEvent("e_confirm", {bubbles: true}));
         this.close();
     }
 }
