@@ -12,7 +12,7 @@ interface View<M extends object = object> {
     readonly model: M;
     render(): Element;
 }
-declare function isViewRoot(root: Element): root is ViewRoot;
+declare function isViewRoot(root: Node): root is ViewRoot;
 declare abstract class ViewBase<M extends object = object> implements View {
     readonly root: ViewRoot;
     readonly model: M;
@@ -23,7 +23,6 @@ interface ReactiveView<M extends object = object> extends View<M> {
     disconnect(): void;
 }
 declare abstract class ReactiveViewBase<M extends object = object> extends ViewBase<M> implements ReactiveView<M> {
-    readonly observer: MutationObserver;
     constructor(model: M);
     disconnect(): void;
     addReactiveListeners(node: Node): void;
