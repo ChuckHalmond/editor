@@ -23,6 +23,7 @@ interface ReactiveView<M extends object = object> extends View<M> {
     disconnect(): void;
 }
 declare abstract class ReactiveViewBase<M extends object = object> extends ViewBase<M> implements ReactiveView<M> {
+    readonly observer: MutationObserver;
     constructor(model: M);
     disconnect(): void;
     addReactiveListeners(node: Node): void;

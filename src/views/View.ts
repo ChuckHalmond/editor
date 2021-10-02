@@ -43,11 +43,11 @@ interface ReactiveView<M extends object = object> extends View<M> {
 }
 
 abstract class ReactiveViewBase<M extends object = object> extends ViewBase<M> implements ReactiveView<M> {
-    //readonly observer: MutationObserver;
+    readonly observer: MutationObserver;
     
     constructor(model: M) {
         super(model);
-        /*this.observer = new MutationObserver((mutations: MutationRecord[]) => {
+        this.observer = new MutationObserver((mutations: MutationRecord[]) => {
             mutations.forEach((record: MutationRecord) => {
                 Array.from(record.removedNodes).map((node) => {
                     if (!isViewRoot(node)) {
@@ -65,16 +65,16 @@ abstract class ReactiveViewBase<M extends object = object> extends ViewBase<M> i
             subtree: true,
             childList: true
         });
-        this.addReactiveListeners(this.root);*/
+        this.addReactiveListeners(this.root);
     }
 
     public disconnect(): void {
-        /*this.observer.disconnect();
-        this.removeReactiveListeners(this.root);*/
+        this.observer.disconnect();
+        this.removeReactiveListeners(this.root);
     }
 
     public addReactiveListeners(node: Node): void {
-        /*if (isReactiveNode(node)) {
+        if (isReactiveNode(node)) {
             node._reactiveNodeAttributes.addReactListener();
         }
         if (isReactiveParentNode(node)) {
@@ -86,11 +86,11 @@ abstract class ReactiveViewBase<M extends object = object> extends ViewBase<M> i
                     this.addReactiveListeners(childNode);
                 }
             });
-        }*/
+        }
     }
 
     public removeReactiveListeners(node: Node): void {
-        /*if (isReactiveNode(node)) {
+        if (isReactiveNode(node)) {
             node._reactiveNodeAttributes.addReactListener();
         }
         if (isReactiveParentNode(node)) {
@@ -102,6 +102,6 @@ abstract class ReactiveViewBase<M extends object = object> extends ViewBase<M> i
                     this.removeReactiveListeners(childNode);
                 }
             });
-        }*/
+        }
     }
 }

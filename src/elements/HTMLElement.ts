@@ -500,24 +500,6 @@ function createMutationObserverCallback(
     return (mutationsList: MutationRecord[]) =>  {
         mutationsList.forEach((mutation: MutationRecord) => {
             mutation.addedNodes.forEach((node: Node) => {
-                
-                if (isReactiveNode(node)) {
-                    node._reactiveNodeAttributes.addReactListener();
-                }
-                if (isReactiveParentNode(node)) {
-                    node._reactiveParentNodeAttributes.addReactListener();
-                }
-                if (isParentNode(node)) {
-                    forAllSubtreeNodes(node, (childNode) => {
-                        if (isReactiveNode(childNode)) {
-                            childNode._reactiveNodeAttributes.addReactListener();
-                        }
-                        if (isReactiveParentNode(childNode)) {
-                            childNode._reactiveParentNodeAttributes.addReactListener();
-                        }
-                    });
-                }
-
                 if (isElement(node)) {
                     forAllSubtreeElements(node, (childElement: Element) => {
                         [...childElement.attributes].forEach((attr) => {
@@ -535,24 +517,6 @@ function createMutationObserverCallback(
                 }
             });
             mutation.removedNodes.forEach((node: Node) => {
-
-                if (isReactiveNode(node)) {
-                    node._reactiveNodeAttributes.removeReactListener();
-                }
-                if (isReactiveParentNode(node)) {
-                    node._reactiveParentNodeAttributes.removeReactListener();
-                }
-                if (isParentNode(node)) {
-                    forAllSubtreeNodes(node, (childNode) => {
-                        if (isReactiveNode(childNode)) {
-                            childNode._reactiveNodeAttributes.removeReactListener();
-                        }
-                        if (isReactiveParentNode(childNode)) {
-                            childNode._reactiveParentNodeAttributes.removeReactListener();
-                        }
-                    });
-                }
-
                 if (isElement(node)) {
                     forAllSubtreeElements(node, (childElement: Element) => {
                         [...childElement.attributes].forEach((attr) => {
