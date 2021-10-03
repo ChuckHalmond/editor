@@ -75,7 +75,6 @@ const testKeyModifier = (mod: KeyModifier, event: KeyboardEvent) => {
 }
 
 class HotKey {
-
     public readonly key: Key;
     public readonly mod1?: KeyModifier;
     public readonly mod2?: KeyModifier;

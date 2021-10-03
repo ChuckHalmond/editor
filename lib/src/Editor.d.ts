@@ -1,62 +1,36 @@
 import { Command } from "./commands/Command";
-import { Event, EventDispatcher } from "./events/EventDispatcher";
-import { HTMLEMenuBarElement } from "./elements/containers/menus/MenuBar";
-import { HTMLEStatusBarElement } from "./elements/containers/status/StatusBar";
 import { HotKey } from "./Input";
+import { ObjectModel } from "./models/Model";
 export { Editor };
 export { EditorBase };
-export { EditorCommand };
-export { EditorHotKey };
-declare type EditorEventsMap = {
-    "e_contextchange": Event<"e_contextchange">;
-};
-interface Editor extends EventDispatcher<EditorEventsMap> {
-    getState(key: string): any;
-    setState(key: string, value: any): void;
-    addStateListener(statekey: string, listener: (newValue: any) => void): number;
-    removeStateListener(statekey: string, listener: (newValue: any) => void): void;
-    addHotkeyExec(hotkey: EditorHotKey, exec: () => void): void;
-    removeHotkeyExec(hotkey: EditorHotKey, exec: () => void): void;
-    readonly statusbar: HTMLEStatusBarElement | null;
-    readonly menubar: HTMLEMenuBarElement | null;
-    registerCommand(name: string, command: EditorCommand): void;
+interface EditorConstructor {
+    readonly prototype: Editor;
+    new (): Editor;
+}
+interface Editor {
+    addHotkeyExec(hotkey: HotKey, exec: () => void): void;
+    removeHotkeyExec(hotkey: HotKey, exec: () => void): void;
+    registerCommand(name: string, command: Command): void;
     executeCommand(name: string, args?: any, opts?: {
         undo?: boolean;
     }): void;
-    undoLastCommand(): void;
-    redoLastCommand(): void;
-    setContext(context: string): void;
-    setup(): Promise<void>;
+    setup(): void;
 }
-interface EditorCommand extends Command {
-    context: string;
+declare global {
+    interface EditorState {
+    }
 }
-interface EditorHotKey extends HotKey {
-}
-declare class EditorBase<State extends object> extends EventDispatcher<EditorEventsMap> implements Editor {
+declare class EditorBase implements Editor {
+    readonly state: ObjectModel<EditorState>;
     private _commands;
     private _hotkeys;
-    private _undoCommandsCallStack;
-    private _redoCommandsCallStack;
-    private _context;
-    private _state;
-    private _stateListeners;
-    menubar: HTMLEMenuBarElement | null;
-    statusbar: HTMLEStatusBarElement | null;
     constructor();
-    get context(): string;
-    setup(): Promise<any>;
-    setContext(context: string): void;
-    getState(key: string): any;
-    setState(key: string, value: any): void;
-    addStateListener(statekey: string, listener: (newValue: any) => void): number;
-    removeStateListener(statekey: string, listener: (newValue: any) => void): void;
-    registerCommand(name: string, command: EditorCommand): void;
+    setup(): void;
+    registerCommand(name: string, command: Command): void;
     executeCommand(name: string, args?: any, opts?: {
         undo?: boolean;
     }): void;
-    undoLastCommand(): void;
-    redoLastCommand(): void;
-    addHotkeyExec(hotkey: EditorHotKey, exec: () => void): number;
-    removeHotkeyExec(hotkey: EditorHotKey, exec: () => void): void;
+    addHotkeyExec(hotkey: HotKey, exec: () => void): void;
+    removeHotkeyExec(hotkey: HotKey, exec: () => void): void;
 }
+declare var Editor: EditorConstructor;

@@ -100,7 +100,7 @@ class EventDispatcherBase<Events extends {[K in Extract<keyof Events, string>]: 
     public dispatchEvent<K extends Extract<keyof Events, string>>(event: Events[K]): void;
     public dispatchEvent<K extends Extract<keyof Events, string>>(event: Events[K]): void {
         let listeners = this._listeners.get(event.type);
-        if (typeof listeners !== 'undefined') {
+        if (typeof listeners !== "undefined") {
             listeners = listeners.filter((listener) => {
                 listener.handler(event);
                 return !listener.once
