@@ -5,7 +5,6 @@ export { GenerateAttributeAccessors };
 export { bindShadowRoot };
 export { setElementProperties };
 export { setElementAttributes };
-export { setElementChildren };
 export { isParentNode };
 export { isReactiveNode };
 export { isReactiveParentNode };
@@ -18,8 +17,6 @@ export { AttributeMutationMixin };
 export { AttributeType };
 export { areAttributesMatching };
 export { AttributeMutationMixinBase };
-export { createAttributeMutationObserverCallback };
-export { createReactiveNodesMutationObserverCallback };
 export { Fragment };
 export { TextNode };
 export { setHTMLElementEventListeners };
@@ -94,7 +91,6 @@ declare function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, 
 declare function setHTMLElementEventListeners<K extends keyof HTMLElementTagNameMap>(element: HTMLElementTagNameMap[K], listeners: {
     [K in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[K]) => void | [(event: HTMLElementEventMap[K]) => void, Partial<boolean | AddEventListenerOptions>];
 }): HTMLElementTagNameMap[K];
-declare function setElementChildren<E extends Element>(element: E, children: (Node | string)[] | NodeList): E;
 declare function setElementProperties<E extends Element>(element: E, properties?: Partial<Pick<E, WritableKeys<E>>>): E;
 declare function setElementAttributes<E extends Element>(element: E, attributes?: {
     [attrName: string]: number | string | boolean;
@@ -116,5 +112,3 @@ declare abstract class AttributeMutationMixinBase implements AttributeMutationMi
     abstract attach(element: Element): void;
     abstract detach(element: Element): void;
 }
-declare function createAttributeMutationObserverCallback(mixins: AttributeMutationMixin[]): (mutationsList: MutationRecord[]) => void;
-declare function createReactiveNodesMutationObserverCallback(): (mutationsList: MutationRecord[]) => void;

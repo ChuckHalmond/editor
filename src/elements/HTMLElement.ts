@@ -7,7 +7,6 @@ export { GenerateAttributeAccessors };
 export { bindShadowRoot };
 export { setElementProperties };
 export { setElementAttributes };
-export { setElementChildren };
 export { isParentNode };
 export { isReactiveNode };
 export { isReactiveParentNode };
@@ -20,8 +19,6 @@ export { AttributeMutationMixin };
 export { AttributeType };
 export { areAttributesMatching };
 export { AttributeMutationMixinBase };
-export { createAttributeMutationObserverCallback };
-export { createReactiveNodesMutationObserverCallback };
 export { Fragment };
 export { TextNode };
 export { setHTMLElementEventListeners };
@@ -235,10 +232,10 @@ function Element<K extends keyof HTMLElementTagNameMap>(
             }
             if (init.children) {
                 if (typeof init.children === "function") {
-                    setElementChildren(element, init.children(element));
+                    element.replaceChildren(...init.children(element));
                 }
                 else {
-                    setElementChildren(element, init.children);
+                    element.replaceChildren(...init.children);
                 }
             }
             if (init.listeners) {
@@ -415,15 +412,6 @@ function setHTMLElementStyles<E extends HTMLElement>(
     return element;
 };
 
-function setElementChildren<E extends Element>(
-    element: E,
-    children: (Node | string)[] | NodeList
-): E {
-    element.textContent = "";
-    element.append(...children);
-    return element;
-};
-
 function setElementProperties<E extends Element>(
         element: E,
         properties?: Partial<Pick<E, WritableKeys<E>>>
@@ -493,109 +481,4 @@ abstract class AttributeMutationMixinBase implements AttributeMutationMixin {
 
     public abstract attach(element: Element): void;
     public abstract detach(element: Element): void;
-}
-
-function createAttributeMutationObserverCallback(
-    mixins: AttributeMutationMixin[]
-    ) {
-    return (mutationsList: MutationRecord[]) =>  {
-        mutationsList.forEach((mutation: MutationRecord) => {
-            mutation.addedNodes.forEach((node: Node) => {
-                if (isElement(node)) {
-                    forAllSubtreeElements(node, (childElement: Element) => {
-                        [...childElement.attributes].forEach((attr) => {
-                            let matchingMixins = mixins.filter(
-                                mixin => areAttributesMatching(
-                                    mixin.attributeType, mixin.attributeName, mixin.attributeValue,
-                                    attr.name, attr.value
-                                )
-                            );
-                            matchingMixins.forEach((mixin) => {
-                                mixin.attach(childElement);
-                            });
-                        });
-                    });
-                }
-            });
-            mutation.removedNodes.forEach((node: Node) => {
-                if (isElement(node)) {
-                    forAllSubtreeElements(node, (childElement: Element) => {
-                        [...childElement.attributes].forEach((attr) => {
-                            let matchingMixins = mixins.filter(
-                                mixin => areAttributesMatching(
-                                    mixin.attributeType, mixin.attributeName, mixin.attributeValue,
-                                    attr.name, attr.value
-                                )
-                            );
-                            matchingMixins.forEach((mixin) => {
-                                mixin.detach(childElement);
-                            });
-                        });
-                    });
-                }
-            });
-            if (isElement(mutation.target)) {
-                let targetElement = mutation.target;
-                let attrName = mutation.attributeName;
-                if (attrName) {
-                    let relatedMixins = mixins.filter(mixin => mixin.attributeName === attrName);
-                    relatedMixins.forEach((mixin) => {
-                        if (areAttributesMatching(
-                                mixin.attributeType, mixin.attributeName, mixin.attributeValue,
-                                attrName!, targetElement.getAttribute(attrName!)
-                            )) {
-                                mixin.attach(targetElement);
-                        }
-                        else {
-                            mixin.detach(targetElement);
-                        }
-                    });
-                }
-            }
-        });
-    }
-}
-
-function createReactiveNodesMutationObserverCallback() {
-    return (mutationsList: MutationRecord[]) =>  {
-        mutationsList.forEach((mutation: MutationRecord) => {
-            mutation.addedNodes.forEach((node: Node) => {
-                console.log(isReactiveNode(node));
-                if (isReactiveNode(node)) {
-                    node._reactiveNodeAttributes.addReactListener();
-                }
-                if (isReactiveParentNode(node)) {
-                    node._reactiveParentNodeAttributes.addReactListener();
-                }
-                if (isParentNode(node)) {
-                    forAllSubtreeNodes(node, (childNode) => {
-                        if (isReactiveNode(childNode)) {
-                            childNode._reactiveNodeAttributes.addReactListener();
-                        }
-                        if (isReactiveParentNode(childNode)) {
-                            childNode._reactiveParentNodeAttributes.addReactListener();
-                        }
-                    });
-                }
-            });
-            mutation.removedNodes.forEach((node: Node) => {
-                if (isReactiveNode(node)) {
-                    node._reactiveNodeAttributes.addReactListener();
-                }
-                if (isReactiveParentNode(node)) {
-                    node._reactiveParentNodeAttributes.addReactListener();
-                }
-                if (isParentNode(node)) {
-                    forAllSubtreeNodes(node, (childNode) => {
-                        if (isReactiveNode(childNode)) {
-                            childNode._reactiveNodeAttributes.addReactListener();
-                        }
-                        if (isReactiveParentNode(childNode)) {
-                            childNode._reactiveParentNodeAttributes.addReactListener();
-                        }
-                    });
-                }
-            });
-        });
-    }
 }

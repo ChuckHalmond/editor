@@ -28,6 +28,8 @@ export * from "./src/elements/utils/Import";
 export * from "./src/elements/utils/Loader";
 export * from "./src/elements/utils/Palette";
 export * from "./src/elements/utils/WidthSash";
+export * from "./src/observers/AttributeMixinsObserver";
+export * from "./src/observers/ReactiveNodesObserver";
 export * from "./src/events/EventDispatcher";
 export * from "./src/models/Model";
 export * from "./src/templates/menus/MenubarTemplate";
