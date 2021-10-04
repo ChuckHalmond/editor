@@ -18,7 +18,8 @@ export { AttributeMutationMixin };
 export { AttributeType };
 export { areAttributesMatching };
 export { AttributeMutationMixinBase };
-export { createMutationObserverCallback };
+export { createAttributeMutationObserverCallback };
+export { createReactiveNodesMutationObserverCallback };
 export { Fragment };
 export { TextNode };
 export { setHTMLElementEventListeners };
@@ -115,4 +116,5 @@ declare abstract class AttributeMutationMixinBase implements AttributeMutationMi
     abstract attach(element: Element): void;
     abstract detach(element: Element): void;
 }
-declare function createMutationObserverCallback(mixins: AttributeMutationMixin[]): (mutationsList: MutationRecord[]) => void;
+declare function createAttributeMutationObserverCallback(mixins: AttributeMutationMixin[]): (mutationsList: MutationRecord[]) => void;
+declare function createReactiveNodesMutationObserverCallback(): (mutationsList: MutationRecord[]) => void;

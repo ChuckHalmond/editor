@@ -20,7 +20,8 @@ export { AttributeMutationMixin };
 export { AttributeType };
 export { areAttributesMatching };
 export { AttributeMutationMixinBase };
-export { createMutationObserverCallback };
+export { createAttributeMutationObserverCallback };
+export { createReactiveNodesMutationObserverCallback };
 export { Fragment };
 export { TextNode };
 export { setHTMLElementEventListeners };
@@ -494,7 +495,7 @@ abstract class AttributeMutationMixinBase implements AttributeMutationMixin {
     public abstract detach(element: Element): void;
 }
 
-function createMutationObserverCallback(
+function createAttributeMutationObserverCallback(
     mixins: AttributeMutationMixin[]
     ) {
     return (mutationsList: MutationRecord[]) =>  {
@@ -551,6 +552,50 @@ function createMutationObserverCallback(
                     });
                 }
             }
+        });
+    }
+}
+
+function createReactiveNodesMutationObserverCallback() {
+    return (mutationsList: MutationRecord[]) =>  {
+        mutationsList.forEach((mutation: MutationRecord) => {
+            mutation.addedNodes.forEach((node: Node) => {
+                console.log(isReactiveNode(node));
+                if (isReactiveNode(node)) {
+                    node._reactiveNodeAttributes.addReactListener();
+                }
+                if (isReactiveParentNode(node)) {
+                    node._reactiveParentNodeAttributes.addReactListener();
+                }
+                if (isParentNode(node)) {
+                    forAllSubtreeNodes(node, (childNode) => {
+                        if (isReactiveNode(childNode)) {
+                            childNode._reactiveNodeAttributes.addReactListener();
+                        }
+                        if (isReactiveParentNode(childNode)) {
+                            childNode._reactiveParentNodeAttributes.addReactListener();
+                        }
+                    });
+                }
+            });
+            mutation.removedNodes.forEach((node: Node) => {
+                if (isReactiveNode(node)) {
+                    node._reactiveNodeAttributes.addReactListener();
+                }
+                if (isReactiveParentNode(node)) {
+                    node._reactiveParentNodeAttributes.addReactListener();
+                }
+                if (isParentNode(node)) {
+                    forAllSubtreeNodes(node, (childNode) => {
+                        if (isReactiveNode(childNode)) {
+                            childNode._reactiveNodeAttributes.addReactListener();
+                        }
+                        if (isReactiveParentNode(childNode)) {
+                            childNode._reactiveParentNodeAttributes.addReactListener();
+                        }
+                    });
+                }
+            });
         });
     }
 }
