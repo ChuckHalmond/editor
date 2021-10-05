@@ -4,13 +4,13 @@ export { HTMLEDragzoneElementBase };
 interface HTMLEDragzoneElement extends HTMLElement {
     draggables: HTMLEDraggableElement[];
     selectedDraggables: HTMLEDraggableElement[];
-    label: string;
+    disabled: boolean;
     selectDraggable(draggable: HTMLEDraggableElement): void;
     unselectDraggable(draggable: HTMLEDraggableElement): void;
     clearSelection(): void;
 }
 declare class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneElement {
-    label: string;
+    disabled: boolean;
     draggables: HTMLEDraggableElement[];
     selectedDraggables: HTMLEDraggableElement[];
     constructor();

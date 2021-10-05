@@ -1,4 +1,4 @@
-import { RegisterCustomHTMLElement, bindShadowRoot, isTagElement } from "../../HTMLElement";
+import { RegisterCustomHTMLElement, bindShadowRoot, isTagElement, GenerateAttributeAccessors } from "../../HTMLElement";
 import { HTMLEDraggableElement } from "./Draggable";
 
 export { HTMLEDragzoneElement };
@@ -7,7 +7,7 @@ export { HTMLEDragzoneElementBase };
 interface HTMLEDragzoneElement extends HTMLElement {
     draggables: HTMLEDraggableElement[];
     selectedDraggables: HTMLEDraggableElement[];
-    label: string;
+    disabled: boolean;
     selectDraggable(draggable: HTMLEDraggableElement): void;
     unselectDraggable(draggable: HTMLEDraggableElement): void;
     clearSelection(): void;
@@ -16,9 +16,12 @@ interface HTMLEDragzoneElement extends HTMLElement {
 @RegisterCustomHTMLElement({
     name: "e-dragzone"
 })
+@GenerateAttributeAccessors([
+    {name: "disabled", type: "boolean"},
+])
 class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneElement {
 
-    public label!: string;
+    public disabled!: boolean;
 
     public draggables: HTMLEDraggableElement[];
     public selectedDraggables: HTMLEDraggableElement[];
@@ -53,7 +56,6 @@ class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneEleme
                 }
             </style>
             <div part="container">
-                <span part="label"/></span>
                 <slot></slot>
             </div>
         `);
