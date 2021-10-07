@@ -76,7 +76,7 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
             this.addEventListener("pointerup", (event: PointerEvent) => {
                 this.removeEventListener("pointermove", onPointerMove);
                 this.releasePointerCapture(event.pointerId);
-            }, {once: true});
+            });
         });
     }
 

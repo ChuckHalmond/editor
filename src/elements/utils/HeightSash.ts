@@ -76,7 +76,7 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
             this.addEventListener("pointerup", (event: PointerEvent) => {
                 this.removeEventListener("pointermove", onPointerMove);
                 this.releasePointerCapture(event.pointerId);
-            }, {once: true});
+            });
         });
     }
 

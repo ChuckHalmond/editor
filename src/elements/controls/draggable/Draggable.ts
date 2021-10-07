@@ -1,4 +1,5 @@
 import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
+import { forAllSubtreeElements } from "../../Snippets";
 
 export { HTMLEDraggableElement };
 export { HTMLEDraggableElementBase };
@@ -104,7 +105,11 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
                 const refereeId = this.referee.id;
                 if (refereeId) {
                     this.referee.references.slice(thisRefIndex).forEach((reference, index) => {
-                        reference.id = `${refereeId}-${thisRefIndex + index + 1}`;
+                        forAllSubtreeElements(reference, (element) => {
+                            if (element.id) {
+                                element.id = `${element.id}-${thisRefIndex + index + 1}`;
+                            }
+                        });
                     });
                 }
             }
@@ -116,7 +121,11 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
         const referenceIdx = this.references.push(reference);
         reference._referee = this;
         if (this.id) {
-            reference.id = `${this.id}-${referenceIdx}`;
+            forAllSubtreeElements(reference, (element) => {
+                if (element.id) {
+                    element.id = `${element.id}-${referenceIdx}`;
+                }
+            });
         }
         return reference;
     }
