@@ -88,7 +88,7 @@ class BaseHTMLETabElement extends HTMLElement implements HTMLETabElement {
             switch (name) {
                 case "active":
                     if (this.active) {
-                        this.dispatchEvent(new CustomEvent("tabchange", {detail: {tab: this}, bubbles: true}));
+                        this.dispatchEvent(new CustomEvent("e_tabchange", {detail: {tab: this}, bubbles: true}));
                     }
                     const panel = document.getElementById(this.controls);
                     if (panel !== this.panel && isTagElement("e-tabpanel", panel)) {
