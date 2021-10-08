@@ -22,7 +22,6 @@ export { AttributeMutationMixinBase };
 export { Fragment };
 export { TextNode };
 export { setHTMLElementEventListeners };
-export { parseStringTemplate };
 
 function isTagElement<K extends keyof HTMLElementTagNameMap>(tagName: K, obj: any): obj is HTMLElementTagNameMap[K] {
     return obj instanceof Node && obj.nodeType === obj.ELEMENT_NODE && (obj as Element).tagName.toLowerCase() == tagName;
@@ -34,26 +33,6 @@ interface RegisterCustomHTMLElementDecorator {
         observedAttributes?: string[],
         options?: ElementDefinitionOptions
     }): <C extends CustomElementConstructor>(elementCtor: C) => C;
-}
-
-function parseStringTemplate(template: string, items: {[key: string]: Node | string}): DocumentFragment {
-    const regexp = /\[(.*?)\]/gm;
-    const itemsKeys = Object.keys(items);
-    let result: RegExpExecArray  | null;
-    let resultNodes: (Node | string)[] = [];
-    let lastResultIndex = 0;
-    while ((result = regexp.exec(template)) !== null) {
-        if (result.index >= lastResultIndex) {
-            resultNodes.push(document.createTextNode(template.substring(lastResultIndex, result.index)));
-        }
-        if (itemsKeys.indexOf(result[1]) > -1) {
-            resultNodes.push(items[result[1]]);
-        }
-        lastResultIndex = result.index + result[0].length;
-    }
-    let fragment = new DocumentFragment();
-    fragment.append(...resultNodes, template.substring(lastResultIndex, template.length));
-    return fragment;
 }
 
 const RegisterCustomHTMLElement: RegisterCustomHTMLElementDecorator = function(args: {

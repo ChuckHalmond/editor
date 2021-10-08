@@ -20,7 +20,6 @@ export { AttributeMutationMixinBase };
 export { Fragment };
 export { TextNode };
 export { setHTMLElementEventListeners };
-export { parseStringTemplate };
 declare function isTagElement<K extends keyof HTMLElementTagNameMap>(tagName: K, obj: any): obj is HTMLElementTagNameMap[K];
 interface RegisterCustomHTMLElementDecorator {
     (args: {
@@ -29,9 +28,6 @@ interface RegisterCustomHTMLElementDecorator {
         options?: ElementDefinitionOptions;
     }): <C extends CustomElementConstructor>(elementCtor: C) => C;
 }
-declare function parseStringTemplate(template: string, items: {
-    [key: string]: Node | string;
-}): DocumentFragment;
 declare const RegisterCustomHTMLElement: RegisterCustomHTMLElementDecorator;
 interface GenerateAttributeAccessorsDecorator {
     (attributes: {
