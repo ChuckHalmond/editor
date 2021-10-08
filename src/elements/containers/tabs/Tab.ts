@@ -1,6 +1,7 @@
 import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "../../HTMLElement";
-import { HTMLETabPanelElement, isHTMLETabPanelElement } from "./TabPanel";
+import { HTMLETabPanelElement } from "./TabPanel";
 
+export { ETabChangeEvent };
 export { HTMLETabElement };
 export { BaseHTMLETabElement };
 
@@ -11,6 +12,10 @@ interface HTMLETabElement extends HTMLElement {
     controls: string;
     panel: HTMLETabPanelElement | null;
 }
+
+type ETabChangeEvent = CustomEvent<{
+    tab: HTMLETabElement;
+}>;
 
 @RegisterCustomHTMLElement({
     name: "e-tab",
@@ -69,31 +74,31 @@ class BaseHTMLETabElement extends HTMLElement implements HTMLETabElement {
     public connectedCallback(): void {
         this.tabIndex = this.tabIndex;
 
-        let panel = document.getElementById(this.controls);
-        if (isTagElement("e-tabpanel", panel)) {
+        const panel = document.getElementById(this.controls);
+        if (panel !== this.panel && isTagElement("e-tabpanel", panel)) {
             this.panel = panel;
+        }
+        if (this.panel)  {
             this.panel.hidden = !this.active;
         }
     }
     
     public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
-        switch (name) {
-            case "controls":
-                if (oldValue !== newValue) {
-                    let panel = document.getElementById(this.controls);
-                    if (isHTMLETabPanelElement(panel)) {
+        if (newValue !== oldValue) {
+            switch (name) {
+                case "active":
+                    if (this.active) {
+                        this.dispatchEvent(new CustomEvent("tabchange", {detail: {tab: this}, bubbles: true}));
+                    }
+                    const panel = document.getElementById(this.controls);
+                    if (panel !== this.panel && isTagElement("e-tabpanel", panel)) {
                         this.panel = panel;
                     }
-                }
-                break;
-            case "active":
-                if (this.active) {
-                    this.dispatchEvent(new CustomEvent("tabchange", {detail: {tab: this}, bubbles: true}));
-                }
-                if (this.panel) {
-                    this.panel.hidden = !this.active;
-                }
-                break;
+                    if (this.panel)  {
+                        this.panel.hidden = !this.active;
+                    }
+                    break;
+            }
         }
     }
 }
@@ -101,5 +106,11 @@ class BaseHTMLETabElement extends HTMLElement implements HTMLETabElement {
 declare global {
     interface HTMLElementTagNameMap {
         "e-tab": HTMLETabElement,
+    }
+}
+
+declare global {
+    interface HTMLElementEventMap {
+        "e_tabchange": ETabChangeEvent,
     }
 }

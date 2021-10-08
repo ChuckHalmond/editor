@@ -80,14 +80,14 @@ class BaseHTMLETabListElement extends HTMLElement implements HTMLETabListElement
         });
         
         this.addEventListener("click", (event) => {
-            let target = event.target as any;
+            const target = event.target;
             if (isTagElement("e-tab", target)) {
                 target.active = true;
             }
         });
 
-        this.addEventListener("tabchange", (event) => {
-            let targetIndex = this.tabs.indexOf(event.detail.tab);
+        this.addEventListener("e_tabchange", (event) => {
+            const targetIndex = this.tabs.indexOf(event.detail.tab);
             this._activeIndex = targetIndex;
             this.tabs.forEach((thisTab, thisTabIndex) => {
                 if (thisTabIndex !== targetIndex) {
@@ -98,7 +98,7 @@ class BaseHTMLETabListElement extends HTMLElement implements HTMLETabListElement
     }
 
     public focusTabAt(index: number): void {
-        let tab = this.tabs[index];
+        const tab = this.tabs[index];
         if (tab) {
             this._activeIndex = index;
             tab.focus();

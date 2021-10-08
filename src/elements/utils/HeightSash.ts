@@ -71,6 +71,11 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
         };
 
         this.addEventListener("pointerdown", (event: PointerEvent) => {
+            const target = document.getElementById(this.controls);
+            if (target && this._target !== target) {
+                this._target = target;
+                this._targetStyle = window.getComputedStyle(target);
+            }
             this.setPointerCapture(event.pointerId);
             this.addEventListener("pointermove", onPointerMove);
             this.addEventListener("pointerup", (event: PointerEvent) => {
