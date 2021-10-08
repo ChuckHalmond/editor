@@ -70,18 +70,19 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
             }
         };
 
+        const self = this;
         this.addEventListener("pointerdown", (event: PointerEvent) => {
-            const target = document.getElementById(this.controls);
-            if (target && this._target !== target) {
-                this._target = target;
-                this._targetStyle = window.getComputedStyle(target);
+            const target = document.getElementById(self.controls);
+            if (target && self._target !== target) {
+                self._target = target;
+                self._targetStyle = window.getComputedStyle(target);
             }
             const pointerId = event.pointerId;
-            this.setPointerCapture(pointerId);
-            this.addEventListener("pointermove", onPointerMove);
-            this.addEventListener("pointerup", () => {
-                this.removeEventListener("pointermove", onPointerMove);
-                this.releasePointerCapture(pointerId);
+            self.setPointerCapture(pointerId);
+            self.addEventListener("pointermove", onPointerMove);
+            self.addEventListener("pointerup", () => {
+                self.removeEventListener("pointermove", onPointerMove);
+                self.releasePointerCapture(pointerId);
             });
         });
     }
