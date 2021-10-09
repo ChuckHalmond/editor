@@ -8,8 +8,9 @@ interface HTMLETreeElement extends HTMLElement {
     name: string;
     items: HTMLETreeItemElement[];
     readonly activeItem: HTMLETreeItemElement | null;
-    reset(): void;
+    readonly selectedItem: HTMLETreeItemElement | null;
     findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null;
+    reset(): void;
 }
 
 @RegisterCustomHTMLElement({
@@ -27,6 +28,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
     public items: HTMLETreeItemElement[];
 
     private _activeItem: HTMLETreeItemElement | null;
+    private _selectedItem: HTMLETreeItemElement | null;
 
     constructor() {
         super();
@@ -50,10 +52,15 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         `);
         this.items = [];
         this._activeItem = null;
+        this._selectedItem = null;
     }
 
     public get activeItem(): HTMLETreeItemElement | null {
         return this._activeItem;
+    }
+
+    public get selectedItem(): HTMLETreeItemElement | null {
+        return this._selectedItem;
     }
 
     public connectedCallback() {
@@ -81,7 +88,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
                         }
                         else {
                             if (isTagElement("e-treeitem", this.activeItem.parent)) {
-                                this.activeItem.parent.focus();
+                                this.focusItem(this.activeItem.parent);
                             }
                         }
                     }
@@ -94,7 +101,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
                         }
                         else {
                             if (this.activeItem.items.length > 0) {
-                                this.activeItem.items[0].focus();
+                                this.focusItem(this.activeItem.items[0]);
                             }
                         }
                     }
@@ -102,80 +109,102 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
                     break;
                 case "ArrowUp":
                     if (this.activeItem) {
-                        this.activeItem.previousVisibleItem().focus();
+                        this.focusItem(this.activeItem.previousVisibleItem());
                     }
                     else if (this.items.length > 0) {
-                        this.items[0].focus();
+                        this.focusItem(this.items[0]);
                     }
                     event.preventDefault();
                     break;
                 case "ArrowDown":
                     if (this.activeItem) {
-                        this.activeItem.nextVisibleItem().focus();
+                        this.focusItem(this.activeItem.nextVisibleItem());
                     }
                     else if (this.items.length > 0) {
-                        this.items[this.items.length - 1].focus();
+                        this.focusItem(this.items[this.items.length - 1]);
                     }
                     event.preventDefault();
                     break;
                 case "Home":
                     if (this.items.length > 0) {
-                        this.items[0].focus();
+                        this.focusItem(this.items[0]);
                     }
                     event.preventDefault();
                     break;
                 case "End":
                     if (this.items.length > 0) {
-                        this.items[this.items.length - 1].deepestVisibleChildItem().focus();
+                        this.focusItem(this.items[this.items.length - 1].deepestVisibleChildItem());
                     }
                     event.preventDefault();
                     break;
                 case "Enter":
                     if (this.activeItem) {
+                        this.selectItem(this.activeItem);
                         this.activeItem.trigger();
                     }
                     break;
                 case "Escape":
                     this.active = false;
-                    if (this.activeItem) {
-                        this.activeItem.active = false;
-                    }
+                    this.reset();
                     this.focus();
                     break;
             }
         });
 
         this.addEventListener("click", (event: MouseEvent) => {
-            const target = event.target as any;
+            const target = event.target as Element;
             if (isTagElement("e-treeitem", target)) {
-                if (this._activeItem) {
-                    this._activeItem.active = false;
-                }
-                this._activeItem = target;
-                this._activeItem.active = true;
+                this.selectItem(target);
                 target.trigger();
             }
         });
 
-        this.addEventListener("focusin", () => {
+        this.addEventListener("focusin", (event: FocusEvent) => {
+            const target = event.target as Element;
             if (!this.active) {
                 this.active = true;
+            }
+            const closestItem = target.closest("e-treeitem");
+            if (closestItem && this.contains(closestItem)) {
+                this.focusItem(closestItem);
             }
         });
 
         this.addEventListener("focusout", (event: FocusEvent) => {
-            const relatedTarget = event.relatedTarget as any;
+            const relatedTarget = event.relatedTarget as Element;
             if (!this.contains(relatedTarget)) {
                 this.active = false;
+                if (this.activeItem) {
+                    this.activeItem.active = false;
+                }
             }
         });
     }
 
-    public reset(): void {
-        if (this._activeItem) {
-            this._activeItem.active = false;
+    public focusItem(item: HTMLETreeItemElement) {
+        if (this.activeItem) {
+            this.activeItem.active = false;
         }
-        this.active = false;
+        this._activeItem = item;
+        this._activeItem.active = true;
+        item.focus();
+    }
+
+    public selectItem(item: HTMLETreeItemElement) {
+        if (this._selectedItem) {
+            this._selectedItem.selected = false;
+        }
+        this._selectedItem = item;
+        this._selectedItem.selected = true;
+    }
+
+    public reset(): void {
+        if (this.activeItem) {
+            this.activeItem.active = false;
+        }
+        if (this._selectedItem) {
+            this._selectedItem.selected = false;
+        }
     }
 
     public findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null {

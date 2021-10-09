@@ -7,6 +7,7 @@ interface HTMLETreeItemElement extends HTMLElement {
     expanded: boolean;
     indent: number;
     icon: string;
+    selected: boolean;
     active: boolean;
     leaf: boolean;
     items: HTMLETreeItemElement[];
@@ -26,11 +27,11 @@ declare class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeI
     expanded: boolean;
     value: string;
     icon: string;
+    selected: boolean;
     active: boolean;
     leaf: boolean;
     items: HTMLETreeItemElement[];
     parent: HTMLETreeItemElement | HTMLETreeElement | null;
-    private _toggleArrow;
     constructor();
     connectedCallback(): void;
     attributeChangedCallback(name: string, oldValue: string, newValue: string): void;

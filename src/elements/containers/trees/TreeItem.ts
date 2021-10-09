@@ -10,6 +10,7 @@ interface HTMLETreeItemElement extends HTMLElement {
     expanded: boolean;
     indent: number;
     icon: string;
+    selected: boolean;
     active: boolean;
     leaf: boolean;
 
@@ -37,6 +38,7 @@ interface HTMLETreeItemElement extends HTMLElement {
     {name: "icon", type: "string"},
     {name: "indent", type: "number"},
     {name: "active", type: "boolean"},
+    {name: "selected", type: "boolean"},
     {name: "expanded", type: "boolean"},
     {name: "leaf", type: "boolean"}
 ])
@@ -48,12 +50,12 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
     public expanded!: boolean;
     public value!: string;
     public icon!: string;
+    public selected!: boolean;
     public active!: boolean;
     public leaf!: boolean;
 
     public items: HTMLETreeItemElement[];
     public parent: HTMLETreeItemElement | HTMLETreeElement | null;
-    private _toggleArrow: Element;
 
     constructor() {
         super();
@@ -62,7 +64,6 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
             <style>
                 :host {
                     display: inline-block;
-                    position: relative;
 
                     user-select: none;
                     white-space: nowrap;
@@ -73,12 +74,13 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                     --indent-width: 6px;
                 }
                 
-                :host([active]) [part~="content"] {
-                    background-color: gainsboro;
+                [part~="content"]:hover,
+                :host([active]:not([selected])) [part~="content"] {
+                    background-color: whitesmoke;
                 }
 
-                [part~="content"]:hover {
-                    background-color: whitesmoke;
+                :host([selected]) [part~="content"] {
+                    background-color: gainsboro;
                 }
 
                 :host(:not([expanded])) [part~="container"] {
@@ -99,10 +101,6 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                     overflow: hidden;
                     white-space: nowrap;
                     text-overflow: ellipsis;
-                }
-
-                [part~="toggle_arrow"]:hover {
-                    background-color: whitesmoke;
                 }
 
                 :host([leaf]) [part~="container"],
@@ -161,8 +159,6 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
         this.items = [];
         this.parent = null;
         this.indent = 0;
-
-        this._toggleArrow = this.shadowRoot!.querySelector("[part~=toggle_arrow]")!;
     }
 
     public connectedCallback() {
@@ -181,11 +177,9 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
             });
         }
 
-        this.shadowRoot!.addEventListener("mousedown", (event) => {
-            let target = event.target as Element;
-            if (target === this._toggleArrow) {
-                this.toggle();
-            }
+        const content = this.shadowRoot!.querySelector("[part=content]")!;
+        content.addEventListener("click", () => {
+            this.toggle();
         });
     }
 
