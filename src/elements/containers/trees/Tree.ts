@@ -8,7 +8,7 @@ interface HTMLETreeElement extends HTMLElement {
     name: string;
     items: HTMLETreeItemElement[];
     readonly activeItem: HTMLETreeItemElement | null;
-
+    reset(): void;
     findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null;
 }
 
@@ -173,6 +173,13 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
                 this.active = false;
             }
         });
+    }
+
+    public reset(): void {
+        if (this._activeItem) {
+            this._activeItem.active = false;
+        }
+        this.active = false;
     }
 
     public findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null {

@@ -5,6 +5,7 @@ interface HTMLETreeElement extends HTMLElement {
     name: string;
     items: HTMLETreeItemElement[];
     readonly activeItem: HTMLETreeItemElement | null;
+    reset(): void;
     findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null;
 }
 declare class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
@@ -15,6 +16,7 @@ declare class HTMLETreeElementBase extends HTMLElement implements HTMLETreeEleme
     constructor();
     get activeItem(): HTMLETreeItemElement | null;
     connectedCallback(): void;
+    reset(): void;
     findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null;
 }
 declare global {

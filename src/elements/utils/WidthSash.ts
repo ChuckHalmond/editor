@@ -70,19 +70,17 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
             }
         };
 
-        const self = this;
         this.addEventListener("pointerdown", (event: PointerEvent) => {
-            const target = document.getElementById(self.controls);
-            if (target && self._target !== target) {
-                self._target = target;
-                self._targetStyle = window.getComputedStyle(target);
+            const target = document.getElementById(this.controls);
+            if (target && this._target !== target) {
+                this._target = target;
+                this._targetStyle = window.getComputedStyle(target);
             }
-            const pointerId = event.pointerId;
-            self.setPointerCapture(pointerId);
-            self.addEventListener("pointermove", onPointerMove);
-            self.addEventListener("pointerup", () => {
-                self.removeEventListener("pointermove", onPointerMove);
-                self.releasePointerCapture(pointerId);
+            this.setPointerCapture(event.pointerId);
+            this.addEventListener("pointermove", onPointerMove);
+            this.addEventListener("pointerup", () => {
+                this.removeEventListener("pointermove", onPointerMove);
+                this.releasePointerCapture(event.pointerId);
             });
         });
     }
