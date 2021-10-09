@@ -146,29 +146,25 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         });
 
         this.addEventListener("click", (event: MouseEvent) => {
-            let target = event.target as any;
+            const target = event.target as any;
             if (isTagElement("e-treeitem", target)) {
+                if (this._activeItem) {
+                    this._activeItem.active = false;
+                }
+                this._activeItem = target;
+                this._activeItem.active = true;
                 target.trigger();
             }
         });
 
-        this.addEventListener("focusin", (event: FocusEvent) => {
-            let target = event.target as Element;
+        this.addEventListener("focusin", () => {
             if (!this.active) {
                 this.active = true;
-            }
-            let closestItem = target.closest("e-treeitem");
-            if (closestItem && this.contains(closestItem)) {
-                if (this._activeItem) {
-                    this._activeItem.active = false;
-                }
-                this._activeItem = closestItem;
-                this._activeItem.active = true;
             }
         });
 
         this.addEventListener("focusout", (event: FocusEvent) => {
-            let relatedTarget = event.relatedTarget as any;
+            const relatedTarget = event.relatedTarget as any;
             if (!this.contains(relatedTarget)) {
                 this.active = false;
             }
