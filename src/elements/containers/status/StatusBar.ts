@@ -1,5 +1,5 @@
 import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "../../HTMLElement";
-import { HTMLEStatusItemElement } from "./StatusItem";
+        import { HTMLEStatusItemElement } from "./StatusItem";
 
 export { HTMLEStatusBarElement };
 export { HTMLEStatusBarElementBase };
@@ -23,7 +23,7 @@ class HTMLEStatusBarElementBase extends HTMLElement implements HTMLEStatusBarEle
     public items: HTMLEStatusItemElement[];
 
     public _selectedItemIndex: number;
-
+    
     constructor() {
         super();
 

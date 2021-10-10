@@ -3,8 +3,6 @@ export { isTagElement };
 export { RegisterCustomHTMLElement };
 export { GenerateAttributeAccessors };
 export { bindShadowRoot };
-export { setElementProperties };
-export { setElementAttributes };
 export { isParentNode };
 export { isReactiveNode };
 export { isReactiveParentNode };
@@ -13,14 +11,12 @@ export { ReactiveParentNode };
 export { ReactiveChildNodes };
 export { isElement };
 export { Element };
+export { Fragment };
+export { TextNode };
 export { AttributeMutationMixin };
 export { AttributeType };
 export { areAttributesMatching };
 export { AttributeMutationMixinBase };
-export { Fragment };
-export { TextNode };
-export { setHTMLElementEventListeners };
-declare function isTagElement<K extends keyof HTMLElementTagNameMap>(tagName: K, obj: any): obj is HTMLElementTagNameMap[K];
 interface RegisterCustomHTMLElementDecorator {
     (args: {
         name: string;
@@ -61,6 +57,7 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
         [property: string]: string | [string, string];
     };
 }
+declare function isTagElement<K extends keyof HTMLElementTagNameMap>(tagName: K, obj: any): obj is HTMLElementTagNameMap[K];
 declare function Element<K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLInit<K>): HTMLElementTagNameMap[K];
 declare type ReactiveNode = Node & {
     _reactiveNodeAttributes: {
@@ -79,18 +76,11 @@ declare function isElement(node: Node): node is Element;
 declare function isReactiveNode(node: Node): node is ReactiveNode;
 declare function isReactiveParentNode(node: Node): node is ReactiveParentNode;
 declare function ReactiveNode<Data extends object, N extends Node>(list: ListModel<Data>, node: N, react: (node: N, addedItems: Data[], removedItems: Data[], index: number) => void): N;
-declare function ReactiveNode<Data extends object, N extends Node>(object: ObjectModel<Data>, node: N, react: <K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void): N;
+declare function ReactiveNode<Data extends object, N extends Node>(object: ObjectModel, node: N, react: <K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void): N;
 interface ReactiveChildNodes {
     (parent: Node & ParentNode): (Node | string)[];
 }
 declare function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string, placeholder?: Node): ReactiveChildNodes;
-declare function setHTMLElementEventListeners<K extends keyof HTMLElementTagNameMap>(element: HTMLElementTagNameMap[K], listeners: {
-    [K in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[K]) => void | [(event: HTMLElementEventMap[K]) => void, Partial<boolean | AddEventListenerOptions>];
-}): HTMLElementTagNameMap[K];
-declare function setElementProperties<E extends Element>(element: E, properties?: Partial<Pick<E, WritableKeys<E>>>): E;
-declare function setElementAttributes<E extends Element>(element: E, attributes?: {
-    [attrName: string]: number | string | boolean;
-}): E;
 interface AttributeMutationMixin {
     readonly attributeName: string;
     readonly attributeValue: string;

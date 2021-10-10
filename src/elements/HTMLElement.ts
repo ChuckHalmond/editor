@@ -1,12 +1,10 @@
 import { ListModel, ListModelChangeEvent, ObjectModel, ObjectModelChangeEvent } from "../models/Model";
-import { camelToTrain, forAllSubtreeElements, forAllSubtreeNodes } from "./Snippets";
+import { camelToTrain } from "./Snippets";
 
 export { isTagElement };
 export { RegisterCustomHTMLElement };
 export { GenerateAttributeAccessors };
 export { bindShadowRoot };
-export { setElementProperties };
-export { setElementAttributes };
 export { isParentNode };
 export { isReactiveNode };
 export { isReactiveParentNode };
@@ -15,17 +13,12 @@ export { ReactiveParentNode };
 export { ReactiveChildNodes };
 export { isElement };
 export { Element };
+export { Fragment };
+export { TextNode };
 export { AttributeMutationMixin };
 export { AttributeType };
 export { areAttributesMatching };
 export { AttributeMutationMixinBase };
-export { Fragment };
-export { TextNode };
-export { setHTMLElementEventListeners };
-
-function isTagElement<K extends keyof HTMLElementTagNameMap>(tagName: K, obj: any): obj is HTMLElementTagNameMap[K] {
-    return obj instanceof Node && obj.nodeType === obj.ELEMENT_NODE && (obj as Element).tagName.toLowerCase() == tagName;
-}
 
 interface RegisterCustomHTMLElementDecorator {
     (args: {
@@ -199,29 +192,68 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     }
 }
 
+function isTagElement<K extends keyof HTMLElementTagNameMap>(tagName: K, obj: any): obj is HTMLElementTagNameMap[K] {
+    return obj instanceof Node && obj.nodeType === obj.ELEMENT_NODE && (obj as Element).tagName.toLowerCase() == tagName;
+}
+
 function Element<K extends keyof HTMLElementTagNameMap>(
     tagName: K, init?: HTMLInit<K>): HTMLElementTagNameMap[K] {
         const element = document.createElement(tagName, init?.options);
         if (init) {
-            if (init.props) {
-                setElementProperties(element, init.props);
+            const { props, attrs, children, listeners, styles } = init;
+            if (props) {
+                const keys = Object.keys(props) as (keyof Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>)[];
+                keys.forEach((key) => {
+                    const value = props[key];
+                    if (typeof props[key] !== "undefined") {
+                        Object.assign(
+                            element, {
+                                [key]: value
+                            }
+                        );
+                    }
+                });
             }
-            if (init.attrs) {
-                setElementAttributes(element, init.attrs);
+            if (attrs) {
+                Object.keys(attrs).forEach((attrName) => {
+                    const value = attrs[attrName];
+                    if (typeof value === "boolean") {
+                        if (value) {
+                            element.setAttribute(camelToTrain(attrName), "");
+                        }
+                    }
+                    else {
+                        element.setAttribute(camelToTrain(attrName), value.toString());
+                    }
+                });
             }
-            if (init.children) {
-                if (typeof init.children === "function") {
-                    element.replaceChildren(...init.children(element));
+            if (children) {
+                if (typeof children === "function") {
+                    element.replaceChildren(...children(element));
                 }
                 else {
-                    element.replaceChildren(...init.children);
+                    element.replaceChildren(...children);
                 }
             }
-            if (init.listeners) {
-                setHTMLElementEventListeners(element, init.listeners);
+            if (listeners) {
+                Object.entries(listeners).forEach((entry) => {
+                    if (Array.isArray(entry[1])) {
+                        element.addEventListener(entry[0], entry[1][0] as EventListener, entry[1][1]);
+                    }
+                    else {
+                        element.addEventListener(entry[0], entry[1] as EventListener);
+                    }
+                });
             }
-            if (init.styles) {
-                setHTMLElementStyles(element, init.styles);
+            if (styles) {
+                Object.keys(styles).forEach((property) => {
+                    if (Array.isArray(styles[property])) {
+                        element.style.setProperty(property, styles[property][0], styles[property][1]);
+                    }
+                    else {
+                        element.style.setProperty(property, styles[property] as string);
+                    }
+                });
             }
         }
         return element;
@@ -264,9 +296,9 @@ function isReactiveParentNode(node: Node): node is ReactiveParentNode {
 function ReactiveNode<Data extends object, N extends Node>
     (list: ListModel<Data>, node: N, react: (node: N, addedItems: Data[], removedItems: Data[], index: number) => void): N
 function ReactiveNode<Data extends object, N extends Node>
-    (object: ObjectModel<Data>, node: N, react: <K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void): N
+    (object: ObjectModel, node: N, react: <K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void): N
 function ReactiveNode<Data extends object, N extends Node>
-    (objectOrList: ObjectModel<Data> | ListModel<Data>, node: N, react: (<K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void)
+    (objectOrList: ObjectModel | ListModel<Data>, node: N, react: (<K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void)
     | ((node: N, addedItems: Data[], removedItems: Data[], index: number) => void)): N {
         if ("items" in objectOrList) {
             const listener = (event: ListModelChangeEvent) => {
@@ -302,9 +334,9 @@ function ReactiveNode<Data extends object, N extends Node>
                     }
                 }
             ) as ReactiveNode;
-            const keys = Object.keys(objectOrList.data) as (keyof Data)[];
+            const keys = Object.keys(objectOrList) as (keyof Data)[];
             keys.forEach((key) => {
-                react(node, key as any, void 0 as any, objectOrList.data[key] as any);
+                react(node, key as any, void 0 as any, (objectOrList as any)[key] as any);
             });
         }
         return node;
@@ -356,72 +388,6 @@ function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (it
         return children;
     }
 }
-
-function setHTMLElementEventListeners<K extends keyof HTMLElementTagNameMap>(
-    element: HTMLElementTagNameMap[K],
-    listeners: {
-        [K in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[K]) => void | [(event: HTMLElementEventMap[K]) => void, Partial<boolean | AddEventListenerOptions>]
-    }
-): HTMLElementTagNameMap[K] {
-    Object.entries(listeners).forEach((entry) => {
-        if (Array.isArray(entry[1])) {
-            element.addEventListener(entry[0], entry[1][0] as EventListener, entry[1][1]);
-        }
-        else {
-            element.addEventListener(entry[0], entry[1] as EventListener);
-        }
-    });
-    return element;
-};
-
-function setHTMLElementStyles<E extends HTMLElement>(
-    element: E,
-    styles: {
-        [property: string]: string | [string, string]
-    }
-): E {
-    Object.keys(styles).forEach((property) => {
-        if (Array.isArray(styles[property])) {
-            element.style.setProperty(property, styles[property][0], styles[property][1]);
-        }
-        else {
-            element.style.setProperty(property, styles[property] as string);
-        }
-    });
-    return element;
-};
-
-function setElementProperties<E extends Element>(
-        element: E,
-        properties?: Partial<Pick<E, WritableKeys<E>>>
-    ): E {
-    for (const property in properties) {
-        let value = properties[property];
-        if (typeof value !== "undefined") {
-            element[property] = value!;
-        }
-    }
-    return element;
-};
-
-function setElementAttributes<E extends Element>(
-        element: E,
-        attributes?: {[attrName: string]: number | string | boolean}
-    ): E {
-    for (const key in attributes) {
-        const value = attributes[key];
-        const attributeName = camelToTrain(key);
-        if (typeof value === "boolean") {
-            if (value) {
-                element.setAttribute(attributeName, "");
-            }
-        }
-        else {
-            element.setAttribute(attributeName, value.toString());
-        }
-    }
-    return element;
-};
 
 interface AttributeMutationMixin {
     readonly attributeName: string;

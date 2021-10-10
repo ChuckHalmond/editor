@@ -4,6 +4,11 @@ import { forAllSubtreeElements } from "../../Snippets";
 export { HTMLEDraggableElement };
 export { HTMLEDraggableElementBase };
 
+interface HTMLEDraggableElementConstructor {
+    readonly prototype: HTMLEDraggableElement;
+    new(): HTMLEDraggableElement;
+}
+
 interface HTMLEDraggableElement extends HTMLElement {
     selected: boolean;
     dragged: boolean;
@@ -130,6 +135,8 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
         return reference;
     }
 }
+
+var HTMLEDraggableElement: HTMLEDraggableElementConstructor = HTMLEDraggableElementBase
 
 declare global {
     interface HTMLElementTagNameMap {

@@ -21,7 +21,7 @@ declare global {
     }
 }
 declare class EditorBase implements Editor {
-    readonly state: ObjectModel<EditorState>;
+    readonly state: ObjectModel;
     private _commands;
     private _hotkeys;
     constructor();

@@ -89,7 +89,7 @@ class HTMLEDropzoneElementBase extends HTMLElement implements HTMLEDropzoneEleme
                     padding: 2px;
                 }
 
-                ::slotted(e-draggable:not(:only-child)) {
+                ::slotted(*:not(:only-child)) {
                     margin-top: 2px;
                     margin-bottom: 2px;
                 }
@@ -159,7 +159,7 @@ class HTMLEDropzoneElementBase extends HTMLElement implements HTMLEDropzoneEleme
         if (slot) {
             slot.addEventListener("slotchange", () => {
                 const draggables = slot.assignedElements().filter(
-                    elem => isTagElement("e-draggable", elem)
+                    elem => elem instanceof HTMLEDraggableElement
                 ) as HTMLEDraggableElement[];
                 this.draggables = draggables;
                 this.draggables.forEach((draggable) => {

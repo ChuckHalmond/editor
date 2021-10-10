@@ -1,5 +1,9 @@
 export { HTMLEDraggableElement };
 export { HTMLEDraggableElementBase };
+interface HTMLEDraggableElementConstructor {
+    readonly prototype: HTMLEDraggableElement;
+    new (): HTMLEDraggableElement;
+}
 interface HTMLEDraggableElement extends HTMLElement {
     selected: boolean;
     dragged: boolean;
@@ -25,6 +29,7 @@ declare class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDrag
     disconnectedCallback(): void;
     getReference(): HTMLEDraggableElementBase;
 }
+declare var HTMLEDraggableElement: HTMLEDraggableElementConstructor;
 declare global {
     interface HTMLElementTagNameMap {
         "e-draggable": HTMLEDraggableElement;

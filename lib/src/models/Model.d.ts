@@ -1,11 +1,9 @@
 import { EventDispatcher } from "../events/EventDispatcher";
+export { GenerateObjectModelAccessors };
 export { ObjectModelChangeEvent };
 export { ObjectModel };
-export { isObjectModel };
 export { ObjectModelBase };
 export { ListModelChangeEvent };
-export { ListModelChangeType };
-export { isListModel };
 export { ListModel };
 export { ListModelBase };
 interface ObjectModelChangeEvent {
@@ -19,18 +17,17 @@ interface ObjectModelChangeEvent {
 interface ObjectModelChangeEvents {
     "objectmodelchange": ObjectModelChangeEvent;
 }
-interface ObjectModel<Data extends object = object> extends EventDispatcher<ObjectModelChangeEvents> {
-    readonly data: Readonly<Data>;
-    set<K extends keyof Data>(key: K, value: Data[K]): void;
+interface ObjectModel extends EventDispatcher<ObjectModelChangeEvents> {
 }
-declare function isObjectModel(obj: any): obj is ObjectModel;
-declare class ObjectModelBase<Data extends object> extends EventDispatcher<ObjectModelChangeEvents> implements ObjectModel<Data> {
-    private _data;
-    constructor(data: Data);
-    get data(): Readonly<Data>;
-    set<K extends keyof Data>(key: K, value: Data[K]): void;
+declare class ObjectModelBase extends EventDispatcher<ObjectModelChangeEvents> implements ObjectModel {
+    constructor();
 }
-declare type ListModelChangeType = "insert" | "remove" | "clear";
+interface GenerateObjectModelAccessorsDecorator {
+    (args: {
+        props: string[];
+    }): <O extends ObjectModelBase, C extends new (...args: any[]) => O>(ctor: C) => C;
+}
+declare const GenerateObjectModelAccessors: GenerateObjectModelAccessorsDecorator;
 interface ListModelChangeEvent {
     type: "listmodelchange";
     data: {
@@ -51,7 +48,6 @@ interface ListModel<Item = {}> extends EventDispatcher<ListModelEvents> {
     remove(item: Item): void;
     clear(): void;
 }
-declare function isListModel(obj: any): obj is ListModel;
 declare class ListModelBase<Item> extends EventDispatcher<ListModelEvents> implements ListModel<Item> {
     private _items;
     constructor(items?: Item[]);

@@ -26,14 +26,14 @@ declare global {
 }
 
 class EditorBase implements Editor {
-    readonly state: ObjectModel<EditorState>;
+    readonly state: ObjectModel;
     private _commands: Map<string, Command>;
     private _hotkeys: Map<HotKey, (() => void)[]>;
 
     constructor() {
         this._commands = new Map();
         this._hotkeys = new Map();
-        this.state = new ObjectModelBase({});
+        this.state = new ObjectModelBase();
     }
     
     public setup(): void {
