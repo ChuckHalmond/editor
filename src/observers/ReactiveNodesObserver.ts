@@ -1,9 +1,7 @@
 import { isParentNode, isReactiveNode, isReactiveParentNode } from "../elements/HTMLElement";
 import { forAllSubtreeNodes } from "../elements/Snippets";
 
-export { ReactiveNodesObserverConstructor };
 export { ReactiveNodesObserver };
-export { ReactiveNodesObserverBase };
 
 interface ReactiveNodesObserverConstructor {
     readonly prototype: ReactiveNodesObserver;

@@ -1,9 +1,7 @@
 import { areAttributesMatching, AttributeMutationMixin, isElement } from "../elements/HTMLElement";
 import { forAllSubtreeElements } from "../elements/Snippets";
 
-export { AttributeMixinsObserverConstructor };
 export { AttributeMixinsObserver };
-export { AttributeMixinsObserverBase };
 
 interface AttributeMixinsObserverConstructor {
     readonly prototype: AttributeMixinsObserver;
