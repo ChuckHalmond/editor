@@ -1,7 +1,10 @@
-import { HTMLEMenuElement } from "./Menu";
 import { HTMLEMenuItemElement } from "./MenuItem";
+import { HTMLEMenuElement } from "./Menu";
 export { HTMLEMenuItemGroupElement };
-export { HTMLEMenuItemGroupElementBase };
+interface HTMLEMenuItemGroupElementConstructor {
+    readonly prototype: HTMLEMenuItemGroupElement;
+    new (): HTMLEMenuItemGroupElement;
+}
 interface HTMLEMenuItemGroupElement extends HTMLElement {
     name: string;
     label: string;
@@ -16,26 +19,9 @@ interface HTMLEMenuItemGroupElement extends HTMLElement {
     reset(): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null;
 }
-declare class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItemGroupElement {
-    name: string;
-    label: string;
-    type: "list" | "grid";
-    rows: number;
-    cells: number;
-    parentMenu: HTMLEMenuElement | null;
-    items: HTMLEMenuItemElement[];
-    private _activeIndex;
-    constructor();
-    get activeIndex(): number;
-    get activeItem(): HTMLEMenuItemElement | null;
-    connectedCallback(): void;
-    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
-    focusItemAt(index: number, childMenu?: boolean): void;
-    reset(): void;
-    findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null;
-}
 declare global {
     interface HTMLElementTagNameMap {
         "e-menuitemgroup": HTMLEMenuItemGroupElement;
     }
 }
+declare var HTMLEMenuItemGroupElement: HTMLEMenuItemGroupElementConstructor;

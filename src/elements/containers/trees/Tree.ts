@@ -1,8 +1,7 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "../../HTMLElement";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
 import { HTMLETreeItemElement } from "./TreeItem";
 
 export { HTMLETreeElement };
-export { HTMLETreeElementBase };
 
 interface HTMLETreeElement extends HTMLElement {
     name: string;
@@ -70,7 +69,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         if (slot) {
             slot.addEventListener("slotchange", () => {
                 const items = slot.assignedElements()
-                    .filter(item => isTagElement("e-treeitem", item)) as HTMLETreeItemElement[];
+                    .filter(item => item instanceof HTMLETreeItemElement) as HTMLETreeItemElement[];
                 this.items = items;
                 items.forEach((item) => {
                     item.parent = this;
@@ -87,7 +86,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
                             this.activeItem.toggle();
                         }
                         else {
-                            if (isTagElement("e-treeitem", this.activeItem.parent)) {
+                            if (this.activeItem.parent instanceof HTMLETreeItemElement) {
                                 this.focusItem(this.activeItem.parent);
                             }
                         }
@@ -153,7 +152,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
 
         this.addEventListener("click", (event: MouseEvent) => {
             const target = event.target as Element;
-            if (isTagElement("e-treeitem", target)) {
+            if (target instanceof HTMLETreeItemElement) {
                 this.selectItem(target);
                 target.trigger();
             }

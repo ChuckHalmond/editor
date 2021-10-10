@@ -1,15 +1,14 @@
 import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
 
-export { isHTMLETabPanelElement };
 export { HTMLETabPanelElement };
-export { BaseHTMLETabPanelElement };
+
+interface HTMLETabPanelElementConstructor {
+    readonly prototype: HTMLETabPanelElement;
+    new(): HTMLETabPanelElement;
+}
 
 interface HTMLETabPanelElement extends HTMLElement {
     name: string;
-}
-
-function isHTMLETabPanelElement(obj: any): obj is BaseHTMLETabPanelElement {
-    return obj instanceof Node && obj.nodeType === obj.ELEMENT_NODE && (obj as Element).tagName.toLowerCase() === "e-tabpanel";
 }
 
 @RegisterCustomHTMLElement({
@@ -18,7 +17,7 @@ function isHTMLETabPanelElement(obj: any): obj is BaseHTMLETabPanelElement {
 @GenerateAttributeAccessors([
     {name: "name", type: "string"}
 ])
-class BaseHTMLETabPanelElement extends HTMLElement implements HTMLETabPanelElement {
+class HTMLETabPanelElementBase extends HTMLElement implements HTMLETabPanelElement {
 
     public name!: string;
 
@@ -43,6 +42,8 @@ class BaseHTMLETabPanelElement extends HTMLElement implements HTMLETabPanelEleme
         this.tabIndex = this.tabIndex;
     }
 }
+
+var HTMLETabPanelElement: HTMLETabPanelElementConstructor = HTMLETabPanelElementBase;
 
 declare global {
     interface HTMLElementTagNameMap {

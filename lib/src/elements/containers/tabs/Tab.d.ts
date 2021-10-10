@@ -1,7 +1,10 @@
 import { HTMLETabPanelElement } from "./TabPanel";
 export { ETabChangeEvent };
 export { HTMLETabElement };
-export { BaseHTMLETabElement };
+interface HTMLETabElementConstructor {
+    readonly prototype: HTMLETabElement;
+    new (): HTMLETabElement;
+}
 interface HTMLETabElement extends HTMLElement {
     name: string;
     active: boolean;
@@ -12,23 +15,12 @@ interface HTMLETabElement extends HTMLElement {
 declare type ETabChangeEvent = CustomEvent<{
     tab: HTMLETabElement;
 }>;
-declare class BaseHTMLETabElement extends HTMLElement implements HTMLETabElement {
-    name: string;
-    disabled: boolean;
-    active: boolean;
-    controls: string;
-    panel: HTMLETabPanelElement | null;
-    constructor();
-    connectedCallback(): void;
-    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
-}
-declare global {
-    interface HTMLElementTagNameMap {
-        "e-tab": HTMLETabElement;
-    }
-}
 declare global {
     interface HTMLElementEventMap {
         "e_tabchange": ETabChangeEvent;
     }
+    interface HTMLElementTagNameMap {
+        "e-tab": HTMLETabElement;
+    }
 }
+declare var HTMLETabElement: HTMLETabElementConstructor;

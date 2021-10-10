@@ -1,8 +1,12 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "../../HTMLElement";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
 import { HTMLEMenuElement } from "./Menu";
 
 export { HTMLEMenuButtonElement };
-export { HTMLEMenuButtonElementBase };
+
+interface HTMLEMenuButtonElementConstructor {
+    readonly prototype: HTMLEMenuButtonElement;
+    new(): HTMLEMenuButtonElement;
+}
 
 interface HTMLEMenuButtonElement extends HTMLElement {
     name: string;
@@ -111,7 +115,7 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
         if (menuSlot) {
             menuSlot.addEventListener("slotchange", () => {
                 const menuElem = menuSlot.assignedElements()[0];
-                if (isTagElement("e-menu", menuElem)) {
+                if (menuElem instanceof HTMLEMenuElement) {
                     this.childMenu = menuElem;
                 }
             });
@@ -183,3 +187,5 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
         }
     }
 }
+
+var HTMLEMenuButtonElement: HTMLEMenuButtonElementConstructor = HTMLEMenuButtonElementBase;

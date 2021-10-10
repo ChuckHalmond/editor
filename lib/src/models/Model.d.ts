@@ -14,20 +14,25 @@ interface ObjectModelChangeEvent {
         newValue: any;
     };
 }
-interface ObjectModelChangeEvents {
-    "objectmodelchange": ObjectModelChangeEvent;
+declare global {
+    interface EventsMap {
+        "objectmodelchange": ObjectModelChangeEvent;
+    }
 }
-interface ObjectModel extends EventDispatcher<ObjectModelChangeEvents> {
+interface ObjectModelConstructor {
+    readonly prototype: ObjectModel;
+    new (): ObjectModel;
 }
-declare class ObjectModelBase extends EventDispatcher<ObjectModelChangeEvents> implements ObjectModel {
+interface ObjectModel extends EventDispatcher {
+}
+declare class ObjectModelBase extends EventDispatcher implements ObjectModel {
     constructor();
 }
 interface GenerateObjectModelAccessorsDecorator {
-    (args: {
-        props: string[];
-    }): <O extends ObjectModelBase, C extends new (...args: any[]) => O>(ctor: C) => C;
+    (props: string[]): <O extends ObjectModelBase, C extends new (...args: any[]) => O>(ctor: C) => C;
 }
 declare const GenerateObjectModelAccessors: GenerateObjectModelAccessorsDecorator;
+declare var ObjectModel: ObjectModelConstructor;
 interface ListModelChangeEvent {
     type: "listmodelchange";
     data: {
@@ -36,10 +41,17 @@ interface ListModelChangeEvent {
         index: number;
     };
 }
-interface ListModelEvents {
-    "listmodelchange": ListModelChangeEvent;
+declare global {
+    interface EventsMap {
+        "listmodelchange": ListModelChangeEvent;
+    }
 }
-interface ListModel<Item = {}> extends EventDispatcher<ListModelEvents> {
+interface ListModelConstructor {
+    readonly prototype: ListModel;
+    new (): ListModel;
+    new <Item>(items?: Item[]): ListModel;
+}
+interface ListModel<Item = {}> extends EventDispatcher {
     readonly items: ReadonlyArray<Item>;
     set(index: number, item: Item): void;
     insert(index: number, ...items: Item[]): void;
@@ -48,7 +60,7 @@ interface ListModel<Item = {}> extends EventDispatcher<ListModelEvents> {
     remove(item: Item): void;
     clear(): void;
 }
-declare class ListModelBase<Item> extends EventDispatcher<ListModelEvents> implements ListModel<Item> {
+declare class ListModelBase<Item> extends EventDispatcher implements ListModel<Item> {
     private _items;
     constructor(items?: Item[]);
     get items(): ReadonlyArray<Item>;
@@ -59,3 +71,4 @@ declare class ListModelBase<Item> extends EventDispatcher<ListModelEvents> imple
     remove(item: Item): void;
     clear(): void;
 }
+declare var ListModel: ListModelConstructor;

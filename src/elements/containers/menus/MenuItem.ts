@@ -1,15 +1,17 @@
 import { HotKey } from "../../../Input";
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "../../HTMLElement";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
 import { HTMLEMenuElement } from "./Menu";
 import { HTMLEMenuBarElement } from "./MenuBar";
 import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
 
-export { EMenuItemElementType };
 export { HTMLEMenuItemElement };
-export { HTMLEMenuItemElementBase };
-export { HotKeyChangeEvent };
 
 type EMenuItemElementType = "button" | "radio" | "checkbox" | "menu" | "submenu";
+
+interface HTMLEMenuItemElementConstructor {
+    readonly prototype: HTMLEMenuItemElement;
+    new(): HTMLEMenuItemElement;
+}
 
 interface HTMLEMenuItemElement extends HTMLElement {
     name: string;
@@ -28,6 +30,24 @@ interface HTMLEMenuItemElement extends HTMLElement {
     commandArgs: any;
 
     trigger(): void;
+}
+
+type HotKeyChangeEvent = CustomEvent<{
+    oldHotKey: HotKey | null;
+    newHotKey: HotKey | null;
+}>;
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "e-menuitem": HTMLEMenuItemElement,
+    }
+
+    interface HTMLElementEventMap {
+        "e_hotkeychange": HotKeyChangeEvent,
+        "e_trigger": Event,
+        "e_radiochangerequest": Event,
+        "e_change": Event,
+    }
 }
 
 @RegisterCustomHTMLElement({
@@ -240,7 +260,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
         if (menuSlot) {
             menuSlot.addEventListener("slotchange", () => {
                 const menuElem = menuSlot.assignedElements()[0];
-                if (isTagElement("e-menu", menuElem)) {
+                if (menuElem instanceof HTMLEMenuElement) {
                     this.childMenu = menuElem;
                     menuElem.parentItem = this;
                 }
@@ -310,37 +330,4 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
     }
 }
 
-declare global {
-    interface HTMLElementTagNameMap {
-        "e-menuitem": HTMLEMenuItemElement,
-    }
-}
-
-type HotKeyChangeEvent = CustomEvent<{
-    oldHotKey: HotKey | null;
-    newHotKey: HotKey | null;
-}>;
-
-declare global {
-    interface HTMLElementEventMap {
-        "e_hotkeychange": HotKeyChangeEvent,
-    }
-}
-
-declare global {
-    interface HTMLElementEventMap {
-        "e_trigger": Event,
-    }
-}
-
-declare global {
-    interface HTMLElementEventMap {
-        "e_radiochangerequest": Event,
-    }
-}
-
-declare global {
-    interface HTMLElementEventMap {
-        "e_change": Event,
-    }
-}
+var HTMLEMenuItemElement: HTMLEMenuItemElementConstructor = HTMLEMenuItemElementBase;

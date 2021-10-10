@@ -1,49 +1,42 @@
 export { EventBase };
 export { Event };
-export { EEvent };
 export { EventDispatcher };
 export { EventDispatcherBase };
+interface Event<D extends object = object> {
+    readonly type: string;
+    readonly data: D;
+}
 interface EventConstructor {
     readonly prototype: Event;
-    new <T extends string, D extends any>(type: T, data: D): Event<T, D>;
+    new <D extends object>(type: string, data: D): Event<D>;
 }
-interface Event<T extends string = string, D extends any = any> {
-    readonly type: T;
+declare class EventBase<D extends object = object> implements Event<D> {
+    readonly type: string;
     readonly data: D;
-}
-declare type EEvent<T extends string = string, D extends any = any> = Event<T, D>;
-declare class EventBase<T extends string, D extends any> implements Event<T, D> {
-    readonly type: T;
-    readonly data: D;
-    constructor(type: T, data: D);
+    constructor(type: string, data: D);
 }
 declare var Event: EventConstructor;
-interface EventDispatcher<Events extends {
-    [K in Extract<keyof Events, string>]: Event<K>;
-} = {}> {
-    addEventListener<K extends Extract<keyof Events, string>>(event: K, handler: (event: Events[K]) => void, once?: boolean): (event: Events[K]) => void;
-    addEventListener<K extends string>(event: K, handler: (event: Event<K>) => void, once?: boolean): (event: Event<K>) => void;
-    removeEventListener<K extends Extract<keyof Events, string>>(event: K, handler: (event: Events[K]) => void, once?: boolean): number;
-    removeEventListener<K extends string>(event: K, handler: (event: Event<K>) => void, once?: boolean): number;
-    dispatchEvent<K extends Extract<keyof Events, string>>(event: Events[K]): void;
-    dispatchEvent<K extends string>(event: Event<K>): void;
+declare global {
+    interface EventsMap {
+    }
+}
+interface EventDispatcher {
+    addEventListener<K extends keyof EventsMap>(event: K, handler: (event: EventsMap[K]) => void, once?: boolean): (event: EventsMap[K]) => void;
+    addEventListener(event: string, handler: (event: Event) => void, once?: boolean): (event: Event) => void;
+    removeEventListener<K extends keyof EventsMap>(event: K, handler: (event: EventsMap[K]) => void, once?: boolean): number;
+    removeEventListener(event: string, handler: (event: Event) => void, once?: boolean): number;
+    dispatchEvent<K extends keyof EventsMap>(event: EventsMap[K]): void;
+    dispatchEvent(event: Event): void;
 }
 interface EventDispatcherConstructor {
-    readonly prototype: EventDispatcher<{}>;
-    new <Events extends {
-        [K in Extract<keyof Events, string>]: Event<K>;
-    } = {}>(): EventDispatcher<Events>;
+    readonly prototype: EventDispatcher;
+    new (): EventDispatcher;
 }
-declare class EventDispatcherBase<Events extends {
-    [K in Extract<keyof Events, string>]: Event<K>;
-} = {}> implements EventDispatcher<Events> {
+declare class EventDispatcherBase implements EventDispatcher {
     private _listeners;
     constructor();
-    addEventListener<K extends string>(event: K, handler: (event: Event<K>) => void, once?: boolean): (event: Event<K>) => void;
-    addEventListener<K extends Extract<keyof Events, string>>(event: K, handler: (event: Events[K]) => void, once?: boolean): (event: Events[K]) => void;
-    removeEventListener<K extends string>(event: string, handler: (event: Event<K>) => void, once?: boolean): number;
-    removeEventListener<K extends Extract<keyof Events, string>>(event: K, handler: (event: Events[K]) => void, once?: boolean): number;
-    dispatchEvent<K extends string>(event: Event<K>): void;
-    dispatchEvent<K extends Extract<keyof Events, string>>(event: Events[K]): void;
+    addEventListener<K extends keyof EventsMap>(event: K, handler: (event: EventsMap[K]) => void, once?: boolean): (event: EventsMap[K]) => void;
+    removeEventListener<K extends keyof EventsMap>(event: K, handler: (event: EventsMap[K]) => void, once?: boolean): number;
+    dispatchEvent<K extends keyof EventsMap>(event: EventsMap[K]): void;
 }
 declare const EventDispatcher: EventDispatcherConstructor;

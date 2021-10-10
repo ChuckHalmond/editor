@@ -1,7 +1,11 @@
 import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
 
 export { HTMLEStatusItemElement };
-export { HTMLEStatusItemElementBase };
+
+interface HTMLEStatusItemElementConstructor {
+    readonly prototype: HTMLEStatusItemElement;
+    new(): HTMLEStatusItemElement;
+}
 
 interface HTMLEStatusItemElement extends HTMLElement {
 
@@ -96,6 +100,8 @@ class HTMLEStatusItemElementBase extends HTMLElement implements HTMLEStatusItemE
         });
     }
 }
+
+var HTMLEStatusItemElement: HTMLEStatusItemElementConstructor = HTMLEStatusItemElementBase;
 
 declare global {
     interface HTMLElementTagNameMap {

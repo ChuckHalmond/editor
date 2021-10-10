@@ -1,13 +1,27 @@
 import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../HTMLElement";
 
 export { HTMLEHeightSashElement };
-export { HTMLEHeightSashElementBase };
 
 type EHeightSashDirection = "top" | "bottom";
+
+interface HTMLEHeightSashElementConstructor {
+    readonly prototype: HTMLEHeightSashElement;
+    new(): HTMLEHeightSashElement;
+}
 
 interface HTMLEHeightSashElement extends HTMLElement {
     controls: string;
     growdir: EHeightSashDirection;
+}
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "e-hsash": HTMLEHeightSashElement;
+    }
+
+    interface HTMLElementEventMap {
+        "e_resize": Event;
+    }
 }
 
 @RegisterCustomHTMLElement({
@@ -102,14 +116,4 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
     }
 }
 
-declare global {
-    interface HTMLElementTagNameMap {
-        "e-hsash": HTMLEHeightSashElement,
-    }
-}
-
-declare global {
-    interface HTMLElementEventMap {
-        "e_resize": CustomEvent,
-    }
-}
+var HTMLEHeightSashElement: HTMLEHeightSashElementConstructor = HTMLEHeightSashElementBase;

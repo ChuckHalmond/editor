@@ -1,13 +1,27 @@
 import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../HTMLElement";
 
 export { HTMLEWidthSashElement };
-export { HTMLEWidthSashElementBase };
 
 type EWidthSashDirection = "left" | "right";
+
+interface HTMLEWidthSashElementConstructor {
+    readonly prototype: HTMLEWidthSashElement;
+    new(): HTMLEWidthSashElement;
+}
 
 interface HTMLEWidthSashElement extends HTMLElement {
     controls: string;
     growdir: EWidthSashDirection;
+}
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "e-wsash": HTMLEWidthSashElement;
+    }
+
+    interface HTMLElementEventMap {
+        "e_resize": Event;
+    }
 }
 
 @RegisterCustomHTMLElement({
@@ -102,14 +116,4 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
     }
 }
 
-declare global {
-    interface HTMLElementTagNameMap {
-        "e-wsash": HTMLEWidthSashElement,
-    }
-}
-
-declare global {
-    interface HTMLElementEventMap {
-        "e_resize": CustomEvent,
-    }
-}
+var HTMLEHeightSashElement: HTMLEWidthSashElementConstructor = HTMLEWidthSashElementBase;

@@ -1,8 +1,12 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "../../HTMLElement";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
 import { HTMLETreeElement } from "./Tree";
 
 export { HTMLETreeItemElement };
-export { HTMLETreeItemElementBase };
+
+interface HTMLETreeItemElementConstructor {
+    readonly prototype: HTMLETreeItemElement;
+    new(): HTMLETreeItemElement;
+}
 
 interface HTMLETreeItemElement extends HTMLElement {
     name: string;
@@ -168,7 +172,7 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
         if (slot) {
             slot.addEventListener("slotchange", () => {
                 const items = slot.assignedElements()
-                    .filter(item => isTagElement("e-treeitem", item)) as HTMLETreeItemElement[];
+                    .filter(item => item instanceof HTMLETreeItemElement) as HTMLETreeItemElement[];
                 this.items = items;
                 this.items.forEach((item) => {
                     item.parent = this;
@@ -226,7 +230,7 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                 let previousItem = this.parent.items[indexOfThis - 1];
                 return previousItem.deepestVisibleChildItem();
             }
-            return isTagElement("e-treeitem", this.parent) ? this.parent : this;
+            return this.parent instanceof HTMLETreeItemElement ? this.parent : this;
         }
         return this;
     }
@@ -246,7 +250,7 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
     }
 
     public nearestParentItem(): HTMLETreeItemElement {
-        if (isTagElement("e-treeitem", this.parent)) {
+        if (this.parent instanceof HTMLETreeItemElement) {
             let indexOfThis = this.parent.items.indexOf(this);
             if (indexOfThis === this.parent.items.length - 1) {
                 return this.parent.nearestParentItem();
@@ -282,6 +286,8 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
         return foundItem;
     }
 }
+
+var HTMLETreeItemElement: HTMLETreeItemElementConstructor = HTMLETreeItemElementBase;
 
 declare global {
     interface HTMLElementTagNameMap {

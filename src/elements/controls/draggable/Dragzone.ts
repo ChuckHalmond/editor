@@ -1,8 +1,12 @@
-import { RegisterCustomHTMLElement, bindShadowRoot, isTagElement, GenerateAttributeAccessors } from "../../HTMLElement";
+import { RegisterCustomHTMLElement, bindShadowRoot, GenerateAttributeAccessors } from "../../HTMLElement";
 import { HTMLEDraggableElement } from "./Draggable";
 
 export { HTMLEDragzoneElement };
-export { HTMLEDragzoneElementBase };
+
+interface HTMLEDragzoneElementConstructor {
+    readonly prototype: HTMLEDragzoneElement;
+    new(): HTMLEDragzoneElement
+}
 
 interface HTMLEDragzoneElement extends HTMLElement {
     draggables: HTMLEDraggableElement[];
@@ -11,6 +15,12 @@ interface HTMLEDragzoneElement extends HTMLElement {
     selectDraggable(draggable: HTMLEDraggableElement): void;
     unselectDraggable(draggable: HTMLEDraggableElement): void;
     clearSelection(): void;
+}
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "e-dragzone": HTMLEDragzoneElement,
+    }
 }
 
 @RegisterCustomHTMLElement({
@@ -199,8 +209,4 @@ class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneEleme
     }
 }
 
-declare global {
-    interface HTMLElementTagNameMap {
-        "e-dragzone": HTMLEDragzoneElement,
-    }
-}
+var HTMLEDragzoneElement: HTMLEDragzoneElementConstructor = HTMLEDragzoneElementBase;

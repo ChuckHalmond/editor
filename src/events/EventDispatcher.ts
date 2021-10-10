@@ -1,26 +1,23 @@
 export { EventBase };
 export { Event };
-export { EEvent };
 export { EventDispatcher };
 export { EventDispatcherBase };
 
+interface Event<D extends object = object> {
+    readonly type: string;
+    readonly data: D;
+}
+
 interface EventConstructor {
     readonly prototype: Event;
-    new<T extends string, D extends any>(type: T, data: D): Event<T, D>;
+    new<D extends object>(type: string, data: D): Event<D>;
 }
 
-interface Event<T extends string = string, D extends any = any> {
-    readonly type: T;
-    readonly data: D;
-}
-
-type EEvent<T extends string = string, D extends any = any> = Event<T, D>;
-
-class EventBase<T extends string, D extends any> implements Event<T, D> {
-    readonly type: T;
+class EventBase<D extends object = object> implements Event<D> {
+    readonly type: string;
     readonly data: D;
 
-    constructor(type: T, data: D) {
+    constructor(type: string, data: D) {
         this.type = type;
         this.data = data;
     }
@@ -35,38 +32,41 @@ interface EventListener<E extends Event = Event> {
     once?: boolean;
 }
 
-interface EventDispatcher<Events extends {[K in Extract<keyof Events, string>]: Event<K>} = {}> {
-    addEventListener<K extends Extract<keyof Events, string>>(event: K, handler: (event: Events[K]) => void, once?: boolean): (event: Events[K]) => void;
-    addEventListener<K extends string>(event: K, handler: (event: Event<K>) => void, once?: boolean): (event: Event<K>) => void;
-    removeEventListener<K extends Extract<keyof Events, string>>(event: K, handler: (event: Events[K]) => void, once?: boolean): number;
-    removeEventListener<K extends string>(event: K, handler: (event: Event<K>) => void, once?: boolean): number;
-    dispatchEvent<K extends Extract<keyof Events, string>>(event: Events[K]): void;
-    dispatchEvent<K extends string>(event: Event<K>): void;
+declare global {
+    interface EventsMap {}
+}
+
+interface EventDispatcher {
+    addEventListener<K extends keyof EventsMap>(event: K, handler: (event: EventsMap[K]) => void, once?: boolean): (event: EventsMap[K]) => void;
+    addEventListener(event: string, handler: (event: Event) => void, once?: boolean): (event: Event) => void;
+    removeEventListener<K extends keyof EventsMap>(event: K, handler: (event: EventsMap[K]) => void, once?: boolean): number;
+    removeEventListener(event: string, handler: (event: Event) => void, once?: boolean): number;
+    dispatchEvent<K extends keyof EventsMap>(event: EventsMap[K]): void;
+    dispatchEvent(event: Event): void;
 }
 
 interface EventDispatcherConstructor {
-    readonly prototype: EventDispatcher<{}>;
-    new<Events extends {[K in Extract<keyof Events, string>]: Event<K>} = {}>(): EventDispatcher<Events>;
+    readonly prototype: EventDispatcher;
+    new(): EventDispatcher;
 }
 
-class EventDispatcherBase<Events extends {[K in Extract<keyof Events, string>]: Event<K>} = {}> implements EventDispatcher<Events> {
+class EventDispatcherBase implements EventDispatcher {
     private _listeners: Map<string, EventListener<any>[]>;
 
     constructor() {
         this._listeners = new Map();
     }
 
-    public addEventListener<K extends string>(event: K, handler: (event: Event<K>) => void, once?: boolean): (event: Event<K>) => void;
-    public addEventListener<K extends Extract<keyof Events, string>>(event: K, handler: (event: Events[K]) => void, once?: boolean): (event: Events[K]) => void;
-    public addEventListener<K extends Extract<keyof Events, string>>(event: K, handler: (event: Events[K]) => void, once?: boolean): (event: Events[K]) => void {
-        let listeners = this._listeners.get(event.toString());
+    public addEventListener<K extends keyof EventsMap>(event: K, handler: (event: EventsMap[K]) => void, once?: boolean): (event: EventsMap[K]) => void;
+    public addEventListener(event: string, handler: (event: Event) => void, once?: boolean): (event: Event) => void {
+        let listeners = this._listeners.get(event);
         let newListener: EventListener<any> = {
             handler: handler,
             once: once
         };
         
         if (typeof listeners === "undefined") {
-            this._listeners.set(event.toString(), [newListener]);
+            this._listeners.set(event, [newListener]);
         }
         else if (!listeners.find(listener => listener.handler === handler && listener.once === once)) {
             listeners.push(newListener);
@@ -75,9 +75,8 @@ class EventDispatcherBase<Events extends {[K in Extract<keyof Events, string>]: 
         return handler;
     }
 
-    public removeEventListener<K extends string>(event: string, handler: (event: Event<K>) => void, once?: boolean): number;
-    public removeEventListener<K extends Extract<keyof Events, string>>(event: K, handler: (event: Events[K]) => void, once?: boolean): number;
-    public removeEventListener<K extends Extract<keyof Events, string>>(event: K, handler: (event: Events[K]) => void, once?: boolean): number {
+    public removeEventListener<K extends keyof EventsMap>(event: K, handler: (event: EventsMap[K]) => void, once?: boolean): number;
+    public removeEventListener(event: string, handler: (event: Event) => void, once?: boolean): number {
         let listeners = this._listeners.get(event);
         if (typeof listeners !== "undefined") {
             const count = listeners.length;
@@ -96,9 +95,8 @@ class EventDispatcherBase<Events extends {[K in Extract<keyof Events, string>]: 
         return -1;
     }
 
-    public dispatchEvent<K extends string>(event: Event<K>): void;
-    public dispatchEvent<K extends Extract<keyof Events, string>>(event: Events[K]): void;
-    public dispatchEvent<K extends Extract<keyof Events, string>>(event: Events[K]): void {
+    public dispatchEvent<K extends keyof EventsMap>(event: EventsMap[K]): void;
+    public dispatchEvent(event: Event): void {
         let listeners = this._listeners.get(event.type);
         if (typeof listeners !== "undefined") {
             listeners = listeners.filter((listener) => {

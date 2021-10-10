@@ -1,6 +1,9 @@
 import { HTMLEDraggableElement } from "./Draggable";
 export { HTMLEDragzoneElement };
-export { HTMLEDragzoneElementBase };
+interface HTMLEDragzoneElementConstructor {
+    readonly prototype: HTMLEDragzoneElement;
+    new (): HTMLEDragzoneElement;
+}
 interface HTMLEDragzoneElement extends HTMLElement {
     draggables: HTMLEDraggableElement[];
     selectedDraggables: HTMLEDraggableElement[];
@@ -9,18 +12,9 @@ interface HTMLEDragzoneElement extends HTMLElement {
     unselectDraggable(draggable: HTMLEDraggableElement): void;
     clearSelection(): void;
 }
-declare class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneElement {
-    disabled: boolean;
-    draggables: HTMLEDraggableElement[];
-    selectedDraggables: HTMLEDraggableElement[];
-    constructor();
-    selectDraggable(draggable: HTMLEDraggableElement): void;
-    unselectDraggable(draggable: HTMLEDraggableElement): void;
-    clearSelection(): void;
-    connectedCallback(): void;
-}
 declare global {
     interface HTMLElementTagNameMap {
         "e-dragzone": HTMLEDragzoneElement;
     }
 }
+declare var HTMLEDragzoneElement: HTMLEDragzoneElementConstructor;

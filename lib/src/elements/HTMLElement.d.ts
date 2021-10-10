@@ -1,5 +1,5 @@
+import { EventDispatcher } from "../events/EventDispatcher";
 import { ListModel, ObjectModel } from "../models/Model";
-export { isTagElement };
 export { RegisterCustomHTMLElement };
 export { GenerateAttributeAccessors };
 export { bindShadowRoot };
@@ -57,7 +57,6 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
         [property: string]: string | [string, string];
     };
 }
-declare function isTagElement<K extends keyof HTMLElementTagNameMap>(tagName: K, obj: any): obj is HTMLElementTagNameMap[K];
 declare function Element<K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLInit<K>): HTMLElementTagNameMap[K];
 declare type ReactiveNode = Node & {
     _reactiveNodeAttributes: {
@@ -76,7 +75,7 @@ declare function isElement(node: Node): node is Element;
 declare function isReactiveNode(node: Node): node is ReactiveNode;
 declare function isReactiveParentNode(node: Node): node is ReactiveParentNode;
 declare function ReactiveNode<Data extends object, N extends Node>(list: ListModel<Data>, node: N, react: (node: N, addedItems: Data[], removedItems: Data[], index: number) => void): N;
-declare function ReactiveNode<Data extends object, N extends Node>(object: ObjectModel, node: N, react: <K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void): N;
+declare function ReactiveNode<Model extends ObjectModel, N extends Node>(object: Model, node: N, react: <K extends Exclude<keyof Model, keyof EventDispatcher>>(node: N, property: K, oldValue: Model[K], newValue: Model[K]) => void): N;
 interface ReactiveChildNodes {
     (parent: Node & ParentNode): (Node | string)[];
 }

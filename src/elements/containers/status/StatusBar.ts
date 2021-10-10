@@ -1,8 +1,7 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "../../HTMLElement";
-        import { HTMLEStatusItemElement } from "./StatusItem";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
+import { HTMLEStatusItemElement } from "./StatusItem";
 
 export { HTMLEStatusBarElement };
-export { HTMLEStatusBarElementBase };
 
 interface HTMLEStatusBarElement  extends HTMLElement {
     items: HTMLEStatusItemElement[];
@@ -23,7 +22,7 @@ class HTMLEStatusBarElementBase extends HTMLElement implements HTMLEStatusBarEle
     public items: HTMLEStatusItemElement[];
 
     public _selectedItemIndex: number;
-    
+
     constructor() {
         super();
 
@@ -69,7 +68,7 @@ class HTMLEStatusBarElementBase extends HTMLElement implements HTMLEStatusBarEle
         if (slot) {
             slot.addEventListener("slotchange", (event: Event) => {
                 const items = (event.target as HTMLSlotElement).assignedElements()
-                    .filter(item => isTagElement("e-statusitem", item)) as HTMLEStatusItemElement[];
+                    .filter(item => item instanceof HTMLEStatusItemElement) as HTMLEStatusItemElement[];
                 this.items = items;
             }, {once: true});
         }

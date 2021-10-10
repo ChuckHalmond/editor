@@ -1,12 +1,13 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "../../HTMLElement";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
 import { HTMLEDraggableElement } from "./Draggable";
 import { HTMLEDragzoneElement } from "./Dragzone";
 
-export { EDataChangeEvent };
 export { HTMLEDropzoneElement };
-export { HTMLEDropzoneElementBase };
-export { DropzoneDataBase };
-export { DropzoneData };
+
+interface HTMLEDropzoneElementConstructor {
+    readonly prototype: HTMLEDropzoneElement;
+    new(): HTMLEDropzoneElement;
+}
 
 interface HTMLEDropzoneElement extends HTMLElement {
     selectedDraggables: HTMLEDraggableElement[]
@@ -32,6 +33,16 @@ type EDataChangeEvent = CustomEvent<{
     draggables: HTMLEDraggableElement[];
     position: number;
 }>;
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "e-dropzone": HTMLEDropzoneElement,
+    }
+    
+    interface HTMLElementEventMap {
+        "e_datachange": EDataChangeEvent,
+    }
+}
 
 @RegisterCustomHTMLElement({
     name: "e-dropzone",
@@ -435,52 +446,4 @@ class HTMLEDropzoneElementBase extends HTMLElement implements HTMLEDropzoneEleme
     }
 }
 
-declare global {
-    interface HTMLElementTagNameMap {
-        "e-dropzone": HTMLEDropzoneElement,
-    }
-}
-
-declare global {
-    interface HTMLElementEventMap {
-        "e_datachange": EDataChangeEvent,
-    }
-}
-
-interface DropzoneData {
-    getData(): object | null;
-}
-
-interface DropzoneDataConstructor {
-    readonly prototype: DropzoneData;
-    new(dropzone: HTMLEDropzoneElement): DropzoneData;
-}
-
-class DropzoneDataBase {
-    private _dropzone: HTMLEDropzoneElement;
-
-    constructor(dropzone: HTMLEDropzoneElement) {
-        this._dropzone = dropzone;
-    }
-
-    public getData(): object | null {
-        const dropzoneData = 
-            this._dropzone.multiple ? this._dropzone.draggables.map(draggable => draggable.data) :
-            this._dropzone.draggables.length > 0 ? this._dropzone.draggables[0].data : null;
-
-        const childDropzones = Array.from(this._dropzone.querySelectorAll("e-dropzone")).filter(
-            dropzone => dropzone.parentElement!.closest("e-dropzone") === this._dropzone
-        );
-
-        childDropzones.forEach((childDropzone) => {
-            const childDropzoneData = new DropzoneDataBase(childDropzone).getData();
-            Object.assign(dropzoneData, {
-                ...childDropzoneData
-            });
-        });
-
-        return dropzoneData;
-    }
-}
-
-var DropzoneData: DropzoneDataConstructor = DropzoneDataBase;
+var HTMLEDropzoneElement: HTMLEDropzoneElementConstructor = HTMLEDropzoneElementBase;

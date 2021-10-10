@@ -2,7 +2,6 @@ import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot }
 import { forAllSubtreeElements } from "../../Snippets";
 
 export { HTMLEDraggableElement };
-export { HTMLEDraggableElementBase };
 
 interface HTMLEDraggableElementConstructor {
     readonly prototype: HTMLEDraggableElement;
@@ -14,11 +13,16 @@ interface HTMLEDraggableElement extends HTMLElement {
     dragged: boolean;
     type: string;
     dragovered: boolean;
-    data: object | null;
 
     getReference(): HTMLEDraggableElement;
     readonly referee: HTMLEDraggableElement | null;
     readonly references: HTMLEDraggableElement[];
+}
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "e-draggable": HTMLEDraggableElement,
+    }
 }
 
 @RegisterCustomHTMLElement({
@@ -40,7 +44,6 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
     public disabled!: boolean;
 
     public type!: string;
-    public data!: object | null;
 
     private _referee: HTMLEDraggableElementBase | null;
     public readonly references: HTMLEDraggableElementBase[];
@@ -137,9 +140,3 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
 }
 
 var HTMLEDraggableElement: HTMLEDraggableElementConstructor = HTMLEDraggableElementBase
-
-declare global {
-    interface HTMLElementTagNameMap {
-        "e-draggable": HTMLEDraggableElement,
-    }
-}

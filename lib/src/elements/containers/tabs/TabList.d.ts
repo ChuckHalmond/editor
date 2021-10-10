@@ -1,32 +1,16 @@
 import { HTMLETabElement } from "./Tab";
-export { TabChangeEvent };
 export { HTMLETabListElement };
-export { BaseHTMLETabListElement };
+interface HTMLETabListElementConstructor {
+    readonly prototype: HTMLETabListElement;
+    new (): HTMLETabListElement;
+}
 interface HTMLETabListElement extends HTMLElement {
     readonly activeTab: HTMLETabElement | null;
     tabs: HTMLETabElement[];
-}
-declare type TabChangeEvent = CustomEvent<{
-    tab: HTMLETabElement;
-}>;
-declare class BaseHTMLETabListElement extends HTMLElement implements HTMLETabListElement {
-    tabs: HTMLETabElement[];
-    private _activeIndex;
-    constructor();
-    get activeIndex(): number;
-    get activeTab(): HTMLETabElement | null;
-    connectedCallback(): void;
-    focusTabAt(index: number): void;
-    findTab(predicate: (tab: HTMLETabElement) => boolean): HTMLETabElement | null;
-    activateTab(tab: HTMLETabElement): void;
 }
 declare global {
     interface HTMLElementTagNameMap {
         "e-tablist": HTMLETabListElement;
     }
 }
-declare global {
-    interface HTMLElementEventMap {
-        "tabchange": TabChangeEvent;
-    }
-}
+declare var HTMLETabListElement: HTMLETabListElementConstructor;

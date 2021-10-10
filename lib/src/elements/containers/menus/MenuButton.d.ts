@@ -1,6 +1,9 @@
 import { HTMLEMenuElement } from "./Menu";
 export { HTMLEMenuButtonElement };
-export { HTMLEMenuButtonElementBase };
+interface HTMLEMenuButtonElementConstructor {
+    readonly prototype: HTMLEMenuButtonElement;
+    new (): HTMLEMenuButtonElement;
+}
 interface HTMLEMenuButtonElement extends HTMLElement {
     name: string;
     label: string;
@@ -9,15 +12,4 @@ interface HTMLEMenuButtonElement extends HTMLElement {
     childMenu: HTMLEMenuElement | null;
     trigger(): void;
 }
-declare class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonElement {
-    name: string;
-    label: string;
-    disabled: boolean;
-    active: boolean;
-    childMenu: HTMLEMenuElement | null;
-    constructor();
-    connectedCallback(): void;
-    toggle(): void;
-    trigger(): void;
-    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
-}
+declare var HTMLEMenuButtonElement: HTMLEMenuButtonElementConstructor;

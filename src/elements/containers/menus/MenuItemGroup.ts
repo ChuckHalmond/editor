@@ -1,11 +1,15 @@
 
 import { pointIntersectsWithDOMRect } from "../../Snippets";
-import { bindShadowRoot, GenerateAttributeAccessors, isTagElement, RegisterCustomHTMLElement } from "../../HTMLElement";
-import { HTMLEMenuElement } from "./Menu";
+import { bindShadowRoot, GenerateAttributeAccessors, RegisterCustomHTMLElement } from "../../HTMLElement";
 import { HTMLEMenuItemElement } from "./MenuItem";
+import { HTMLEMenuElement } from "./Menu";
 
 export { HTMLEMenuItemGroupElement };
-export { HTMLEMenuItemGroupElementBase };
+
+interface HTMLEMenuItemGroupElementConstructor {
+    readonly prototype: HTMLEMenuItemGroupElement;
+    new(): HTMLEMenuItemGroupElement;
+}
 
 interface HTMLEMenuItemGroupElement extends HTMLElement {
     name: string;
@@ -23,6 +27,12 @@ interface HTMLEMenuItemGroupElement extends HTMLElement {
     focusItemAt(index: number, childMenu?: boolean): void;
     reset(): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null;
+}
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "e-menuitemgroup": HTMLEMenuItemGroupElement,
+    }
 }
 
 @RegisterCustomHTMLElement({
@@ -109,7 +119,7 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
         if (slot) {
             slot.addEventListener("slotchange", () => {
                 const items = slot.assignedElements()
-                    .filter(item => isTagElement("e-menuitem", item)) as HTMLEMenuItemElement[];
+                    .filter(item => item instanceof HTMLEMenuItemElement) as HTMLEMenuItemElement[];
                 this.items = items;
                 items.forEach((item) => {
                     item.group = this;
@@ -164,7 +174,7 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
         
         this.addEventListener("e_radiochangerequest", (event: Event) => {
             let target = event.target as any;
-            if (isTagElement("e-menuitem", target)) {
+            if (target instanceof HTMLEMenuItemElement) {
                 let item = target;
                 if (item.type === "radio" && !item.checked) {
                     let checkedRadio = this.findItem(
@@ -262,7 +272,7 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
             }
             if (subitems && item.childMenu) {
                 foundItem = item.childMenu.findItem(predicate, subitems);
-                if (foundItem) {
+                if (foundItem && foundItem) {
                     return foundItem;
                 }
             }
@@ -271,8 +281,4 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
     }
 }
 
-declare global {
-    interface HTMLElementTagNameMap {
-        "e-menuitemgroup": HTMLEMenuItemGroupElement,
-    }
-}
+var HTMLEMenuItemGroupElement: HTMLEMenuItemGroupElementConstructor = HTMLEMenuItemGroupElementBase;

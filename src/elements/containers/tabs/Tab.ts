@@ -1,9 +1,13 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "../../HTMLElement";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
 import { HTMLETabPanelElement } from "./TabPanel";
 
 export { ETabChangeEvent };
 export { HTMLETabElement };
-export { BaseHTMLETabElement };
+
+interface HTMLETabElementConstructor {
+    readonly prototype: HTMLETabElement;
+    new(): HTMLETabElement;
+}
 
 interface HTMLETabElement extends HTMLElement {
     name: string;
@@ -17,6 +21,16 @@ type ETabChangeEvent = CustomEvent<{
     tab: HTMLETabElement;
 }>;
 
+declare global {
+    interface HTMLElementEventMap {
+        "e_tabchange": ETabChangeEvent,
+    }
+
+    interface HTMLElementTagNameMap {
+        "e-tab": HTMLETabElement,
+    }
+}
+
 @RegisterCustomHTMLElement({
     name: "e-tab",
     observedAttributes: ["active", "controls"]
@@ -27,7 +41,7 @@ type ETabChangeEvent = CustomEvent<{
     {name: "disabled", type: "boolean"},
     {name: "controls", type: "string"},
 ])
-class BaseHTMLETabElement extends HTMLElement implements HTMLETabElement {
+class HTMLETabElementBase extends HTMLElement implements HTMLETabElement {
 
     public name!: string;
     public disabled!: boolean;
@@ -75,7 +89,7 @@ class BaseHTMLETabElement extends HTMLElement implements HTMLETabElement {
         this.tabIndex = this.tabIndex;
 
         const panel = document.getElementById(this.controls);
-        if (panel !== this.panel && isTagElement("e-tabpanel", panel)) {
+        if (panel !== this.panel && panel instanceof HTMLETabPanelElement) {
             this.panel = panel;
         }
         if (this.panel)  {
@@ -91,7 +105,7 @@ class BaseHTMLETabElement extends HTMLElement implements HTMLETabElement {
                         this.dispatchEvent(new CustomEvent("e_tabchange", {detail: {tab: this}, bubbles: true}));
                     }
                     const panel = document.getElementById(this.controls);
-                    if (panel !== this.panel && isTagElement("e-tabpanel", panel)) {
+                    if (panel !== this.panel && panel instanceof HTMLETabPanelElement) {
                         this.panel = panel;
                     }
                     if (this.panel)  {
@@ -103,14 +117,4 @@ class BaseHTMLETabElement extends HTMLElement implements HTMLETabElement {
     }
 }
 
-declare global {
-    interface HTMLElementTagNameMap {
-        "e-tab": HTMLETabElement,
-    }
-}
-
-declare global {
-    interface HTMLElementEventMap {
-        "e_tabchange": ETabChangeEvent,
-    }
-}
+var HTMLETabElement: HTMLETabElementConstructor = HTMLETabElementBase;

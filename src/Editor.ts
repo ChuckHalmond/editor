@@ -1,7 +1,6 @@
 
 import { Command, isUndoCommand } from "./commands/Command";
-import { isTagElement } from "./elements/HTMLElement";
-import { HotKeyChangeEvent } from "./elements/containers/menus/MenuItem";
+import { HTMLEMenuItemElement } from "./elements/containers/menus/MenuItem";
 import { HotKey } from "./Input";
 import { ObjectModel, ObjectModelBase } from "./models/Model";
 
@@ -50,9 +49,9 @@ class EditorBase implements Editor {
             });
         });
         
-        document.body.addEventListener("e_hotkeychange", (event: HotKeyChangeEvent) => {
+        document.body.addEventListener("e_hotkeychange", (event) => {
             const target = event.target;
-            if (isTagElement("e-menuitem", target)) {
+            if (target instanceof HTMLEMenuItemElement) {
                 if (event.detail.oldHotKey) {
                     this.removeHotkeyExec(event.detail.oldHotKey, target.trigger.bind(target));
                 }
@@ -64,7 +63,7 @@ class EditorBase implements Editor {
 
         document.body.addEventListener("e_trigger", (event) => {
             const target = event.target;
-            if (isTagElement("e-menuitem", target)) {
+            if (target instanceof HTMLEMenuItemElement) {
                 if (target.command) {
                     this.executeCommand(target.command, target.commandArgs)
                 }

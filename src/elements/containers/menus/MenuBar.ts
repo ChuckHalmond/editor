@@ -1,8 +1,12 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot, isTagElement } from "../../HTMLElement";
+import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
 import { HTMLEMenuItemElement } from "./MenuItem";
 
 export { HTMLEMenuBarElement };
-export { HTMLEMenuBarElementBase };
+
+interface HTMLEMenuBarElementConstructor {
+    readonly prototype: HTMLEMenuBarElement;
+    new(): HTMLEMenuBarElement;
+}
 
 interface HTMLEMenuBarElement extends HTMLElement {
     name: string;
@@ -13,6 +17,12 @@ interface HTMLEMenuBarElement extends HTMLElement {
     focusItemAt(index: number, childMenu?: boolean): void;
     reset(): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): HTMLEMenuItemElement | null;
+}
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "e-menubar": HTMLEMenuBarElement,
+    }
 }
 
 @RegisterCustomHTMLElement({
@@ -76,7 +86,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
         if (slot) {
             slot.addEventListener("slotchange", () => {
                 const items = slot.assignedElements()
-                    .filter(item => isTagElement("e-menuitem", item)) as HTMLEMenuItemElement[];
+                    .filter(item => item instanceof HTMLEMenuItemElement) as HTMLEMenuItemElement[];
                 this.items = items;
                 items.forEach((item) => {
                     item.parentMenu = this;
@@ -187,8 +197,4 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
     }
 }
 
-declare global {
-    interface HTMLElementTagNameMap {
-        "e-menubar": HTMLEMenuBarElement,
-    }
-}
+var HTMLEMenuBarElement: HTMLEMenuBarElementConstructor = HTMLEMenuBarElementBase;

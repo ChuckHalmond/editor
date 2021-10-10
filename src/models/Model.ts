@@ -17,46 +17,55 @@ interface ObjectModelChangeEvent {
     };
 }
 
-interface ObjectModelChangeEvents {
-    "objectmodelchange": ObjectModelChangeEvent;
+declare global {
+    interface EventsMap {
+        "objectmodelchange": ObjectModelChangeEvent;
+    }
 }
 
-interface ObjectModel extends EventDispatcher<ObjectModelChangeEvents> {}
+interface ObjectModelConstructor {
+    readonly prototype: ObjectModel;
+    new(): ObjectModel;
+}
 
-class ObjectModelBase extends EventDispatcher<ObjectModelChangeEvents> implements ObjectModel {
+interface ObjectModel extends EventDispatcher {}
+
+class ObjectModelBase extends EventDispatcher implements ObjectModel {
     constructor() {
         super();
     }
 }
 
 interface GenerateObjectModelAccessorsDecorator {
-    (args: {
-        props: string[];
-    }): <O extends ObjectModelBase, C extends new(...args: any[]) => O>(ctor: C) => C
+    (props: string[]): <O extends ObjectModelBase, C extends new(...args: any[]) => O>(ctor: C) => C
 }
 
-const GenerateObjectModelAccessors: GenerateObjectModelAccessorsDecorator = function(args: {
-    props: string[]
-}) {
+const GenerateObjectModelAccessors: GenerateObjectModelAccessorsDecorator = function(props: string[]) {
     return <O extends ObjectModelBase, C extends new(...args: any[]) => O>(ctor: C) => {
-        const { props } = args;
-        
-        props.forEach((prop) => {
-            Object.defineProperty(ctor, prop, {
-                get: function(this: ObjectModelBase) {
-                    return (this as {[key: string]: any})[`_${prop}`];
-                },
-                set: function(this: ObjectModelBase, value) {
-                    const oldValue = (this as {[key: string]: any})[`_${prop}`];
-                    (this as {[key: string]: any})[`_${prop}`] = value;
-                    this.dispatchEvent(new Event("objectmodelchange", {property: prop, oldValue: oldValue, newValue: value}));
+        const properties = props.reduce(
+            (obj, prop) => {
+                return {
+                    ...obj,
+                    [prop]: {
+                        enumerable: true,
+                        get: function(this: ObjectModelBase) {
+                            return (this as {[key: string]: any})[`_${prop}`];
+                        },
+                        set: function(this: ObjectModelBase, value: any) {
+                            const oldValue = (this as {[key: string]: any})[`_${prop}`];
+                            (this as {[key: string]: any})[`_${prop}`] = value;
+                            this.dispatchEvent(new Event("objectmodelchange", {property: prop, oldValue: oldValue, newValue: value}));
+                        }
+                    }
                 }
-            });
-        });
-
+            }, {}
+        );
+        Object.defineProperties(ctor.prototype, properties);
         return ctor;
     }
 }
+
+var ObjectModel: ObjectModelConstructor = ObjectModelBase;
 
 interface ListModelChangeEvent {
     type: "listmodelchange";
@@ -67,11 +76,19 @@ interface ListModelChangeEvent {
     };
 }
 
-interface ListModelEvents {
-    "listmodelchange": ListModelChangeEvent;
+declare global {
+    interface EventsMap {
+        "listmodelchange": ListModelChangeEvent;
+    }
 }
 
-interface ListModel<Item = {}> extends EventDispatcher<ListModelEvents> {
+interface ListModelConstructor {
+    readonly prototype: ListModel;
+    new(): ListModel;
+    new<Item>(items?: Item[]): ListModel;
+}
+
+interface ListModel<Item = {}> extends EventDispatcher {
     readonly items: ReadonlyArray<Item>;
     set(index: number, item: Item): void;
     insert(index: number, ...items: Item[]): void;
@@ -81,7 +98,7 @@ interface ListModel<Item = {}> extends EventDispatcher<ListModelEvents> {
     clear(): void;
 }
 
-class ListModelBase<Item> extends EventDispatcher<ListModelEvents> implements ListModel<Item> {
+class ListModelBase<Item> extends EventDispatcher implements ListModel<Item> {
     private _items: Item[];
     
     constructor(items: Item[] = []) {
@@ -144,3 +161,5 @@ class ListModelBase<Item> extends EventDispatcher<ListModelEvents> implements Li
         this.dispatchEvent(new Event("listmodelchange", {addedItems: [], removedItems: removedItems, index: 0}));
     }
 }
+
+var ListModel: ListModelConstructor = ListModelBase;

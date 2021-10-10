@@ -1,7 +1,7 @@
+import { EventDispatcher } from "../events/EventDispatcher";
 import { ListModel, ListModelChangeEvent, ObjectModel, ObjectModelChangeEvent } from "../models/Model";
 import { camelToTrain } from "./Snippets";
 
-export { isTagElement };
 export { RegisterCustomHTMLElement };
 export { GenerateAttributeAccessors };
 export { bindShadowRoot };
@@ -192,10 +192,6 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     }
 }
 
-function isTagElement<K extends keyof HTMLElementTagNameMap>(tagName: K, obj: any): obj is HTMLElementTagNameMap[K] {
-    return obj instanceof Node && obj.nodeType === obj.ELEMENT_NODE && (obj as Element).tagName.toLowerCase() == tagName;
-}
-
 function Element<K extends keyof HTMLElementTagNameMap>(
     tagName: K, init?: HTMLInit<K>): HTMLElementTagNameMap[K] {
         const element = document.createElement(tagName, init?.options);
@@ -295,8 +291,8 @@ function isReactiveParentNode(node: Node): node is ReactiveParentNode {
 
 function ReactiveNode<Data extends object, N extends Node>
     (list: ListModel<Data>, node: N, react: (node: N, addedItems: Data[], removedItems: Data[], index: number) => void): N
-function ReactiveNode<Data extends object, N extends Node>
-    (object: ObjectModel, node: N, react: <K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void): N
+function ReactiveNode<Model extends ObjectModel, N extends Node>
+    (object: Model, node: N, react: <K extends Exclude<keyof Model, keyof EventDispatcher>>(node: N, property: K, oldValue: Model[K], newValue: Model[K]) => void): N
 function ReactiveNode<Data extends object, N extends Node>
     (objectOrList: ObjectModel | ListModel<Data>, node: N, react: (<K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void)
     | ((node: N, addedItems: Data[], removedItems: Data[], index: number) => void)): N {

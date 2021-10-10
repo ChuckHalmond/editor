@@ -1,6 +1,9 @@
 import { HTMLEMenuItemElement } from "./MenuItem";
 export { HTMLEMenuBarElement };
-export { HTMLEMenuBarElementBase };
+interface HTMLEMenuBarElementConstructor {
+    readonly prototype: HTMLEMenuBarElement;
+    new (): HTMLEMenuBarElement;
+}
 interface HTMLEMenuBarElement extends HTMLElement {
     name: string;
     active: boolean;
@@ -11,21 +14,9 @@ interface HTMLEMenuBarElement extends HTMLElement {
     reset(): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): HTMLEMenuItemElement | null;
 }
-declare class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement {
-    name: string;
-    active: boolean;
-    items: HTMLEMenuItemElement[];
-    private _activeIndex;
-    constructor();
-    get activeIndex(): number;
-    get activeItem(): HTMLEMenuItemElement | null;
-    connectedCallback(): void;
-    focusItemAt(index: number, childMenu?: boolean): void;
-    reset(): void;
-    findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): HTMLEMenuItemElement | null;
-}
 declare global {
     interface HTMLElementTagNameMap {
         "e-menubar": HTMLEMenuBarElement;
     }
 }
+declare var HTMLEMenuBarElement: HTMLEMenuBarElementConstructor;

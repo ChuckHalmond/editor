@@ -1,5 +1,3 @@
-import { isTagElement } from "../HTMLElement";
-
 export { FormState };
 export { getFormState };
 export { setFormState };
@@ -15,7 +13,7 @@ const getFormState = (form: HTMLFormElement) => {
     const elements = Array.from(form.elements);
     const state: FormState = {};
     elements.forEach((element) => {
-        if (isTagElement("input", element)) {
+        if (element instanceof HTMLInputElement) {
             if (element.type === "radio") {
                 if (typeof state[element.name] === "undefined") {
                     state[element.name] = {
@@ -37,20 +35,11 @@ const getFormState = (form: HTMLFormElement) => {
                 };
             }
             else if (element.type === "number") {
-                let floatValue = parseFloat(element.value);
+                const floatValue = parseFloat(element.value);
                 state[element.name] = {
                     value: !isNaN(floatValue) ? floatValue : null,
                     _control: element.type
                 };
-            }
-            else if (element.type === "file") {
-                let files = element.files;
-                if (files !== null) {
-                    state[element.name] = {
-                        value: files[0].name,
-                        _control: element.type
-                    };
-                }
             }
             else {
                 state[element.name] = {
@@ -59,7 +48,7 @@ const getFormState = (form: HTMLFormElement) => {
                 };
             }
         }
-        else if (isTagElement("select", element) || isTagElement("textarea", element)) {
+        else if (element instanceof HTMLSelectElement || element instanceof HTMLTextAreaElement) {
             state[element.name] = {
                 value: (element.value !== "") ? element.value : null,
                 _control: element.type
@@ -74,10 +63,10 @@ const setFormState = (form: HTMLFormElement, state: FormState) => {
     const elements = Array.from(form.elements);
     const names = Object.keys(state);
     names.forEach((name) => {
-        let namedElements = elements.filter((element) => (element as any).name === name);
+        const namedElements = elements.filter((element) => (element as any).name === name);
         namedElements.forEach((element) => {
-            let stateValue = state[name].value;
-            if (isTagElement("input", element)) {
+            const stateValue = state[name].value;
+            if (element instanceof HTMLInputElement) {
                 if (element.type === "radio") {
                     element.checked = (stateValue !== null && element.value === stateValue.toString());
                 }
@@ -91,7 +80,7 @@ const setFormState = (form: HTMLFormElement, state: FormState) => {
                     element.value = (stateValue !== null) ? stateValue.toString() : "";
                 }
             }
-            else if (isTagElement("select", element) || isTagElement("textarea", element)) {
+            else if (element instanceof HTMLSelectElement || element instanceof HTMLTextAreaElement) {
                 element.value = (stateValue !== null) ? stateValue.toString() : "";
             }
         });

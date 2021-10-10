@@ -93,9 +93,7 @@ function setPropertyFromPath(src: object, path: string, value: any): object {
         if (typeof obj[prop] !== "object") {
           obj[prop] = {}
         }
-        //else {
         obj = obj[prop];
-        //}
       }
     }
   });

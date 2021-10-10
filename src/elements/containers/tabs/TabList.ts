@@ -1,23 +1,28 @@
-import { RegisterCustomHTMLElement, bindShadowRoot, isTagElement } from "../../HTMLElement";
+import { RegisterCustomHTMLElement, bindShadowRoot } from "../../HTMLElement";
 import { HTMLETabElement } from "./Tab";
 
-export { TabChangeEvent };
 export { HTMLETabListElement };
-export { BaseHTMLETabListElement };
+
+interface HTMLETabListElementConstructor {
+    readonly prototype: HTMLETabListElement;
+    new(): HTMLETabListElement;
+}
 
 interface HTMLETabListElement extends HTMLElement {
     readonly activeTab: HTMLETabElement | null;
     tabs: HTMLETabElement[];
 }
 
-type TabChangeEvent = CustomEvent<{
-    tab: HTMLETabElement;
-}>
+declare global {
+    interface HTMLElementTagNameMap {
+        "e-tablist": HTMLETabListElement,
+    }
+}
 
 @RegisterCustomHTMLElement({
     name: "e-tablist"
 })
-class BaseHTMLETabListElement extends HTMLElement implements HTMLETabListElement {
+class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement {
 
     public tabs: HTMLETabElement[];
 
@@ -55,7 +60,7 @@ class BaseHTMLETabListElement extends HTMLElement implements HTMLETabListElement
             slot.addEventListener("slotchange", (event) => {
                 const tabs = (event.target as HTMLSlotElement)
                     .assignedElements()
-                    .filter(tab => isTagElement("e-tab", tab)) as HTMLETabElement[];
+                    .filter(tab => tab instanceof HTMLETabElement) as HTMLETabElement[];
                 this.tabs = tabs;
                 this._activeIndex = this.tabs.findIndex(tab => tab.active);
             });
@@ -81,7 +86,7 @@ class BaseHTMLETabListElement extends HTMLElement implements HTMLETabListElement
         
         this.addEventListener("click", (event) => {
             const target = event.target;
-            if (isTagElement("e-tab", target)) {
+            if (target instanceof HTMLETabElement) {
                 target.active = true;
             }
         });
@@ -116,14 +121,4 @@ class BaseHTMLETabListElement extends HTMLElement implements HTMLETabListElement
     }
 }
 
-declare global {
-    interface HTMLElementTagNameMap {
-        "e-tablist": HTMLETabListElement,
-    }
-}
-
-declare global {
-    interface HTMLElementEventMap {
-        "tabchange": TabChangeEvent
-    }
-}
+var HTMLETabListElement: HTMLETabListElementConstructor = HTMLETabListElementBase;
