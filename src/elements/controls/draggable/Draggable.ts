@@ -14,6 +14,9 @@ interface HTMLEDraggableElement extends HTMLElement {
     type: string;
     dragovered: boolean;
 
+    connectedCallback(): void;
+    disconnectedCallback(): void;
+
     getReference(): HTMLEDraggableElement;
     readonly referee: HTMLEDraggableElement | null;
     readonly references: HTMLEDraggableElement[];
@@ -100,12 +103,12 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
         return this._referee;
     }
     
-    public connectedCallback() {
+    public connectedCallback(): void {
         this.tabIndex = this.tabIndex;
         this.draggable = true;
     }
 
-    public disconnectedCallback() {
+    public disconnectedCallback(): void {
         if (this.referee) {
             const thisRefIndex = this.referee.references.indexOf(this);
             if (thisRefIndex > -1) {

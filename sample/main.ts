@@ -7,8 +7,9 @@ editor;
     name: "my-drag"
 })
 class MyDraggable extends HTMLEDraggableElement {
-    public test() {
-
+    constructor(str: string) {
+        super();
+        console.log(str);
     }
 }
 
@@ -16,6 +17,7 @@ const observer = new ReactiveNodesObserver();
 observer.observe(document.body);
 
 export async function main() {
+    console.log(new MyDraggable("salut!"));
     setTimeout(() => {
         document.getElementById("dragzone")!.append(document.createElement("my-drag"));
     }, 100);

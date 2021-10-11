@@ -8,6 +8,8 @@ interface HTMLEDraggableElement extends HTMLElement {
     dragged: boolean;
     type: string;
     dragovered: boolean;
+    connectedCallback(): void;
+    disconnectedCallback(): void;
     getReference(): HTMLEDraggableElement;
     readonly referee: HTMLEDraggableElement | null;
     readonly references: HTMLEDraggableElement[];

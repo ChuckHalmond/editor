@@ -44,12 +44,12 @@ enum KeyModifier {
     Shift = "Shift",
 }
 
-function displayKeyModifier(mode: KeyModifier): string {
-    switch (mode) {
+function displayKeyModifier(mod: KeyModifier): string {
+    switch (mod) {
         case KeyModifier.Control:
             return "Ctrl";
         default:
-            return mode;
+            return mod;
     }
 }
 
@@ -61,7 +61,7 @@ enum MouseButton {
     BACK = 5
 }
 
-const testKeyModifier = (mod: KeyModifier, event: KeyboardEvent) => {
+function testKeyModifier(mod: KeyModifier, event: KeyboardEvent): boolean {
     switch (mod) {
         case 'Alt':
             return event.altKey;
@@ -70,7 +70,7 @@ const testKeyModifier = (mod: KeyModifier, event: KeyboardEvent) => {
         case 'Shift':
             return event.shiftKey;
         default:
-            return () => true;
+            return true;
     }
 }
 
