@@ -2,10 +2,8 @@ import { EventDispatcher } from "../events/EventDispatcher";
 export { GenerateObjectModelAccessors };
 export { ObjectModelChangeEvent };
 export { ObjectModel };
-export { ObjectModelBase };
 export { ListModelChangeEvent };
 export { ListModel };
-export { ListModelBase };
 interface ObjectModelChangeEvent {
     type: "objectmodelchange";
     data: {
@@ -49,7 +47,7 @@ declare global {
 interface ListModelConstructor {
     readonly prototype: ListModel;
     new (): ListModel;
-    new <Item>(items?: Item[]): ListModel;
+    new <Item>(items: Item[]): ListModel;
 }
 interface ListModel<Item = {}> extends EventDispatcher {
     readonly items: ReadonlyArray<Item>;
@@ -57,17 +55,6 @@ interface ListModel<Item = {}> extends EventDispatcher {
     insert(index: number, ...items: Item[]): void;
     push(...items: Item[]): number;
     pop(): Item | undefined;
-    remove(item: Item): void;
-    clear(): void;
-}
-declare class ListModelBase<Item> extends EventDispatcher implements ListModel<Item> {
-    private _items;
-    constructor(items?: Item[]);
-    get items(): ReadonlyArray<Item>;
-    set(index: number, item: Item): void;
-    push(...items: Item[]): number;
-    pop(): Item | undefined;
-    insert(index: number, ...items: Item[]): void;
     remove(item: Item): void;
     clear(): void;
 }

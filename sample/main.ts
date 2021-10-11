@@ -1,5 +1,5 @@
 import * as editor from "../index";
-import { Element, GenerateObjectModelAccessors, HTMLEDraggableElement, ListModel, ObjectModelBase, ReactiveChildNodes, ReactiveNode, ReactiveNodesObserver, RegisterCustomHTMLElement, TextNode } from "../index";
+import { Element, GenerateObjectModelAccessors, HTMLEDraggableElement, ListModel, ObjectModel, ReactiveChildNodes, ReactiveNode, ReactiveNodesObserver, RegisterCustomHTMLElement, TextNode } from "../index";
 
 editor;
 
@@ -24,7 +24,7 @@ export async function main() {
     console.log("Main loaded!");
 
     @GenerateObjectModelAccessors(["lol"])
-    class MyModel extends ObjectModelBase {
+    class MyModel extends ObjectModel {
         public lol: string = "holoo";
     }
 

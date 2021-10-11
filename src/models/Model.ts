@@ -3,10 +3,8 @@ import { EventDispatcher, Event } from "../events/EventDispatcher";
 export { GenerateObjectModelAccessors };
 export { ObjectModelChangeEvent };
 export { ObjectModel };
-export { ObjectModelBase };
 export { ListModelChangeEvent };
 export { ListModel };
-export { ListModelBase };
 
 interface ObjectModelChangeEvent {
     type: "objectmodelchange";
@@ -85,7 +83,7 @@ declare global {
 interface ListModelConstructor {
     readonly prototype: ListModel;
     new(): ListModel;
-    new<Item>(items?: Item[]): ListModel;
+    new<Item>(items: Item[]): ListModel;
 }
 
 interface ListModel<Item = {}> extends EventDispatcher {
@@ -101,6 +99,7 @@ interface ListModel<Item = {}> extends EventDispatcher {
 class ListModelBase<Item> extends EventDispatcher implements ListModel<Item> {
     private _items: Item[];
     
+    constructor()
     constructor(items: Item[] = []) {
         super();
         this._items = items;

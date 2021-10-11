@@ -2,7 +2,7 @@
 import { Command, isUndoCommand } from "./commands/Command";
 import { HTMLEMenuItemElement } from "./elements/containers/menus/MenuItem";
 import { HotKey } from "./Input";
-import { ObjectModel, ObjectModelBase } from "./models/Model";
+import { ObjectModel } from "./models/Model";
 
 export { Editor };
 export { EditorBase };
@@ -32,7 +32,7 @@ class EditorBase implements Editor {
     constructor() {
         this._commands = new Map();
         this._hotkeys = new Map();
-        this.state = new ObjectModelBase();
+        this.state = new ObjectModel();
     }
     
     public setup(): void {
