@@ -1,5 +1,6 @@
 import { HTMLEDraggableElement } from "./Draggable";
 export { HTMLEDropzoneElement };
+export { EDataChangeEvent };
 interface HTMLEDropzoneElementConstructor {
     readonly prototype: HTMLEDropzoneElement;
     new (): HTMLEDropzoneElement;

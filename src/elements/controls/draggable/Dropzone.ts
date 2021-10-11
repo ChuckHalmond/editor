@@ -3,6 +3,7 @@ import { HTMLEDraggableElement } from "./Draggable";
 import { HTMLEDragzoneElement } from "./Dragzone";
 
 export { HTMLEDropzoneElement };
+export { EDataChangeEvent };
 
 interface HTMLEDropzoneElementConstructor {
     readonly prototype: HTMLEDropzoneElement;
