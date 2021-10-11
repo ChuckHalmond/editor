@@ -77,7 +77,8 @@ const GenerateAttributeAccessors: GenerateAttributeAccessorsDecorator = function
             name: string,
             type?: "string" | "number" | "boolean" | "json"
         }) => {
-            const { name,  type } = attr;
+            const name = camelToTrain(attr.name);
+            const type = attr.type;
             switch (type) {
                 case "boolean":
                     Object.defineProperty(elementCtor.prototype, name, {
