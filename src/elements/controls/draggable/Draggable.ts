@@ -17,9 +17,9 @@ interface HTMLEDraggableElement extends HTMLElement {
     connectedCallback(): void;
     disconnectedCallback(): void;
 
-    getReference(): HTMLEDraggableElement;
-    readonly referee: HTMLEDraggableElement | null;
-    readonly references: HTMLEDraggableElement[];
+    getReference(): this;
+    readonly referee: this | null;
+    readonly references: this[];
 }
 
 declare global {
@@ -48,8 +48,8 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
 
     public type!: string;
 
-    private _referee: HTMLEDraggableElementBase | null;
-    public readonly references: HTMLEDraggableElementBase[];
+    private _referee: this | null;
+    public readonly references: this[];
 
     constructor() {
         super();
@@ -99,7 +99,7 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
         this._referee = null;
     }
 
-    public get referee(): HTMLEDraggableElementBase | null {
+    public get referee(): this | null {
         return this._referee;
     }
     
@@ -127,8 +127,8 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
         }
     }
 
-    public getReference(): HTMLEDraggableElementBase {
-        const reference = this.cloneNode(true) as HTMLEDraggableElementBase;
+    public getReference(): this {
+        const reference = this.cloneNode(true) as this;
         const referenceIdx = this.references.push(reference);
         reference._referee = this;
         if (this.id) {

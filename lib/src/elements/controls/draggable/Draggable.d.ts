@@ -10,9 +10,9 @@ interface HTMLEDraggableElement extends HTMLElement {
     dragovered: boolean;
     connectedCallback(): void;
     disconnectedCallback(): void;
-    getReference(): HTMLEDraggableElement;
-    readonly referee: HTMLEDraggableElement | null;
-    readonly references: HTMLEDraggableElement[];
+    getReference(): this;
+    readonly referee: this | null;
+    readonly references: this[];
 }
 declare global {
     interface HTMLElementTagNameMap {
