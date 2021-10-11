@@ -6,7 +6,6 @@ interface HTMLEDraggableElementConstructor {
 interface HTMLEDraggableElement extends HTMLElement {
     selected: boolean;
     dragged: boolean;
-    type: string;
     dragovered: boolean;
     connectedCallback(): void;
     disconnectedCallback(): void;

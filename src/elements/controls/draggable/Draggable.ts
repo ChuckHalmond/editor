@@ -11,7 +11,6 @@ interface HTMLEDraggableElementConstructor {
 interface HTMLEDraggableElement extends HTMLElement {
     selected: boolean;
     dragged: boolean;
-    type: string;
     dragovered: boolean;
 
     connectedCallback(): void;
@@ -36,8 +35,6 @@ declare global {
     {name: "dragged", type: "boolean"},
     {name: "dragovered", type: "boolean"},
     {name: "disabled", type: "boolean"},
-    {name: "type", type: "string"},
-    {name: "data", type: "json"}
 ])
 class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableElement {
     
@@ -45,8 +42,6 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
     public dragovered!: boolean;
     public dragged!: boolean;
     public disabled!: boolean;
-
-    public type!: string;
 
     private _referee: this | null;
     public readonly references: this[];

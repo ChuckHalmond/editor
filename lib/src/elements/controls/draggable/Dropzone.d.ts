@@ -6,15 +6,14 @@ interface HTMLEDropzoneElementConstructor {
     new (): HTMLEDropzoneElement;
 }
 interface HTMLEDropzoneElement extends HTMLElement {
-    selectedDraggables: HTMLEDraggableElement[];
-    draggables: HTMLEDraggableElement[];
     dragovered: DropzoneDragoveredType | null;
     name: string;
-    type: string;
     multiple: boolean;
     disabled: boolean;
     placeholder: string;
     droptest: ((dropzone: HTMLEDropzoneElement, draggables: HTMLEDraggableElement[]) => void) | null;
+    draggables: HTMLEDraggableElement[];
+    selectedDraggables: HTMLEDraggableElement[];
     addDraggables(draggables: HTMLEDraggableElement[], position: number): void;
     removeDraggables(predicate: (draggable: HTMLEDraggableElement, index: number) => boolean): void;
     selectDraggable(draggable: HTMLEDraggableElement): void;

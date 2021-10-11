@@ -11,15 +11,17 @@ interface HTMLEDropzoneElementConstructor {
 }
 
 interface HTMLEDropzoneElement extends HTMLElement {
-    selectedDraggables: HTMLEDraggableElement[]
-    draggables: HTMLEDraggableElement[];
     dragovered: DropzoneDragoveredType | null;
     name: string;
-    type: string;
     multiple: boolean;
     disabled: boolean;
     placeholder: string;
+
     droptest: ((dropzone: HTMLEDropzoneElement, draggables: HTMLEDraggableElement[]) => void) | null;
+
+    draggables: HTMLEDraggableElement[];
+    selectedDraggables: HTMLEDraggableElement[]
+
     addDraggables(draggables: HTMLEDraggableElement[], position: number): void;
     removeDraggables(predicate: (draggable: HTMLEDraggableElement, index: number) => boolean): void;
     selectDraggable(draggable: HTMLEDraggableElement): void;
@@ -50,27 +52,20 @@ declare global {
     observedAttributes: ["placeholder", "label"]
 })
 @GenerateAttributeAccessors([
+    {name: "name", type: "string"},
     {name: "dragovered", type: "string"},
     {name: "placeholder", type: "string"},
     {name: "disabled", type: "boolean"},
     {name: "multiple", type: "boolean"},
-    {name: "input", type: "string"},
-    {name: "label", type: "string"},
-    {name: "name", type: "string"},
-    {name: "type", type: "string"},
 ])
 class HTMLEDropzoneElementBase extends HTMLElement implements HTMLEDropzoneElement {
-    
+    public name!: string;
     public dragovered!: DropzoneDragoveredType | null;
     public placeholder!: string;
-    public input!: string;
     public multiple!: boolean;
     public disabled!: boolean;
-    public name!: string;
-    public type!: string;
 
     public droptest!: ((dropzone: HTMLEDropzoneElement, draggables: HTMLEDraggableElement[]) => boolean) | null;
-    public value: any;
 
     public draggables: HTMLEDraggableElement[];
     public selectedDraggables: HTMLEDraggableElement[];
