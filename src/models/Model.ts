@@ -82,11 +82,11 @@ declare global {
 
 interface ListModelConstructor {
     readonly prototype: ListModel;
-    new(): ListModel;
-    new<Item>(items: Item[]): ListModel;
+    new<Item>(): ListModel<Item>;
+    new<Item>(items: Item[]): ListModel<Item>;
 }
 
-interface ListModel<Item = {}> extends EventDispatcher {
+interface ListModel<Item = any> extends EventDispatcher {
     readonly items: ReadonlyArray<Item>;
     set(index: number, item: Item): void;
     insert(index: number, ...items: Item[]): void;
@@ -96,7 +96,7 @@ interface ListModel<Item = {}> extends EventDispatcher {
     clear(): void;
 }
 
-class ListModelBase<Item> extends EventDispatcher implements ListModel<Item> {
+class ListModelBase<Item = any> extends EventDispatcher implements ListModel<Item> {
     private _items: Item[];
     
     constructor()

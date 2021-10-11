@@ -79,7 +79,7 @@ declare function ReactiveNode<Model extends ObjectModel, N extends Node>(object:
 interface ReactiveChildNodes {
     (parent: Node & ParentNode): (Node | string)[];
 }
-declare function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string, placeholder?: Node): ReactiveChildNodes;
+declare function ReactiveChildNodes<Item extends any>(list: ListModel<Item>, map: (item: Item) => Node | string, placeholder?: Node): ReactiveChildNodes;
 interface AttributeMutationMixin {
     readonly attributeName: string;
     readonly attributeValue: string;

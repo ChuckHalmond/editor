@@ -28,7 +28,7 @@ export async function main() {
         public lol: string = "holoo";
     }
 
-    class MyListModel extends ListModel {
+    class MyListModel extends ListModel<string> {
         
     }
 

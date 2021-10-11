@@ -342,7 +342,7 @@ interface ReactiveChildNodes {
     (parent: Node & ParentNode): (Node | string)[]
 }
 
-function ReactiveChildNodes<Item extends object>(list: ListModel<Item>, map: (item: Item) => Node | string, placeholder?: Node): ReactiveChildNodes {
+function ReactiveChildNodes<Item extends any>(list: ListModel<Item>, map: (item: Item) => Node | string, placeholder?: Node): ReactiveChildNodes {
     return (parent: Node & ParentNode) => {
         const listener = (event: ListModelChangeEvent) => {
             if (event.data.addedItems.length === list.items.length) {
