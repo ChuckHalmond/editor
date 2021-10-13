@@ -9,7 +9,6 @@ interface HTMLETreeItemElement extends HTMLElement {
     label: string;
     expanded: boolean;
     indent: number;
-    icon: string;
     selected: boolean;
     active: boolean;
     leaf: boolean;

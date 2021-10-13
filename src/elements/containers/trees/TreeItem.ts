@@ -13,7 +13,6 @@ interface HTMLETreeItemElement extends HTMLElement {
     label: string;
     expanded: boolean;
     indent: number;
-    icon: string;
     selected: boolean;
     active: boolean;
     leaf: boolean;
@@ -34,12 +33,11 @@ interface HTMLETreeItemElement extends HTMLElement {
 
 @RegisterCustomHTMLElement({
     name: "e-treeitem",
-    observedAttributes: ["icon", "label", "expanded", "indent"]
+    observedAttributes: ["label", "expanded", "indent"]
 })
 @GenerateAttributeAccessors([
     {name: "name", type: "string"},
     {name: "label", type: "string"},
-    {name: "icon", type: "string"},
     {name: "indent", type: "number"},
     {name: "active", type: "boolean"},
     {name: "selected", type: "boolean"},
@@ -53,7 +51,6 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
     public indent!: number;
     public expanded!: boolean;
     public value!: string;
-    public icon!: string;
     public selected!: boolean;
     public active!: boolean;
     public leaf!: boolean;
@@ -198,12 +195,9 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                         }
                     }
                     break;
-                case "icon":
+                case "expanded":
                     if (oldValue !== newValue) {
-                        const iconPart = this.shadowRoot?.querySelector<HTMLElement>("[part~=icon]");
-                        if (iconPart) {
-                            iconPart.dataset.value = newValue;
-                        }
+                        this.dispatchEvent(new CustomEvent("e_toggle", {bubbles: true}));
                     }
                     break;
                 case "indent":
@@ -261,7 +255,6 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
 
     public toggle(): void {
         this.expanded = !this.expanded;
-        this.dispatchEvent(new CustomEvent("e_toggle", {bubbles: true}));
     }
 
     public trigger(): void {
