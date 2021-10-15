@@ -37,7 +37,7 @@ interface GenerateDatasetAccessorsDecorator {
     (attributes: {
         name: string;
         type?: "string" | "number" | "boolean" | "json";
-    }[]): <C extends new () => DOMStringMap>(datasetCtor: C) => C;
+    }[]): <C extends CustomElementConstructor>(elementCtor: C) => C;
 }
 declare const GenerateDatasetAccessors: GenerateDatasetAccessorsDecorator;
 declare function bindShadowRoot(element: HTMLElement, templateContent?: string): ShadowRoot;

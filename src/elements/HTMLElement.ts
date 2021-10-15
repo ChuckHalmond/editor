@@ -157,16 +157,17 @@ interface GenerateDatasetAccessorsDecorator {
     (attributes: {
         name: string,
         type?: "string" | "number" | "boolean" | "json"
-    }[]): <C extends new() => DOMStringMap>(datasetCtor: C) => C;
+    }[]): <C extends CustomElementConstructor>(elementCtor: C) => C;
 }
 
 const GenerateDatasetAccessors: GenerateDatasetAccessorsDecorator = function(dataset: {
     name: string,
     type?: "string" | "number" | "boolean" | "json"
 }[]) {
-    return <C extends new() => DOMStringMap>(
-        datasetCtor: C
+    return <C extends CustomElementConstructor>(
+        elementCtor: C
     ) => {
+        const datasetCtor = elementCtor.prototype.dataset.constructor;
         dataset.forEach((datasetEntry: {
             name: string,
             type?: "string" | "number" | "boolean" | "json"
