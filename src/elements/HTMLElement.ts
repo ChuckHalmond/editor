@@ -167,58 +167,57 @@ const GenerateDatasetAccessors: GenerateDatasetAccessorsDecorator = function(dat
     return <C extends CustomElementConstructor>(
         elementCtor: C
     ) => {
-        const datasetCtor = elementCtor.prototype.dataset.constructor;
         dataset.forEach((datasetEntry: {
             name: string,
             type?: "string" | "number" | "boolean" | "json"
         }) => {
-            const name = camelToTrain(datasetEntry.name);
+            const name = datasetEntry.name;
             const type = datasetEntry.type;
             switch (type) {
                 case "boolean":
-                    Object.defineProperty(datasetCtor.prototype, name, {
-                        get: function(this: DOMStringMap) {
-                            const val = this[name];
+                    Object.defineProperty(elementCtor.prototype, name, {
+                        get: function(this: HTMLElement) {
+                            const val = this.dataset[name];
                             return (val === "");
                         },
-                        set: function(this: DOMStringMap, value) {
+                        set: function(this: HTMLElement, value) {
                             if (value) {
-                                this[name] = "";
+                                this.dataset[name] = "";
                             }
                             else {
-                                this[name] = void 0;
+                                this.dataset[name] = void 0;
                             }
                         }
                     });
                     break;
                 case "json":
-                    Object.defineProperty(datasetCtor.prototype, name, {
-                        get: function(this: DOMStringMap) {
-                            const val = this[name];
+                    Object.defineProperty(elementCtor.prototype, name, {
+                        get: function(this: HTMLElement) {
+                            const val = this.dataset[name];
                             return (typeof val !== "undefined") ? JSON.parse(val) : val;
                         },
-                        set: function(this: DOMStringMap, value) {
+                        set: function(this: HTMLElement, value) {
                             if (typeof value !== "undefined") {
-                                this[name] = JSON.stringify(value);
+                                this.dataset[name] = JSON.stringify(value);
                             }
                             else {
-                                this[name] = void 0;
+                                this.dataset[name] = void 0;
                             }
                         }
                     });
                     break;
                 case "number":
-                    Object.defineProperty(datasetCtor.prototype, name, {
-                        get: function(this: DOMStringMap) {
-                            const val = this[name];
+                    Object.defineProperty(elementCtor.prototype, name, {
+                        get: function(this: HTMLElement) {
+                            const val = this.dataset[name];
                             return (typeof val !== "undefined") ? parseFloat(val) : val;
                         },
-                        set: function(this: DOMStringMap, value) {
+                        set: function(this: HTMLElement, value) {
                             if (typeof value !== "undefined") {
-                                this[name] = value.toString();
+                                this.dataset[name] = value.toString();
                             }
                             else {
-                                this[name] = void 0;
+                                this.dataset[name] = void 0;
                             }
                         }
                     });
@@ -229,7 +228,7 @@ const GenerateDatasetAccessors: GenerateDatasetAccessorsDecorator = function(dat
             }
         });
 
-        return datasetCtor;
+        return elementCtor;
     }
 }
 
