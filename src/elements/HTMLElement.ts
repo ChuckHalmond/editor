@@ -225,6 +225,14 @@ const GenerateDatasetAccessors: GenerateDatasetAccessorsDecorator = function(dat
                     break;
                 case "string":
                 default:
+                    Object.defineProperty(elementCtor.prototype, accessorName, {
+                        get: function(this: HTMLElement) {
+                            return this.dataset[dataEntryName];
+                        },
+                        set: function(this: HTMLElement, value) {
+                            this.dataset[dataEntryName] = value;
+                        }
+                    });
                     break;
             }
         });
