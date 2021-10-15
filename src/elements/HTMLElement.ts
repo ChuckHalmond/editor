@@ -19,6 +19,7 @@ export { AttributeMutationMixin };
 export { AttributeType };
 export { areAttributesMatching };
 export { AttributeMutationMixinBase };
+export { GenerateDatasetAccessors };
 
 interface RegisterCustomHTMLElementDecorator {
     (args: {
@@ -149,6 +150,85 @@ const GenerateAttributeAccessors: GenerateAttributeAccessorsDecorator = function
         });
 
         return elementCtor;
+    }
+}
+
+interface GenerateDatasetAccessorsDecorator {
+    (attributes: {
+        name: string,
+        type?: "string" | "number" | "boolean" | "json"
+    }[]): <C extends new() => DOMStringMap>(datasetCtor: C) => C;
+}
+
+const GenerateDatasetAccessors: GenerateDatasetAccessorsDecorator = function(dataset: {
+    name: string,
+    type?: "string" | "number" | "boolean" | "json"
+}[]) {
+    return <C extends new() => DOMStringMap>(
+        datasetCtor: C
+    ) => {
+        dataset.forEach((datasetEntry: {
+            name: string,
+            type?: "string" | "number" | "boolean" | "json"
+        }) => {
+            const name = camelToTrain(datasetEntry.name);
+            const type = datasetEntry.type;
+            switch (type) {
+                case "boolean":
+                    Object.defineProperty(datasetCtor.prototype, name, {
+                        get: function(this: DOMStringMap) {
+                            const val = this[name];
+                            return (val === "");
+                        },
+                        set: function(this: DOMStringMap, value) {
+                            if (value) {
+                                this[name] = "";
+                            }
+                            else {
+                                this[name] = void 0;
+                            }
+                        }
+                    });
+                    break;
+                case "json":
+                    Object.defineProperty(datasetCtor.prototype, name, {
+                        get: function(this: DOMStringMap) {
+                            const val = this[name];
+                            return (typeof val !== "undefined") ? JSON.parse(val) : val;
+                        },
+                        set: function(this: DOMStringMap, value) {
+                            if (typeof value !== "undefined") {
+                                this[name] = JSON.stringify(value);
+                            }
+                            else {
+                                this[name] = void 0;
+                            }
+                        }
+                    });
+                    break;
+                case "number":
+                    Object.defineProperty(datasetCtor.prototype, name, {
+                        get: function(this: DOMStringMap) {
+                            const val = this[name];
+                            return (typeof val !== "undefined") ? parseFloat(val) : val;
+                        },
+                        set: function(this: DOMStringMap, value) {
+                            if (typeof value !== "undefined") {
+                                this[name] = value.toString();
+                            }
+                            else {
+                                this[name] = void 0;
+                            }
+                        }
+                    });
+                    break;
+                case "string":
+                default:
+                    break;
+            }
+        });
+
+        return datasetCtor;
     }
 }
 

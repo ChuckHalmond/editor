@@ -17,6 +17,7 @@ export { AttributeMutationMixin };
 export { AttributeType };
 export { areAttributesMatching };
 export { AttributeMutationMixinBase };
+export { GenerateDatasetAccessors };
 interface RegisterCustomHTMLElementDecorator {
     (args: {
         name: string;
@@ -32,6 +33,13 @@ interface GenerateAttributeAccessorsDecorator {
     }[]): <C extends CustomElementConstructor>(elementCtor: C) => C;
 }
 declare const GenerateAttributeAccessors: GenerateAttributeAccessorsDecorator;
+interface GenerateDatasetAccessorsDecorator {
+    (attributes: {
+        name: string;
+        type?: "string" | "number" | "boolean" | "json";
+    }[]): <C extends new () => DOMStringMap>(datasetCtor: C) => C;
+}
+declare const GenerateDatasetAccessors: GenerateDatasetAccessorsDecorator;
 declare function bindShadowRoot(element: HTMLElement, templateContent?: string): ShadowRoot;
 declare function Fragment(...nodes: (Node | string)[]): DocumentFragment;
 declare function TextNode(text?: string): Node;
