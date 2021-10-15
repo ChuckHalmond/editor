@@ -49,12 +49,15 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     attrs?: {
         [name: string]: number | string | boolean;
     };
+    styles?: {
+        [property: string]: string | [string, string];
+    };
+    dataset?: {
+        [DatasetEntry in keyof HTMLElementTagNameMap[K]["dataset"]]?: HTMLElementTagNameMap[K]["dataset"][DatasetEntry];
+    };
     children?: Node[] | NodeList | ReactiveChildNodes;
     listeners?: {
         [EventName in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[EventName]) => void | [(event: HTMLElementEventMap[EventName]) => void, Partial<boolean | AddEventListenerOptions>];
-    };
-    styles?: {
-        [property: string]: string | [string, string];
     };
 }
 declare function Element<K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLInit<K>): HTMLElementTagNameMap[K];

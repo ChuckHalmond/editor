@@ -184,12 +184,15 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     options?: ElementCreationOptions,
     props?: Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>,
     attrs?: {[name: string]: number | string | boolean},
+    styles?: {
+        [property: string]: string | [string, string]
+    },
+    dataset?: {
+        [DatasetEntry in keyof HTMLElementTagNameMap[K]["dataset"]]?: HTMLElementTagNameMap[K]["dataset"][DatasetEntry]
+    },
     children?: Node[] | NodeList | ReactiveChildNodes,
     listeners?: {
         [EventName in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[EventName]) => void | [(event: HTMLElementEventMap[EventName]) => void, Partial<boolean | AddEventListenerOptions>]
-    },
-    styles?: {
-        [property: string]: string | [string, string]
     }
 }
 
@@ -197,7 +200,7 @@ function Element<K extends keyof HTMLElementTagNameMap>(
     tagName: K, init?: HTMLInit<K>): HTMLElementTagNameMap[K] {
         const element = document.createElement(tagName, init?.options);
         if (init) {
-            const { props, attrs, children, listeners, styles } = init;
+            const { props, attrs, dataset, children, listeners, styles } = init;
             if (props) {
                 const keys = Object.keys(props) as (keyof Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>)[];
                 keys.forEach((key) => {
@@ -224,6 +227,21 @@ function Element<K extends keyof HTMLElementTagNameMap>(
                     }
                 });
             }
+            if (styles) {
+                Object.keys(styles).forEach((property) => {
+                    if (Array.isArray(styles[property])) {
+                        element.style.setProperty(property, styles[property][0], styles[property][1]);
+                    }
+                    else {
+                        element.style.setProperty(property, styles[property] as string);
+                    }
+                });
+            }
+            if (dataset) {
+                Object.keys(dataset).forEach((datasetEntry) => {
+                    element.dataset[datasetEntry] = dataset[datasetEntry];
+                });
+            }
             if (children) {
                 if (typeof children === "function") {
                     element.replaceChildren(...children(element));
@@ -239,16 +257,6 @@ function Element<K extends keyof HTMLElementTagNameMap>(
                     }
                     else {
                         element.addEventListener(entry[0], entry[1] as EventListener);
-                    }
-                });
-            }
-            if (styles) {
-                Object.keys(styles).forEach((property) => {
-                    if (Array.isArray(styles[property])) {
-                        element.style.setProperty(property, styles[property][0], styles[property][1]);
-                    }
-                    else {
-                        element.style.setProperty(property, styles[property] as string);
                     }
                 });
             }

@@ -29,5 +29,4 @@ export * from "./src/observers/AttributeMixinsObserver";
 export * from "./src/observers/ReactiveNodesObserver";
 export * from "./src/events/EventDispatcher";
 export * from "./src/models/Model";
-export * from "./src/views/View";
 export * from "./index";
