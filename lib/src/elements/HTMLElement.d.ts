@@ -60,9 +60,7 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     styles?: {
         [property: string]: string | [string, string];
     };
-    dataset?: {
-        [DatasetEntry in keyof HTMLElementTagNameMap[K]["dataset"]]?: HTMLElementTagNameMap[K]["dataset"][DatasetEntry];
-    };
+    dataset?: DOMStringMap;
     children?: Node[] | NodeList | ReactiveChildNodes;
     listeners?: {
         [EventName in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[EventName]) => void | [(event: HTMLElementEventMap[EventName]) => void, Partial<boolean | AddEventListenerOptions>];
