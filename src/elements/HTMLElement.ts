@@ -1,6 +1,6 @@
 import { EventDispatcher } from "../events/EventDispatcher";
 import { ListModel, ListModelChangeEvent, ObjectModel, ObjectModelChangeEvent } from "../models/Model";
-import { camelToTrain } from "./Snippets";
+import { camelToTrain, titlize } from "./Snippets";
 
 export { RegisterCustomHTMLElement };
 export { GenerateAttributeAccessors };
@@ -171,7 +171,7 @@ const GenerateDatasetAccessors: GenerateDatasetAccessorsDecorator = function(dat
             name: string,
             type?: "string" | "number" | "boolean" | "json"
         }) => {
-            const name = datasetEntry.name;
+            const name = `data${titlize(datasetEntry.name)}`;
             const type = datasetEntry.type;
             switch (type) {
                 case "boolean":
