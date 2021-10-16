@@ -15,6 +15,7 @@ interface HTMLEDragzoneElement extends HTMLElement {
     selectDraggable(draggable: HTMLEDraggableElement): void;
     unselectDraggable(draggable: HTMLEDraggableElement): void;
     clearSelection(): void;
+    connectedCallback(): void;
 }
 
 declare global {
@@ -49,18 +50,15 @@ class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneEleme
                     pointer-events: none;
                 }
 
-                [part~="container"]:empty {
-                    display: none !important;
-                }
-
                 [part~="container"] {
                     position: relative;
                     display: flex;
                     flex-direction: column;
-                    padding: 2px;
+                    padding-left: 2px;
+                    padding-right: 2px;
                 }
 
-                ::slotted(*:not(:only-child)) {
+                ::slotted(*) {
                     margin-top: 2px;
                     margin-bottom: 2px;
                 }
@@ -121,23 +119,30 @@ class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneEleme
         });
 
         this.addEventListener("dragstart", (event: DragEvent) => {
-            let target = event.target as any;
+            const target = event.target as any;
             if (this.draggables.includes(target)) {
                 this.selectedDraggables.forEach((thisSelectedDraggable) => {
                     thisSelectedDraggable.dragged = true;
                 });
-                let dataTransfer = event.dataTransfer;
+                const dataTransfer = event.dataTransfer;
                 if (dataTransfer) {
-                    dataTransfer.effectAllowed = "move";
+                    dataTransfer.dropEffect = "move";
                     dataTransfer.setData("text/plain", this.id);
                 }
             }
         });
+
+        this.addEventListener("dragleave", (event) => {
+            const dataTransfer = event.dataTransfer;
+            if (dataTransfer) {
+                dataTransfer.dropEffect = "none";
+            }
+        });
         
         this.addEventListener("dragend", (event: DragEvent) => {
-            let target = event.target as any;
+            const target = event.target as any;
             if (this.draggables.includes(target)) {
-                let thisDraggedDraggables = this.draggables.filter(draggable => draggable.dragged);
+                const thisDraggedDraggables = this.draggables.filter(draggable => draggable.dragged);
                 thisDraggedDraggables.forEach((thisDraggedDraggable) => {
                     thisDraggedDraggable.dragged = false;
                 });
@@ -145,14 +150,14 @@ class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneEleme
         });
 
         this.addEventListener("focusout", (event: FocusEvent) => {
-            let relatedTarget = event.relatedTarget as any;
+            const relatedTarget = event.relatedTarget as any;
             if (!this.contains(relatedTarget)) {
                 this.clearSelection();
             }
         });
         
         this.addEventListener("mousedown", (event: MouseEvent) => {
-            let target = event.target as any;
+            const target = event.target as any;
             if (event.button === 0) {
                 if (this.draggables.includes(target)) {
                     if (!event.shiftKey && !event.ctrlKey) {
@@ -193,7 +198,7 @@ class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneEleme
         });
         
         this.addEventListener("mouseup", (event: MouseEvent) => {
-            let target = event.target as any;
+            const target = event.target as any;
             if (event.button === 0) {
                 if (this.draggables.includes(target)) {
                     if (!event.shiftKey && !event.ctrlKey) {

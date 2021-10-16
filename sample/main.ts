@@ -1,5 +1,5 @@
 import * as editor from "../index";
-import { Element, GenerateObjectModelAccessors, HTMLEDraggableElement, ListModel, ObjectModel, ReactiveChildNodes, ReactiveNode, ReactiveNodesObserver, RegisterCustomHTMLElement, TextNode } from "../index";
+import { Element, GenerateObjectModelAccessors, HTMLEDraggableElement, HTMLEDropzoneElement, ListModel, ObjectModel, ReactiveChildNodes, ReactiveNode, ReactiveNodesObserver, RegisterCustomHTMLElement, TextNode } from "../index";
 
 editor;
 
@@ -17,7 +17,7 @@ const observer = new ReactiveNodesObserver();
 observer.observe(document.body);
 
 export async function main() {
-    console.log(new MyDraggable("salut!"));
+    /*console.log(new MyDraggable("salut!"));
     setTimeout(() => {
         document.getElementById("dragzone")!.append(document.createElement("my-drag"));
     }, 100);
@@ -77,8 +77,30 @@ export async function main() {
             })
         ]
     });
-    document.body.append(parent);
+    document.body.append(parent);*/
 
+    document.body.addEventListener("dragover", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLEDropzoneElement)) {
+            const dataTransfer = event.dataTransfer;
+            if (dataTransfer) {
+                dataTransfer.dropEffect = "move";
+            }
+            event.preventDefault();
+        }
+    });
+
+    document.body.addEventListener("drop", (event) => {
+        const dataTransfer = event.dataTransfer;
+        if (dataTransfer) {
+            const dragzoneId = dataTransfer.getData("text/plain");
+            const dragzone = document.getElementById(dragzoneId);
+            if (dragzone instanceof HTMLEDropzoneElement) {
+                const selectedDraggables = dragzone.selectedDraggables;
+                dragzone.removeDraggables((draggable) => selectedDraggables.includes(draggable));
+            }
+        }
+    });
     /*(window as {[key: string]: any})["editor"] = editor;
     let formDataImport = document.getElementById("formdata-import");
     if (formDataImport) {

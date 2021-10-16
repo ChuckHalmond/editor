@@ -11,6 +11,7 @@ interface HTMLEDragzoneElement extends HTMLElement {
     selectDraggable(draggable: HTMLEDraggableElement): void;
     unselectDraggable(draggable: HTMLEDraggableElement): void;
     clearSelection(): void;
+    connectedCallback(): void;
 }
 declare global {
     interface HTMLElementTagNameMap {
