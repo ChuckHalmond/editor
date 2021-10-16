@@ -71,14 +71,6 @@ class HTMLEDropzoneElementBase extends HTMLEDragzoneElement implements HTMLEDrop
                 display: none !important;
             }
 
-            :host(:not([dragovered])) [part="dragovered"] {
-                display: none;
-            }
-
-            :host([dragovered]) [part="placeholder"] {
-                display: none;
-            }
-
             [part="appendarea"] {
                 display: block;
                 margin: 2px;
@@ -90,7 +82,6 @@ class HTMLEDropzoneElementBase extends HTMLEDragzoneElement implements HTMLEDrop
                 border-color: transparent;
             }
             
-            [part="dragovered"],
             [part="placeholder"] {
                 display: inline-block;
                 color: grey;
@@ -102,7 +93,6 @@ class HTMLEDropzoneElementBase extends HTMLEDragzoneElement implements HTMLEDrop
         this.shadowRoot!.innerHTML += /*html*/`
             <div part="appendarea">
                 <span part="placeholder">&nbsp;</span>
-                <span part="dragovered">&nbsp;</span>
             </div>
         `;
 
