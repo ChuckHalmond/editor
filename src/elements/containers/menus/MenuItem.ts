@@ -11,6 +11,7 @@ type EMenuItemElementType = "button" | "radio" | "checkbox" | "menu" | "submenu"
 interface HTMLEMenuItemElementConstructor {
     readonly prototype: HTMLEMenuItemElement;
     new(): HTMLEMenuItemElement;
+    readonly observedAttributes: string[];
 }
 
 interface HTMLEMenuItemElement extends HTMLElement {
@@ -30,6 +31,8 @@ interface HTMLEMenuItemElement extends HTMLElement {
     commandArgs: any;
 
     trigger(): void;
+    connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
 
 type HotKeyChangeEvent = CustomEvent<{
@@ -51,8 +54,7 @@ declare global {
 }
 
 @RegisterCustomHTMLElement({
-    name: "e-menuitem",
-    observedAttributes: ["label", "checked", "type"]
+    name: "e-menuitem"
 })
 @GenerateAttributeAccessors([
     {name: "name", type: "string"},
@@ -78,6 +80,10 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
     public commandArgs: any;
 
     private _hotkey: HotKey | null;
+
+    public static get observedAttributes(): string[] {
+        return ["label", "checked", "type"];
+    }
 
     constructor() {
         super();

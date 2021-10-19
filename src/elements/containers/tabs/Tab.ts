@@ -7,6 +7,7 @@ export { HTMLETabElement };
 interface HTMLETabElementConstructor {
     readonly prototype: HTMLETabElement;
     new(): HTMLETabElement;
+    readonly observedAttributes: string[];
 }
 
 interface HTMLETabElement extends HTMLElement {
@@ -15,6 +16,8 @@ interface HTMLETabElement extends HTMLElement {
     disabled: boolean;
     controls: string;
     panel: HTMLETabPanelElement | null;
+    connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
 
 type ETabChangeEvent = CustomEvent<{
@@ -32,8 +35,7 @@ declare global {
 }
 
 @RegisterCustomHTMLElement({
-    name: "e-tab",
-    observedAttributes: ["active", "controls"]
+    name: "e-tab"
 })
 @GenerateAttributeAccessors([
     {name: "name", type: "string"},
@@ -49,6 +51,10 @@ class HTMLETabElementBase extends HTMLElement implements HTMLETabElement {
     public controls!: string;
 
     public panel: HTMLETabPanelElement | null;
+
+    public static get observedAttributes(): string[] {
+        return ["active", "controls"];
+    }
 
     constructor() {
         super();

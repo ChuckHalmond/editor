@@ -16,11 +16,14 @@ interface HTMLEMenuElement extends HTMLElement {
     focusItemAt(index: number, childMenu?: boolean): void;
     reset(): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null;
+    connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
 
 interface HTMLEMenuElementConstructor {
     readonly prototype: HTMLEMenuElement;
     new(): HTMLEMenuElement;
+    readonly observedAttributes: string[];
 }
 
 declare global {
@@ -30,8 +33,7 @@ declare global {
 }
 
 @RegisterCustomHTMLElement({
-    name: "e-menu",
-    observedAttributes: ["expanded"]
+    name: "e-menu"
 })
 @GenerateAttributeAccessors([
     {name: "name", type: "string"},
@@ -48,6 +50,10 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     public items: (HTMLEMenuItemElement | HTMLEMenuItemGroupElement)[];
 
     private _activeIndex: number;
+
+    public static get observedAttributes(): string[] {
+        return ["expanded"];
+    }
 
     constructor() {
         super();
@@ -122,8 +128,8 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         });
 
         this.addEventListener("mouseover", (event: MouseEvent) => {
-            let target = event.target as any;
-            let targetIndex = this.items.indexOf(target);
+            const target = event.target as any;
+            const targetIndex = this.items.indexOf(target);
             if (this === target) {
                 this.reset();
                 this.focus();
@@ -139,8 +145,8 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         });
 
         this.addEventListener("mouseout", (event: MouseEvent) => {
-            let target = event.target as any;
-            let thisIntersectsWithMouse = pointIntersectsWithDOMRect(
+            const target = event.target as any;
+            const thisIntersectsWithMouse = pointIntersectsWithDOMRect(
                 event.clientX, event.clientY,
                 this.getBoundingClientRect()
             );
@@ -151,7 +157,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         });
 
         this.addEventListener("focusin", (event: FocusEvent) => {
-            let target = event.target as any;
+            const target = event.target as any;
             this._activeIndex = this.items.findIndex(
                 (item) => item.contains(target)
             );
@@ -159,7 +165,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         });
 
         this.addEventListener("focusout", (event: FocusEvent) => {
-            let newTarget = event.relatedTarget as any;
+            const newTarget = event.relatedTarget as any;
             if (!this.contains(newTarget)) {  
                 this.reset();
                 this.expanded = false;
@@ -254,8 +260,8 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
             switch (name) {
                 case "expanded":
                     if (newValue !== null) {
-                        let thisRect = this.getBoundingClientRect();
-                        let thisIsOverflowing = thisRect.right > document.body.clientWidth;
+                        const thisRect = this.getBoundingClientRect();
+                        const thisIsOverflowing = thisRect.right > document.body.clientWidth;
                         if (thisIsOverflowing) {
                             this.overflowing = true;
                         }
@@ -269,7 +275,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     }
 
     public focusItemAt(index: number, childMenu?: boolean): void {
-        let item = this.items[index];
+        const item = this.items[index];
         if (item) {
             this._activeIndex = index;
             item.focus();
@@ -285,7 +291,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     }
 
     public reset(): void {
-        let item = this.activeItem;
+        const item = this.activeItem;
         this._activeIndex = -1;
         if (item instanceof HTMLEMenuItemElement && item.childMenu) {
             item.childMenu.reset();

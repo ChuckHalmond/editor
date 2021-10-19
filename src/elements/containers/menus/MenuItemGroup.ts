@@ -9,6 +9,7 @@ export { HTMLEMenuItemGroupElement };
 interface HTMLEMenuItemGroupElementConstructor {
     readonly prototype: HTMLEMenuItemGroupElement;
     new(): HTMLEMenuItemGroupElement;
+    readonly observedAttributes: string[];
 }
 
 interface HTMLEMenuItemGroupElement extends HTMLElement {
@@ -27,6 +28,8 @@ interface HTMLEMenuItemGroupElement extends HTMLElement {
     focusItemAt(index: number, childMenu?: boolean): void;
     reset(): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null;
+    connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
 
 declare global {
@@ -36,8 +39,7 @@ declare global {
 }
 
 @RegisterCustomHTMLElement({
-    name: "e-menuitemgroup",
-    observedAttributes: ["label"]
+    name: "e-menuitemgroup"
 })
 @GenerateAttributeAccessors([
     {name: "label", type: "string"},
@@ -57,6 +59,10 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
     public items: HTMLEMenuItemElement[];
 
     private _activeIndex: number;
+
+    public static get observedAttributes(): string[] {
+        return ["label"];
+    }
 
     constructor() {
         super();

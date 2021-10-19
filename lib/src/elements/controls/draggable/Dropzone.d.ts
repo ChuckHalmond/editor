@@ -5,6 +5,7 @@ export { EDataChangeEvent };
 interface HTMLEDropzoneElementConstructor {
     readonly prototype: HTMLEDropzoneElement;
     new (): HTMLEDropzoneElement;
+    readonly observedAttributes: string[];
 }
 interface HTMLEDropzoneElement extends HTMLEDragzoneElement {
     dragovered: DropzoneDragoveredType | null;
@@ -14,6 +15,8 @@ interface HTMLEDropzoneElement extends HTMLEDragzoneElement {
     droptest: ((dropzone: HTMLEDropzoneElement, draggables: HTMLEDraggableElement[]) => void) | null;
     addDraggables(draggables: HTMLEDraggableElement[], position: number): void;
     removeDraggables(predicate: (draggable: HTMLEDraggableElement, index: number) => boolean): void;
+    connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
 declare type DropzoneDragoveredType = "self" | "draggable" | "appendarea";
 declare type EDataChangeEvent = CustomEvent<{

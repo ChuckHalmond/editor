@@ -7,8 +7,6 @@ export * from "./src/elements/containers/menus/MenuBar";
 export * from "./src/elements/containers/menus/MenuButton";
 export * from "./src/elements/containers/menus/MenuItem";
 export * from "./src/elements/containers/menus/MenuItemGroup";
-export * from "./src/elements/containers/panels/Panel";
-export * from "./src/elements/containers/panels/PanelGroup";
 export * from "./src/elements/containers/status/StatusBar";
 export * from "./src/elements/containers/status/StatusItem";
 export * from "./src/elements/containers/tabs/Tab";

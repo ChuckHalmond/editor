@@ -8,6 +8,7 @@ export { EDataChangeEvent };
 interface HTMLEDropzoneElementConstructor {
     readonly prototype: HTMLEDropzoneElement;
     new(): HTMLEDropzoneElement;
+    readonly observedAttributes: string[];
 }
 
 interface HTMLEDropzoneElement extends HTMLEDragzoneElement {
@@ -20,6 +21,9 @@ interface HTMLEDropzoneElement extends HTMLEDragzoneElement {
 
     addDraggables(draggables: HTMLEDraggableElement[], position: number): void;
     removeDraggables(predicate: (draggable: HTMLEDraggableElement, index: number) => boolean): void;
+
+    connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
 
 type DropzoneDragoveredType = "self" | "draggable" | "appendarea";
@@ -41,8 +45,7 @@ declare global {
 }
 
 @RegisterCustomHTMLElement({
-    name: "e-dropzone",
-    observedAttributes: ["placeholder"]
+    name: "e-dropzone"
 })
 @GenerateAttributeAccessors([
     {name: "name", type: "string"},
@@ -57,6 +60,10 @@ class HTMLEDropzoneElementBase extends HTMLEDragzoneElement implements HTMLEDrop
     public multiple!: boolean;
 
     public droptest!: ((dropzone: HTMLEDropzoneElement, draggables: HTMLEDraggableElement[]) => boolean) | null;
+
+    public static get observedAttributes(): string[] {
+        return ["placeholder"];
+    }
 
     constructor() {
         super();

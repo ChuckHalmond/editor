@@ -7,6 +7,7 @@ declare type EMenuItemElementType = "button" | "radio" | "checkbox" | "menu" | "
 interface HTMLEMenuItemElementConstructor {
     readonly prototype: HTMLEMenuItemElement;
     new (): HTMLEMenuItemElement;
+    readonly observedAttributes: string[];
 }
 interface HTMLEMenuItemElement extends HTMLElement {
     name: string;
@@ -22,6 +23,8 @@ interface HTMLEMenuItemElement extends HTMLElement {
     command: string | null;
     commandArgs: any;
     trigger(): void;
+    connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
 declare type HotKeyChangeEvent = CustomEvent<{
     oldHotKey: HotKey | null;

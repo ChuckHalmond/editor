@@ -7,11 +7,14 @@ type EWidthSashDirection = "left" | "right";
 interface HTMLEWidthSashElementConstructor {
     readonly prototype: HTMLEWidthSashElement;
     new(): HTMLEWidthSashElement;
+    readonly observedAttributes: string[];
 }
 
 interface HTMLEWidthSashElement extends HTMLElement {
     controls: string;
     growdir: EWidthSashDirection;
+    connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
 
 declare global {
@@ -25,8 +28,7 @@ declare global {
 }
 
 @RegisterCustomHTMLElement({
-    name: "e-wsash",
-    observedAttributes: ["controls"]
+    name: "e-wsash"
 })
 @GenerateAttributeAccessors([
     {name: "controls", type: "string"},
@@ -39,6 +41,10 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
 
     private _target: HTMLElement | null;
     private _targetStyle: CSSStyleDeclaration | null;
+
+    public static get observedAttributes() {
+        return ["controls"];
+    }
 
     constructor() {
         super();

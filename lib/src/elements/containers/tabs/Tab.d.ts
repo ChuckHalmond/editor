@@ -4,6 +4,7 @@ export { HTMLETabElement };
 interface HTMLETabElementConstructor {
     readonly prototype: HTMLETabElement;
     new (): HTMLETabElement;
+    readonly observedAttributes: string[];
 }
 interface HTMLETabElement extends HTMLElement {
     name: string;
@@ -11,6 +12,8 @@ interface HTMLETabElement extends HTMLElement {
     disabled: boolean;
     controls: string;
     panel: HTMLETabPanelElement | null;
+    connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
 declare type ETabChangeEvent = CustomEvent<{
     tab: HTMLETabElement;

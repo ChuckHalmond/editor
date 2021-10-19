@@ -22,7 +22,6 @@ export { GenerateDatasetAccessors };
 interface RegisterCustomHTMLElementDecorator {
     (args: {
         name: string;
-        observedAttributes?: string[];
         options?: ElementDefinitionOptions;
     }): <C extends CustomElementConstructor>(elementCtor: C) => C;
 }

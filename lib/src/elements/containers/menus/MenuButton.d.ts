@@ -3,6 +3,7 @@ export { HTMLEMenuButtonElement };
 interface HTMLEMenuButtonElementConstructor {
     readonly prototype: HTMLEMenuButtonElement;
     new (): HTMLEMenuButtonElement;
+    readonly observedAttributes: string[];
 }
 interface HTMLEMenuButtonElement extends HTMLElement {
     name: string;
@@ -11,5 +12,7 @@ interface HTMLEMenuButtonElement extends HTMLElement {
     active: boolean;
     childMenu: HTMLEMenuElement | null;
     trigger(): void;
+    connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
 declare var HTMLEMenuButtonElement: HTMLEMenuButtonElementConstructor;

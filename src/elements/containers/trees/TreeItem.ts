@@ -6,6 +6,7 @@ export { HTMLETreeItemElement };
 interface HTMLETreeItemElementConstructor {
     readonly prototype: HTMLETreeItemElement;
     new(): HTMLETreeItemElement;
+    readonly observedAttributes: string[];
 }
 
 interface HTMLETreeItemElement extends HTMLElement {
@@ -29,11 +30,13 @@ interface HTMLETreeItemElement extends HTMLElement {
     trigger(): void;
 
     findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null;
+
+    connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void
 }
 
 @RegisterCustomHTMLElement({
-    name: "e-treeitem",
-    observedAttributes: ["label", "expanded", "indent"]
+    name: "e-treeitem"
 })
 @GenerateAttributeAccessors([
     {name: "name", type: "string"},
@@ -57,6 +60,10 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
 
     public items: HTMLETreeItemElement[];
     public parent: HTMLETreeItemElement | HTMLETreeElement | null;
+
+    public static get observedAttributes(): string[] {
+        return ["label", "expanded", "indent"];
+    }
 
     constructor() {
         super();

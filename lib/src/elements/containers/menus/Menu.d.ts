@@ -12,10 +12,13 @@ interface HTMLEMenuElement extends HTMLElement {
     focusItemAt(index: number, childMenu?: boolean): void;
     reset(): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null;
+    connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
 interface HTMLEMenuElementConstructor {
     readonly prototype: HTMLEMenuElement;
     new (): HTMLEMenuElement;
+    readonly observedAttributes: string[];
 }
 declare global {
     interface HTMLElementTagNameMap {

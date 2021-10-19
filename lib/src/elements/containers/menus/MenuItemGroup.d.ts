@@ -4,6 +4,7 @@ export { HTMLEMenuItemGroupElement };
 interface HTMLEMenuItemGroupElementConstructor {
     readonly prototype: HTMLEMenuItemGroupElement;
     new (): HTMLEMenuItemGroupElement;
+    readonly observedAttributes: string[];
 }
 interface HTMLEMenuItemGroupElement extends HTMLElement {
     name: string;
@@ -18,6 +19,8 @@ interface HTMLEMenuItemGroupElement extends HTMLElement {
     focusItemAt(index: number, childMenu?: boolean): void;
     reset(): void;
     findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null;
+    connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
 declare global {
     interface HTMLElementTagNameMap {

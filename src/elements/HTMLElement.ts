@@ -25,7 +25,6 @@ export { GenerateDatasetAccessors };
 interface RegisterCustomHTMLElementDecorator {
     (args: {
         name: string;
-        observedAttributes?: string[],
         options?: ElementDefinitionOptions
     }): <C extends CustomElementConstructor>(elementCtor: C) => C;
 }
@@ -33,21 +32,12 @@ interface RegisterCustomHTMLElementDecorator {
 const RegisterCustomHTMLElement: RegisterCustomHTMLElementDecorator = function(args: {
     name: string;
     attributes?: string[],
-    observedAttributes?: string[],
     options?: ElementDefinitionOptions
 }) {
     return <C extends CustomElementConstructor>(
         elementCtor: C
     ) => {
-        const { name, observedAttributes, options } = args;
-
-        if (observedAttributes) {
-            Object.defineProperty(elementCtor.prototype.constructor, 'observedAttributes', {
-                get: () => {
-                    return observedAttributes;
-                }
-            });
-        }
+        const { name, options } = args;
 
         if (!customElements.get(name)) {
             customElements.define(

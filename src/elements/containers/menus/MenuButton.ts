@@ -6,6 +6,7 @@ export { HTMLEMenuButtonElement };
 interface HTMLEMenuButtonElementConstructor {
     readonly prototype: HTMLEMenuButtonElement;
     new(): HTMLEMenuButtonElement;
+    readonly observedAttributes: string[];
 }
 
 interface HTMLEMenuButtonElement extends HTMLElement {
@@ -14,12 +15,13 @@ interface HTMLEMenuButtonElement extends HTMLElement {
     disabled: boolean;
     active: boolean;
     childMenu: HTMLEMenuElement | null;
-    trigger(): void
+    trigger(): void;
+    connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
 
 @RegisterCustomHTMLElement({
-    name: "e-menubutton",
-    observedAttributes: ["icon", "label", "checked"]
+    name: "e-menubutton"
 })
 @GenerateAttributeAccessors([
     {name: "name", type: "string"},
@@ -35,6 +37,10 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
     public active!: boolean;
 
     public childMenu: HTMLEMenuElement | null;
+
+    public static get observedAttributes(): string[] {
+        return ["label"];
+    }
 
     constructor() {
         super();

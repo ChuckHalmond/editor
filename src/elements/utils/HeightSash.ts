@@ -7,11 +7,14 @@ type EHeightSashDirection = "top" | "bottom";
 interface HTMLEHeightSashElementConstructor {
     readonly prototype: HTMLEHeightSashElement;
     new(): HTMLEHeightSashElement;
+    readonly observedAttributes: string[];
 }
 
 interface HTMLEHeightSashElement extends HTMLElement {
     controls: string;
     growdir: EHeightSashDirection;
+    connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
 
 declare global {
@@ -25,8 +28,7 @@ declare global {
 }
 
 @RegisterCustomHTMLElement({
-    name: "e-hsash",
-    observedAttributes: ["controls"]
+    name: "e-hsash"
 })
 @GenerateAttributeAccessors([
     {name: "controls", type: "string"},
@@ -39,6 +41,10 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
 
     private _target: HTMLElement | null;
     private _targetStyle: CSSStyleDeclaration | null;
+
+    public static get observedAttributes() {
+        return ["controls"];
+    }
 
     constructor() {
         super();

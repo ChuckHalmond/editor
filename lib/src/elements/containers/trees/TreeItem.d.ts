@@ -3,6 +3,7 @@ export { HTMLETreeItemElement };
 interface HTMLETreeItemElementConstructor {
     readonly prototype: HTMLETreeItemElement;
     new (): HTMLETreeItemElement;
+    readonly observedAttributes: string[];
 }
 interface HTMLETreeItemElement extends HTMLElement {
     name: string;
@@ -21,6 +22,8 @@ interface HTMLETreeItemElement extends HTMLElement {
     toggle(): void;
     trigger(): void;
     findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null;
+    connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
 declare var HTMLETreeItemElement: HTMLETreeItemElementConstructor;
 declare global {
