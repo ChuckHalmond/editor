@@ -12,6 +12,7 @@ export { ReactiveNode };
 export { ReactiveParentNode };
 export { ReactiveChildNodes };
 export { isElement };
+export { HTML };
 export { Element };
 export { Fragment };
 export { TextNode };
@@ -239,6 +240,12 @@ const GenerateDatasetAccessors: GenerateDatasetAccessorsDecorator = function(dat
 
         return elementCtor;
     }
+}
+
+function HTML(innerHTML: string): Node {
+    const template = document.createElement("template");
+    template.innerHTML = innerHTML;
+    return template.content.cloneNode(true);
 }
 
 function bindShadowRoot(element: HTMLElement, templateContent?: string): ShadowRoot {
