@@ -12,7 +12,6 @@ export { ReactiveNode };
 export { ReactiveParentNode };
 export { ReactiveChildNodes };
 export { isElement };
-export { HTML };
 export { Element };
 export { Fragment };
 export { TextNode };
@@ -55,14 +54,14 @@ interface GenerateAttributeAccessorsDecorator {
     (attributes: {
         name: string,
         type?: "string" | "number" | "boolean" | "json"
-    }[]): <C extends CustomElementConstructor>(elementCtor: C) => C;
+    }[]): <C extends {readonly prototype: HTMLElement}>(elementCtor: C) => C;
 }
 
 const GenerateAttributeAccessors: GenerateAttributeAccessorsDecorator = function(attributes: {
     name: string,
     type?: "string" | "number" | "boolean" | "json"
 }[]) {
-    return <C extends CustomElementConstructor>(
+    return <C extends {readonly prototype: HTMLElement}>(
         elementCtor: C
     ) => {
         attributes.forEach((attr: {
@@ -148,14 +147,14 @@ interface GenerateDatasetAccessorsDecorator {
     (attributes: {
         name: string,
         type?: "string" | "number" | "boolean" | "json"
-    }[]): <C extends CustomElementConstructor>(elementCtor: C) => C;
+    }[]): <C extends {readonly prototype: HTMLElement}>(elementCtor: C) => C;
 }
 
 const GenerateDatasetAccessors: GenerateDatasetAccessorsDecorator = function(dataset: {
     name: string,
     type?: "string" | "number" | "boolean" | "json"
 }[]) {
-    return <C extends CustomElementConstructor>(
+    return <C extends {readonly prototype: HTMLElement}>(
         elementCtor: C
     ) => {
         dataset.forEach((datasetEntry: {
@@ -232,12 +231,6 @@ const GenerateDatasetAccessors: GenerateDatasetAccessorsDecorator = function(dat
     }
 }
 
-function HTML(innerHTML: string): Node {
-    const template = document.createElement("template");
-    template.innerHTML = innerHTML;
-    return template.content.cloneNode(true);
-}
-
 function bindShadowRoot(element: HTMLElement, templateContent?: string): ShadowRoot {
     const root = element.attachShadow({mode: "open"});
     const template = document.createElement("template");
@@ -249,7 +242,7 @@ function bindShadowRoot(element: HTMLElement, templateContent?: string): ShadowR
 }
 
 function Fragment(...nodes: (Node | string)[]): DocumentFragment {
-    let fragment = document.createDocumentFragment();
+    const fragment = document.createDocumentFragment();
     fragment.append(...nodes);
     return fragment;
 }

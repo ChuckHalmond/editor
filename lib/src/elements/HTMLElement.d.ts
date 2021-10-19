@@ -10,7 +10,6 @@ export { ReactiveNode };
 export { ReactiveParentNode };
 export { ReactiveChildNodes };
 export { isElement };
-export { HTML };
 export { Element };
 export { Fragment };
 export { TextNode };
@@ -30,17 +29,20 @@ interface GenerateAttributeAccessorsDecorator {
     (attributes: {
         name: string;
         type?: "string" | "number" | "boolean" | "json";
-    }[]): <C extends CustomElementConstructor>(elementCtor: C) => C;
+    }[]): <C extends {
+        readonly prototype: HTMLElement;
+    }>(elementCtor: C) => C;
 }
 declare const GenerateAttributeAccessors: GenerateAttributeAccessorsDecorator;
 interface GenerateDatasetAccessorsDecorator {
     (attributes: {
         name: string;
         type?: "string" | "number" | "boolean" | "json";
-    }[]): <C extends CustomElementConstructor>(elementCtor: C) => C;
+    }[]): <C extends {
+        readonly prototype: HTMLElement;
+    }>(elementCtor: C) => C;
 }
 declare const GenerateDatasetAccessors: GenerateDatasetAccessorsDecorator;
-declare function HTML(innerHTML: string): Node;
 declare function bindShadowRoot(element: HTMLElement, templateContent?: string): ShadowRoot;
 declare function Fragment(...nodes: (Node | string)[]): DocumentFragment;
 declare function TextNode(text?: string): Node;
