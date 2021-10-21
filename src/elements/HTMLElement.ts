@@ -259,9 +259,9 @@ type WritableKeys<T> = {
     [P in keyof T]-?: _IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, P>
 }[keyof T];
 
-interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
+interface HTMLInit<E extends HTMLElement> {
     options?: ElementCreationOptions,
-    props?: Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>,
+    props?: Partial<Pick<E, WritableKeys<E>>>,
     part?: string[],
     attrs?: {[name: string]: number | string | boolean},
     styles?: {
@@ -274,8 +274,10 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     }
 }
 
+function Element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementTagNameMap>(
+    tagName: K, init?: HTMLInit<E>):E;
 function Element<K extends keyof HTMLElementTagNameMap>(
-    tagName: K, init?: HTMLInit<K>): HTMLElementTagNameMap[K] {
+    tagName: K, init?: HTMLInit<HTMLElementTagNameMap[K]>): HTMLElementTagNameMap[K] {
         const element = document.createElement(tagName, init?.options);
         if (init) {
             const { props, part, attrs, dataset, children, listeners, styles } = init;

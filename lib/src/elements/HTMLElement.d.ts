@@ -54,9 +54,9 @@ declare type WritableKeys<T> = {
         -readonly [Q in P]: T[P];
     }, P>;
 }[keyof T];
-interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
+interface HTMLInit<E extends HTMLElement> {
     options?: ElementCreationOptions;
-    props?: Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>;
+    props?: Partial<Pick<E, WritableKeys<E>>>;
     part?: string[];
     attrs?: {
         [name: string]: number | string | boolean;
@@ -70,7 +70,7 @@ interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
         [EventName in keyof HTMLElementEventMap]?: (event: HTMLElementEventMap[EventName]) => void | [(event: HTMLElementEventMap[EventName]) => void, Partial<boolean | AddEventListenerOptions>];
     };
 }
-declare function Element<K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLInit<K>): HTMLElementTagNameMap[K];
+declare function Element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLInit<E>): E;
 declare type ReactiveNode = Node & {
     _reactiveNodeAttributes: {
         addReactListener: () => void;
