@@ -279,6 +279,9 @@ function Element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElement
 function Element<K extends keyof HTMLElementTagNameMap>(
     tagName: K, init?: HTMLInit<HTMLElementTagNameMap[K]>): HTMLElementTagNameMap[K] {
         const element = document.createElement(tagName, init?.options);
+        if (init && init.options && init.options.is) {
+            element.setAttribute("is", init.options.is)
+        }
         if (init) {
             const { props, part, attrs, dataset, children, listeners, styles } = init;
             if (props) {
