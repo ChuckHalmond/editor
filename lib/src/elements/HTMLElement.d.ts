@@ -57,6 +57,7 @@ declare type WritableKeys<T> = {
 interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     options?: ElementCreationOptions;
     props?: Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>;
+    part?: string[];
     attrs?: {
         [name: string]: number | string | boolean;
     };

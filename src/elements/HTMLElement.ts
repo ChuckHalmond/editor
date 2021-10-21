@@ -262,6 +262,7 @@ type WritableKeys<T> = {
 interface HTMLInit<K extends keyof HTMLElementTagNameMap> {
     options?: ElementCreationOptions,
     props?: Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>,
+    part?: string[],
     attrs?: {[name: string]: number | string | boolean},
     styles?: {
         [property: string]: string | [string, string]
@@ -277,7 +278,7 @@ function Element<K extends keyof HTMLElementTagNameMap>(
     tagName: K, init?: HTMLInit<K>): HTMLElementTagNameMap[K] {
         const element = document.createElement(tagName, init?.options);
         if (init) {
-            const { props, attrs, dataset, children, listeners, styles } = init;
+            const { props, part, attrs, dataset, children, listeners, styles } = init;
             if (props) {
                 const keys = Object.keys(props) as (keyof Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>)[];
                 keys.forEach((key) => {
@@ -289,6 +290,11 @@ function Element<K extends keyof HTMLElementTagNameMap>(
                             }
                         );
                     }
+                });
+            }
+            if (part) {
+                part.forEach((part) => {
+                    element.part.add(part);
                 });
             }
             if (attrs) {
