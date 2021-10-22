@@ -55,9 +55,13 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
                     display: block;
                     z-index: 1;
 
+                    max-height: 4px;
                     height: 4px;
+                    min-height: 4px;
+
                     margin-top: -2px;
                     margin-bottom: -2px;
+                    
                     background-color: rgb(0, 128, 255);
                     cursor: ns-resize;
 
