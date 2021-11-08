@@ -1,4 +1,4 @@
-import { RegisterCustomHTMLElement, bindShadowRoot, GenerateAttributeAccessors } from "../../HTMLElement";
+import { CustomElement, AttributeProperty, HTML } from "../../Element";
 import { HTMLEDraggableElement } from "./Draggable";
 
 export { HTMLEDragzoneElement };
@@ -24,14 +24,12 @@ declare global {
     }
 }
 
-@RegisterCustomHTMLElement({
+@CustomElement({
     name: "e-dragzone"
 })
-@GenerateAttributeAccessors([
-    {name: "disabled", type: "boolean"},
-])
 class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneElement {
 
+    @AttributeProperty({type: "boolean"})
     public disabled!: boolean;
 
     public draggables: HTMLEDraggableElement[];
@@ -40,33 +38,41 @@ class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneEleme
     constructor() {
         super();
 
-        bindShadowRoot(this, /*template*/`
-            <style>
-                :host {
-                    display: block;
+        this.attachShadow({mode: "open"}).append(
+            HTML("style", {
+                properties: {
+                    innerText: /*css*/`
+                        :host {
+                            display: block;
+                        }
+        
+                        :host([disabled]) {
+                            pointer-events: none;
+                        }
+        
+                        [part~="container"] {
+                            position: relative;
+                            display: flex;
+                            flex-direction: column;
+                            padding-left: 2px;
+                            padding-right: 2px;
+                        }
+        
+                        ::slotted(*) {
+                            margin-top: 2px;
+                            margin-bottom: 2px;
+                        }
+                    `
                 }
-
-                :host([disabled]) {
-                    pointer-events: none;
-                }
-
-                [part~="container"] {
-                    position: relative;
-                    display: flex;
-                    flex-direction: column;
-                    padding-left: 2px;
-                    padding-right: 2px;
-                }
-
-                ::slotted(*) {
-                    margin-top: 2px;
-                    margin-bottom: 2px;
-                }
-            </style>
-            <div part="container">
-                <slot></slot>
-            </div>
-        `);
+            }),
+            HTML("div", {
+                part: ["container"],
+                children: [
+                    HTML("slot")
+                ]
+            })
+        );
+        
         this.draggables = [];
         this.selectedDraggables = [];
     }

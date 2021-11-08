@@ -7,6 +7,7 @@ interface HTMLEMenuElement extends HTMLElement {
     overflowing: boolean;
     parentItem: HTMLEMenuItemElement | null;
     items: (HTMLEMenuItemElement | HTMLEMenuItemGroupElement)[];
+    readonly shadowRoot: ShadowRoot;
     readonly activeIndex: number;
     readonly activeItem: HTMLEMenuItemElement | HTMLEMenuItemGroupElement | null;
     focusItemAt(index: number, childMenu?: boolean): void;

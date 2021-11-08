@@ -13,6 +13,7 @@ interface HTMLETreeItemElement extends HTMLElement {
     selected: boolean;
     active: boolean;
     leaf: boolean;
+    shadowRoot: ShadowRoot;
     items: HTMLETreeItemElement[];
     parent: HTMLETreeItemElement | HTMLETreeElement | null;
     deepestVisibleChildItem(): HTMLETreeItemElement;
@@ -20,24 +21,16 @@ interface HTMLETreeItemElement extends HTMLElement {
     nextVisibleItem(): HTMLETreeItemElement;
     nearestParentItem(): HTMLETreeItemElement;
     toggle(): void;
-    trigger(): void;
     findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null;
     connectedCallback(): void;
     attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
-declare var HTMLETreeItemElement: HTMLETreeItemElementConstructor;
 declare global {
     interface HTMLElementTagNameMap {
         "e-treeitem": HTMLETreeItemElement;
     }
-}
-declare global {
     interface HTMLElementEventMap {
         "e_toggle": Event;
     }
 }
-declare global {
-    interface HTMLElementEventMap {
-        "e_trigger": Event;
-    }
-}
+declare var HTMLETreeItemElement: HTMLETreeItemElementConstructor;

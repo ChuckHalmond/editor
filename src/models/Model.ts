@@ -1,131 +1,182 @@
-import { EventDispatcher, Event } from "../events/EventDispatcher";
-
-export { GenerateObjectModelAccessors };
 export { ObjectModelChangeEvent };
 export { ObjectModel };
 export { ListModelChangeEvent };
 export { ListModel };
 
-interface ObjectModelChangeEvent {
-    type: "objectmodelchange";
-    data: {
-        property: string;
-        oldValue: any;
-        newValue: any;
-    };
+interface ObjectModelEventDetail {
+    property: string;
+    oldValue: any;
+    newValue: any;
 }
 
-declare global {
-    interface EventsMap {
-        "objectmodelchange": ObjectModelChangeEvent;
+interface ObjectModelChangeEventConstructor {
+    readonly prototype: ObjectModelChangeEvent;
+    new(eventInitDict?: CustomEventInit<ObjectModelEventDetail>): ObjectModelChangeEvent;
+}
+
+interface ObjectModelChangeEvent extends CustomEvent<ObjectModelEventDetail> {
+    type: "objectmodelchange";
+}
+
+class ObjectModelChangeEventBase extends CustomEvent<ObjectModelEventDetail> {
+    type!: "objectmodelchange";
+
+    constructor(eventInitDict?: CustomEventInit<ObjectModelEventDetail>) {
+        super("objectmodelchange", eventInitDict);
     }
 }
+
+interface ObjectModelEventMap {
+    "objectmodelchange": ObjectModelChangeEvent;
+}
+
+var ObjectModelChangeEvent: ObjectModelChangeEventConstructor = ObjectModelChangeEventBase;
 
 interface ObjectModelConstructor {
     readonly prototype: ObjectModel;
     new(): ObjectModel;
 }
 
-interface ObjectModel extends EventDispatcher {}
+interface ObjectModel extends EventTarget {
+    dispatchEvent(event: Event): boolean;
+    addEventListener<K extends keyof ObjectModelEventMap>(type: K, listener: (this: ObjectModel, ev: ObjectModelEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+    addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+    removeEventListener<K extends keyof ObjectModelEventMap>(type: K, listener: (this: ObjectModel, ev: ObjectModelEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+    removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+}
 
-class ObjectModelBase extends EventDispatcher implements ObjectModel {
+class ObjectModelBase extends EventTarget implements ObjectModel {
+    private _listmodelListeners: Map<string, EventListener>;
+
     constructor() {
         super();
-    }
-}
-
-interface GenerateObjectModelAccessorsDecorator {
-    (props: string[]): <O extends ObjectModelBase, C extends new(...args: any[]) => O>(ctor: C) => C
-}
-
-const GenerateObjectModelAccessors: GenerateObjectModelAccessorsDecorator = function(props: string[]) {
-    return <O extends ObjectModelBase, C extends new(...args: any[]) => O>(ctor: C) => {
-        const properties = props.reduce(
-            (obj, prop) => {
-                return {
-                    ...obj,
-                    [prop]: {
-                        enumerable: true,
-                        get: function(this: ObjectModelBase) {
-                            return (this as {[key: string]: any})[`_${prop}`];
-                        },
-                        set: function(this: ObjectModelBase, value: any) {
-                            const oldValue = (this as {[key: string]: any})[`_${prop}`];
-                            (this as {[key: string]: any})[`_${prop}`] = value;
-                            this.dispatchEvent(new Event("objectmodelchange", {property: prop, oldValue: oldValue, newValue: value}));
-                        }
+        this._listmodelListeners = new Map();
+        return new Proxy(this, {
+            get: (target: this, property: string, receiver: any) => {
+                const value = Reflect.get(target, property, receiver);
+                return typeof value === "function" ? value.bind(target) : value;
+            },
+            set: (target: this, property: string, value: any, receiver: any) => {
+                const oldValue = Reflect.get(target, property, receiver);
+                if (oldValue instanceof ListModel) {
+                    if (this._listmodelListeners.has(property)) {
+                        const listmodelListener = this._listmodelListeners.get(property)!;
+                        oldValue.removeEventListener("listmodelchange", listmodelListener);
+                        this._listmodelListeners.delete(property);
                     }
                 }
-            }, {}
-        );
-        Object.defineProperties(ctor.prototype, properties);
-        return ctor;
+                if (value instanceof ListModel) {
+                    const listmodelListener = () => {
+                        target.dispatchEvent(new ObjectModelChangeEvent({detail: {property: property, oldValue: value, newValue: value}}));
+                    };
+                    this._listmodelListeners.set(property, listmodelListener);
+                    value.addEventListener("listmodelchange", listmodelListener);
+                }
+                target.dispatchEvent(new ObjectModelChangeEvent({detail: {property: property, oldValue: oldValue, newValue: value}}));
+                return Reflect.set(target, property, value, receiver);
+            }
+        });
     }
 }
 
 var ObjectModel: ObjectModelConstructor = ObjectModelBase;
 
-interface ListModelChangeEvent {
-    type: "listmodelchange";
-    data: {
-        addedItems: any[];
-        removedItems: any[];
-        index: number;
-    };
+interface ListModelEventDetail {
+    addedItems: any[];
+    removedItems: any[];
+    index: number;
 }
 
-declare global {
-    interface EventsMap {
-        "listmodelchange": ListModelChangeEvent;
+interface ListModelChangeEventConstructor {
+    readonly prototype: ListModelChangeEvent;
+    new(eventInitDict?: CustomEventInit<ListModelEventDetail>): ListModelChangeEvent;
+}
+
+interface ListModelChangeEvent extends Event {
+    type: "listmodelchange";
+    detail: ListModelEventDetail;
+}
+
+class ListModelChangeEventBase extends CustomEvent<ListModelEventDetail> {
+    type!: "listmodelchange";
+
+    constructor(eventInitDict?: CustomEventInit<ListModelEventDetail>) {
+        super("listmodelchange", eventInitDict);
     }
 }
 
+var ListModelChangeEvent: ListModelChangeEventConstructor = ListModelChangeEventBase;
+
 interface ListModelConstructor {
     readonly prototype: ListModel;
-    new<Item>(): ListModel<Item>;
+    new(): ListModel;
     new<Item>(items: Item[]): ListModel<Item>;
 }
 
-interface ListModel<Item = any> extends EventDispatcher {
-    readonly items: ReadonlyArray<Item>;
+interface ListModelEventMap {
+    "listmodelchange": ListModelChangeEvent;
+}
+
+interface ListModel<Item = any> extends EventTarget {
+    get(index: number): Item | undefined;
+    getAll(): Item[];
+    length(): number;
     set(index: number, item: Item): void;
+    setAll(items: Item[]): void;
     insert(index: number, ...items: Item[]): void;
     push(...items: Item[]): number;
     pop(): Item | undefined;
     remove(item: Item): void;
     clear(): void;
+
+    addEventListener<K extends keyof ListModelEventMap>(type: K, listener: (this: ListModel, ev: ListModelEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+    addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+    removeEventListener<K extends keyof ListModelEventMap>(type: K, listener: (this: ListModel, ev: ListModelEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+    removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
 
-class ListModelBase<Item = any> extends EventDispatcher implements ListModel<Item> {
+class ListModelBase<Item = any> extends EventTarget implements ListModel<Item> {
     private _items: Item[];
     
     constructor()
     constructor(items: Item[] = []) {
         super();
-        this._items = items;
+        this._items = items.slice();
     }
 
-    public get items(): ReadonlyArray<Item> {
-        return this._items;
+    public get(index: number): Item | undefined {
+        return this._items[index];
+    }
+
+    public getAll(): Item[] {
+        return this._items.slice();
+    }
+
+    public length(): number {
+        return this._items.length;
     }
 
     public set(index: number, item: Item): void {
         if (index >= 0 && index < this._items.length) {
             this._items[index] = item;
-            this.dispatchEvent(new Event("listmodelchange", {addedItems: [item], removedItems: [], index: index}));
+            this.dispatchEvent(new ListModelChangeEvent({detail: {addedItems: [item], removedItems: [], index: index}}));
         }
+    }
+
+    public setAll(items: Item[]): void {
+        this._items = items.slice();
     }
 
     public push(...items: Item[]): number {
         const newLength = this._items.push(...items);
-        this.dispatchEvent(new Event("listmodelchange", {addedItems: items, removedItems: [], index: newLength - items.length}));
+        this.dispatchEvent(new ListModelChangeEvent({detail: {addedItems: items, removedItems: [], index: newLength - items.length}}));
         return newLength;
     }
 
     public pop(): Item | undefined {
         const item = this._items.pop();
         if (item) {
-            this.dispatchEvent(new Event("listmodelchange", {addedItems: [], removedItems: [item], index: this._items.length}));
+            this.dispatchEvent(new ListModelChangeEvent({detail: {addedItems: [], removedItems: [item], index: this._items.length}}));
         }
         return item;
     }
@@ -143,21 +194,21 @@ class ListModelBase<Item = any> extends EventDispatcher implements ListModel<Ite
             }
         }
         this._items.splice(index, 0, ...items);
-        this.dispatchEvent(new Event("listmodelchange", {addedItems: items, removedItems: [], index: index}));
+        this.dispatchEvent(new ListModelChangeEvent({detail: {addedItems: items, removedItems: [], index: index}}));
     }
 
     public remove(item: Item): void {
         const itemIndex = this._items.indexOf(item);
         if (itemIndex > -1) {
             this._items.splice(itemIndex, 1);
-            this.dispatchEvent(new Event("listmodelchange", {addedItems: [], removedItems: [item], index: itemIndex}));
+            this.dispatchEvent(new ListModelChangeEvent({detail: {addedItems: [], removedItems: [item], index: itemIndex}}));
         }
     }
 
     public clear(): void {
         const removedItems = this._items.slice();
         this._items.splice(0, this._items.length);
-        this.dispatchEvent(new Event("listmodelchange", {addedItems: [], removedItems: removedItems, index: 0}));
+        this.dispatchEvent(new ListModelChangeEvent({detail: {addedItems: [], removedItems: removedItems, index: 0}}));
     }
 }
 

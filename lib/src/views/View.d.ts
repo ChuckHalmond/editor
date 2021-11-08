@@ -1,31 +1,16 @@
-export { ViewRoot };
-export { isViewRoot };
-export { View };
-export { ViewBase };
-export { ReactiveView };
-export { ReactiveViewBase };
-declare type ViewRoot = Element & {
-    _view: View;
-};
-interface View<M extends object = object> {
-    root: ViewRoot;
-    readonly model: M;
-    render(): Element;
+export interface HTMLView extends HTMLElement {
+    readonly shadowRoot: ShadowRoot;
+    render(): HTMLElement;
+    refresh(): void;
 }
-declare function isViewRoot(root: Node): root is ViewRoot;
-declare abstract class ViewBase<M extends object = object> implements View {
-    readonly root: ViewRoot;
-    readonly model: M;
-    constructor(model: M);
-    abstract render(): Element;
+export interface ViewConstructor {
+    readonly prototype: HTMLView;
+    readonly styles: string | undefined;
 }
-interface ReactiveView<M extends object = object> extends View<M> {
-    disconnect(): void;
-}
-declare abstract class ReactiveViewBase<M extends object = object> extends ViewBase<M> implements ReactiveView<M> {
-    readonly observer: MutationObserver;
-    constructor(model: M);
-    disconnect(): void;
-    addReactiveListeners(node: Node): void;
-    removeReactiveListeners(node: Node): void;
+export declare abstract class HTMLViewBase extends HTMLElement implements HTMLView {
+    readonly shadowRoot: ShadowRoot;
+    constructor();
+    static styles: string | undefined;
+    abstract render(): HTMLElement;
+    refresh(): void;
 }

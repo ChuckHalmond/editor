@@ -49,7 +49,7 @@ class EditorBase implements Editor {
             });
         });
         
-        document.body.addEventListener("e_hotkeychange", (event) => {
+        /*document.body.addEventListener("e_hotkeychange", (event) => {
             const target = event.target;
             if (target instanceof HTMLEMenuItemElement) {
                 if (event.detail.oldHotKey) {
@@ -59,7 +59,7 @@ class EditorBase implements Editor {
                     this.addHotkeyExec(event.detail.newHotKey, target.trigger.bind(target));
                 }
             }
-        });
+        });*/
 
         document.body.addEventListener("e_trigger", (event) => {
             const target = event.target;

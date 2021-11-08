@@ -1,4 +1,4 @@
-import { AttributeMutationMixin } from "../elements/HTMLElement";
+import { AttributeMutationMixin } from "../elements/Element";
 export { AttributeMixinsObserver };
 interface AttributeMixinsObserverConstructor {
     readonly prototype: AttributeMixinsObserver;

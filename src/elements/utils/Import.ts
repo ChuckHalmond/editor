@@ -1,4 +1,4 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors } from "../HTMLElement";
+import { CustomElement, AttributeProperty } from "../Element";
 
 export { HTMLEImportElement };
 export { HTMLEImportElementBase };
@@ -7,14 +7,12 @@ interface HTMLEImportElement extends HTMLElement {
     src: string;
 }
 
-@RegisterCustomHTMLElement({
+@CustomElement({
     name: "e-import"
 })
-@GenerateAttributeAccessors([
-    {name: "src", type: "string"}
-])
 class HTMLEImportElementBase extends HTMLElement {
 
+    @AttributeProperty({type: "string"})
     public src!: string;
 
     constructor() {

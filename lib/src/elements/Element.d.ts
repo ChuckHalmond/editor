@@ -1,8 +1,7 @@
 import { EventDispatcher } from "../events/EventDispatcher";
 import { ListModel, ObjectModel } from "../models/Model";
 export { CustomElement };
-export { ReactiveAttribute };
-export { bindShadowRoot };
+export { AttributeProperty };
 export { isReactiveNode };
 export { isReactiveParentNode };
 export { ReactiveNode };
@@ -15,7 +14,6 @@ export { AttributeMutationMixin };
 export { AttributeType };
 export { areAttributesMatching };
 export { AttributeMutationMixinBase };
-export { GenerateDatasetAccessors };
 interface CustomElementDecorator {
     (init: {
         name: string;
@@ -23,22 +21,12 @@ interface CustomElementDecorator {
     }): <C extends CustomElementConstructor>(elementCtor: C) => C;
 }
 declare const CustomElement: CustomElementDecorator;
-interface ReactiveAttributeDecorator {
+interface AttributePropertyDecorator {
     (init: {
         type: "string" | "number" | "boolean" | "json";
     }): <E extends HTMLElement>(target: E, propertyKey: keyof E) => void;
 }
-declare const ReactiveAttribute: ReactiveAttributeDecorator;
-interface GenerateDatasetAccessorsDecorator {
-    (attributes: {
-        name: string;
-        type?: "string" | "number" | "boolean" | "json";
-    }[]): <C extends {
-        readonly prototype: HTMLElement;
-    }>(elementCtor: C) => C;
-}
-declare const GenerateDatasetAccessors: GenerateDatasetAccessorsDecorator;
-declare function bindShadowRoot(element: HTMLElement, templateContent?: string): ShadowRoot;
+declare const AttributeProperty: AttributePropertyDecorator;
 declare function Fragment(...nodes: (Node | string)[]): DocumentFragment;
 declare function TextNode(text?: string): Node;
 declare type _IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? A : B;
@@ -51,10 +39,10 @@ declare type WritableKeys<T> = {
 }[keyof T];
 interface HTMLInit<E extends HTMLElement> {
     options?: ElementCreationOptions;
-    props?: Partial<Pick<E, WritableKeys<E>>>;
+    properties?: Partial<Pick<E, WritableKeys<E>>>;
     part?: string[];
     exportparts?: string[];
-    attrs?: {
+    attributes?: {
         [name: string]: number | string | boolean;
     };
     styles?: {
@@ -95,7 +83,7 @@ interface AttributeMutationMixin {
     attach(element: Element): void;
     detach(element: Element): void;
 }
-declare type AttributeType = "string" | "boolean" | "listitem";
+declare type AttributeType = "string" | "boolean" | "list";
 declare function areAttributesMatching(refAttributeType: AttributeType, refAttrName: string, refAttrValue: string, attrName: string, attrValue: string | null): boolean;
 declare abstract class AttributeMutationMixinBase implements AttributeMutationMixin {
     readonly attributeName: string;

@@ -1,5 +1,4 @@
-import { areAttributesMatching, AttributeMutationMixin, isElement } from "../elements/HTMLElement";
-import { forAllSubtreeElements } from "../elements/Snippets";
+import { areAttributesMatching, AttributeMutationMixin } from "../elements/Element";
 
 export { AttributeMixinsObserver };
 
@@ -27,48 +26,24 @@ class AttributeMixinsObserverBase implements AttributeMixinsObserver {
     public callback(mutationsList: MutationRecord[]) {
         mutationsList.forEach((mutation: MutationRecord) => {
             mutation.addedNodes.forEach((node: Node) => {
-                if (isElement(node)) {
-                    forAllSubtreeElements(node, (childElement: Element) => {
-                        [...childElement.attributes].forEach((attr) => {
-                            let matchingMixins = this._mixins.filter(
-                                mixin => areAttributesMatching(
-                                    mixin.attributeType, mixin.attributeName, mixin.attributeValue,
-                                    attr.name, attr.value
-                                )
-                            );
-                            matchingMixins.forEach((mixin) => {
-                                mixin.attach(childElement);
-                            });
-                        });
-                    });
+                if (node instanceof Element) {
+                    this.attachMatchingAttributeMixinsInSubtree(node);
                 }
             });
             mutation.removedNodes.forEach((node: Node) => {
-                if (isElement(node)) {
-                    forAllSubtreeElements(node, (childElement: Element) => {
-                        [...childElement.attributes].forEach((attr) => {
-                            let matchingMixins = this._mixins.filter(
-                                mixin => areAttributesMatching(
-                                    mixin.attributeType, mixin.attributeName, mixin.attributeValue,
-                                    attr.name, attr.value
-                                )
-                            );
-                            matchingMixins.forEach((mixin) => {
-                                mixin.detach(childElement);
-                            });
-                        });
-                    });
+                if (node instanceof Element) {
+                    this.detachMatchingAttributeMixinsInSubtree(node);
                 }
             });
-            if (isElement(mutation.target)) {
-                let targetElement = mutation.target;
-                let attrName = mutation.attributeName;
-                if (attrName) {
-                    let relatedMixins = this._mixins.filter(mixin => mixin.attributeName === attrName);
+            if (mutation.target instanceof Element) {
+                const targetElement = mutation.target;
+                const attributeName = mutation.attributeName;
+                if (attributeName) {
+                    const relatedMixins = this._mixins.filter(mixin => mixin.attributeName === attributeName);
                     relatedMixins.forEach((mixin) => {
                         if (areAttributesMatching(
                                 mixin.attributeType, mixin.attributeName, mixin.attributeValue,
-                                attrName!, targetElement.getAttribute(attrName!)
+                                attributeName!, targetElement.getAttribute(attributeName!)
                             )) {
                                 mixin.attach(targetElement);
                         }
@@ -91,6 +66,50 @@ class AttributeMixinsObserverBase implements AttributeMixinsObserver {
 
     public disconnect(): void {
         this._observer.disconnect();
+    }
+
+    private attachMatchingAttributeMixinsInSubtree(element: Element) {
+        Array.from(element.attributes).forEach((attr) => {
+            let matchingMixins = this._mixins.filter(
+                mixin => areAttributesMatching(
+                    mixin.attributeType, mixin.attributeName, mixin.attributeValue,
+                    attr.name, attr.value
+                )
+            );
+            matchingMixins.forEach((mixin) => {
+                mixin.attach(element);
+            });
+        });
+        let childIndex = 0;
+        while (childIndex < element.children.length) {
+            const child = element.children.item(childIndex);
+            if (child !== null) {
+                this.attachMatchingAttributeMixinsInSubtree(child);
+            }
+            childIndex++;
+        }
+    }
+
+    private detachMatchingAttributeMixinsInSubtree(element: Element) {
+        Array.from(element.attributes).forEach((attr) => {
+            let matchingMixins = this._mixins.filter(
+                mixin => areAttributesMatching(
+                    mixin.attributeType, mixin.attributeName, mixin.attributeValue,
+                    attr.name, attr.value
+                )
+            );
+            matchingMixins.forEach((mixin) => {
+                mixin.detach(element);
+            });
+        });
+        let childIndex = 0;
+        while (childIndex < element.children.length) {
+            const child = element.children.item(childIndex);
+            if (child !== null) {
+                this.detachMatchingAttributeMixinsInSubtree(child);
+            }
+            childIndex++;
+        }
     }
 }
 

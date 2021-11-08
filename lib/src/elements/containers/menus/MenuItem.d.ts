@@ -15,14 +15,12 @@ interface HTMLEMenuItemElement extends HTMLElement {
     type: EMenuItemElementType;
     disabled: boolean;
     checked: boolean;
-    value: string;
     group: HTMLEMenuItemGroupElement | null;
     parentMenu: HTMLEMenuElement | HTMLEMenuBarElement | null;
     childMenu: HTMLEMenuElement | null;
     hotkey: HotKey | null;
     command: string | null;
     commandArgs: any;
-    trigger(): void;
     connectedCallback(): void;
     attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }
@@ -36,9 +34,6 @@ declare global {
     }
     interface HTMLElementEventMap {
         "e_hotkeychange": HotKeyChangeEvent;
-        "e_trigger": Event;
-        "e_radiochangerequest": Event;
-        "e_change": Event;
     }
 }
 declare var HTMLEMenuItemElement: HTMLEMenuItemElementConstructor;

@@ -1,4 +1,4 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../HTMLElement";
+import { CustomElement, AttributeProperty, HTML } from "../Element";
 
 export { HTMLEWidthSashElement };
 
@@ -27,16 +27,15 @@ declare global {
     }
 }
 
-@RegisterCustomHTMLElement({
+@CustomElement({
     name: "e-wsash"
 })
-@GenerateAttributeAccessors([
-    {name: "controls", type: "string"},
-    {name: "growdir", type: "string"},
-])
 class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashElement {
 
+    @AttributeProperty({type: "string"})
     public controls!: string;
+
+    @AttributeProperty({type: "string"})
     public growdir!: EWidthSashDirection;
 
     private _target: HTMLElement | null;
@@ -49,35 +48,40 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
     constructor() {
         super();
         
-        bindShadowRoot(this, /*template*/`
-            <style>
-                :host {
-                    display: block;
-                    z-index: 1;
-
-                    min-width: 4px;
-                    width: 4px;
-                    max-width: 4px;
-
-                    margin-left: -2px;
-                    margin-right: -2px;
-                    
-                    background-color: rgb(0, 128, 255);
-                    cursor: ew-resize;
-
-                    transition-property: opacity;
-                    transition-delay: 0.2s;
-                    transition-duration: 0.2s;
-                    transition-timing-function: ease-out;
-                    opacity: 0;
+        this.attachShadow({mode: "open"}).append(
+            HTML("style", {
+                properties: {
+                    innerText: /*css*/`
+                        :host {
+                            display: block;
+                            z-index: 1;
+        
+                            min-width: 4px;
+                            width: 4px;
+                            max-width: 4px;
+        
+                            margin-left: -2px;
+                            margin-right: -2px;
+                            
+                            background-color: rgb(0, 128, 255);
+                            cursor: ew-resize;
+        
+                            transition-property: opacity;
+                            transition-delay: 0.2s;
+                            transition-duration: 0.2s;
+                            transition-timing-function: ease-out;
+                            opacity: 0;
+                        }
+        
+                        :host(:active),
+                        :host(:hover) {
+                            opacity: 1;
+                        }
+                    `
                 }
+            })
+        );
 
-                :host(:active),
-                :host(:hover) {
-                    opacity: 1;
-                }
-            </style>
-        `);
         this._target = null;
         this._targetStyle = null;
     }

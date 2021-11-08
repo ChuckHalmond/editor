@@ -8,6 +8,7 @@ interface HTMLEMenuBarElement extends HTMLElement {
     name: string;
     active: boolean;
     items: HTMLEMenuItemElement[];
+    readonly shadowRoot: ShadowRoot;
     readonly activeIndex: number;
     readonly activeItem: HTMLEMenuItemElement | null;
     focusItemAt(index: number, childMenu?: boolean): void;

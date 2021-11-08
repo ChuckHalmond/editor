@@ -1,4 +1,4 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../HTMLElement";
+import { CustomElement, AttributeProperty, HTML } from "../Element";
 
 export { HTMLEHeightSashElement };
 
@@ -27,16 +27,15 @@ declare global {
     }
 }
 
-@RegisterCustomHTMLElement({
+@CustomElement({
     name: "e-hsash"
 })
-@GenerateAttributeAccessors([
-    {name: "controls", type: "string"},
-    {name: "growdir", type: "string"},
-])
 class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashElement {
 
+    @AttributeProperty({type: "string"})
     public controls!: string;
+
+    @AttributeProperty({type: "string"})
     public growdir!: EHeightSashDirection;
 
     private _target: HTMLElement | null;
@@ -49,35 +48,40 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
     constructor() {
         super();
         
-        bindShadowRoot(this, /*template*/`
-            <style>
-                :host {
-                    display: block;
-                    z-index: 1;
-
-                    max-height: 4px;
-                    height: 4px;
-                    min-height: 4px;
-
-                    margin-top: -2px;
-                    margin-bottom: -2px;
-                    
-                    background-color: rgb(0, 128, 255);
-                    cursor: ns-resize;
-
-                    transition-property: opacity;
-                    transition-delay: 0.2s;
-                    transition-duration: 0.2s;
-                    transition-timing-function: ease-out;
-                    opacity: 0;
+        this.attachShadow({mode: "open"}).append(
+            HTML("style", {
+                properties: {
+                    innerText: /*css*/`
+                        :host {
+                            display: block;
+                            z-index: 1;
+        
+                            max-height: 4px;
+                            height: 4px;
+                            min-height: 4px;
+        
+                            margin-top: -2px;
+                            margin-bottom: -2px;
+                            
+                            background-color: rgb(0, 128, 255);
+                            cursor: ns-resize;
+        
+                            transition-property: opacity;
+                            transition-delay: 0.2s;
+                            transition-duration: 0.2s;
+                            transition-timing-function: ease-out;
+                            opacity: 0;
+                        }
+        
+                        :host(:active),
+                        :host(:hover) {
+                            opacity: 1;
+                        }
+                    `
                 }
-
-                :host(:active),
-                :host(:hover) {
-                    opacity: 1;
-                }
-            </style>
-        `);
+            })
+        );
+        
         this._target = null;
         this._targetStyle = null;
     }

@@ -1,7 +1,12 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
+import { CustomElement, AttributeProperty, HTML } from "../../Element";
 import { HTMLETreeItemElement } from "./TreeItem";
 
 export { HTMLETreeElement };
+
+interface HTMLETreeElementConstructor {
+    readonly prototype: HTMLETreeElement;
+    new(): HTMLETreeElement;
+}
 
 interface HTMLETreeElement extends HTMLElement {
     name: string;
@@ -12,16 +17,15 @@ interface HTMLETreeElement extends HTMLElement {
     reset(): void;
 }
 
-@RegisterCustomHTMLElement({
+@CustomElement({
     name: "e-tree"
 })
-@GenerateAttributeAccessors([
-    {name: "active", type: "boolean"},
-    {name: "name", type: "string"}
-])
 class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
 
+    @AttributeProperty({type: "boolean"})
     public active!: boolean;
+
+    @AttributeProperty({type: "string"})
     public name!: string;
     
     public items: HTMLETreeItemElement[];
@@ -29,26 +33,36 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
     private _activeItem: HTMLETreeItemElement | null;
     private _selectedItem: HTMLETreeItemElement | null;
 
+    public readonly shadowRoot!: ShadowRoot;
+
     constructor() {
         super();
         
-        bindShadowRoot(this, /*template*/`
-            <style>
-                :host {
-                    display: block;
-                    position: relative;
-                    user-select: none;
+        this.attachShadow({mode: "open"}).append(
+            HTML("style", {
+                properties: {
+                    innerText: /*css*/`
+                        :host {
+                            display: block;
+                            position: relative;
+                            user-select: none;
+                        }
+        
+                        [part~="container"] {
+                            display: flex;
+                            flex-direction: column;
+                        }
+                    `
                 }
-
-                [part~="container"] {
-                    display: flex;
-                    flex-direction: column;
-                }
-            </style>
-            <div part="container">
-                <slot></slot>
-            </div>
-        `);
+            }),
+            HTML("div", {
+                part: ["container"],
+                children: [
+                    HTML("slot")
+                ]
+            })
+        );
+        
         this.items = [];
         this._activeItem = null;
         this._selectedItem = null;
@@ -65,119 +79,120 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
     public connectedCallback() {
         this.tabIndex = this.tabIndex;
         
-        const slot = this.shadowRoot?.querySelector("slot");
-        if (slot) {
-            slot.addEventListener("slotchange", () => {
-                const items = slot.assignedElements()
-                    .filter(item => item instanceof HTMLETreeItemElement) as HTMLETreeItemElement[];
-                this.items = items;
-                items.forEach((item) => {
-                    item.parent = this;
-                    item.indent = 1;
-                });
-            });
-        }
+        this.shadowRoot.addEventListener("slotchange", this);
         
-        this.addEventListener("keydown", (event: KeyboardEvent) => {
-            switch (event.key) {
-                case "ArrowLeft":
-                    if (this.activeItem) {
-                        if (this.activeItem.expanded) {
-                            this.activeItem.toggle();
-                        }
-                        else {
-                            if (this.activeItem.parent instanceof HTMLETreeItemElement) {
-                                this.focusItem(this.activeItem.parent);
-                            }
-                        }
-                    }
-                    event.preventDefault();
-                    break;
-                case "ArrowRight":
-                    if (this.activeItem) {
-                        if (!this.activeItem.expanded) {
-                            this.activeItem.toggle();
-                        }
-                        else {
-                            if (this.activeItem.items.length > 0) {
-                                this.focusItem(this.activeItem.items[0]);
-                            }
-                        }
-                    }
-                    event.preventDefault();
-                    break;
-                case "ArrowUp":
-                    if (this.activeItem) {
-                        this.focusItem(this.activeItem.previousVisibleItem());
-                    }
-                    else if (this.items.length > 0) {
-                        this.focusItem(this.items[0]);
-                    }
-                    event.preventDefault();
-                    break;
-                case "ArrowDown":
-                    if (this.activeItem) {
-                        this.focusItem(this.activeItem.nextVisibleItem());
-                    }
-                    else if (this.items.length > 0) {
-                        this.focusItem(this.items[this.items.length - 1]);
-                    }
-                    event.preventDefault();
-                    break;
-                case "Home":
-                    if (this.items.length > 0) {
-                        this.focusItem(this.items[0]);
-                    }
-                    event.preventDefault();
-                    break;
-                case "End":
-                    if (this.items.length > 0) {
-                        this.focusItem(this.items[this.items.length - 1].deepestVisibleChildItem());
-                    }
-                    event.preventDefault();
-                    break;
-                case "Enter":
-                    if (this.activeItem) {
-                        this.selectItem(this.activeItem);
-                        this.activeItem.trigger();
-                    }
-                    break;
-                case "Escape":
-                    this.active = false;
-                    this.reset();
-                    this.focus();
-                    break;
-            }
-        });
+        this.addEventListener("click", this);
+        this.addEventListener("focusin", this);
+        this.addEventListener("focusout", this);
+        this.addEventListener("keydown", this);
+    }
 
-        this.addEventListener("click", (event: MouseEvent) => {
-            const target = event.target as Element;
-            if (target instanceof HTMLETreeItemElement) {
-                this.selectItem(target);
-                target.trigger();
-            }
-        });
-
-        this.addEventListener("focusin", (event: FocusEvent) => {
-            const target = event.target as Element;
-            if (!this.active) {
-                this.active = true;
-            }
-            const closestItem = target.closest("e-treeitem");
-            if (closestItem && this.contains(closestItem)) {
-                this.focusItem(closestItem);
-            }
-        });
-
-        this.addEventListener("focusout", (event: FocusEvent) => {
-            const relatedTarget = event.relatedTarget as Element;
-            if (!this.contains(relatedTarget)) {
-                this.active = false;
-                if (this.activeItem) {
-                    this.activeItem.active = false;
+    public handleEvent(event: Event) {
+        const target = event.target;
+        switch (event.type) {
+            case "slotchange":
+                if (target instanceof Element && target.matches("slot:not([name])")) {
+                    this.items = (event.target as HTMLSlotElement)
+                        .assignedElements()
+                        .filter(item => item instanceof HTMLETreeItemElement) as HTMLETreeItemElement[];
                 }
-            }
-        });
+                break;
+            case "click":
+                if (target instanceof HTMLETreeItemElement) {
+                    this.selectItem(target);
+                }
+                break;
+            case "focusin":
+                if (!this.active) {
+                    this.active = true;
+                }
+                if (target instanceof Element) {
+                    const closestItem = target.closest("e-treeitem");
+                    if (closestItem && this.contains(closestItem)) {
+                        this.focusItem(closestItem);
+                    }
+                }
+                break;
+            case "focusout":
+                const relatedTarget = (event as FocusEvent).relatedTarget;
+                if (relatedTarget instanceof Element && !this.contains(relatedTarget)) {
+                    this.active = false;
+                    if (this.activeItem) {
+                        this.activeItem.active = false;
+                    }
+                }
+            case "keydown":
+                switch ((event as KeyboardEvent).key) {
+                    case "ArrowLeft":
+                        if (this.activeItem) {
+                            if (this.activeItem.expanded) {
+                                this.activeItem.toggle();
+                            }
+                            else {
+                                if (this.activeItem.parent instanceof HTMLETreeItemElement) {
+                                    this.focusItem(this.activeItem.parent);
+                                }
+                            }
+                        }
+                        event.preventDefault();
+                        break;
+                    case "ArrowRight":
+                        if (this.activeItem) {
+                            if (!this.activeItem.expanded) {
+                                this.activeItem.toggle();
+                            }
+                            else {
+                                if (this.activeItem.items.length > 0) {
+                                    this.focusItem(this.activeItem.items[0]);
+                                }
+                            }
+                        }
+                        event.preventDefault();
+                        break;
+                    case "ArrowUp":
+                        if (this.activeItem) {
+                            this.focusItem(this.activeItem.previousVisibleItem());
+                        }
+                        else if (this.items.length > 0) {
+                            this.focusItem(this.items[0]);
+                        }
+                        event.preventDefault();
+                        break;
+                    case "ArrowDown":
+                        if (this.activeItem) {
+                            this.focusItem(this.activeItem.nextVisibleItem());
+                        }
+                        else if (this.items.length > 0) {
+                            this.focusItem(this.items[this.items.length - 1]);
+                        }
+                        event.preventDefault();
+                        break;
+                    case "Home":
+                        if (this.items.length > 0) {
+                            this.focusItem(this.items[0]);
+                        }
+                        event.preventDefault();
+                        break;
+                    case "End":
+                        if (this.items.length > 0) {
+                            this.focusItem(this.items[this.items.length - 1].deepestVisibleChildItem());
+                        }
+                        event.preventDefault();
+                        break;
+                    case "Enter":
+                        if (this.activeItem) {
+                            this.selectItem(this.activeItem);
+                            this.activeItem.click();
+                        }
+                        break;
+                    case "Escape":
+                        this.active = false;
+                        this.reset();
+                        this.focus();
+                        break;
+                }
+                break;
+        }
     }
 
     public focusItem(item: HTMLETreeItemElement) {
@@ -224,6 +239,8 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         return foundItem;
     }
 }
+
+var HTMLETreeElement: HTMLETreeElementConstructor = HTMLETreeElementBase;
 
 declare global {
     interface HTMLElementTagNameMap {

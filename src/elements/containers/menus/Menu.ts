@@ -1,5 +1,4 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
-import { pointIntersectsWithDOMRect } from "../../Snippets";
+import { CustomElement, AttributeProperty, HTML } from "../../Element";
 import { HTMLEMenuItemElement } from "./MenuItem";
 import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
 
@@ -11,6 +10,7 @@ interface HTMLEMenuElement extends HTMLElement {
     overflowing: boolean;
     parentItem: HTMLEMenuItemElement | null;
     items: (HTMLEMenuItemElement | HTMLEMenuItemGroupElement)[];
+    readonly shadowRoot: ShadowRoot;
     readonly activeIndex: number;
     readonly activeItem: HTMLEMenuItemElement | HTMLEMenuItemGroupElement | null;
     focusItemAt(index: number, childMenu?: boolean): void;
@@ -32,22 +32,23 @@ declare global {
     }
 }
 
-@RegisterCustomHTMLElement({
+@CustomElement({
     name: "e-menu"
 })
-@GenerateAttributeAccessors([
-    {name: "name", type: "string"},
-    {name: "expanded", type: "boolean"},
-    {name: "overflowing", type: "boolean"}
-])
 class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
 
+    @AttributeProperty({type: "string"})
     public name!: string;
+
+    @AttributeProperty({type: "boolean"})
     public expanded!: boolean;
+
+    @AttributeProperty({type: "boolean"})
     public overflowing!: boolean;
 
     public parentItem: HTMLEMenuItemElement | null;
     public items: (HTMLEMenuItemElement | HTMLEMenuItemGroupElement)[];
+    public readonly shadowRoot!: ShadowRoot;
 
     private _activeIndex: number;
 
@@ -58,35 +59,42 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     constructor() {
         super();
 
-        bindShadowRoot(this, /*template*/`
-            <style>
-                :host {
-                    display: inline-block;
-                    user-select: none;
-
-                    padding: 6px 0;
-                    background-color: white;
-                    cursor: initial;
-                    width: max-content;
-
-                    -webkit-box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
-                    -moz-box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
-                    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
+        this.attachShadow({mode: "open"}).append(
+            HTML("style", {
+                properties: {
+                    innerText: /*css*/`
+                        :host {
+                            display: inline-block;
+                            user-select: none;
+        
+                            padding: 6px 0;
+                            background-color: white;
+                            cursor: initial;
+                            width: max-content;
+        
+                            -webkit-box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
+                            -moz-box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
+                            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
+                        }
+        
+                        [part="container"] {
+                            display: flex;
+                            flex-direction: column;
+                        }
+        
+                        ::slotted(hr) {
+                            margin: 6px 0;
+                        }
+                    `
                 }
-
-                [part~="container"] {
-                    display: flex;
-                    flex-direction: column;
-                }
-
-                ::slotted(hr) {
-                    margin: 6px 0;
-                }
-            </style>
-            <div part="container">
-                <slot></slot>
-            </div>
-        `);
+            }),
+            HTML("div", {
+                part: ["container"],
+                children: [
+                    HTML("slot")
+                ]
+            })
+        );
 
         this.parentItem = null;
         this.items = [];
@@ -103,156 +111,161 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     
     public connectedCallback() {
         this.tabIndex = this.tabIndex;
+
+        this.parentItem = (
+            this.parentElement instanceof HTMLEMenuItemElement
+        ) ? this.parentElement : null;
         
-        const slot = this.shadowRoot?.querySelector("slot");
-        if (slot) {
-            slot.addEventListener("slotchange", () => {
-                const items = slot.assignedElements().filter(
-                    elem => elem instanceof HTMLEMenuItemElement || elem instanceof HTMLEMenuItemGroupElement
-                ) as (HTMLEMenuItemElement | HTMLEMenuItemGroupElement)[];
-                this.items = items;
-                items.forEach((item) => {
-                    item.parentMenu = this;
-                });
-            });
-        }
+        this.shadowRoot.addEventListener("slotchange", this);
 
-        this.addEventListener("mousedown", (event: MouseEvent) => {
-            let target = event.target as any;
-            if (target instanceof HTMLEMenuItemElement) {
-                let thisIncludesTarget = this.items.includes(target);
-                if (thisIncludesTarget) {
-                    target.trigger();
-                }
-            }
-        });
+        this.addEventListener("mousedown", this);
+        this.addEventListener("mouseover", this);
+        this.addEventListener("mouseout", this);
+        this.addEventListener("focusin", this);
+        this.addEventListener("focusout", this);
+        this.addEventListener("keydown", this);
+    }
 
-        this.addEventListener("mouseover", (event: MouseEvent) => {
-            const target = event.target as any;
-            const targetIndex = this.items.indexOf(target);
-            if (this === target) {
-                this.reset();
-                this.focus();
-            } 
-            else if (targetIndex >= 0) {
+    public handleEvent(event: Event) {
+        const target = event.target;
+        switch (event.type) {
+            case "slotchange":
+                this.items = (target as HTMLSlotElement)
+                    .assignedElements()
+                    .filter(
+                        elem => elem instanceof HTMLEMenuItemElement || elem instanceof HTMLEMenuItemGroupElement
+                    ) as (HTMLEMenuItemElement | HTMLEMenuItemGroupElement)[];
+                break;
+            case "mousedown":
                 if (target instanceof HTMLEMenuItemElement) {
-                    this.focusItemAt(targetIndex, true);
+                    if (this.items.includes(target)) {
+                        target.click();
+                    }
                 }
-                else {
-                    this._activeIndex = targetIndex;
-                }
-            }
-        });
-
-        this.addEventListener("mouseout", (event: MouseEvent) => {
-            const target = event.target as any;
-            const thisIntersectsWithMouse = pointIntersectsWithDOMRect(
-                event.clientX, event.clientY,
-                this.getBoundingClientRect()
-            );
-            if ((this === target || this.items.includes(target)) && !thisIntersectsWithMouse) {
-                this.reset();
-                this.focus();
-            }
-        });
-
-        this.addEventListener("focusin", (event: FocusEvent) => {
-            const target = event.target as any;
-            this._activeIndex = this.items.findIndex(
-                (item) => item.contains(target)
-            );
-            this.expanded = true;
-        });
-
-        this.addEventListener("focusout", (event: FocusEvent) => {
-            const newTarget = event.relatedTarget as any;
-            if (!this.contains(newTarget)) {  
-                this.reset();
-                this.expanded = false;
-            }
-        });
-
-        this.addEventListener("keydown", (event: KeyboardEvent) => {
-            switch (event.key) {
-                case "ArrowUp":
-                    this.focusItemAt((this.activeIndex <= 0) ? this.items.length - 1 : this.activeIndex - 1);
-                    if (this.activeItem instanceof HTMLEMenuItemGroupElement) {
-                        this.activeItem.focusItemAt(this.activeItem.items.length - 1);
-                    }
-                    event.stopPropagation();
-                    break;
-                case "ArrowDown":
-                    this.focusItemAt((this.activeIndex >= this.items.length - 1) ? 0 : this.activeIndex + 1);
-                    if (this.activeItem instanceof HTMLEMenuItemGroupElement) {
-                        this.activeItem.focusItemAt(0);
-                    }
-                    event.stopPropagation();
-                    break;
-                case "Home":
-                    this.focusItemAt(0);
-                    if (this.activeItem instanceof HTMLEMenuItemGroupElement) {
-                        this.activeItem.focusItemAt(0);
-                    }
-                    event.stopPropagation();
-                    break;
-                case "End":
-                    this.focusItemAt(this.items.length - 1);
-                    if (this.activeItem instanceof HTMLEMenuItemGroupElement) {
-                        this.activeItem.focusItemAt(this.activeItem.items.length - 1);
-                    }
-                    event.stopPropagation();
-                    break;
-                case "Enter":
-                    if (this.activeItem instanceof HTMLEMenuItemElement) {
-                        this.activeItem.trigger();
-                        event.stopPropagation();
-                    }
-                    break;
-                case "Escape":
-                    if (this.parentItem) {
-                        let parentGroup = this.parentItem.group;
-                        let parentMenu = parentGroup ? parentGroup.parentMenu : this.parentItem.parentMenu;
-                        if (parentMenu instanceof HTMLEMenuElement) {
-                            if (parentGroup) {
-                                parentGroup.focusItemAt(parentGroup.activeIndex);
-                            }
-                            else {
-                                parentMenu.focusItemAt(parentMenu.activeIndex);
-                            }
-                            this.reset();
-                            event.stopPropagation();
-                        }
+                break;
+            case "mouseover":
+                const targetIndex = this.items.indexOf(target as (HTMLEMenuItemElement | HTMLEMenuItemGroupElement));
+                if (this === target) {
+                    this.reset();
+                    this.focus();
+                } 
+                else if (targetIndex >= 0) {
+                    if (target instanceof HTMLEMenuItemElement) {
+                        this.focusItemAt(targetIndex, true);
                     }
                     else {
-                        document.body.focus();
+                        this._activeIndex = targetIndex;
                     }
-                    break;
-                case "ArrowLeft":
-                    if (this.parentItem) {
-                        let parentGroup = this.parentItem.group;
-                        let parentMenu = parentGroup ? parentGroup.parentMenu : this.parentItem.parentMenu;
-                        if (parentMenu instanceof HTMLEMenuElement) {
-                            if (parentGroup) {
-                                parentGroup.focusItemAt(parentGroup.activeIndex);
-                            }
-                            else {
-                                parentMenu.focusItemAt(parentMenu.activeIndex);
-                            }
-                            this.reset();
+                }
+                break;
+            case "mouseout":
+                const thisRect = this.getBoundingClientRect();
+                const thisIntersectsWithMouse = !(
+                    thisRect.left > (event as MouseEvent).clientX || 
+                    thisRect.right < (event as MouseEvent).clientX || 
+                    thisRect.top > (event as MouseEvent).clientY ||
+                    thisRect.bottom < (event as MouseEvent).clientY
+                );
+                if ((this === target || this.items.includes(target as (HTMLEMenuItemElement | HTMLEMenuItemGroupElement))) && !thisIntersectsWithMouse) {
+                    this.reset();
+                    this.focus();
+                }
+                break;
+            case "focusin":
+                this._activeIndex = this.items.findIndex(
+                    (item) => item.contains(target as (HTMLEMenuItemElement | HTMLEMenuItemGroupElement))
+                );
+                this.expanded = true;
+                break;
+            case "focusout":
+                const newTarget = (event as FocusEvent).relatedTarget;
+                if (newTarget instanceof Element && !this.contains(newTarget)) {
+                    this.reset();
+                    this.expanded = false;
+                }
+                break;
+            case "keydown":
+                switch ((event as KeyboardEvent).key) {
+                    case "ArrowUp":
+                        this.focusItemAt((this.activeIndex <= 0) ? this.items.length - 1 : this.activeIndex - 1);
+                        if (this.activeItem instanceof HTMLEMenuItemGroupElement) {
+                            this.activeItem.focusItemAt(this.activeItem.items.length - 1);
+                        }
+                        event.stopPropagation();
+                        break;
+                    case "ArrowDown":
+                        this.focusItemAt((this.activeIndex >= this.items.length - 1) ? 0 : this.activeIndex + 1);
+                        if (this.activeItem instanceof HTMLEMenuItemGroupElement) {
+                            this.activeItem.focusItemAt(0);
+                        }
+                        event.stopPropagation();
+                        break;
+                    case "Home":
+                        this.focusItemAt(0);
+                        if (this.activeItem instanceof HTMLEMenuItemGroupElement) {
+                            this.activeItem.focusItemAt(0);
+                        }
+                        event.stopPropagation();
+                        break;
+                    case "End":
+                        this.focusItemAt(this.items.length - 1);
+                        if (this.activeItem instanceof HTMLEMenuItemGroupElement) {
+                            this.activeItem.focusItemAt(this.activeItem.items.length - 1);
+                        }
+                        event.stopPropagation();
+                        break;
+                    case "Enter":
+                        if (this.activeItem instanceof HTMLEMenuItemElement) {
+                            this.activeItem.click();
                             event.stopPropagation();
                         }
-                    }
-                    break;
-                case "ArrowRight":
-                    if (this.items.includes(event.target as any)) {
-                        if (this.activeItem instanceof HTMLEMenuItemElement && this.activeItem.childMenu) {
-                            this.activeItem.childMenu.focusItemAt(0);
-                            event.stopPropagation();
+                        break;
+                    case "Escape":
+                        if (this.parentItem) {
+                            const parentGroup = this.parentItem.group;
+                            const parentMenu = parentGroup ? parentGroup.parentMenu : this.parentItem.parentMenu;
+                            if (parentMenu instanceof HTMLEMenuElement) {
+                                if (parentGroup) {
+                                    parentGroup.focusItemAt(parentGroup.activeIndex);
+                                }
+                                else {
+                                    parentMenu.focusItemAt(parentMenu.activeIndex);
+                                }
+                                this.reset();
+                                event.stopPropagation();
+                            }
                         }
-                    }
-                    break;
-            }
-        });
+                        else {
+                            document.body.focus();
+                        }
+                        break;
+                    case "ArrowLeft":
+                        if (this.parentItem) {
+                            const parentGroup = this.parentItem.group;
+                            const parentMenu = parentGroup ? parentGroup.parentMenu : this.parentItem.parentMenu;
+                            if (parentMenu instanceof HTMLEMenuElement) {
+                                if (parentGroup) {
+                                    parentGroup.focusItemAt(parentGroup.activeIndex);
+                                }
+                                else {
+                                    parentMenu.focusItemAt(parentMenu.activeIndex);
+                                }
+                                this.reset();
+                                event.stopPropagation();
+                            }
+                        }
+                        break;
+                    case "ArrowRight":
+                        if (this.items.includes(event.target as any)) {
+                            if (this.activeItem instanceof HTMLEMenuItemElement && this.activeItem.childMenu) {
+                                this.activeItem.childMenu.focusItemAt(0);
+                                event.stopPropagation();
+                            }
+                        }
+                        break;
+                }
+                break;
+        }
     }
 
     public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {

@@ -11,7 +11,6 @@ interface HTMLEMenuButtonElement extends HTMLElement {
     disabled: boolean;
     active: boolean;
     childMenu: HTMLEMenuElement | null;
-    trigger(): void;
     connectedCallback(): void;
     attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
 }

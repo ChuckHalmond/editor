@@ -1,46 +1,17 @@
-export { forAllSubtreeElements };
-export { forAllSubtreeNodes };
 export { getPropertyFromPath };
 export { setPropertyFromPath };
-export { pointIntersectsWithDOMRect };
 export { snakeToCamel };
 export { camelToSnake };
 export { trainToCamel };
 export { camelToTrain };
 export { titlize };
 
-function forAllSubtreeElements(element: Element, func: (element: Element) => void) {
-  let index = 0;
-  func(element);
-  while (index < element.children.length) {
-    let child = element.children.item(index);
-    if (child) {
-      forAllSubtreeElements(child, func);
-    }
-    index++;
-  }
-}
-
-function forAllSubtreeNodes(parent: Node & ParentNode, func: (childNode: Node & ChildNode, parentNode: Node & ParentNode) => void) {
-  let index = 0;
-  while (index < parent.childNodes.length) {
-    let child = parent.childNodes.item(index);
-    if (child) {
-      func(child, parent);
-      if (child.hasChildNodes()) {
-        forAllSubtreeNodes(child as unknown as Node & ParentNode, func);
-      }
-    }
-    index++;
-  }
-}
-
 function getPropertyFromPath(src: object, path: string): any {
   const props = path.split(".");
   let obj: {[key: string]: any} | undefined  = src;
   props.forEach((prop) => {
     if (prop.includes("[")) {
-      let index = parseInt(prop.substring(prop.indexOf("[") + 1, prop.indexOf("]")));
+      const index = parseInt(prop.substring(prop.indexOf("[") + 1, prop.indexOf("]")));
       if (Number.isNaN(index)) {
         console.error(`Wrong indexed path: ${prop}`);
       }
@@ -67,7 +38,7 @@ function setPropertyFromPath(src: object, path: string, value: any): object {
   }
   props.forEach((prop, idx) => {
     if (prop.includes("[")) {
-      let index = parseInt(prop.substring(prop.indexOf("[") + 1, prop.indexOf("]")));
+      const index = parseInt(prop.substring(prop.indexOf("[") + 1, prop.indexOf("]")));
       if (Number.isNaN(index)) {
         console.error(`Wrong indexed path: ${prop}`);
       }
@@ -98,13 +69,6 @@ function setPropertyFromPath(src: object, path: string, value: any): object {
     }
   });
   return src;
-}
-
-function pointIntersectsWithDOMRect(x: number, y: number, rect: DOMRect) {
-  return !(rect.left > x || 
-    rect.right < x || 
-    rect.top > y ||
-    rect.bottom < y);
 }
 
 function titlize(str: string) {

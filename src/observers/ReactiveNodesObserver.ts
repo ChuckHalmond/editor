@@ -1,5 +1,4 @@
-import { isParentNode, isReactiveNode, isReactiveParentNode } from "../elements/HTMLElement";
-import { forAllSubtreeNodes } from "../elements/Snippets";
+import { isReactiveNode, isReactiveParentNode } from "../elements/Element";
 
 export { ReactiveNodesObserver };
 
@@ -25,40 +24,10 @@ class ReactiveNodesObserverBase implements ReactiveNodesObserver {
     public callback(mutationsList: MutationRecord[]) {
         mutationsList.forEach((mutation: MutationRecord) => {
             mutation.addedNodes.forEach((node: Node) => {
-                if (isReactiveNode(node)) {
-                    node._reactiveNodeAttributes.addReactListener();
-                }
-                if (isReactiveParentNode(node)) {
-                    node._reactiveParentNodeAttributes.addReactListener();
-                }
-                if (isParentNode(node)) {
-                    forAllSubtreeNodes(node, (childNode) => {
-                        if (isReactiveNode(childNode)) {
-                            childNode._reactiveNodeAttributes.addReactListener();
-                        }
-                        if (isReactiveParentNode(childNode)) {
-                            childNode._reactiveParentNodeAttributes.addReactListener();
-                        }
-                    });
-                }
+                this.addReactListenersInSubtree(node);
             });
             mutation.removedNodes.forEach((node: Node) => {
-                if (isReactiveNode(node)) {
-                    node._reactiveNodeAttributes.addReactListener();
-                }
-                if (isReactiveParentNode(node)) {
-                    node._reactiveParentNodeAttributes.addReactListener();
-                }
-                if (isParentNode(node)) {
-                    forAllSubtreeNodes(node, (childNode) => {
-                        if (isReactiveNode(childNode)) {
-                            childNode._reactiveNodeAttributes.addReactListener();
-                        }
-                        if (isReactiveParentNode(childNode)) {
-                            childNode._reactiveParentNodeAttributes.addReactListener();
-                        }
-                    });
-                }
+                this.removeReactListenersInSubtree(node);
             });
         });
     }
@@ -68,10 +37,46 @@ class ReactiveNodesObserverBase implements ReactiveNodesObserver {
             childList: true,
             subtree: true
         });
+        
+        this.addReactListenersInSubtree(target);
     }
 
     public disconnect(): void {
         this._observer.disconnect();
+    }
+
+    private addReactListenersInSubtree(node: Node) {
+        if (isReactiveNode(node)) {
+            node._reactiveNodeAttributes.addReactListener();
+        }
+        if (isReactiveParentNode(node)) {
+            node._reactiveParentNodeAttributes.addReactListener();
+        }
+        let childIndex = 0;
+        while (childIndex < node.childNodes.length) {
+            const child = node.childNodes.item(childIndex);
+            if (child !== null) {
+                this.addReactListenersInSubtree(child);
+            }
+            childIndex++;
+        }
+    }
+
+    private removeReactListenersInSubtree(node: Node) {
+        if (isReactiveNode(node)) {
+            node._reactiveNodeAttributes.removeReactListener();
+        }
+        if (isReactiveParentNode(node)) {
+            node._reactiveParentNodeAttributes.removeReactListener();
+        }
+        let childIndex = 0;
+        while (childIndex < node.childNodes.length) {
+            const child = node.childNodes.item(childIndex);
+            if (child !== null) {
+                this.removeReactListenersInSubtree(child);
+            }
+            childIndex++;
+        }
     }
 }
 

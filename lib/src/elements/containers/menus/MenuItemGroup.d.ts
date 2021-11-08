@@ -9,9 +9,6 @@ interface HTMLEMenuItemGroupElementConstructor {
 interface HTMLEMenuItemGroupElement extends HTMLElement {
     name: string;
     label: string;
-    type: "list" | "grid";
-    rows: number;
-    cells: number;
     parentMenu: HTMLEMenuElement | null;
     items: HTMLEMenuItemElement[];
     readonly activeIndex: number;

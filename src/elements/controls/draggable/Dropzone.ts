@@ -1,4 +1,4 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors } from "../../HTMLElement";
+import { CustomElement, AttributeProperty, HTML } from "../../Element";
 import { HTMLEDraggableElement } from "./Draggable";
 import { HTMLEDragzoneElement } from "./Dragzone";
 
@@ -44,19 +44,20 @@ declare global {
     }
 }
 
-@RegisterCustomHTMLElement({
+@CustomElement({
     name: "e-dropzone"
 })
-@GenerateAttributeAccessors([
-    {name: "name", type: "string"},
-    {name: "dragovered", type: "string"},
-    {name: "placeholder", type: "string"},
-    {name: "multiple", type: "boolean"},
-])
 class HTMLEDropzoneElementBase extends HTMLEDragzoneElement implements HTMLEDropzoneElement {
+    @AttributeProperty({type: "string"})
     public name!: string;
+
+    @AttributeProperty({type: "string"})
     public dragovered!: DropzoneDragoveredType | null;
+
+    @AttributeProperty({type: "string"})
     public placeholder!: string;
+
+    @AttributeProperty({type: "boolean"})
     public multiple!: boolean;
 
     public droptest!: ((dropzone: HTMLEDropzoneElement, draggables: HTMLEDraggableElement[]) => boolean) | null;
@@ -68,7 +69,7 @@ class HTMLEDropzoneElementBase extends HTMLEDragzoneElement implements HTMLEDrop
     constructor() {
         super();
 
-        this.shadowRoot!.querySelector("style")!.innerHTML += /*css*/`
+        this.shadowRoot!.querySelector("style")!.append(/*css*/`
             :host {
                 border: 1px dashed gray;
             }
@@ -95,13 +96,21 @@ class HTMLEDropzoneElementBase extends HTMLEDragzoneElement implements HTMLEDrop
                 pointer-events: none;
                 user-select: none;
             }
-        `;
+        `);
 
-        this.shadowRoot!.innerHTML += /*html*/`
-            <div part="appendarea">
-                <span part="placeholder">&nbsp;</span>
-            </div>
-        `;
+        this.shadowRoot!.append(
+            HTML("div", {
+                part: ["appendarea"],
+                children: [
+                    HTML("span", {
+                        part: ["placeholder"],
+                        properties: {
+                            textContent: "&nbsp;"
+                        }
+                    })
+                ]
+            })
+        );
 
         this.droptest = null;
     }

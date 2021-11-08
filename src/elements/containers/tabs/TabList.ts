@@ -1,4 +1,4 @@
-import { RegisterCustomHTMLElement, bindShadowRoot } from "../../HTMLElement";
+import { CustomElement, HTML } from "../../Element";
 import { HTMLETabElement } from "./Tab";
 
 export { HTMLETabListElement };
@@ -19,7 +19,7 @@ declare global {
     }
 }
 
-@RegisterCustomHTMLElement({
+@CustomElement({
     name: "e-tablist"
 })
 class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement {
@@ -31,15 +31,20 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
     constructor() {
         super();
         
-        bindShadowRoot(this, /*template*/`
-            <style>
-                :host {
-                    display: block;
-                    position: relative;
+        this.attachShadow({mode: "open"}).append(
+            HTML("style", {
+                properties: {
+                    innerText: /*css*/`
+                        :host {
+                            display: block;
+                            position: relative;
+                        }
+                    `
                 }
-            </style>
-            <slot></slot>
-        `);
+            }),
+            HTML("slot")
+        );
+        
         this.tabs = [];
         this._activeIndex = 1;
     }

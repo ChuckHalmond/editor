@@ -1,7 +1,8 @@
 const path = require("path");
+const webpack = require('webpack');
 
 exports.default = {
-  entry: "./sample/main.ts",
+  entry: "./main.ts",
   devtool: "source-map",
   module: {
     rules: [
@@ -11,6 +12,11 @@ exports.default = {
       },
     ],
   },
+  plugins: [
+    new webpack.WatchIgnorePlugin({
+      paths: [/\.js$/, /\.d\.ts$/]
+    })
+  ],
   resolve: {
     extensions: [".ts", ".js"],
     modules: [

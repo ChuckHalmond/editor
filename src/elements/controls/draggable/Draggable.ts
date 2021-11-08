@@ -1,5 +1,4 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
-import { forAllSubtreeElements } from "../../Snippets";
+import { CustomElement, AttributeProperty, HTML } from "../../Element";
 
 export { HTMLEDraggableElement };
 
@@ -27,20 +26,21 @@ declare global {
     }
 }
 
-@RegisterCustomHTMLElement({
+@CustomElement({
     name: "e-draggable"
 })
-@GenerateAttributeAccessors([
-    {name: "selected", type: "boolean"},
-    {name: "dragged", type: "boolean"},
-    {name: "dragovered", type: "boolean"},
-    {name: "disabled", type: "boolean"},
-])
 class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableElement {
     
+    @AttributeProperty({type: "boolean"})
     public selected!: boolean;
+
+    @AttributeProperty({type: "boolean"})
     public dragovered!: boolean;
+
+    @AttributeProperty({type: "boolean"})
     public dragged!: boolean;
+
+    @AttributeProperty({type: "boolean"})
     public disabled!: boolean;
 
     private _referee: this | null;
@@ -49,47 +49,59 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
     constructor() {
         super();
 
-        bindShadowRoot(this, /*template*/`
-            <style>
-                :host {
-                    display: inline-block;
-                    padding: 3px 4px;
-                    cursor: pointer;
-                    white-space: nowrap;
-                    border-radius: 4px;
-                    border: 1px solid black;
-                    user-select: none;
+        this.attachShadow({mode: "open"}).append(
+            HTML("style", {
+                properties: {
+                    innerText: /*css*/`
+                        :host {
+                            display: inline-block;
+                            padding: 3px 4px;
+                            cursor: pointer;
+                            white-space: nowrap;
+                            border-radius: 4px;
+                            border: 1px solid black;
+                            user-select: none;
+                        }
+        
+                        :host([disabled]) {
+                            pointer-events: none;
+                            color: gray;
+                            border-color: gray;
+                        }
+        
+                        :host([selected]:active) {
+                            cursor: grabbing;
+                        }
+                        
+                        :host([selected]) {
+                            cursor: grab;
+                            font-weight: bold;
+                            outline: 1px auto black;
+                        }
+        
+                        :host([dragovered]) {
+                            border-style: dotted;
+                        }
+                        
+                        [part="container"] {
+                            display: flex;
+                            align-items: center;
+                        }
+                    `
                 }
+            }),
+            HTML("div", {
+                part: ["container"],
+                children: [
+                    HTML("slot", {
+                        properties: {
+                            textContent: "&nbsp;"
+                        }
+                    })
+                ]
+            })
+        );
 
-                :host([disabled]) {
-                    pointer-events: none;
-                    color: gray;
-                    border-color: gray;
-                }
-
-                :host([selected]:active) {
-                    cursor: grabbing;
-                }
-                
-                :host([selected]) {
-                    cursor: grab;
-                    font-weight: bold;
-                    outline: 1px auto black;
-                }
-
-                :host([dragovered]) {
-                    border-style: dotted;
-                }
-                
-                [part="container"] {
-                    display: flex;
-                    align-items: center;
-                }
-            </style>
-            <div part="container">
-                <slot>&nbsp;</slot>
-            </div>
-        `);
         this.references = [];
         this._referee = null;
     }
@@ -108,31 +120,13 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
             const thisRefIndex = this.referee.references.indexOf(this);
             if (thisRefIndex > -1) {
                 this.referee.references.splice(thisRefIndex, 1);
-                const refereeId = this.referee.id;
-                if (refereeId) {
-                    this.referee.references.slice(thisRefIndex).forEach((reference, index) => {
-                        forAllSubtreeElements(reference, (element) => {
-                            if (element.id) {
-                                element.id = `${element.id}-${thisRefIndex + index + 1}`;
-                            }
-                        });
-                    });
-                }
             }
         }
     }
 
     public getReference(): this {
         const reference = this.cloneNode(true) as this;
-        const referenceIdx = this.references.push(reference);
         reference._referee = this;
-        if (this.id) {
-            forAllSubtreeElements(reference, (element) => {
-                if (element.id) {
-                    element.id = `${element.id}-${referenceIdx}`;
-                }
-            });
-        }
         return reference;
     }
 }

@@ -1,4 +1,4 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
+import { CustomElement, AttributeProperty, HTML } from "../../Element";
 import { HTMLETabPanelElement } from "./TabPanel";
 
 export { ETabChangeEvent };
@@ -34,20 +34,21 @@ declare global {
     }
 }
 
-@RegisterCustomHTMLElement({
+@CustomElement({
     name: "e-tab"
 })
-@GenerateAttributeAccessors([
-    {name: "name", type: "string"},
-    {name: "active", type: "boolean"},
-    {name: "disabled", type: "boolean"},
-    {name: "controls", type: "string"},
-])
 class HTMLETabElementBase extends HTMLElement implements HTMLETabElement {
 
+    @AttributeProperty({type: "string"})
     public name!: string;
+
+    @AttributeProperty({type: "boolean"})
     public disabled!: boolean;
+
+    @AttributeProperty({type: "boolean"})
     public active!: boolean;
+
+    @AttributeProperty({type: "string"})
     public controls!: string;
 
     public panel: HTMLETabPanelElement | null;
@@ -59,35 +60,40 @@ class HTMLETabElementBase extends HTMLElement implements HTMLETabElement {
     constructor() {
         super();
 
-        bindShadowRoot(this, /*template*/`
-            <style>
-                :host {
-                    display: inline-block;
-                    position: relative;
-                    
-                    user-select: none;
-                    white-space: nowrap;
-                    padding: 2px 6px;
-                    border-left: 3px solid transparent;
-                    cursor: pointer;
+        this.attachShadow({mode: "open"}).append(
+            HTML("style", {
+                properties: {
+                    innerText: /*css*/`
+                        :host {
+                            display: inline-block;
+                            position: relative;
+                            
+                            user-select: none;
+                            white-space: nowrap;
+                            padding: 2px 6px;
+                            border-left: 3px solid transparent;
+                            cursor: pointer;
+                        }
+                        
+                        :host([disabled]) {
+                            color: grey;
+                            pointer-events: none;
+                        }
+        
+                        :host([active]) {
+                            border-left: 3px solid dimgray;
+                            background-color: whitesmoke;
+                        }
+        
+                        ::slotted(*) {
+                            pointer-events: none;
+                        }
+                    `
                 }
-                
-                :host([disabled]) {
-                    color: grey;
-                    pointer-events: none;
-                }
+            }),
+            HTML("slot")
+        );
 
-                :host([active]) {
-                    border-left: 3px solid dimgray;
-                    background-color: whitesmoke;
-                }
-
-                ::slotted(*) {
-                    pointer-events: none;
-                }
-            </style>
-            <slot></slot>
-        `);
         this.panel = null;
     }
 

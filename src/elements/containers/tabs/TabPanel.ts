@@ -1,4 +1,4 @@
-import { RegisterCustomHTMLElement, GenerateAttributeAccessors, bindShadowRoot } from "../../HTMLElement";
+import { CustomElement, AttributeProperty, HTML } from "../../Element";
 
 export { HTMLETabPanelElement };
 
@@ -11,31 +11,33 @@ interface HTMLETabPanelElement extends HTMLElement {
     name: string;
 }
 
-@RegisterCustomHTMLElement({
+@CustomElement({
     name: "e-tabpanel"
 })
-@GenerateAttributeAccessors([
-    {name: "name", type: "string"}
-])
 class HTMLETabPanelElementBase extends HTMLElement implements HTMLETabPanelElement {
 
+    @AttributeProperty({type: "string"})
     public name!: string;
 
     constructor() {
         super();
         
-        bindShadowRoot(this, /*template*/`
-            <style>
-                :host {
-                    display: block;
+        this.attachShadow({mode: "open"}).append(
+            HTML("style", {
+                properties: {
+                    innerText: /*css*/`
+                        :host {
+                            display: block;
+                        }
+        
+                        :host([hidden]) {
+                            display: none;
+                        }
+                    `
                 }
-
-                :host([hidden]) {
-                    display: none;
-                }
-            </style>
-            <slot></slot>
-        `);
+            }),
+            HTML("slot")
+        );
     }
 
     public connectedCallback(): void {
