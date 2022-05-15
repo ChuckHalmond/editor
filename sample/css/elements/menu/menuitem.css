@@ -33,8 +33,13 @@ e-menuitem::part(content) {
     pointer-events: none;
 }
 
-e-menuitem[type="submenu"]::part(content) {
-    margin-left: 22px;
+e-menuitem[type="submenu"]::part(icon) {
+    visibility: hidden;
+}
+
+e-menuitem[type="menu"]::part(icon),
+e-menuitem:not([type="submenu"])::part(arrow) {
+    display: none;
 }
 
 e-menuitem::part(icon),

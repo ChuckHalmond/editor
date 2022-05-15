@@ -75,95 +75,24 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
     #group: HTMLETreeItemGroupElement | null;
     
     static {
-        shadowTemplate = element("template");
-        shadowTemplate.content.append(
-            element("style", {
-                properties: {
-                    textContent: /*css*/`
-                        :host {
-                            display: block;
-                            user-select: none;
-                        }
-                        
-                        :host([droptarget]) {
-                            background-color: gainsboro;
-                        }
-
-                        :host([active]) [part="content"] {
-                            background-color: whitesmoke;
-                            outline: 1px solid black;
-                            outline-offset: -1px;
-                        }
-
-                        :host([selected]) [part="content"] {
-                            background-color: gainsboro;
-                        }
-
-                        [part="content"] {
-                            display: flex;
-                            line-height: 22px;
-                            padding-left: calc(var(--level) * var(--indent-width, 12px));
-                        }
-
-                        [part="content"]:hover {
-                            background-color: whitesmoke;
-                        }
-                        
-                        :host(:not([type="parent"])) ::slotted([slot="group"]),
-                        :host(:not([expanded])) ::slotted([slot="group"]) {
-                            display: none;
-                        }
-
-                        :host(:not([type="parent"])) [part="arrow"]::before {
-                            visibility: hidden;
-                        }
-
-                        [part="arrow"] {
-                            display: inline-block;
-                            width: 18px;
-                            height: 18px;
-                            margin: 1px 4px 1px 1px;
-                        }
-
-                        [part="arrow"]::before {
-                            display: inline-block;
-                            width: 18px;
-                            height: 18px;
-                            margin: 1px;
-                            content: "";
-                            mask-size: 18px 18px;
-                            -webkit-mask-size: 18px 18px;
-                            background-color: var(--arrow-color, none);
-                            filter: var(--arrow-filter, none);
-                        }
-                        
-                        :host(:not([expanded])) [part="arrow"]::before {
-                            -webkit-mask-image: var(--arrow-image-collapsed, none);
-                            mask-image: var(--arrow-image-collapsed, none);
-                        }
-                        
-                        :host([expanded]) [part="arrow"]::before {
-                            -webkit-mask-image: var(--arrow-image-expanded, none);
-                            mask-image: var(--arrow-image-expanded, none);
-                        }
-                    `
-                }
-            }),
-            element("div", {
-                part: ["content"],
-                children: [
-                    element("span", {
-                        part: ["arrow"]
-                    }),
-                    element("slot")
-                ]
-            }),
-            element("slot", {
-                properties: {
-                    name: "group"
-                }
-            })
-        );
+        shadowTemplate = element("template", {
+            content: [
+                element("div", {
+                    part: ["content"],
+                    children: [
+                        element("span", {
+                            part: ["arrow"]
+                        }),
+                        element("slot")
+                    ]
+                }),
+                element("slot", {
+                    properties: {
+                        name: "group"
+                    }
+                })
+            ]
+        });
     }
     
     constructor() {

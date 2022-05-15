@@ -68,7 +68,8 @@ class HTMLEMenuItemElementBase extends HTMLEActionElement implements HTMLEMenuIt
                         shadowTemplateIconPart,
                         element("span", {
                             part: ["label"]
-                        })
+                        }),
+                        shadowTemplateArrowPart
                     ]
                 }),
                 element("slot", {
@@ -110,7 +111,7 @@ class HTMLEMenuItemElementBase extends HTMLEActionElement implements HTMLEMenuIt
                 labelPart.textContent = newValue;   
                 break;
             }
-            case "type": {
+            /*case "type": {
                 switch (newValue) {
                     case "submenu": {
                         const {contentPart, iconPart, arrowPart} = this;
@@ -146,7 +147,7 @@ class HTMLEMenuItemElementBase extends HTMLEActionElement implements HTMLEMenuIt
                     }
                 }
                 break;
-            }
+            }*/
         }
     }
 

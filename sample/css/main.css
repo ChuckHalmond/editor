@@ -10,6 +10,8 @@
 
 @import "elements/toolbar/toolbaritem.css" layer(base);
 
+@import "elements/tree/treeitem.css" layer(base);
+
 @import "elements/select/select.css" layer(base);
 
 @import "elements/grid/gridcell.css" layer(base);
