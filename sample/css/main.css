@@ -5,6 +5,7 @@
 @import "client.css" layer(client);
 
 @import "elements/menu/menu.css" layer(base);
+@import "elements/menu/menubar.css" layer(base);
 @import "elements/menu/menuitem.css" layer(base);
 @import "elements/menu/menubutton.css" layer(base);
 

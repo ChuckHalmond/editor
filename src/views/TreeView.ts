@@ -1,3 +1,4 @@
+import { HTMLEToolBarElement } from "../..";
 import { HTMLEToolBarItemElement } from "../elements/containers/toolbars/ToolBarItem";
 import { HTMLETreeElement } from "../elements/containers/trees/Tree";
 import { HTMLETreeItemElement } from "../elements/containers/trees/TreeItem";
@@ -102,17 +103,12 @@ class TreeItemList implements TreeItem {
     }
 
     show(): void {
-        const items = this.#items;
-        items.forEach(item_i => {
-            item_i.show();
-        });
+        console.log(this.#items);
+        this.#items.forEach(item_i => item_i.show());
     }
 
     hide(): void {
-        const items = this.#items;
-        items.forEach(item_i => {
-            item_i.hide();
-        });
+        this.#items.forEach(item_i => item_i.hide());
     }
 
     display(): void {
@@ -359,22 +355,6 @@ class TreeViewBase extends View implements TreeView {
                             }
                         })
                     ].concat(
-                        (item.type == "parent") ? [
-                            element("e-treeitemgroup", {
-                                properties: {
-                                    slot: "group"
-                                },
-                                children: reactiveChildElements(item.childItems,
-                                    item => this.#renderTreeItem(item)
-                                )
-                            }),
-                            element("span", {
-                                properties: {
-                                    className: "c-badge"
-                                }
-                            })
-                        ] : []
-                    ).concat(
                         element("e-toolbar", {
                             properties: {
                                 tabIndex: 0
@@ -396,25 +376,41 @@ class TreeViewBase extends View implements TreeView {
                                 })
                             ]
                         })
+                    ).concat(
+                        (item.type == "parent") ? [
+                            element("e-treeitemgroup", {
+                                properties: {
+                                    slot: "group"
+                                },
+                                children: reactiveChildElements(item.childItems,
+                                    item => this.#renderTreeItem(item)
+                                )
+                            }),
+                            element("span", {
+                                properties: {
+                                    className: "c-badge"
+                                }
+                            })
+                        ] : []
                     )
             }),
             ["label", "childCount", "visibility"],
             (treeitem, property, oldValue, newValue) => {
                 switch (property) {
                     case "label":
-                        const label = treeitem.querySelector(".c-label");
+                        const label = treeitem.querySelector(":scope > .c-label");
                         if (label) {
                             label.textContent = newValue;
                         }
                         break;
                     case "childCount":
-                        const badge = treeitem.querySelector(".c-badge");
+                        const badge = treeitem.querySelector(":scope > .c-badge");
                         if (badge) {
                             badge.textContent = `(${newValue})`;
                         }
                         break;
                     case "visibility": {
-                        const toolbar = treeitem.querySelector("e-toolbar");
+                        const toolbar = treeitem.querySelector<HTMLEToolBarElement>(":scope > e-toolbar");
                         if (toolbar) {
                             const visibilityItem = <HTMLEToolBarItemElement>toolbar.items.namedItem("visibility");
                             if (visibilityItem) {

@@ -3,8 +3,11 @@ body {
     font-family: inherit;
 }
 
-*:focus {
-    z-index: 1;
+*:focus-visible {
+    /*outline-width: 2px;
+    outline-style: solid;
+    outline-offset: -1px;*/
+    outline: none;
 }
 
 summary {

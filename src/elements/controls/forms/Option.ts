@@ -88,11 +88,11 @@ class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
                             height: 18px;
                             margin-right: 6px;
 
-                            content: var(--icon-content, "");
-                            color: var(--icon-color, unset);
-                            background-color: var(--icon-mask-color, none);
-                            -webkit-mask-image: var(--icon-mask-image, none);
-                            mask-image: var(--icon-mask-image, none);
+                            mask-size: 18px 18px;
+                            -webkit-mask-size: 18px 18px;
+                            background-color: var(--icon-color, none);
+                            -webkit-mask-image: var(--icon-image, none);
+                            mask-image: var(--icon-image, none);
                         }
 
                         [part="label"] {

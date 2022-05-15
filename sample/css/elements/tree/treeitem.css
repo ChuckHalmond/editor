@@ -8,13 +8,12 @@ e-treeitem[droptarget] {
 }
 
 e-treeitem[active]::part(content) {
-    background-color: whitesmoke;
-    outline: 1px solid black;
+    outline: 1px solid var(--focused-item-outline-color);
     outline-offset: -1px;
 }
 
 e-treeitem[selected]::part(content) {
-    background-color: gainsboro;
+    background-color: var(--selected-item-color);
 }
 
 e-treeitem::part(content) {
@@ -23,8 +22,8 @@ e-treeitem::part(content) {
     padding-left: calc(var(--level) * var(--indent-width, 12px));
 }
 
-e-treeitem[selected]::part(content):hover {
-    background-color: whitesmoke;
+e-treeitem::part(content):hover {
+    background-color: var(--hovered-item-color);
 }
 
 e-treeitem:not([type="parent"]) [slot="group"],
@@ -56,11 +55,11 @@ e-treeitem::part(arrow)::before {
 }
 
 e-treeitem:not([expanded])::part(arrow)::before {
-    -webkit-mask-image: var(--arrow-image-collapsed, none);
-    mask-image: var(--arrow-image-collapsed, none);
+    -webkit-mask-image: var(--arrow-icon-collapsed, none);
+    mask-image: var(--arrow-icon-collapsed, none);
 }
 
 e-treeitem[expanded]::part(arrow)::before {
-    -webkit-mask-image: var(--arrow-image-expanded, none);
-    mask-image: var(--arrow-image-expanded, none);
+    -webkit-mask-image: var(--arrow-icon-expanded, none);
+    mask-image: var(--arrow-icon-expanded, none);
 }

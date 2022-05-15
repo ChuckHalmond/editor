@@ -431,24 +431,25 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
                 element_i => element_i instanceof HTMLEOptionElement
             );
         if (options.length > 0) {
-            let selectedOption: HTMLEOptionElement | undefined | null = null;
-            let {value} = this;
+            let selectedOption: HTMLEOptionElement | null = null;
+            /*let {value} = this;
             if (value) {
-                selectedOption = options.find(option => option.value == value);
+                selectedOption = options.find(option => option.value == value) ?? null;
+            }*/
+            if (selectedOption == null) {
+                selectedOption = options.find(option => option.selected) ?? null;
             }
             if (selectedOption == null) {
-                selectedOption = options.find(option => option.selected);
-            }
-            if (selectedOption == null) {
-                selectedOption = options.find(option => option.default);
+                selectedOption = options.find(option => option.default) ?? null;
             }
             if (selectedOption == null) {
                 selectedOption = this.#firstOption();
             }
+            console.log(selectedOption);
             options.forEach(option_i => {
                 option_i.selected = option_i == selectedOption
             });
-            if (selectedOption) {
+            if (selectedOption !== null) {
                 this.#setSelectedOption(selectedOption);
             }
         }

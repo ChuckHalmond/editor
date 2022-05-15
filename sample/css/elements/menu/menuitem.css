@@ -5,21 +5,14 @@ e-menuitem {
     white-space: nowrap;
 }
 
-e-menuitem:focus-within {
-    background-color: var(--focus-background-color);
-}
-
-e-menuitem[disabled] {
-    color: lightgrey;
-}
-
-e-menuitem[disabled]:focus-within {
-    background-color: whitesmoke;
+e-menuitem:is(:focus, :focus-within)::part(content) {
+    background-color: var(--focused-item-color);
 }
 
 e-menuitem:is([type="menu"], [type="submenu"]) [slot="menu"] {
     z-index: 1;
     position: absolute;
+    transform: translateY(-2px);
 }
 
 e-menuitem:is([type="menu"], [type="submenu"]):not([expanded]) [slot="menu"] {
@@ -52,6 +45,7 @@ e-menuitem::part(icon) {
     display: inline-block;
     width: 18px;
     height: 18px;
+    margin-left: 6px;
     overflow: hidden;
 }
 
@@ -63,7 +57,7 @@ e-menuitem::part(label) {
 }
 
 e-menuitem:is(:not([type]), [type="button"], [type="radio"], [type="checkbox"])[checked]::part(icon) {
-    background-color: rgba(135, 206, 250);
+    background-color: var(--activated-item-color);
 }
 
 e-menuitem:is(:not([type]), [type="button"], [type="radio"], [type="checkbox"])::part(icon)::before {

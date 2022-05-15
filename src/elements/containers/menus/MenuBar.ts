@@ -47,22 +47,6 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
-            element("style", {
-                properties: {
-                    innerText: /*css*/`
-                        :host {
-                            display: flex;
-                            flex-direction: row;
-                            width: max-content;
-                        }
-        
-                        :host(:focus) ::slotted(:hover),
-                        :host(:not(:focus-within)) ::slotted(:hover) {
-                            background-color: rgba(135, 206, 250, 0.5);
-                        }
-                    `
-                }
-            }),
             element("slot")
         );
     }

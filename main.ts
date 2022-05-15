@@ -269,13 +269,13 @@ export async function main() {
     }, {hotkey: new HotKey(Key.ARROW_UP, KeyModifier.Alt)});*/
 
 
-    editor.registerRadioAction("selectTest", (oldValue, newValue) => {
+    /*editor.registerRadioAction("selectTest", (oldValue, newValue) => {
         console.log(`Test is ${newValue}`);
     }, {value: "2", key: "test"});
 
     document.addEventListener("slotchange", (event) => {
         console.log(event);
-    });
+    });*/
     
     /*setTimeout(() => {
         const execLayoutToolBarItem = document.querySelector<HTMLEActionElement>("e-toolbaritem[name=execLayout]");

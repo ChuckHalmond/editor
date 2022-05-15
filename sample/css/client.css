@@ -11,17 +11,17 @@
 
 body {
     font-family: "Open Sans";
-    font-size: 14px;
+    font-size: 13px;
 }
 
 e-toolbaritem[name="visibility"][checked] {
     --icon-color: black;
-    --icon-image: url("/sample/assets/sharp_visibility_black_18dp.png");
+    --icon-image: url("/sample/assets/visibility_FILL1_wght400_GRAD0_opsz48.svg");
 }
 
 e-toolbaritem[name="visibility"] {
     --icon-color: black;
-    --icon-image: url("/sample/assets/sharp_visibility_off_black_18dp.png");
+    --icon-image: url("/sample/assets/visibility_off_FILL1_wght400_GRAD0_opsz48.svg");
 }
 
 e-menubutton::part(content) {
@@ -55,6 +55,11 @@ e-toolbaritem::part(label) {
     overflow: hidden;
 }*/
 
+e-menuitem,
+e-menuitem::part(icon) {
+    border-radius: 2px;
+}
+
 e-treeitem:not([active]):not([selected]) > e-treeitemgroup:hover ~ e-toolbar,
 e-treeitem:not(:hover):not([active]):not([selected]) > e-toolbar {
     display: none;
@@ -66,10 +71,37 @@ e-menuitem[type="checkbox"][checked] {
     --icon-image: url("/sample/assets/done_FILL0_wght400_GRAD0_opsz48.svg");
 }
 
-e-menuitem[type="radio"][checked]::part(icon)::before {
+e-menuitem[type="radio"][checked]::part(icon) {
     --icon-color: black;
     --icon-image: url("/sample/assets/done_FILL0_wght400_GRAD0_opsz48.svg");
 }
+
+e-menuitem[name="A1"]::part(icon) {
+    --icon-color: black;
+    --icon-image: url("/sample/assets/topic_FILL0_wght400_GRAD0_opsz48.svg");
+}
+
+e-menuitem[name="A2"]::part(icon) {
+    --icon-color: black;
+    --icon-image: url("/sample/assets/add_a_photo_FILL0_wght400_GRAD0_opsz48.svg");
+}
+
+e-menuitem[name="toggleAdvancedUser"]::part(icon) {
+    --icon-color: black;
+    --icon-image: url("/sample/assets/add_a_photo_FILL0_wght400_GRAD0_opsz48.svg");
+}
+
+e-menuitem[disabled] {
+    opacity: 0.38;
+}
+/*
+e-menuitem[disabled]::part(icon) {
+    --icon-color: lightgrey;
+}
+
+e-menuitem[disabled][checked]::part(icon) {
+    background-color: whitesmoke;
+}*/
 
 e-listitemgroup[data-default] {
     border-top: 1px solid black;

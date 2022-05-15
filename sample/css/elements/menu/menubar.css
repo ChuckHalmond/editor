@@ -1,0 +1,10 @@
+e-menubar {
+    display: flex;
+    flex-direction: row;
+    width: max-content;
+}
+
+e-menubar:focus > e-menuitem:hover,
+e-menubar:not(:focus-within) > e-menuitem:hover {
+    background-color: gainsboro;
+}

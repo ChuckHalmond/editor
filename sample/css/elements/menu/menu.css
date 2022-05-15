@@ -2,7 +2,7 @@ e-menu {
     display: flex;
     flex-direction: column;
 
-    padding: 8px 3px;
+    padding: 3px;
     background-color: white;
     width: max-content;
 
@@ -12,6 +12,10 @@ e-menu {
 
 e-menu[contextual] {
     position: absolute;
+}
+
+e-menu e-menuitem {
+    margin: 1px 0;
 }
 
 e-menu > hr {
