@@ -14,8 +14,8 @@ const getFormState = (form: HTMLFormElement) => {
     const state: FormState = {};
     elements.forEach((element) => {
         if (element instanceof HTMLInputElement) {
-            if (element.type === "radio") {
-                if (typeof state[element.name] === "undefined") {
+            if (element.type == "radio") {
+                if (typeof state[element.name] == "undefined") {
                     state[element.name] = {
                         value: null,
                         _control: element.type
@@ -28,13 +28,13 @@ const getFormState = (form: HTMLFormElement) => {
                     };
                 }
             }
-            else if (element.type === "checkbox") {
+            else if (element.type == "checkbox") {
                 state[element.name] = {
                     value: element.checked,
                     _control: element.type
                 };
             }
-            else if (element.type === "number") {
+            else if (element.type == "number") {
                 const floatValue = parseFloat(element.value);
                 state[element.name] = {
                     value: !isNaN(floatValue) ? floatValue : null,
@@ -63,24 +63,19 @@ const setFormState = (form: HTMLFormElement, state: FormState) => {
     const elements = Array.from(form.elements);
     const names = Object.keys(state);
     names.forEach((name) => {
-        const namedElements = elements.filter((element) => (element as any).name === name);
+        const namedElements = <(HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)[]>elements.filter((element) => (element as any).name == name);
         namedElements.forEach((element) => {
             const stateValue = state[name].value;
-            if (element instanceof HTMLInputElement) {
-                if (element.type === "radio") {
-                    element.checked = (stateValue !== null && element.value === stateValue.toString());
-                }
-                else if (element.type === "checkbox") {
-                    element.checked = !!stateValue;
-                }
-                else if (element.type === "number") {
-                    element.value = (stateValue !== null) ? stateValue.toString() : "";
-                }
-                else {
-                    element.value = (stateValue !== null) ? stateValue.toString() : "";
-                }
+            if (element.type == "radio") {
+                (<HTMLInputElement>element).checked = (stateValue !== null && element.value == stateValue.toString());
             }
-            else if (element instanceof HTMLSelectElement || element instanceof HTMLTextAreaElement) {
+            else if (element.type == "checkbox") {
+                (<HTMLInputElement>element).checked = !!stateValue;
+            }
+            else if (element.type == "number") {
+                element.value = (stateValue !== null) ? stateValue.toString() : "";
+            }
+            else {
                 element.value = (stateValue !== null) ? stateValue.toString() : "";
             }
         });

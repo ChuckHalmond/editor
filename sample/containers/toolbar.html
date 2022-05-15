@@ -1,0 +1,33 @@
+<e-toolbar tabindex="0">
+    <e-toolbaritemgroup label="Horizontal" tabindex="-1">
+        <e-toolbaritem label="horizontal 1" tabindex="-1" label="One"></e-toolbaritem>
+        <e-toolbaritem label="horizontal 2" tabindex="-1" label="Two"></e-toolbaritem>
+        <e-toolbaritem type="select" tabindex="-1">
+            <e-select name="selectTest" slot="select" tabindex="-1" label="Choice">
+                <e-option tabindex="-1" value="1" label="Default option" description="The first and default option" default></e-option>
+                <e-option tabindex="-1" value="2" label="Option 2" description="The second option"></e-option>
+                <e-option tabindex="-1" value="3" label="Option 3" description="The third option"></e-option>
+            </e-select>
+        </e-toolbaritem>
+        <e-toolbaritem type="menubutton" tabindex="-1">
+            <e-menubutton slot="menubutton" tabindex="-1">
+                <e-menu slot="menu" name="view-layout-menu" tabindex="-1">
+                    <e-menuitemgroup tabindex="-1">
+                        <e-menuitem tabindex="-1" name="selectTest" type="radio" label="Option 1" value="1" checked></e-menuitem>
+                        <e-menuitem tabindex="-1" name="selectTest" type="radio" label="Option 2" value="2"></e-menuitem>
+                        <e-menuitem tabindex="-1" name="selectTest" type="radio" label="Option 3" value="3"></e-menuitem>
+                    </e-menuitemgroup>
+                    <hr/>
+                    <e-menuitem name="view-layout-menuitem" type="submenu" disabled label="Layout"
+                    tabindex="-1" aria-label="Layout">
+                </e-menu>
+            </e-menubutton>
+        </e-toolbaritem>
+    </e-toolbaritemgroup>
+</e-toolbar>
+<e-toolbar tabindex="0">
+    <e-toolbaritemgroup label="Vertical" tabindex="-1">
+        <e-toolbaritem label="vertical 1" tabindex="-1"></e-toolbaritem>
+        <e-toolbaritem label="vertical 2" tabindex="-1"></e-toolbaritem>
+    </e-toolbaritemgroup>
+</e-toolbar>

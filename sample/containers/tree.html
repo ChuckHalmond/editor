@@ -1,23 +1,40 @@
 <e-tree tabindex="0">
-    <e-treeitem label="Extract" tabindex="-1">
-        <e-treeitem label="[E.1] CSVExtractor" tabindex="-1" leaf></e-treeitem>
-        <e-treeitem label="[E.2] NetezzaExtractor" tabindex="-1" leaf></e-treeitem>
-    </e-treeitem>
-    <e-treeitem label="Transform" tabindex="-1">
-        <e-treeitem tabindex="-1">
-            <span slot="label">[T.1] Loop</span>
-            <e-treeitem tabindex="-1" leaf>
-                <span slot="label">[T.1.1] Replace</span>
-            </e-treeitem>
-            <e-treeitem tabindex="-1" leaf>
-                <span slot="label">[T.1.2] Merge</span>
-            </e-treeitem>
+    <e-treeitemgroup slot="group">
+        <e-treeitem label="Extract" tabindex="-1" type="parent">
+            <e-treeitemgroup slot="group">
+                <e-treeitem label="[E.1] CSVExtractor" tabindex="-1">
+                    <e-toolbar tabindex="-1" slot="toolbar">
+                        <e-toolbaritemgroup>
+                            <e-toolbaritem title="Toggle visibility" name="visibility" type="checkbox" label="horizontal 1" tabindex="-1"></e-toolbaritem>
+                            <e-toolbaritem label="horizontal 2" tabindex="-1"></e-toolbaritem>
+                            <e-toolbaritem name="selectTest" type="select" tabindex="-1">
+                                <e-select slot="select" tabindex="-1" label="Choice">
+                                    <e-option tabindex="-1" label="Option 1" value="1" description="The first option"></e-option>
+                                    <e-option tabindex="-1" label="Option 2" value="2" description="The second option"></e-option>
+                                    <e-option tabindex="-1" label="Option 3" value="3" description="The third option"></e-option>
+                                </e-select>
+                            </e-toolbaritem>
+                        </e-toolbaritemgroup>
+                    </e-toolbar>
+                    <span slot="badge">32</span>
+                </e-treeitem>
+                <e-treeitem label="[E.2] NetezzaExtractor" tabindex="-1"></e-treeitem>
+            </e-treeitemgroup>
         </e-treeitem>
-    </e-treeitem>
-    <e-treeitem tabindex="-1">
-        <span slot="label">Load</span>
-        <e-treeitem tabindex="-1" leaf>
-            <span slot="label">[L.1] CSVExporter</span>
+        <e-treeitem label="Transform" tabindex="-1" type="parent">
+            <e-treeitemgroup slot="group">
+                <e-treeitem tabindex="-1" label="[T.1] Loop" type="parent">
+                    <e-treeitemgroup slot="group">
+                        <e-treeitem tabindex="-1" label="[T.1.1] Replace"></e-treeitem>
+                        <e-treeitem tabindex="-1" label="[T.1.2] Merge"></e-treeitem>
+                    </e-treeitemgroup>
+                </e-treeitem>
+            </e-treeitemgroup>
         </e-treeitem>
-    </e-treeitem>
+        <e-treeitem tabindex="-1" label="Load" type="parent">
+            <e-treeitemgroup slot="group">
+                <e-treeitem tabindex="-1" label="[L.1] CSVExporter"></e-treeitem>
+            </e-treeitemgroup>
+        </e-treeitem>
+    </e-treeitemgroup>
 </e-tree>

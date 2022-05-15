@@ -1,4 +1,4 @@
-import { CustomElement, AttributeProperty, HTML } from "../../Element";
+import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEDraggableElement } from "./Draggable";
 
 export { HTMLEDragzoneElement };
@@ -9,8 +9,8 @@ interface HTMLEDragzoneElementConstructor {
 }
 
 interface HTMLEDragzoneElement extends HTMLElement {
-    draggables: HTMLEDraggableElement[];
-    selectedDraggables: HTMLEDraggableElement[];
+    readonly draggables: HTMLEDraggableElement[];
+    readonly selectedDraggables: HTMLEDraggableElement[];
     disabled: boolean;
     selectDraggable(draggable: HTMLEDraggableElement): void;
     unselectDraggable(draggable: HTMLEDraggableElement): void;
@@ -29,17 +29,17 @@ declare global {
 })
 class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneElement {
 
-    @AttributeProperty({type: "boolean"})
-    public disabled!: boolean;
+    @AttributeProperty({type: Boolean})
+    disabled!: boolean;
 
-    public draggables: HTMLEDraggableElement[];
-    public selectedDraggables: HTMLEDraggableElement[];
+    #draggables: HTMLEDraggableElement[];
+    #selectedDraggables: HTMLEDraggableElement[];
 
     constructor() {
         super();
 
         this.attachShadow({mode: "open"}).append(
-            HTML("style", {
+            element("style", {
                 properties: {
                     innerText: /*css*/`
                         :host {
@@ -50,7 +50,7 @@ class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneEleme
                             pointer-events: none;
                         }
         
-                        [part~="container"] {
+                        [part="container"] {
                             position: relative;
                             display: flex;
                             flex-direction: column;
@@ -65,41 +65,52 @@ class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneEleme
                     `
                 }
             }),
-            HTML("div", {
+            element("div", {
                 part: ["container"],
                 children: [
-                    HTML("slot")
+                    element("slot")
                 ]
             })
         );
-        
-        this.draggables = [];
-        this.selectedDraggables = [];
+        this.#draggables = [];
+        this.#selectedDraggables = [];
     }
 
-    public selectDraggable(draggable: HTMLEDraggableElement): void {
-        draggable.selected = true;
+    get draggables(): HTMLEDraggableElement[] {
+        return this.#draggables;
+    }
+
+    get selectedDraggables(): HTMLEDraggableElement[] {
+        return this.#selectedDraggables;
+    }
+
+    selectDraggable(draggable: HTMLEDraggableElement): void {
         if (!this.selectedDraggables.includes(draggable)) {
             this.selectedDraggables.push(draggable);
         }
+        if (!draggable.selected) {
+            draggable.selected = true;
+        }
     }
 
-    public unselectDraggable(draggable: HTMLEDraggableElement): void {
-        let index = this.selectedDraggables.indexOf(draggable);
+    unselectDraggable(draggable: HTMLEDraggableElement): void {
+        const index = this.selectedDraggables.indexOf(draggable);
         if (index > -1) {
-            draggable.selected = false;
+            if (draggable.selected) {
+                draggable.selected = false;
+            }
             this.selectedDraggables.splice(index, 1);
         }
     }
 
-    public clearSelection(): void {
+    clearSelection(): void {
         this.selectedDraggables.forEach((draggable) => {
             draggable.selected = false;
         });
-        this.selectedDraggables = [];
+        this.#selectedDraggables = [];
     }
     
-    public connectedCallback() {
+    connectedCallback(): void {
         this.tabIndex = this.tabIndex;
 
         const slot = this.shadowRoot?.querySelector("slot");
@@ -108,7 +119,7 @@ class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneEleme
                 const draggables = slot.assignedElements().filter(
                     elem => elem instanceof HTMLEDraggableElement
                 ) as HTMLEDraggableElement[];
-                this.draggables = draggables;
+                this.#draggables = draggables;
                 this.draggables.forEach((draggable) => {
                     draggable.draggable = true;
                 });
@@ -164,7 +175,7 @@ class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneEleme
         
         this.addEventListener("mousedown", (event: MouseEvent) => {
             const target = event.target as any;
-            if (event.button === 0) {
+            if (event.button == 0) {
                 if (this.draggables.includes(target)) {
                     if (!event.shiftKey && !event.ctrlKey) {
                         if (!target.selected) {
@@ -179,13 +190,13 @@ class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneEleme
                     }
                     else if (event.shiftKey) {
                         if (this.selectedDraggables.length > 0) {
-                            let targetIndex = this.draggables.indexOf(target);
-                            let firstIndex = this.draggables.indexOf(this.selectedDraggables[0]);
-                            let direction = Math.sign(targetIndex - firstIndex);
-                            let fromIndex = (direction > 0) ? 0 : this.draggables.length - 1;
-                            let toIndex = (direction > 0) ? this.draggables.length - 1 : 0;
-                            let startRangeIndex = (direction > 0) ? firstIndex : targetIndex;
-                            let endRangeIndex = (direction > 0) ? targetIndex : firstIndex;
+                            const targetIndex = this.draggables.indexOf(target);
+                            const firstIndex = this.draggables.indexOf(this.selectedDraggables[0]);
+                            const direction = Math.sign(targetIndex - firstIndex);
+                            const fromIndex = (direction > 0) ? 0 : this.draggables.length - 1;
+                            const toIndex = (direction > 0) ? this.draggables.length - 1 : 0;
+                            const startRangeIndex = (direction > 0) ? firstIndex : targetIndex;
+                            const endRangeIndex = (direction > 0) ? targetIndex : firstIndex;
                             for (let index = fromIndex; index !== (toIndex + direction); index += direction) {
                                 (index >= startRangeIndex && index <= endRangeIndex) ? 
                                     this.selectDraggable(this.draggables[index]) :
@@ -205,7 +216,7 @@ class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneEleme
         
         this.addEventListener("mouseup", (event: MouseEvent) => {
             const target = event.target as any;
-            if (event.button === 0) {
+            if (event.button == 0) {
                 if (this.draggables.includes(target)) {
                     if (!event.shiftKey && !event.ctrlKey) {
                         this.draggables.forEach((thisDraggable) => {

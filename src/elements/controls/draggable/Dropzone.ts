@@ -1,4 +1,4 @@
-import { CustomElement, AttributeProperty, HTML } from "../../Element";
+import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEDraggableElement } from "./Draggable";
 import { HTMLEDragzoneElement } from "./Dragzone";
 
@@ -8,10 +8,10 @@ export { EDataChangeEvent };
 interface HTMLEDropzoneElementConstructor {
     readonly prototype: HTMLEDropzoneElement;
     new(): HTMLEDropzoneElement;
-    readonly observedAttributes: string[];
 }
 
 interface HTMLEDropzoneElement extends HTMLEDragzoneElement {
+    readonly shadowRoot: ShadowRoot;
     dragovered: DropzoneDragoveredType | null;
     name: string;
     multiple: boolean;
@@ -23,7 +23,7 @@ interface HTMLEDropzoneElement extends HTMLEDragzoneElement {
     removeDraggables(predicate: (draggable: HTMLEDraggableElement, index: number) => boolean): void;
 
     connectedCallback(): void;
-    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
+    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
 }
 
 type DropzoneDragoveredType = "self" | "draggable" | "appendarea";
@@ -48,23 +48,21 @@ declare global {
     name: "e-dropzone"
 })
 class HTMLEDropzoneElementBase extends HTMLEDragzoneElement implements HTMLEDropzoneElement {
-    @AttributeProperty({type: "string"})
-    public name!: string;
+    @AttributeProperty({type: String})
+    name!: string;
 
-    @AttributeProperty({type: "string"})
-    public dragovered!: DropzoneDragoveredType | null;
+    @AttributeProperty({type: String})
+    dragovered!: DropzoneDragoveredType | null;
 
-    @AttributeProperty({type: "string"})
-    public placeholder!: string;
+    @AttributeProperty({type: String, observed: true})
+    placeholder!: string;
 
-    @AttributeProperty({type: "boolean"})
-    public multiple!: boolean;
+    @AttributeProperty({type: Boolean})
+    multiple!: boolean;
 
-    public droptest!: ((dropzone: HTMLEDropzoneElement, draggables: HTMLEDraggableElement[]) => boolean) | null;
+    droptest!: ((dropzone: HTMLEDropzoneElement, draggables: HTMLEDraggableElement[]) => boolean) | null;
 
-    public static get observedAttributes(): string[] {
-        return ["placeholder"];
-    }
+    readonly shadowRoot!: ShadowRoot;
 
     constructor() {
         super();
@@ -98,11 +96,11 @@ class HTMLEDropzoneElementBase extends HTMLEDragzoneElement implements HTMLEDrop
             }
         `);
 
-        this.shadowRoot!.append(
-            HTML("div", {
+        this.shadowRoot.append(
+            element("div", {
                 part: ["appendarea"],
                 children: [
-                    HTML("span", {
+                    element("span", {
                         part: ["placeholder"],
                         properties: {
                             textContent: "&nbsp;"
@@ -114,30 +112,8 @@ class HTMLEDropzoneElementBase extends HTMLEDragzoneElement implements HTMLEDrop
 
         this.droptest = null;
     }
-
-    public selectDraggable(draggable: HTMLEDraggableElement): void {
-        draggable.selected = true;
-        if (!this.selectedDraggables.includes(draggable)) {
-            this.selectedDraggables.push(draggable);
-        }
-    }
-
-    public unselectDraggable(draggable: HTMLEDraggableElement): void {
-        let index = this.selectedDraggables.indexOf(draggable);
-        if (index > -1) {
-            draggable.selected = false;
-            this.selectedDraggables.splice(index, 1);
-        }
-    }
-
-    public clearSelection(): void {
-        this.selectedDraggables.forEach((draggable) => {
-            draggable.selected = false;
-        });
-        this.selectedDraggables = [];
-    }
     
-    public connectedCallback() {
+    connectedCallback() {
         super.connectedCallback();
         const appendAreaPart = this.shadowRoot!.querySelector<HTMLDivElement>("[part='appendarea']");
 
@@ -246,22 +222,19 @@ class HTMLEDropzoneElementBase extends HTMLEDragzoneElement implements HTMLEDrop
         });
     }
 
-    public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
-        if (newValue !== oldValue) {
-            switch (name) {
-                case "placeholder":
-                    if (oldValue !== newValue) {
-                        const placeholderPart = this.shadowRoot?.querySelector("[part~=placeholder]");
-                        if (placeholderPart) {
-                            placeholderPart.textContent = newValue;
-                        }
-                    }
-                    break;
+    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
+        switch (name) {
+            case "placeholder": {
+                const placeholderPart = this.shadowRoot.querySelector("[part='placeholder']");
+                if (placeholderPart) {
+                    placeholderPart.textContent = newValue;
+                }
+                break;
             }
         }
     }
 
-    public addDraggables(draggables: HTMLEDraggableElement[], position: number): HTMLEDraggableElement[] | null {
+    addDraggables(draggables: HTMLEDraggableElement[], position: number): HTMLEDraggableElement[] | null {
         if (draggables.length > 0) {
             let dataTransferSuccess = true;
             if (this.droptest) {
@@ -316,7 +289,7 @@ class HTMLEDropzoneElementBase extends HTMLEDragzoneElement implements HTMLEDrop
         return null;
     }
 
-    public removeDraggables(predicate: (draggable: HTMLEDraggableElement, index: number) => boolean = () => true) {
+    removeDraggables(predicate: (draggable: HTMLEDraggableElement, index: number) => boolean = () => true) {
         let toRemove = this.draggables.filter(
             (value: HTMLEDraggableElement, index: number) => {
                 return predicate(value, index);

@@ -1,19 +1,46 @@
-import { EventDispatcher } from "../events/EventDispatcher";
-import { ListModel, ObjectModel } from "../models/Model";
+import { ModelList, ModelNode } from "../models/Model";
+export { subtreeNodes };
+export { ancestorNodes };
 export { CustomElement };
+export { Collection };
+export { QueryProperty };
+export { QueryAllProperty };
 export { AttributeProperty };
-export { isReactiveNode };
-export { isReactiveParentNode };
-export { ReactiveNode };
-export { ReactiveParentNode };
-export { ReactiveChildNodes };
-export { HTML };
+export { reactiveElement };
+export { reactiveChildElements };
+export { element };
 export { Fragment };
 export { TextNode };
 export { AttributeMutationMixin };
 export { AttributeType };
 export { areAttributesMatching };
 export { AttributeMutationMixinBase };
+export { trimMultilineIndent };
+export { Stylesheet };
+interface AttributePropertyDecorator {
+    (init: {
+        type: typeof String;
+        observed?: boolean;
+        defaultValue?: string | null;
+    }): <E extends HTMLElement>(target: E, property: keyof E) => void;
+    (init: {
+        type: typeof Number;
+        observed?: boolean;
+        defaultValue?: number | null;
+    }): <E extends HTMLElement>(target: E, property: keyof E) => void;
+    (init: {
+        type: typeof Boolean;
+        observed?: boolean;
+    }): <E extends HTMLElement>(target: E, property: keyof E) => void;
+    (init: {
+        type: typeof Object;
+        observed?: boolean;
+        defaultValue?: any | null;
+    }): <E extends HTMLElement>(target: E, property: keyof E) => void;
+}
+declare const AttributeProperty: AttributePropertyDecorator;
+declare function Stylesheet(text: string): CSSStyleSheet;
+declare function trimMultilineIndent(text: string): string;
 interface CustomElementDecorator {
     (init: {
         name: string;
@@ -21,61 +48,69 @@ interface CustomElementDecorator {
     }): <C extends CustomElementConstructor>(elementCtor: C) => C;
 }
 declare const CustomElement: CustomElementDecorator;
-interface AttributePropertyDecorator {
+declare function subtreeNodes(node: Node): Generator<Node>;
+declare function ancestorNodes(node: Node): Generator<Node>;
+interface QueryPropertyDecorator {
     (init: {
-        type: "string" | "number" | "boolean" | "json";
+        selector: string;
+        withinShadowRoot?: boolean;
     }): <E extends HTMLElement>(target: E, propertyKey: keyof E) => void;
 }
-declare const AttributeProperty: AttributePropertyDecorator;
+declare const QueryProperty: QueryPropertyDecorator;
+interface QueryAllPropertyDecorator {
+    (init: {
+        selector: string;
+        withinShadowRoot?: boolean;
+    }): <E extends HTMLElement>(target: E, propertyKey: keyof E) => void;
+}
+declare const QueryAllProperty: QueryAllPropertyDecorator;
 declare function Fragment(...nodes: (Node | string)[]): DocumentFragment;
-declare function TextNode(text?: string): Node;
-declare type _IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? A : B;
+declare function TextNode(text: string): Node;
+declare type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? A : B;
 declare type WritableKeys<T> = {
-    [P in keyof T]-?: T[P] extends Function ? never : _IfEquals<{
+    [P in keyof T]-?: IfEquals<{
         [Q in P]: T[P];
     }, {
         -readonly [Q in P]: T[P];
-    }, P>;
+    }, P, never>;
 }[keyof T];
 interface HTMLInit<E extends HTMLElement> {
     options?: ElementCreationOptions;
     properties?: Partial<Pick<E, WritableKeys<E>>>;
     part?: string[];
-    exportparts?: string[];
+    exportParts?: string[];
     attributes?: {
         [name: string]: number | string | boolean;
     };
-    styles?: {
+    style?: {
         [property: string]: string | [string, string];
     };
-    dataset?: DOMStringMap;
-    children?: Node[] | NodeList | ReactiveChildNodes;
-    listeners?: {
+    dataset?: {
+        [property: string]: string | number | boolean;
+    };
+    children?: (Node | string)[] | NodeList | ReactiveChildElements;
+    eventListeners?: {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined];
     };
 }
-declare function HTML<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLInit<E>): E;
-declare function HTML(tagName: string, init?: HTMLInit<HTMLElement>): HTMLElement;
-declare type ReactiveNode = Node & {
-    _reactiveNodeAttributes: {
-        addReactListener: () => void;
-        removeReactListener: () => void;
-    };
-};
-declare type ReactiveParentNode = Node & {
-    _reactiveParentNodeAttributes: {
-        addReactListener: () => void;
-        removeReactListener: () => void;
-    };
-};
-declare function isReactiveNode(node: Node): node is ReactiveNode;
-declare function isReactiveParentNode(node: Node): node is ReactiveParentNode;
-declare function ReactiveNode<Data extends object, N extends Node>(list: ListModel<Data>, node: N, react: (node: N, addedItems: Data[], removedItems: Data[], index: number) => void): N;
-declare function ReactiveNode<Model extends ObjectModel, N extends Node>(object: Model, node: N, react: <K extends Exclude<keyof Model, keyof EventDispatcher>>(node: N, property: K, oldValue: Model[K], newValue: Model[K]) => void): N;
-interface ReactiveChildNodes {
+interface HTMLInitMap {
+    "template": HTMLTemplateInit;
+}
+interface HTMLTemplateInit extends HTMLInit<HTMLTemplateElement> {
+    content?: (Node | string)[] | NodeList;
+}
+declare function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLInitMap>(tagName: K, init?: HTMLInitMap[K]): E;
+declare function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLInit<E>): E;
+declare function element(tagName: string, init?: HTMLInit<HTMLElement>): HTMLElement;
+declare function reactiveElement<M extends ModelNode, E extends Element, K extends string>(model: M, element: E, properties: K[], react: (element: E, property: K, oldValue: any, newValue: any) => void): E;
+interface ReactiveChildElements {
     (parent: Node & ParentNode): (Node | string)[];
 }
-declare function ReactiveChildNodes<Item extends any>(list: ListModel<Item>, map: (item: Item) => Node | string, placeholder?: Node): ReactiveChildNodes;
+declare function reactiveChildElements<Model extends ModelNode>(list: ModelList<Model>, mapping: (item: Model) => Element, placeholder?: Element): ReactiveChildElements;
+interface Collection<E extends Element = Element> {
+    item(index: number): E | null;
+    namedItem(name: string): E | null;
+}
 interface AttributeMutationMixin {
     readonly attributeName: string;
     readonly attributeValue: string;
@@ -84,12 +119,12 @@ interface AttributeMutationMixin {
     detach(element: Element): void;
 }
 declare type AttributeType = "string" | "boolean" | "list";
-declare function areAttributesMatching(refAttributeType: AttributeType, refAttrName: string, refAttrValue: string, attrName: string, attrValue: string | null): boolean;
-declare abstract class AttributeMutationMixinBase implements AttributeMutationMixin {
+declare function areAttributesMatching(referenceAttributeType: AttributeType, referenceAttributeName: string, referenceAttributeValue: string, attributeName: string, attributeValue: string | null): boolean;
+declare class AttributeMutationMixinBase implements AttributeMutationMixin {
     readonly attributeName: string;
     readonly attributeValue: string;
     readonly attributeType: AttributeType;
     constructor(attributeName: string, attributeType?: AttributeType, attributeValue?: string);
-    abstract attach(element: Element): void;
-    abstract detach(element: Element): void;
+    attach(): void;
+    detach(): void;
 }

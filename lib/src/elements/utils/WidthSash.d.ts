@@ -1,16 +1,22 @@
 export { HTMLEWidthSashElement };
-declare type EWidthSashDirection = "left" | "right";
+interface HTMLEWidthSashElementConstructor {
+    readonly prototype: HTMLEWidthSashElement;
+    new (): HTMLEWidthSashElement;
+}
 interface HTMLEWidthSashElement extends HTMLElement {
+    readonly shadowRoot: ShadowRoot;
+    readonly target: HTMLElement | null;
     controls: string;
-    growdir: EWidthSashDirection;
-    connectedCallback(): void;
-    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
+    growdir: "right" | "left";
+    max: boolean;
+    setWidth(width: number): void;
 }
 declare global {
     interface HTMLElementTagNameMap {
         "e-wsash": HTMLEWidthSashElement;
     }
     interface HTMLElementEventMap {
-        "e_resize": Event;
+        "resize": Event;
     }
 }
+declare var HTMLEWidthSashElement: HTMLEWidthSashElementConstructor;

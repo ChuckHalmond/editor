@@ -1,0 +1,38 @@
+input, select, button,
+body {
+    font-family: inherit;
+}
+
+summary {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+summary {
+    padding-left: var(--indent-width);
+}
+
+summary::before {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    color: black;
+    text-align: center;
+    margin-right: 12px;
+}
+
+details:not([open]) summary::before {
+    content: var(--collapsed-symbol);
+}
+            
+details[open] summary::before {
+    content: var(--expanded-symbol);
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+}

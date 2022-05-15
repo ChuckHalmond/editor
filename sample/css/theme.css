@@ -1,0 +1,13 @@
+:root {
+    --font-color: black;
+    --focus-background-color: rgba(135, 206, 250, 0.5);
+
+    --icon-size: 18px;
+    --line-height: 18px;
+
+    --menu-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 3px;
+
+    --arrow-color: var(--font-color);
+    --arrow-image-collapsed: url("/sample/assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg");
+    --arrow-image-expanded: url("/sample/assets/arrow_drop_down_FILL0_wght400_GRAD0_opsz48.svg");
+}

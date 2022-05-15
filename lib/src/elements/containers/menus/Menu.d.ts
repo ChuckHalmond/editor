@@ -1,25 +1,21 @@
 import { HTMLEMenuItemElement } from "./MenuItem";
+import { HTMLEMenuItemCollection } from "./MenuItemCollection";
 import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
 export { HTMLEMenuElement };
+export { EMenu };
 interface HTMLEMenuElement extends HTMLElement {
-    name: string;
-    expanded: boolean;
-    overflowing: boolean;
-    parentItem: HTMLEMenuItemElement | null;
-    items: (HTMLEMenuItemElement | HTMLEMenuItemGroupElement)[];
     readonly shadowRoot: ShadowRoot;
+    readonly items: HTMLEMenuItemCollection;
+    readonly activeItem: HTMLEMenuItemElement | null;
     readonly activeIndex: number;
-    readonly activeItem: HTMLEMenuItemElement | HTMLEMenuItemGroupElement | null;
-    focusItemAt(index: number, childMenu?: boolean): void;
-    reset(): void;
-    findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null;
-    connectedCallback(): void;
-    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
+    name: string;
+    contextual: boolean;
+    contextX: number;
+    contextY: number;
 }
 interface HTMLEMenuElementConstructor {
     readonly prototype: HTMLEMenuElement;
     new (): HTMLEMenuElement;
-    readonly observedAttributes: string[];
 }
 declare global {
     interface HTMLElementTagNameMap {
@@ -27,3 +23,11 @@ declare global {
     }
 }
 declare var HTMLEMenuElement: HTMLEMenuElementConstructor;
+interface EMenuConstructor {
+    readonly prototype: HTMLEMenuElement;
+    new (init: {
+        name?: string;
+        children?: (HTMLEMenuItemElement | HTMLEMenuItemGroupElement | HTMLHRElement)[];
+    }): HTMLEMenuElement;
+}
+declare var EMenu: EMenuConstructor;

@@ -1,16 +1,14 @@
-export interface HTMLView extends HTMLElement {
-    readonly shadowRoot: ShadowRoot;
-    render(): HTMLElement;
+import { ModelObject } from "../models/Model";
+export { View };
+interface View extends HTMLElement {
+    readonly model: ModelObject | null;
+    setModel(model: ModelObject): void;
+    renderShadow(): Node | undefined;
+    renderLight(): Node | undefined;
     refresh(): void;
 }
-export interface ViewConstructor {
-    readonly prototype: HTMLView;
-    readonly styles: string | undefined;
+interface ViewConstructor {
+    readonly prototype: View;
+    new (): View;
 }
-export declare abstract class HTMLViewBase extends HTMLElement implements HTMLView {
-    readonly shadowRoot: ShadowRoot;
-    constructor();
-    static styles: string | undefined;
-    abstract render(): HTMLElement;
-    refresh(): void;
-}
+declare var View: ViewConstructor;

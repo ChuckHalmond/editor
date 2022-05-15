@@ -1,36 +1,28 @@
-import { HTMLETreeElement } from "./Tree";
+import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
 export { HTMLETreeItemElement };
 interface HTMLETreeItemElementConstructor {
     readonly prototype: HTMLETreeItemElement;
     new (): HTMLETreeItemElement;
-    readonly observedAttributes: string[];
 }
 interface HTMLETreeItemElement extends HTMLElement {
+    readonly shadowRoot: ShadowRoot;
+    readonly group: HTMLETreeItemGroupElement | null;
     name: string;
+    posinset: number;
     label: string;
+    droptarget: boolean;
     expanded: boolean;
-    indent: number;
     selected: boolean;
     active: boolean;
-    leaf: boolean;
-    shadowRoot: ShadowRoot;
-    items: HTMLETreeItemElement[];
-    parent: HTMLETreeItemElement | HTMLETreeElement | null;
-    deepestVisibleChildItem(): HTMLETreeItemElement;
-    previousVisibleItem(): HTMLETreeItemElement;
-    nextVisibleItem(): HTMLETreeItemElement;
-    nearestParentItem(): HTMLETreeItemElement;
-    toggle(): void;
-    findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null;
+    level: number;
+    type: "leaf" | "parent";
+    toggle(force?: boolean): void;
     connectedCallback(): void;
-    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
+    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
 }
 declare global {
     interface HTMLElementTagNameMap {
         "e-treeitem": HTMLETreeItemElement;
-    }
-    interface HTMLElementEventMap {
-        "e_toggle": Event;
     }
 }
 declare var HTMLETreeItemElement: HTMLETreeItemElementConstructor;

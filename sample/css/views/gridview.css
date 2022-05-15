@@ -1,0 +1,59 @@
+e-grid[selectby="row"] e-gridbody e-gridcell:is(:hover, [selected], [active]),
+e-grid[selectby="cell"] e-gridbody e-gridrow:is(:hover, [selected], [active]),
+e-grid e-gridhead e-gridrow:is(:hover, [selected], [active]) {
+    background: revert;
+}
+
+e-gridrow[hidden] {
+    display: none;
+}
+
+e-gridcell {
+    padding-left: 4px;
+}
+
+e-gridbody e-gridcell {
+    max-width: 0;
+
+    overflow: clip;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+e-gridcell .gridcell-content {
+    overflow: clip;
+}
+
+e-gridhead .gridcell-content {
+    display: flex;
+}
+
+.gridcell-label {
+    flex: 1 1 0;
+    overflow: clip;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.gridcell-content > e-wsash {
+    flex: 0 0 auto;
+    cursor: col-resize;
+}
+
+e-gridhead e-gridcell {
+    border-right: 1px solid lightgrey;
+}
+
+.gridcell-content > e-toolbar {
+    flex: 0 1 auto;
+    overflow: clip;
+}
+
+e-gridhead e-gridcell {
+    min-width: 64px;
+}
+
+e-menubutton::part(icon) {
+    --icon-color: black;
+    --icon-image: url("/sample/assets/filter_alt_FILL0_wght400_GRAD0_opsz48.svg");
+}

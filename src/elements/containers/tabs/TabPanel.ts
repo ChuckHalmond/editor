@@ -1,4 +1,4 @@
-import { CustomElement, AttributeProperty, HTML } from "../../Element";
+import { CustomElement, AttributeProperty, element } from "../../Element";
 
 export { HTMLETabPanelElement };
 
@@ -16,14 +16,14 @@ interface HTMLETabPanelElement extends HTMLElement {
 })
 class HTMLETabPanelElementBase extends HTMLElement implements HTMLETabPanelElement {
 
-    @AttributeProperty({type: "string"})
-    public name!: string;
+    @AttributeProperty({type: String})
+    name!: string;
 
     constructor() {
         super();
         
         this.attachShadow({mode: "open"}).append(
-            HTML("style", {
+            element("style", {
                 properties: {
                     innerText: /*css*/`
                         :host {
@@ -36,12 +36,8 @@ class HTMLETabPanelElementBase extends HTMLElement implements HTMLETabPanelEleme
                     `
                 }
             }),
-            HTML("slot")
+            element("slot")
         );
-    }
-
-    public connectedCallback(): void {
-        this.tabIndex = this.tabIndex;
     }
 }
 

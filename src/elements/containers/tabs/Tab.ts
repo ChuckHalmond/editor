@@ -1,4 +1,4 @@
-import { CustomElement, AttributeProperty, HTML } from "../../Element";
+import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLETabPanelElement } from "./TabPanel";
 
 export { ETabChangeEvent };
@@ -7,7 +7,6 @@ export { HTMLETabElement };
 interface HTMLETabElementConstructor {
     readonly prototype: HTMLETabElement;
     new(): HTMLETabElement;
-    readonly observedAttributes: string[];
 }
 
 interface HTMLETabElement extends HTMLElement {
@@ -17,7 +16,7 @@ interface HTMLETabElement extends HTMLElement {
     controls: string;
     panel: HTMLETabPanelElement | null;
     connectedCallback(): void;
-    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
+    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
 }
 
 type ETabChangeEvent = CustomEvent<{
@@ -39,92 +38,81 @@ declare global {
 })
 class HTMLETabElementBase extends HTMLElement implements HTMLETabElement {
 
-    @AttributeProperty({type: "string"})
-    public name!: string;
+    @AttributeProperty({type: String})
+    name!: string;
 
-    @AttributeProperty({type: "boolean"})
-    public disabled!: boolean;
+    @AttributeProperty({type: Boolean})
+    disabled!: boolean;
 
-    @AttributeProperty({type: "boolean"})
-    public active!: boolean;
+    @AttributeProperty({type: Boolean, observed: true})
+    active!: boolean;
 
-    @AttributeProperty({type: "string"})
-    public controls!: string;
+    @AttributeProperty({type: String, observed: true})
+    controls!: string;
 
-    public panel: HTMLETabPanelElement | null;
-
-    public static get observedAttributes(): string[] {
-        return ["active", "controls"];
-    }
+    #panel: HTMLETabPanelElement | null;
 
     constructor() {
         super();
 
         this.attachShadow({mode: "open"}).append(
-            HTML("style", {
+            element("style", {
                 properties: {
                     innerText: /*css*/`
                         :host {
                             display: inline-block;
-                            position: relative;
                             
                             user-select: none;
                             white-space: nowrap;
+
                             padding: 2px 6px;
-                            border-left: 3px solid transparent;
                             cursor: pointer;
                         }
                         
                         :host([disabled]) {
-                            color: grey;
+                            color: lightgray;
                             pointer-events: none;
                         }
         
                         :host([active]) {
-                            border-left: 3px solid dimgray;
-                            background-color: whitesmoke;
-                        }
-        
-                        ::slotted(*) {
-                            pointer-events: none;
+                            background-color: lightgray;
                         }
                     `
                 }
             }),
-            HTML("slot")
+            element("slot")
         );
-
-        this.panel = null;
+        this.#panel = null;
     }
 
-    public connectedCallback(): void {
-        this.tabIndex = this.tabIndex;
+    get panel(): HTMLETabPanelElement | null {
+        return this.#panel;
+    }
 
+    connectedCallback(): void {
         const panel = document.getElementById(this.controls);
-        if (panel !== this.panel && panel instanceof HTMLETabPanelElement) {
-            this.panel = panel;
+        if (panel !== this.#panel && panel instanceof HTMLETabPanelElement) {
+            this.#panel = panel;
         }
-        if (this.panel)  {
-            this.panel.hidden = !this.active;
+        if (panel)  {
+            panel.hidden = !this.active;
         }
     }
     
-    public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
-        if (newValue !== oldValue) {
-            switch (name) {
-                case "active":
-                    if (this.active) {
-                        this.dispatchEvent(new CustomEvent("e_tabchange", {detail: {tab: this}, bubbles: true}));
-                    }
-                    const panel = document.getElementById(this.controls);
-                    if (panel !== this.panel && panel instanceof HTMLETabPanelElement) {
-                        this.panel = panel;
-                    }
-                    if (this.panel)  {
-                        this.panel.hidden = !this.active;
-                    }
-                    break;
-            }
+    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
+        switch (name) {
+            case "active":
+                if (this.active) {
+                    this.dispatchEvent(new CustomEvent("e_tabchange", {detail: {tab: this}, bubbles: true}));
+                }
+                const panel = document.getElementById(this.controls);
+                if (panel !== this.panel && panel instanceof HTMLETabPanelElement) {
+                    this.#panel = panel;
+                }
+                if (panel)  {
+                    panel.hidden = !this.active;
+                }
+                break;
         }
     }
 }

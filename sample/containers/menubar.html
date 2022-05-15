@@ -1,30 +1,119 @@
+<e-menu role="menu" name="view-layout-menu" tabindex="-1">
+    <e-menuitemgroup>
+        <e-menuitem name="toggleAdvancedUser" role="menuitem" type="checkbox" label="Advanced User" tabindex="-1" disabled></e-menuitem>
+        <e-menuitem name="toggleAdvancedUser" role="menuitem" type="checkbox" label="Advanced User" tabindex="-1"></e-menuitem>
+    </e-menuitemgroup>
+    <hr/>
+    <e-menuitemgroup>
+        <e-menuitem name="setLayout" role="menuitem" type="radio" value="standard" label="Standard" tabindex="-1"></e-menuitem>
+        <e-menuitem name="setLayout" role="menuitem" type="radio" label="Standard" tabindex="-1" value="standard"></e-menuitem>
+        <e-menuitem name="setLayout" role="menuitem" type="radio" label="Other" tabindex="-1" value="other"></e-menuitem>
+    </e-menuitemgroup>
+    <hr/>
+    <e-menuitemgroup>
+        <e-menuitem name="view-layout-menuitem" type="submenu" label="Layout" tabindex="-1">
+    </e-menuitemgroup>
+</e-menu>
 <e-menubar tabindex="0">
-    <e-menuitem name="file-menu" type="menu" label="File" tabindex="-1" aria-label="File">
-        <e-menu slot="menu" tabindex="-1">
-                <e-menuitem id="file-import-menu-button" name="file-import-menu-button" type="button" label="Import file"
-                    tabindex="-1" aria-label="Import file"></e-menuitem>
-                <e-menuitem id="file-export-menu-button" name="file-export-menu-button" type="button" label="Export file"
-                tabindex="-1" aria-label="Export file"></e-menuitem>
+    <e-menuitem name="A" type="menu" label="A" tabindex="-1">
+        <e-menu name="A" slot="menu" tabindex="-1">
+            <e-menuitemgroup>
+                <e-menuitem name="A1" type="checkbox" label="A1" tabindex="-1"></e-menuitem>
+                <e-menuitem name="A2" type="checkbox" label="A2" tabindex="-1"></e-menuitem>
+            </e-menuitemgroup>
+            <hr/>
+            <e-menuitemgroup>
+                <e-menuitem name="B" type="submenu" label="B" tabindex="-1">
+                    <e-menu slot="menu" name="B" tabindex="-1">
+                        <e-menuitemgroup>
+                            <e-menuitem name="B1" type="radio" label="B1" tabindex="-1"></e-menuitem>
+                            <e-menuitem name="B2" type="radio" label="B2" tabindex="-1"></e-menuitem>
+                            <e-menuitem name="B3" type="radio" label="B3" tabindex="-1"></e-menuitem>
+                        </e-menuitemgroup>
+                        <hr/>
+                        <e-menuitemgroup>
+                            <e-menuitem name="C" type="submenu" label="C" tabindex="-1">
+                                <e-menu slot="menu" name="C" tabindex="-1">
+                                    <e-menuitemgroup>
+                                        <e-menuitem name="C1" type="radio" label="C1" tabindex="-1"></e-menuitem>
+                                        <e-menuitem name="C2" type="radio" label="C2" tabindex="-1"></e-menuitem>
+                                        <e-menuitem name="C3" type="radio" label="C3" tabindex="-1"></e-menuitem>
+                                    </e-menuitemgroup>
+                                    <hr/>
+                                    <e-menuitemgroup>
+                                        <e-menuitem name="D" type="submenu" label="D" tabindex="-1">
+                                    </e-menuitemgroup>
+                                </e-menu>
+                            </e-menuitem>
+                        </e-menuitemgroup>
+                    </e-menu>
+                </e-menuitem>
+                <e-menuitem name="E" type="submenu" label="E" tabindex="-1">
+                    <e-menu slot="menu" name="E" tabindex="-1">
+                        <e-menuitemgroup>
+                            <e-menuitem name="E1" type="radio" label="E1" tabindex="-1"></e-menuitem>
+                            <e-menuitem name="E2" type="radio" label="E2" tabindex="-1"></e-menuitem>
+                            <e-menuitem name="E3" type="radio" label="E3" tabindex="-1"></e-menuitem>
+                        </e-menuitemgroup>
+                    </e-menu>
+                </e-menuitem>
+            </e-menuitemgroup>
         </e-menu>
     </e-menuitem>
-    <e-menuitem name="view-menu" type="menu" label="Preferences" tabindex="-1" aria-label="Preferences">
-        <e-menu slot="menu" tabindex="-1">
-            <e-menuitem name="view-boolean-menuitem" type="checkbox" label="Advanced User"
-            tabindex="-1" aria-label="Advanced User"></e-menuitem>
-            <e-menuitem name="view-layout-menuitem" type="submenu" label="Layout"
-            tabindex="-1" aria-label="Layout">
-                <e-menu slot="menu" name="view-layout-menu">
-                    <e-menuitemgroup>
-                        <e-menuitem name="view-layout-standard-menuitem" type="radio" label="Standard"
-                        tabindex="-1" aria-label="Standard" checked></e-menuitem>
-                        <e-menuitem name="view-layout-standard-menuitem" type="radio" label="Other"
-                        tabindex="-1" aria-label="Other"></e-menuitem>
-                    </e-menuitemgroup>
-                    <hr/>
-                    <e-menuitem name="view-layout-menuitem" type="submenu" disabled label="Layout"
-                    tabindex="-1" aria-label="Layout">
-                </e-menu>
-            </e-menuitem>
+    <e-menuitem name="A" type="menu" label="A" tabindex="-1">
+        <e-menu name="A" slot="menu" tabindex="-1">
+            <e-menuitemgroup>
+                <e-menuitem name="A1" type="checkbox" label="A1" tabindex="-1"></e-menuitem>
+                <e-menuitem name="A2" type="button" label="A2" tabindex="-1"></e-menuitem>
+                <e-menuitem name="A3" type="button" label="A3" tabindex="-1"></e-menuitem>
+            </e-menuitemgroup>
+            <hr/>
+            <e-menuitemgroup>
+                <e-menuitem name="B" type="submenu" label="B" tabindex="-1">
+                    <e-menu slot="menu" name="B" tabindex="-1">
+                        <e-menuitemgroup>
+                            <e-menuitem name="B1" type="radio" label="B1" tabindex="-1"></e-menuitem>
+                            <e-menuitem name="B2" type="radio" label="B2" tabindex="-1"></e-menuitem>
+                            <e-menuitem name="B3" type="radio" label="B3" tabindex="-1"></e-menuitem>
+                        </e-menuitemgroup>
+                        <hr/>
+                        <e-menuitemgroup>
+                            <e-menuitem name="C" type="submenu" label="C" tabindex="-1">
+                                <e-menu slot="menu" name="C" tabindex="-1">
+                                    <e-menuitemgroup>
+                                        <e-menuitem name="C1" type="radio" label="C1" tabindex="-1"></e-menuitem>
+                                        <e-menuitem name="C2" type="radio" label="C2" tabindex="-1"></e-menuitem>
+                                        <e-menuitem name="C3" type="radio" label="C3" tabindex="-1"></e-menuitem>
+                                    </e-menuitemgroup>
+                                    <hr/>
+                                    <e-menuitemgroup>
+                                        <e-menuitem name="D" type="submenu" label="D" tabindex="-1">
+                                    </e-menuitemgroup>
+                                </e-menu>
+                            </e-menuitem>
+                        </e-menuitemgroup>
+                    </e-menu>
+                </e-menuitem>
+                <e-menuitem name="E" type="submenu" label="E" tabindex="-1">
+                    <e-menu slot="menu" name="E" tabindex="-1">
+                        <e-menuitemgroup>
+                            <e-menuitem name="E1" type="radio" label="E1" tabindex="-1"></e-menuitem>
+                            <e-menuitem name="E2" type="radio" label="E2" tabindex="-1"></e-menuitem>
+                            <e-menuitem name="E3" type="radio" label="E3" tabindex="-1"></e-menuitem>
+                        </e-menuitemgroup>
+                    </e-menu>
+                </e-menuitem>
+            </e-menuitemgroup>
         </e-menu>
     </e-menuitem>
 </e-menubar>
+<e-menubutton tabindex="-1">
+    <e-menu slot="menu" name="view-layout-menu" tabindex="-1">
+        <e-menuitemgroup tabindex="-1">
+            <e-menuitem name="view-layout-standard-menuitem" type="radio" label="Standard" checked tabindex="-1"></e-menuitem>
+            <e-menuitem name="view-layout-other-menuitem" type="radio" label="Other" tabindex="-1"></e-menuitem>
+        </e-menuitemgroup>
+        <hr/>
+        <e-menuitem name="view-layout-menuitem" type="submenu" disabled label="Layout" tabindex="-1">
+    </e-menu>
+</e-menubutton>

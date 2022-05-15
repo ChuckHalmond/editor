@@ -1,0 +1,23 @@
+e-gridcell {
+    display: table-cell;
+    user-select: none;
+}
+
+e-gridcell[droptarget] {
+    background-color: gainsboro;
+}
+
+e-gridcell:hover,
+e-gridcell:focus-within {
+    background-color: var(--focus-background-color);
+}
+
+e-gridcell[active] {
+    background-color: var(--focus-background-color);
+    outline: 1px solid black;
+    outline-offset: -1px;
+}
+
+e-gridcell[selected] {
+    background-color: gainsboro;
+}

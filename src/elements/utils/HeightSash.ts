@@ -1,60 +1,61 @@
-import { CustomElement, AttributeProperty, HTML } from "../Element";
+import { CustomElement, AttributeProperty, element } from "../Element";
 
 export { HTMLEHeightSashElement };
-
-type EHeightSashDirection = "top" | "bottom";
 
 interface HTMLEHeightSashElementConstructor {
     readonly prototype: HTMLEHeightSashElement;
     new(): HTMLEHeightSashElement;
-    readonly observedAttributes: string[];
 }
 
 interface HTMLEHeightSashElement extends HTMLElement {
+    readonly shadowRoot: ShadowRoot;
+    readonly target: HTMLElement | null;
     controls: string;
-    growdir: EHeightSashDirection;
-    connectedCallback(): void;
-    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
+    growdir: "top" | "bottom";
 }
 
 declare global {
     interface HTMLElementTagNameMap {
         "e-hsash": HTMLEHeightSashElement;
     }
-
     interface HTMLElementEventMap {
-        "e_resize": Event;
+        "resize": Event;
     }
 }
+
+var shadowTemplate: HTMLTemplateElement;
 
 @CustomElement({
     name: "e-hsash"
 })
 class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashElement {
 
-    @AttributeProperty({type: "string"})
-    public controls!: string;
+    readonly shadowRoot!: ShadowRoot;
 
-    @AttributeProperty({type: "string"})
-    public growdir!: EHeightSashDirection;
-
-    private _target: HTMLElement | null;
-    private _targetStyle: CSSStyleDeclaration | null;
-
-    public static get observedAttributes() {
-        return ["controls"];
+    get target(): HTMLElement | null {
+        return this.#target;
     }
 
-    constructor() {
-        super();
-        
-        this.attachShadow({mode: "open"}).append(
-            HTML("style", {
+    @AttributeProperty({type: String})
+    controls!: string;
+
+    @AttributeProperty({type: String, defaultValue: "top"})
+    growdir!: "top" | "bottom";
+
+    #target: HTMLElement | null;
+    #onCapture: boolean;
+    #queuedPointerCallback: FrameRequestCallback | null;
+    #pointerMovement: number;
+
+    static {
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
+            element("style", {
                 properties: {
                     innerText: /*css*/`
                         :host {
-                            display: block;
-                            z-index: 1;
+                            display: inline-block;
+                            width: 100%;
         
                             max-height: 4px;
                             height: 4px;
@@ -63,7 +64,7 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
                             margin-top: -2px;
                             margin-bottom: -2px;
                             
-                            background-color: rgb(0, 128, 255);
+                            background-color: rgb(135, 206, 250);
                             cursor: ns-resize;
         
                             transition-property: opacity;
@@ -81,52 +82,65 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
                 }
             })
         );
-        
-        this._target = null;
-        this._targetStyle = null;
     }
 
-    public connectedCallback(): void {
-        this.tabIndex = this.tabIndex;
-
-        let onPointerMove = (event: PointerEvent) => {
-            if (this._target && this._targetStyle) {
-                let height = parseFloat(this._targetStyle.getPropertyValue("height"));
-                let newHeight = Math.trunc(height + ((this.growdir === "top") ? -1 : 1) * event.movementY);
-                this._target.style.setProperty("height", `${newHeight}px`);
-                this.dispatchEvent(new CustomEvent("e_resize"));
-            }
-        };
-
-        this.addEventListener("pointerdown", (event: PointerEvent) => {
-            const target = document.getElementById(this.controls);
-            if (target && this._target !== target) {
-                this._target = target;
-                this._targetStyle = window.getComputedStyle(target);
-            }
-            this.setPointerCapture(event.pointerId);
-            this.addEventListener("pointermove", onPointerMove);
-            this.addEventListener("pointerup", (event) => {
-                this.removeEventListener("pointermove", onPointerMove);
-                this.releasePointerCapture(event.pointerId);
-            });
-        });
+    constructor() {
+        super();
+        const shadowRoot = this.attachShadow({mode: "open"});
+        shadowRoot.append(
+            shadowTemplate.content.cloneNode(true)
+        );
+        this.#target = null;
+        this.#queuedPointerCallback = null;
+        this.#pointerMovement = 0;
+        this.#onCapture = false;
+        this.addEventListener("pointerdown", this.#handlePointerDownEvent.bind(this));
+        this.addEventListener("pointermove", this.#handlePointerMoveEvent.bind(this));
+        this.addEventListener("pointerup", this.#handlePointerUpEvent.bind(this));
     }
 
-    public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
-        if (newValue !== oldValue) {
-            switch (name) {
-                case "controls":
-                    if (oldValue !== newValue) {
-                        const target = document.getElementById(this.controls);
-                        if (target) {
-                            this._target = target;
-                            this._targetStyle = window.getComputedStyle(target);
-                        }
-                    }
-                    break;
+    #handlePointerUpEvent(event: PointerEvent): void {
+        const {pointerId} = event;
+        this.releasePointerCapture(pointerId);
+        this.#onCapture = false;
+    }
+
+    #handlePointerDownEvent(event: PointerEvent): void {
+        const {pointerId} = event;
+        const {controls} = this;
+        const rootNode = <ShadowRoot | Document>this.getRootNode();
+        this.#target = rootNode.getElementById(controls);
+        this.setPointerCapture(pointerId);
+        this.#onCapture = true;
+    }
+
+    #handlePointerMoveEvent(event: PointerEvent): void {
+        if (this.#onCapture) {
+            if (this.#queuedPointerCallback == null) {
+                this.#pointerMovement = event.movementY;
+                this.#queuedPointerCallback = this.#pointerMoveCallback.bind(this);
+                requestAnimationFrame(this.#queuedPointerCallback);
+            }
+            else {
+                this.#pointerMovement += event.movementY;
             }
         }
+    }
+
+    #pointerMoveCallback(): void {
+        const target = this.#target;
+        if (target !== null) {
+            const targetComputedStyle = window.getComputedStyle(target);
+            const {growdir} = this;
+            const movementY = this.#pointerMovement;
+            const height = parseFloat(targetComputedStyle.getPropertyValue("height"));
+            const newHeight = Math.trunc(height + (growdir == "top" ? -1 : 1) * movementY);
+            target.style.setProperty("height", `${newHeight}px`);
+            const computedNewHeight = parseFloat(targetComputedStyle.getPropertyValue("height"));
+            target.style.setProperty("height", `${computedNewHeight}px`);
+            this.dispatchEvent(new Event("resize"));
+        }
+        this.#queuedPointerCallback = null;
     }
 }
 

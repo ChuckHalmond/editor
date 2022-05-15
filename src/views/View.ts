@@ -1,49 +1,62 @@
-import { HTML } from "../elements/Element";
-import { ReactiveNodesObserver } from "../observers/ReactiveNodesObserver";
+import { ModelObject } from "../models/Model";
 
-export interface HTMLView extends HTMLElement {
-    readonly shadowRoot: ShadowRoot;
-    render(): HTMLElement;
+export { View };
+
+interface View extends HTMLElement {
+    readonly model: ModelObject | null;
+    setModel(model: ModelObject): void;
+    renderShadow(): Node | undefined;
+    renderLight(): Node | undefined;
     refresh(): void;
 }
 
-export interface ViewConstructor {
-    readonly prototype: HTMLView;
-    readonly styles: string | undefined;
+interface ViewConstructor {
+    readonly prototype: View;
+    new(): View;
 }
 
-export abstract class HTMLViewBase extends HTMLElement implements HTMLView {
-    readonly shadowRoot!: ShadowRoot;
+class ViewBase extends HTMLElement implements View {
+    #model: ModelObject | null;
 
     constructor() {
         super();
-        const shadowRoot = this.attachShadow({mode: "open"});
-        const observer = new ReactiveNodesObserver();
-        observer.observe(shadowRoot);
-        setTimeout(() => {
-            this.refresh();
-        });
+        this.#model = null;
     }
 
-    public static styles: string | undefined;
-    public abstract render(): HTMLElement;
+    get model(): ModelObject | null {
+        return this.#model;
+    }
+    
+    setModel(model: ModelObject): void {
+        this.#model = model;
+        this.#render();            
+    }
 
-    public refresh(): void {
-        const styles = (this.constructor as typeof HTMLViewBase).styles;
-        if (styles !== void 0) {
-            this.shadowRoot.replaceChildren(
-                HTML("style", {
-                    properties: {
-                        textContent: styles,
-                    }
-                }),
-                this.render()
-            );
+    renderLight(): Node | undefined {
+        return;
+    }
+
+    renderShadow(): Node | undefined {
+        return;
+    }
+
+    refresh(): void {
+        this.#render();
+    }
+
+    #render(): void {
+        const {shadowRoot} = this;
+        const shadow = this.renderShadow();
+        if (shadow) {
+            if (shadowRoot) {
+                shadowRoot.replaceChildren(shadow);
+            }
         }
-        else {
-            this.shadowRoot.replaceChildren(
-                this.render()
-            );
+        const light = this.renderLight();
+        if (light) {
+            this.replaceChildren(light);
         }
     }
 }
+
+var View: ViewConstructor = ViewBase;

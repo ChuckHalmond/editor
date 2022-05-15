@@ -4,8 +4,8 @@ export { HotKey };
 export { MouseButton };
 
 enum Key {
-    A = 'a',
-    B = 'b',
+    A = "a",
+    B = "b",
     C = "c",
     D = "d",
     E = "e",
@@ -41,16 +41,7 @@ enum Key {
 enum KeyModifier {
     Alt = "Alt",
     Control = "Control",
-    Shift = "Shift",
-}
-
-function displayKeyModifier(mod: KeyModifier): string {
-    switch (mod) {
-        case KeyModifier.Control:
-            return "Ctrl";
-        default:
-            return mod;
-    }
+    Shift = "Shift"
 }
 
 enum MouseButton {
@@ -61,23 +52,10 @@ enum MouseButton {
     BACK = 5
 }
 
-function testKeyModifier(mod: KeyModifier, event: KeyboardEvent): boolean {
-    switch (mod) {
-        case 'Alt':
-            return event.altKey;
-        case 'Control':
-            return event.ctrlKey;
-        case 'Shift':
-            return event.shiftKey;
-        default:
-            return true;
-    }
-}
-
 class HotKey {
-    public readonly key: Key;
-    public readonly mod1?: KeyModifier;
-    public readonly mod2?: KeyModifier;
+    readonly key: Key;
+    readonly mod1?: KeyModifier;
+    readonly mod2?: KeyModifier;
 
     constructor(key: Key, mod1?: KeyModifier, mod2?: KeyModifier) {
         this.key = key;
@@ -85,11 +63,33 @@ class HotKey {
         this.mod2 = mod2;
     }
 
-    public toString(): string {
-        return `${this.mod1 ? `${displayKeyModifier(this.mod1)}+` : ''}${this.mod2 ? `${displayKeyModifier(this.mod2)}+` : ''}${(this.key.length === 1) ? this.key.toUpperCase() : this.key}`;
+    toString(): string {
+        return `${this.mod1 ? `${this.#modifierString(this.mod1)}+` : ""}${this.mod2 ? `${this.#modifierString(this.mod2)}+` : ""}${(this.key.length == 1) ? this.key.toUpperCase() : this.key}`;
     }
 
-    public test(event: KeyboardEvent): boolean {
-        return ((!this.mod1 || testKeyModifier(this.mod1, event)) && (!this.mod2 || testKeyModifier(this.mod2, event)) && event.key === this.key);
+    test(event: KeyboardEvent): boolean {
+        return (!this.mod1 || this.#testModifier(this.mod1, event)) && (!this.mod2 || this.#testModifier(this.mod2, event)) && event.key == this.key;
+    }
+
+    #modifierString(mod: KeyModifier): string {
+        switch (mod) {
+            case KeyModifier.Control:
+                return "Ctrl";
+            default:
+                return mod;
+        }
+    }
+
+    #testModifier(mod: KeyModifier, event: KeyboardEvent): boolean {
+        switch (mod) {
+            case "Alt":
+                return event.altKey;
+            case "Control":
+                return event.ctrlKey;
+            case "Shift":
+                return event.shiftKey;
+            default:
+                return true;
+        }
     }
 }

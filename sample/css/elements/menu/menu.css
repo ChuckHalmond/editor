@@ -1,0 +1,21 @@
+e-menu {
+    display: flex;
+    flex-direction: column;
+
+    padding: 8px 3px;
+    background-color: white;
+    width: max-content;
+
+    -webkit-box-shadow: var(--menu-box-shadow);
+    box-shadow: var(--menu-box-shadow);
+}
+
+e-menu[contextual] {
+    position: absolute;
+}
+
+e-menu > hr {
+    margin: 10px 0px 10px 36px;
+    border: none;
+    border-top: 1px solid lightgrey;
+}

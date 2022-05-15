@@ -1,4 +1,4 @@
-import { CustomElement, HTML } from "../../Element";
+import { CustomElement, element } from "../../Element";
 import { HTMLETabElement } from "./Tab";
 
 export { HTMLETabListElement };
@@ -24,15 +24,15 @@ declare global {
 })
 class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement {
 
-    public tabs: HTMLETabElement[];
+    tabs: HTMLETabElement[];
 
-    private _activeIndex: number;
+    #activeIndex: number;
 
     constructor() {
         super();
         
         this.attachShadow({mode: "open"}).append(
-            HTML("style", {
+            element("style", {
                 properties: {
                     innerText: /*css*/`
                         :host {
@@ -42,32 +42,32 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
                     `
                 }
             }),
-            HTML("slot")
+            element("slot")
         );
         
         this.tabs = [];
-        this._activeIndex = 1;
+        this.#activeIndex = 1;
     }
 
-    public get activeIndex(): number {
-        return this._activeIndex;
+    get activeIndex(): number {
+        return this.#activeIndex;
     }
 
-    public get activeTab(): HTMLETabElement | null {
-        return this.tabs[this._activeIndex] || null;
+    get activeTab(): HTMLETabElement | null {
+        return this.tabs[this.#activeIndex] || null;
     }
 
-    public connectedCallback(): void {
+    connectedCallback(): void {
         this.tabIndex = this.tabIndex;
-
         const slot = this.shadowRoot!.querySelector("slot");
         if (slot) {
             slot.addEventListener("slotchange", (event) => {
-                const tabs = (event.target as HTMLSlotElement)
+
+                const tabs = <HTMLETabElement[]>(<HTMLSlotElement>event.target)
                     .assignedElements()
-                    .filter(tab => tab instanceof HTMLETabElement) as HTMLETabElement[];
+                    .filter(tab => tab instanceof HTMLETabElement);
                 this.tabs = tabs;
-                this._activeIndex = this.tabs.findIndex(tab => tab.active);
+                this.#activeIndex = this.tabs.findIndex(tab => tab.active);
             });
         }
 
@@ -98,7 +98,7 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
 
         this.addEventListener("e_tabchange", (event) => {
             const targetIndex = this.tabs.indexOf(event.detail.tab);
-            this._activeIndex = targetIndex;
+            this.#activeIndex = targetIndex;
             this.tabs.forEach((thisTab, thisTabIndex) => {
                 if (thisTabIndex !== targetIndex) {
                     thisTab.active = false;
@@ -107,19 +107,15 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
         });
     }
 
-    public focusTabAt(index: number): void {
+    focusTabAt(index: number): void {
         const tab = this.tabs[index];
         if (tab) {
-            this._activeIndex = index;
+            this.#activeIndex = index;
             tab.focus();
         }
     }
 
-    public findTab(predicate: (tab: HTMLETabElement) => boolean): HTMLETabElement | null {
-        return this.tabs.find(predicate) || null;
-    }
-
-    public activateTab(tab: HTMLETabElement) {
+    activateTab(tab: HTMLETabElement) {
         if (this.tabs.includes(tab)) {
             tab.active = true;
         }

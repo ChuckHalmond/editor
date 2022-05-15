@@ -1,19 +1,17 @@
 import { HTMLEMenuItemElement } from "./MenuItem";
+import { HTMLEMenuItemCollection } from "./MenuItemCollection";
 export { HTMLEMenuBarElement };
 interface HTMLEMenuBarElementConstructor {
     readonly prototype: HTMLEMenuBarElement;
     new (): HTMLEMenuBarElement;
 }
 interface HTMLEMenuBarElement extends HTMLElement {
+    readonly shadowRoot: ShadowRoot;
+    readonly items: HTMLEMenuItemCollection;
+    readonly activeItem: HTMLEMenuItemElement | null;
+    readonly activeIndex: number;
     name: string;
     active: boolean;
-    items: HTMLEMenuItemElement[];
-    readonly shadowRoot: ShadowRoot;
-    readonly activeIndex: number;
-    readonly activeItem: HTMLEMenuItemElement | null;
-    focusItemAt(index: number, childMenu?: boolean): void;
-    reset(): void;
-    findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): HTMLEMenuItemElement | null;
 }
 declare global {
     interface HTMLElementTagNameMap {

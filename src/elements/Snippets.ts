@@ -4,7 +4,6 @@ export { snakeToCamel };
 export { camelToSnake };
 export { trainToCamel };
 export { camelToTrain };
-export { titlize };
 
 function getPropertyFromPath(src: object, path: string): any {
   const props = path.split(".");
@@ -16,11 +15,11 @@ function getPropertyFromPath(src: object, path: string): any {
         console.error(`Wrong indexed path: ${prop}`);
       }
       prop = prop.substring(0, prop.indexOf("["));
-      if (typeof obj === "object" && prop in obj && Array.isArray(obj[prop])) {
+      if (typeof obj == "object" && prop in obj && Array.isArray(obj[prop])) {
         obj = obj[prop][index];
       }
     }
-    else if (typeof obj === "object" && prop in obj) {
+    else if (typeof obj == "object" && prop in obj) {
       obj = obj[prop];
     }
     else {
@@ -46,7 +45,7 @@ function setPropertyFromPath(src: object, path: string, value: any): object {
       if (!Array.isArray(obj[prop])) {
         obj[prop] = [];
       }
-      if (idx === props.length - 1) {
+      if (idx == props.length - 1) {
         obj[prop][index] = value;
       }
       else {
@@ -57,7 +56,7 @@ function setPropertyFromPath(src: object, path: string, value: any): object {
       }
     }
     else {
-      if (idx === props.length - 1) {
+      if (idx == props.length - 1) {
         obj[prop] = value;
       }
       else {
@@ -71,12 +70,8 @@ function setPropertyFromPath(src: object, path: string, value: any): object {
   return src;
 }
 
-function titlize(str: string) {
-  return `${str.charAt(0).toUpperCase()}${str.substr(1).toLowerCase()}`;
-}
-
 function snakeToCamel(str: string) {
-  return str.split('_').map(str =>  str.charAt(0).toUpperCase() + str.substr(1).toLowerCase()).join("");
+  return str.split('_').map(str =>  str.charAt(0).toUpperCase() + str.substring(1).toLowerCase()).join("");
 }
 
 function camelToSnake(str: string) {
@@ -84,7 +79,7 @@ function camelToSnake(str: string) {
 }
 
 function trainToCamel(str: string) {
-  return str.split('-').map(str =>  str.charAt(0).toUpperCase() + str.substr(1).toLowerCase()).join("");
+  return str.split('-').map(str =>  str.charAt(0).toUpperCase() + str.substring(1).toLowerCase()).join("");
 }
 
 function camelToTrain(str: string) {

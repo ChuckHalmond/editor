@@ -9,37 +9,54 @@ interface AttributeMixinsObserverConstructor {
 
 interface AttributeMixinsObserver {
     observe(target: Node): void;
+    trigger(): void;
     disconnect(): void;
 }
 
 class AttributeMixinsObserverBase implements AttributeMixinsObserver {
-    private _observer: MutationObserver;
-    private _mixins: AttributeMutationMixin[];
+    #observer: MutationObserver;
+    #mixins: AttributeMutationMixin[];
 
     constructor(mixins: AttributeMutationMixin[]) {
-        this._observer = new MutationObserver(
-            this.callback.bind(this)
+        this.#observer = new MutationObserver(
+            this.#callback.bind(this)
         );
-        this._mixins = mixins.slice();
+        this.#mixins = mixins.slice();
     }
 
-    public callback(mutationsList: MutationRecord[]) {
+    trigger(): void {
+        this.#callback(this.#observer.takeRecords());
+    }
+
+    observe(target: Node): void  {
+        this.#observer.observe(target, {
+            childList: true,
+            subtree: true,
+            attributeFilter: this.#mixins.map((mixin => mixin.attributeName))
+        });
+    }
+
+    disconnect(): void {
+        this.#observer.disconnect();
+    }
+
+    #callback(mutationsList: MutationRecord[]) {
         mutationsList.forEach((mutation: MutationRecord) => {
             mutation.addedNodes.forEach((node: Node) => {
                 if (node instanceof Element) {
-                    this.attachMatchingAttributeMixinsInSubtree(node);
+                    this.#attachMatchingAttributeMixinsInSubtree(node);
                 }
             });
             mutation.removedNodes.forEach((node: Node) => {
                 if (node instanceof Element) {
-                    this.detachMatchingAttributeMixinsInSubtree(node);
+                    this.#detachMatchingAttributeMixinsInSubtree(node);
                 }
             });
             if (mutation.target instanceof Element) {
                 const targetElement = mutation.target;
                 const attributeName = mutation.attributeName;
                 if (attributeName) {
-                    const relatedMixins = this._mixins.filter(mixin => mixin.attributeName === attributeName);
+                    const relatedMixins = this.#mixins.filter(mixin => mixin.attributeName == attributeName);
                     relatedMixins.forEach((mixin) => {
                         if (areAttributesMatching(
                                 mixin.attributeType, mixin.attributeName, mixin.attributeValue,
@@ -56,21 +73,9 @@ class AttributeMixinsObserverBase implements AttributeMixinsObserver {
         });
     }
 
-    public observe(target: Node): void  {
-        this._observer.observe(target, {
-            childList: true,
-            subtree: true,
-            attributeFilter: this._mixins.map((mixin => mixin.attributeName))
-        });
-    }
-
-    public disconnect(): void {
-        this._observer.disconnect();
-    }
-
-    private attachMatchingAttributeMixinsInSubtree(element: Element) {
+    #attachMatchingAttributeMixinsInSubtree(element: Element) {
         Array.from(element.attributes).forEach((attr) => {
-            let matchingMixins = this._mixins.filter(
+            let matchingMixins = this.#mixins.filter(
                 mixin => areAttributesMatching(
                     mixin.attributeType, mixin.attributeName, mixin.attributeValue,
                     attr.name, attr.value
@@ -81,18 +86,19 @@ class AttributeMixinsObserverBase implements AttributeMixinsObserver {
             });
         });
         let childIndex = 0;
-        while (childIndex < element.children.length) {
-            const child = element.children.item(childIndex);
+        const {children} = element;
+        while (childIndex < children.length) {
+            const child = children.item(childIndex);
             if (child !== null) {
-                this.attachMatchingAttributeMixinsInSubtree(child);
+                this.#attachMatchingAttributeMixinsInSubtree(child);
             }
             childIndex++;
         }
     }
 
-    private detachMatchingAttributeMixinsInSubtree(element: Element) {
+    #detachMatchingAttributeMixinsInSubtree(element: Element) {
         Array.from(element.attributes).forEach((attr) => {
-            let matchingMixins = this._mixins.filter(
+            let matchingMixins = this.#mixins.filter(
                 mixin => areAttributesMatching(
                     mixin.attributeType, mixin.attributeName, mixin.attributeValue,
                     attr.name, attr.value
@@ -103,10 +109,11 @@ class AttributeMixinsObserverBase implements AttributeMixinsObserver {
             });
         });
         let childIndex = 0;
-        while (childIndex < element.children.length) {
-            const child = element.children.item(childIndex);
+        const {children} = element;
+        while (childIndex < children.length) {
+            const child = children.item(childIndex);
             if (child !== null) {
-                this.detachMatchingAttributeMixinsInSubtree(child);
+                this.#detachMatchingAttributeMixinsInSubtree(child);
             }
             childIndex++;
         }

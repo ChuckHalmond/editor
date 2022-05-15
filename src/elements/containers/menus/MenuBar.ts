@@ -1,5 +1,7 @@
-import { CustomElement, AttributeProperty, HTML } from "../../Element";
+import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEMenuItemElement } from "./MenuItem";
+import { HTMLEMenuItemCollection } from "./MenuItemCollection";
+import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
 
 export { HTMLEMenuBarElement };
 
@@ -9,15 +11,12 @@ interface HTMLEMenuBarElementConstructor {
 }
 
 interface HTMLEMenuBarElement extends HTMLElement {
+    readonly shadowRoot: ShadowRoot;
+    readonly items: HTMLEMenuItemCollection;
+    readonly activeItem: HTMLEMenuItemElement | null;
+    readonly activeIndex: number;
     name: string;
     active: boolean;
-    items: HTMLEMenuItemElement[];
-    readonly shadowRoot: ShadowRoot;
-    readonly activeIndex: number;
-    readonly activeItem: HTMLEMenuItemElement | null;
-    focusItemAt(index: number, childMenu?: boolean): void;
-    reset(): void;
-    findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): HTMLEMenuItemElement | null;
 }
 
 declare global {
@@ -26,189 +25,255 @@ declare global {
     }
 }
 
+var shadowTemplate: HTMLTemplateElement;
+
 @CustomElement({
     name: "e-menubar"
 })
 class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement {
 
-    @AttributeProperty({type: "string"})
-    public name!: string;
+    @AttributeProperty({type: String})
+    name!: string;
 
-    @AttributeProperty({type: "boolean"})
-    public active!: boolean;
+    @AttributeProperty({type: Boolean})
+    active!: boolean;
     
-    public items: HTMLEMenuItemElement[];
-    public readonly shadowRoot!: ShadowRoot;
+    readonly shadowRoot!: ShadowRoot;
+    readonly items: HTMLEMenuItemCollection;
 
-    private _activeIndex: number;
+    #activeIndex: number;
+    #walker: TreeWalker;
 
-    constructor() {
-        super();
-        
-        this.attachShadow({mode: "open"}).append(
-            HTML("style", {
+    static {
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
+            element("style", {
                 properties: {
                     innerText: /*css*/`
                         :host {
-                            position: relative;
-                            display: block;
-                            user-select: none;
-                        }
-        
-                        :host(:not(:focus-within)) ::slotted(:hover) {
-                            color: black;
-                            background-color: gainsboro;
-                        }
-        
-                        [part="container"] {
                             display: flex;
                             flex-direction: row;
+                            width: max-content;
+                        }
+        
+                        :host(:focus) ::slotted(:hover),
+                        :host(:not(:focus-within)) ::slotted(:hover) {
+                            background-color: rgba(135, 206, 250, 0.5);
                         }
                     `
                 }
             }),
-            HTML("div", {
-                part: ["container"],
-                children: [
-                    HTML("slot")
-                ]
-            })
+            element("slot")
         );
-
-        this.items = [];
-        this._activeIndex = -1;
     }
 
-    public get activeIndex(): number {
-        return this._activeIndex;
+    constructor() {
+        super();
+        this.#walker = document.createTreeWalker(
+            this, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
+        );
+        this.items = new HTMLEMenuItemCollection(this);
+        this.#activeIndex = -1;
+        const shadowRoot = this.attachShadow({mode: "open"});
+        shadowRoot.append(
+            shadowTemplate.content.cloneNode(true)
+        );
+        this.addEventListener("click", this.#handleClickEvent.bind(this));
+        this.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
+        this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
+        this.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
+        this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
+        this.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
     }
 
-    public get activeItem(): HTMLEMenuItemElement | null {
-        return this.items[this.activeIndex] || null;
+    get activeIndex(): number {
+        return this.#activeIndex;
     }
 
-    public connectedCallback() {
-        this.tabIndex = this.tabIndex;
-        
-        this.shadowRoot.addEventListener("slotchange", this);
-
-        this.addEventListener("mouseover", this);
-        this.addEventListener("keydown", this);
-        this.addEventListener("mousedown", this);
-        this.addEventListener("focus", this);
+    get activeItem(): HTMLEMenuItemElement | null {
+        return this.items.item(this.#activeIndex) ?? null;
     }
 
-    public handleEvent(event: Event) {
-        const target = event.target;
-        switch (event.type) {
-            case "slotchange":
-                this.items = (target as HTMLSlotElement)
-                    .assignedElements()
-                    .filter(
-                        elem => elem instanceof HTMLEMenuItemElement
-                    ) as HTMLEMenuItemElement[];
+    #walkerNodeFilter(node: Node): number {
+        if (node instanceof HTMLEMenuItemElement) {
+            return NodeFilter.FILTER_ACCEPT;
+        }
+        if (node instanceof HTMLEMenuItemGroupElement) {
+            return NodeFilter.FILTER_SKIP;
+        }
+        return NodeFilter.FILTER_REJECT;
+    }
+
+    #firstItem(): HTMLEMenuItemElement | null {
+        const walker = this.#walker;
+        walker.currentNode = walker.root;
+        return <HTMLEMenuItemElement | null>walker.firstChild();
+    }
+
+    #lastItem(): HTMLEMenuItemElement | null {
+        const walker = this.#walker;
+        walker.currentNode = walker.root;
+        return <HTMLEMenuItemElement | null>walker.lastChild();
+    }
+    
+    #previousItem(item: HTMLEMenuItemElement): HTMLEMenuItemElement | null {
+        const walker = this.#walker;
+        walker.currentNode = item;
+        const previousItem = <HTMLEMenuItemElement | null>walker.previousSibling();
+        return previousItem;
+    }
+
+    #nextItem(item: HTMLEMenuItemElement): HTMLEMenuItemElement | null {
+        const walker = this.#walker;
+        walker.currentNode = item;
+        return <HTMLEMenuItemElement | null>walker.nextSibling();
+    }
+
+    #firstChildItem(item: HTMLEMenuItemElement): HTMLEMenuItemElement | null {
+        const {menu} = item;
+        if (menu) {
+            return menu.items.item(0);
+        }
+        return null;
+    }
+
+    #setActiveItem(item: HTMLEMenuItemElement | null): void {
+        const {activeItem, active, items} = this;
+        if (activeItem !== null && activeItem !== item) {
+            activeItem.collapse();
+            activeItem.active = false;
+        }
+        if (item !== null) {
+            if (active) {
+                item.expand();
+            }
+            item.active = true;
+            this.#activeIndex = Array.from(items.values()).indexOf(item);
+        }
+        else {
+            this.#activeIndex = -1;
+        }
+    }
+    
+    #handleFocusInEvent(event: FocusEvent): void {
+        const {target} = event;
+        const {items} = this;
+        const targetClosestItem = Array.from(items.values()).find(
+            item_i => item_i.contains(<Node>target)
+        ) ?? null;
+        this.#setActiveItem(targetClosestItem);
+    }
+
+    #handleFocusOutEvent(event: FocusEvent): void {
+        const {relatedTarget} = event;
+        const lostFocusWithin = !this.contains(<Node>relatedTarget);
+        if (lostFocusWithin) {
+            const {activeItem} = this;
+            if (activeItem?.expanded) {
+                activeItem.collapse();
+            }
+            this.#setActiveItem(null);
+            this.active = false;
+        }
+    }
+
+    #handleMouseOverEvent(event: MouseEvent): void {
+        const {target} = event;
+        const {active, activeItem, items} = this;
+        if (target instanceof HTMLEMenuItemElement) {
+            const includesTarget = Array.from(items.values()).includes(target);
+            if (includesTarget && target !== activeItem && active) {
+                const {menu} = target;
+                if (menu) {
+                    target.expand();
+                    menu.focus({preventScroll: true});
+                }
+            }
+        }
+    }
+
+    #handleClickEvent(event: MouseEvent): void {
+        const {target} = event;
+        const {active, activeItem, items} = this;
+        if (target instanceof HTMLEMenuItemElement) {
+            const includesTarget = Array.from(items.values()).includes(target);
+            if (includesTarget) {
+                const isActive = !active;
+                this.active = isActive;
+                if (isActive) {
+                    if (activeItem && !activeItem.expanded) {
+                        activeItem.expand();
+                    }
+                    const {menu} = target;
+                    menu?.focus({preventScroll: true});
+                }
+                else {
+                    this.focus({preventScroll: true})
+                }
+            }
+        }
+    }
+
+    #handleKeyDownEvent(event: KeyboardEvent): void {
+        const {key} = event;
+        const {active} = this;
+        let {activeItem} = this;
+        switch (key) {
+            case "ArrowLeft": {
+                const previousItem = activeItem ?
+                    this.#previousItem(activeItem) ?? this.#lastItem() :
+                    this.#firstItem();
+                previousItem?.focus({preventScroll: true});
+                ({activeItem} = this);
+                if (active && activeItem) {
+                    const firstChildItem = this.#firstChildItem(activeItem);
+                    firstChildItem?.focus({preventScroll: true});
+                }
                 break;
-            case "focus":
-                this._activeIndex = 0;
+            }
+            case "ArrowRight": {
+                const nextItem = activeItem ?
+                    this.#nextItem(activeItem) ?? this.#firstItem() : 
+                    this.#lastItem();
+                nextItem?.focus({preventScroll: true});
+                ({activeItem} = this);
+                if (active && activeItem) {
+                    const firstChildItem = this.#firstChildItem(activeItem);
+                    firstChildItem?.focus({preventScroll: true});
+                }
                 break;
-            case "mousedown":
-                if (target instanceof HTMLEMenuItemElement) {
-                    const targetIndex = this.items.indexOf(target);
-                    if (targetIndex >= 0) {
-                        if (!this.contains(document.activeElement)) {
-                            this.active = true;
-                            this.focusItemAt(targetIndex, true);
-                        }
-                        else {
-                            this.active = false;
-                            document.body.focus();
-                        }
-                        event.preventDefault();
+            }
+            case "Enter": {
+                if (activeItem) {
+                    this.active = !active;
+                    const firstChildItem = this.#firstChildItem(activeItem);
+                    firstChildItem?.focus({preventScroll: true});
+                }
+                break;
+            }
+            case "Escape": {
+                if (active) {
+                    this.active = false;
+                    if (activeItem) {
+                        activeItem.collapse();
+                        activeItem.focus({preventScroll: true});
                     }
                 }
-                break;
-            case "mouseover":
-                if (target instanceof HTMLEMenuItemElement) {
-                    const targetIndex = this.items.indexOf(target);
-                    if (targetIndex >= 0) {
-                        if (this.contains(document.activeElement)) {
-                            if (this.active) {
-                                this.focusItemAt(targetIndex, true);
-                            }
-                            else {
-                                this._activeIndex = targetIndex;
-                            }
-                        }
-                    }
+                else {
+                    this.focus({preventScroll: true});
                 }
                 break;
-            case "keydown":
-                switch ((event as KeyboardEvent).key) {
-                    case "ArrowLeft":
-                        this.focusItemAt((this.activeIndex <= 0) ? this.items.length - 1 : this.activeIndex - 1);
-                        if (this.active && this.activeItem?.childMenu) {
-                            this.activeItem.childMenu.focusItemAt(0);
-                        }
-                        break;
-                    case "ArrowRight":
-                        this.focusItemAt((this.activeIndex >= this.items.length - 1) ? 0 : this.activeIndex + 1);
-                        if (this.active && this.activeItem?.childMenu) {
-                            this.activeItem.childMenu.focusItemAt(0);
-                        }
-                        break;
-                    case "ArrowDown":
-                        this.focusItemAt(this.activeIndex);
-                        if (this.active && this.activeItem?.childMenu) {
-                            this.activeItem.childMenu.focusItemAt(0);
-                        }
-                        break;
-                    case "Enter":
-                        this.active = true;
-                        if (this.activeItem) {
-                            this.activeItem.click();
-                        }
-                        break;
-                    case "Escape":
-                        this.focusItemAt(this.activeIndex);
-                        this.active = false;
-                        break;
-                }
-        }
-    }
-
-    public focusItemAt(index: number, childMenu?: boolean): void {
-        const item = this.items[index];
-        if (item) {
-            this._activeIndex = index;
-            item.focus();
-            if (childMenu && item.childMenu) {
-                item.childMenu.focus();
             }
         }
     }
 
-    public reset(): void {
-        const item = this.activeItem;
-        this._activeIndex = -1;
-        if (item?.childMenu) {
-            item.childMenu.reset();
+    #handleTriggerEvent(): void {
+        const {activeItem} = this;
+        if (activeItem?.expanded) {
+            activeItem.collapse();
         }
-    }
-
-    public findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subtree?: boolean): HTMLEMenuItemElement | null {
-        let foundItem: HTMLEMenuItemElement | null = null;
-        for (let item of this.items) {
-            if (predicate(item)) {
-                return item;
-            }
-            if (subtree && item.childMenu) {
-                foundItem = item.childMenu.findItem(predicate, subtree);
-                if (foundItem) {
-                    return foundItem;
-                }
-            }
-        }
-        return foundItem;
+        this.active = false;
+        this.focus({preventScroll: true});
     }
 }
 

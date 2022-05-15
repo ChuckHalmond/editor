@@ -1,4 +1,4 @@
-import { CustomElement, AttributeProperty, HTML } from "../../Element";
+import { CustomElement, AttributeProperty, element } from "../../Element";
 
 export { HTMLEDialogElement };
 
@@ -7,11 +7,12 @@ interface HTMLEDialogElementConstructor {
     new(): HTMLEDialogElement;
 }
 
-type EDialogElementType = "confirm" | "alert";
+type DialogElementType = "confirm" | "alert";
 
 interface HTMLEDialogElement extends HTMLElement {
+    readonly shadowRoot: ShadowRoot;
     name: string;
-    type: EDialogElementType;
+    type: DialogElementType;
     open(): void;
     close(): void;
     cancel(): void;
@@ -22,12 +23,12 @@ declare global {
     interface HTMLElementTagNameMap {
         "e-dialog": HTMLEDialogElement,
     }
-
+    
     interface HTMLElementEventMap {
-        "e_open": Event,
-        "e_close": Event,
-        "e_cancel": Event,
-        "e_confirm": Event,
+        "open": Event,
+        "close": Event,
+        "cancel": Event,
+        "confirm": Event,
     }
 }
 
@@ -36,21 +37,18 @@ declare global {
 })
 class HTMLEDialogElementBase extends HTMLElement implements HTMLEDialogElement {
 
-    public name!: string;
+    readonly shadowRoot!: ShadowRoot;
 
-    @AttributeProperty({type: "string"})
-    public type!: EDialogElementType;
+    name!: string;
 
-    private _closeButton: HTMLButtonElement;
-    private _cancelButton: HTMLButtonElement;
-    private _confirmButton: HTMLButtonElement;
-    private _okButton: HTMLButtonElement;
+    @AttributeProperty({type: String})
+    type!: DialogElementType;
 
     constructor() {
         super();
 
         this.attachShadow({mode: "open"}).append(
-            HTML("style", {
+            element("style", {
                 properties: {
                     innerText: /*css*/`
                         :host {
@@ -68,37 +66,37 @@ class HTMLEDialogElementBase extends HTMLElement implements HTMLEDialogElement {
                             cursor: pointer;
                         }
         
-                        [part~="actions"] {
+                        [part="actions"] {
                             display: flex;
                             flex-direction: row;
                             justify-content: flex-end;
                         }
         
-                        [part~="header"] {
+                        [part="header"] {
                             display: flex;
                             flex-direction: row;
                             justify-content: flex-end;
                         }
         
-                        [part~="button"]:not(:first-child) {
+                        [part="button"]:not(:first-child) {
                             margin-left: 4px;
                         }
         
-                        :host([type="confirm"]) [part~="ok-button"] {
+                        :host([type="confirm"]) [part="ok-button"] {
                             display: none !important;
                         }
         
-                        :host([type="alert"]) [part~="cancel-button"],
-                        :host([type="alert"]) [part~="confirm-button"] {
+                        :host([type="alert"]) [part="cancel-button"],
+                        :host([type="alert"]) [part="confirm-button"] {
                             display: none !important;
                         }
                     `
                 }
             }),
-            HTML("div", {
+            element("div", {
                 part: ["header"],
                 children: [
-                    HTML("button", {
+                    element("button", {
                         part: ["button", "close-button"],
                         properties: {
                             textContent: "x",
@@ -108,22 +106,22 @@ class HTMLEDialogElementBase extends HTMLElement implements HTMLEDialogElement {
                     })
                 ]
             }),
-            HTML("hr", {
+            element("hr", {
                 part: ["separator"]
             }),
-            HTML("div", {
+            element("div", {
                 part: ["body"],
                 children: [
-                    HTML("slot")
+                    element("slot")
                 ]
             }),
-            HTML("hr", {
+            element("hr", {
                 part: ["separator"]
             }),
-            HTML("div", {
+            element("div", {
                 part: ["actions"],
                 children: [
-                    HTML("button", {
+                    element("button", {
                         part: ["button", "cancel-button"],
                         properties: {
                             textContent: "Cancel",
@@ -131,7 +129,7 @@ class HTMLEDialogElementBase extends HTMLElement implements HTMLEDialogElement {
                             tabIndex: 0
                         }
                     }),
-                    HTML("button", {
+                    element("button", {
                         part: ["button", "confirm-button"],
                         properties: {
                             textContent: "Confirm",
@@ -139,7 +137,7 @@ class HTMLEDialogElementBase extends HTMLElement implements HTMLEDialogElement {
                             tabIndex: 0
                         }
                     }),
-                    HTML("button", {
+                    element("button", {
                         part: ["button", "ok-button"],
                         properties: {
                             textContent: "OK",
@@ -150,42 +148,42 @@ class HTMLEDialogElementBase extends HTMLElement implements HTMLEDialogElement {
                 ]
             }),
         );
-
-        this._closeButton = this.shadowRoot!.querySelector("[part~=close-button]")!;
-        this._cancelButton = this.shadowRoot!.querySelector("[part~=cancel-button]")!;
-        this._confirmButton = this.shadowRoot!.querySelector("[part~=confirm-button]")!;
-        this._okButton = this.shadowRoot!.querySelector("[part~=ok-button]")!;
     }
 
-    public connectedCallback() {
-        this.tabIndex = this.tabIndex;
-
-        this.shadowRoot!.addEventListener("mousedown", (event) => {
-            let target = event.target as Element;
-            if (target === this._closeButton || target === this._cancelButton) {
-                this.cancel();
-            }
-            else if (target === this._confirmButton || target === this._okButton) {
-                this.confirm();
-            }
-        });
+    connectedCallback() {
+        this.shadowRoot.addEventListener("click", this);
     }
 
-    public open(): void {
-        this.dispatchEvent(new CustomEvent("e_open", {bubbles: true}));
+    handleEvent(event: Event) {
+        const {type, target} = event;
+        switch (type) {
+            case "click":
+                const {part} = <Element>target;
+                if (part.contains("close-button") || part.contains("cancel-button")) {
+                    this.cancel();
+                }
+                else if (part.contains("confirm-button") || part.contains("ok-button")) {
+                    this.confirm();
+                }
+                break;
+        }
     }
 
-    public close(): void {
-        this.dispatchEvent(new CustomEvent("e_close", {bubbles: true}));
+    open(): void {
+        this.dispatchEvent(new CustomEvent("open", {bubbles: true}));
     }
 
-    public cancel(): void {
-        this.dispatchEvent(new CustomEvent("e_cancel", {bubbles: true}));
+    close(): void {
+        this.dispatchEvent(new CustomEvent("close", {bubbles: true}));
+    }
+
+    cancel(): void {
+        this.dispatchEvent(new CustomEvent("cancel", {bubbles: true}));
         this.close();
     }
 
-    public confirm(): void {
-        this.dispatchEvent(new CustomEvent("e_confirm", {bubbles: true}));
+    confirm(): void {
+        this.dispatchEvent(new CustomEvent("confirm", {bubbles: true}));
         this.close();
     }
 }

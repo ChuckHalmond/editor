@@ -1,21 +1,175 @@
-import { EventDispatcher } from "../events/EventDispatcher";
-import { ListModel, ListModelChangeEvent, ObjectModel, ObjectModelChangeEvent } from "../models/Model";
+import { ModelList, ModelNode, ModelChangeRecord, ModelChangeObserver, ModelChangeObserverOptions } from "../models/Model";
 import { camelToTrain } from "./Snippets";
 
+export { subtreeNodes };
+export { ancestorNodes };
 export { CustomElement };
-export { AttributeProperty }
-export { isReactiveNode };
-export { isReactiveParentNode };
-export { ReactiveNode };
-export { ReactiveParentNode };
-export { ReactiveChildNodes };
-export { HTML };
+export { Collection };
+export { QueryProperty };
+export { QueryAllProperty };
+export { AttributeProperty };
+export { reactiveElement };
+export { reactiveChildElements };
+export { element };
 export { Fragment };
 export { TextNode };
 export { AttributeMutationMixin };
 export { AttributeType };
 export { areAttributesMatching };
 export { AttributeMutationMixinBase };
+export { trimMultilineIndent };
+export { Stylesheet };
+
+interface AttributePropertyDecorator {
+    (
+        init: {
+            type: typeof String;
+            observed?: boolean;
+            defaultValue?: string | null;
+        }
+    ): <E extends HTMLElement>(target: E, property: keyof E) => void;
+    (
+        init: {
+            type: typeof Number;
+            observed?: boolean;
+            defaultValue?: number | null;
+        }
+    ): <E extends HTMLElement>(target: E, property: keyof E) => void;
+    (
+        init: {
+            type: typeof Boolean;
+            observed?: boolean;
+        }
+    ): <E extends HTMLElement>(target: E, property: keyof E) => void;
+    (
+        init: {
+            type: typeof Object;
+            observed?: boolean;
+            defaultValue?: any | null;
+        }
+    ): <E extends HTMLElement>(target: E, property: keyof E) => void;
+}
+
+const AttributeProperty: AttributePropertyDecorator = function(
+    init: {
+        type: typeof String | typeof Number | typeof Boolean | typeof Object;
+        observed?: boolean;
+        defaultValue?: string | number | any | null;
+    }
+) {
+    return <E extends HTMLElement>(
+        target: E, property: keyof E
+    ) => {
+        const {constructor} = target;
+        const {prototype} = constructor;
+        const propertyName = property.toString();
+        const attributeName = camelToTrain(propertyName);
+        const defaultValue = init.defaultValue ?? null;
+        const observed = init.observed ?? false;
+        if (observed) {
+            const observedAttributes = Reflect.get(constructor, "observedAttributes", constructor);
+            if (Array.isArray(observedAttributes)) {
+                observedAttributes.push(attributeName);
+            }
+            else {
+                Object.defineProperty(
+                    constructor, "observedAttributes", {
+                        value: [attributeName],
+                        writable: false
+                    }
+                );
+            }
+        }
+        const {type} = init;
+        switch (type) {
+            case Boolean: {
+                Object.defineProperty(prototype, propertyName, {
+                    get: function(this: HTMLElement) {
+                        return this.hasAttribute(attributeName);
+                    },
+                    set: function(this: HTMLElement, value) {
+                        if (value) {
+                            this.setAttribute(attributeName, "");
+                        }
+                        else {
+                            this.removeAttribute(attributeName);
+                        }
+                    }
+                });
+                break;
+            }
+            case Object: {
+                Object.defineProperty(prototype, propertyName, {
+                    get: function(this: HTMLElement) {
+                        const val = this.getAttribute(attributeName);
+                        return (val !== null) ? JSON.parse(val) : defaultValue;
+                    },
+                    set: function(this: HTMLElement, value) {
+                        if (value !== null) {
+                            this.setAttribute(attributeName, JSON.stringify(value));
+                        }
+                        else {
+                            this.removeAttribute(attributeName);
+                        }
+                    }
+                });
+                break;
+            }
+            case Number: {
+                Object.defineProperty(prototype, propertyName, {
+                    get: function(this: HTMLElement) {
+                        const val = this.getAttribute(attributeName);
+                        return (val !== null) ? parseFloat(val) : defaultValue;
+                    },
+                    set: function(this: HTMLElement, value) {
+                        if (value !== null) {
+                            this.setAttribute(attributeName, value);
+                        }
+                        else {
+                            this.removeAttribute(attributeName);
+                        }
+                    }
+                });
+                break;
+            }
+            case String:
+            default: {
+                Object.defineProperty(prototype, propertyName, {
+                    get: function(this: HTMLElement) {
+                        const val = this.getAttribute(attributeName);
+                        return (val !== null) ? val : defaultValue;
+                    },
+                    set: function(this: HTMLElement, value) {
+                        if (value !== null) {
+                            this.setAttribute(attributeName, value);
+                        }
+                        else {
+                            this.removeAttribute(attributeName);
+                        }
+                    }
+                });
+                break;
+            }
+        }
+    }
+}
+    
+function Stylesheet(text: string): CSSStyleSheet {
+    const stylesheet = new CSSStyleSheet();
+    (stylesheet as any).replaceSync(text);
+    return stylesheet;
+}
+
+function trimMultilineIndent(text: string): string {
+    const newlineIndex = text.indexOf("\n");
+    text = text.substring(newlineIndex + 1);
+    const indentMatch = text.match(/^[\s]*/);
+    if (indentMatch) {
+        const indent = text.substring(0, indentMatch[0].length);
+        text = text.replaceAll(indent, "").trimEnd();
+    }
+    return text;
+}
 
 interface CustomElementDecorator {
     (init: {
@@ -31,100 +185,116 @@ const CustomElement: CustomElementDecorator = function(init: {
     return <C extends CustomElementConstructor>(
         elementCtor: C
     ) => {
-        const { name, options } = init;
-
-        if (!customElements.get(name)) {
-            customElements.define(
-                name,
-                elementCtor,
-                options
-            );
-        }
-
-        return elementCtor;
+        return registerCustomElement(elementCtor, init);
     }
 }
 
-interface AttributePropertyDecorator {
-    (init: {
-        type: "string" | "number" | "boolean" | "json"
-    }): <E extends HTMLElement>(target: E, propertyKey: keyof E) => void;
+const registerCustomElement = function<C extends CustomElementConstructor>(
+    elementCtor: C,
+    init: {
+        name: string;
+        options?: ElementDefinitionOptions
+    }): C {
+    const {name, options} = init;
+
+    if (!customElements.get(name)) {
+        customElements.define(
+            name,
+            elementCtor,
+            options
+        );
+    }
+
+    return elementCtor;
 }
 
-const AttributeProperty: AttributePropertyDecorator = function(init: {
-    type: "string" | "number" | "boolean" | "json"
-}) {
+function *subtreeNodes(node: Node): Generator<Node> {
+    yield node;
+    const childNodes = node.childNodes;
+    const childNodesCount = childNodes.length;
+    let childIndex = 0;
+    while (childIndex < childNodesCount) {
+        const child = childNodes.item(childIndex);
+        if (child !== null) {
+            yield * subtreeNodes(child);
+        }
+        childIndex++;
+    }
+}
+
+function *ancestorNodes(node: Node): Generator<Node> {
+    const {parentNode} = node;
+    if (parentNode) {
+        yield parentNode;
+        yield *ancestorNodes(parentNode);
+    }
+}
+
+interface QueryPropertyDecorator {
+    (
+        init: {
+            selector: string;
+            withinShadowRoot?: boolean;
+        }
+    ): <E extends HTMLElement>(target: E, propertyKey: keyof E) => void;
+}
+
+const QueryProperty: QueryPropertyDecorator = function(
+        init: {
+            selector: string;
+            withinShadowRoot?: boolean;
+        }
+    ) {
     return <E extends HTMLElement>(
         target: E, propertyKey: keyof E
     ) => {
-        const type = init.type;
+        const {constructor} = target;
+        const {prototype} = constructor;
         const propertyName = propertyKey.toString();
-        const attributeName = camelToTrain(propertyName);
-        switch (type) {
-            case "boolean":
-                Object.defineProperty(target.constructor.prototype, propertyName, {
-                    get: function(this: HTMLElement) {
-                        return this.hasAttribute(attributeName);
-                    },
-                    set: function(this: HTMLElement, value) {
-                        if (value) {
-                            this.setAttribute(attributeName, "");
-                        }
-                        else {
-                            this.removeAttribute(attributeName);
-                        }
-                    }
-                });
-                break;
-            case "json":
-                Object.defineProperty(target.constructor.prototype, propertyName, {
-                    get: function(this: HTMLElement) {
-                        const val = this.getAttribute(attributeName);
-                        return (val !== null) ? JSON.parse(val) : null;
-                    },
-                    set: function(this: HTMLElement, value) {
-                        if (value !== null) {
-                            this.setAttribute(attributeName, JSON.stringify(value));
-                        }
-                        else {
-                            this.removeAttribute(attributeName);
-                        }
-                    }
-                });
-                break;
-            case "number":
-                Object.defineProperty(target.constructor.prototype, propertyName, {
-                    get: function(this: HTMLElement) {
-                        const val = this.getAttribute(attributeName);
-                        return (val !== null) ? parseFloat(val) : val;
-                    },
-                    set: function(this: HTMLElement, value) {
-                        if (value) {
-                            this.setAttribute(attributeName, value);
-                        }
-                        else {
-                            this.removeAttribute(attributeName);
-                        }
-                    }
-                });
-                break;
-            case "string":
-            default:
-                Object.defineProperty(target.constructor.prototype, propertyName, {
-                    get: function(this: HTMLElement) {
-                        return this.getAttribute(attributeName);
-                    },
-                    set: function(this: HTMLElement, value) {
-                        if (value) {
-                            this.setAttribute(attributeName, value);
-                        }
-                        else {
-                            this.removeAttribute(attributeName);
-                        }
-                    }
-                });
-                break;
+        const {selector} = init;
+        const withinShadowRoot = init.withinShadowRoot ?? false;
+        const getter = withinShadowRoot ? function(this: HTMLElement) {
+            return this.shadowRoot!.querySelector(selector);
+        } : function(this: HTMLElement) {
+            return this.querySelector(selector);
         }
+        Object.defineProperty(prototype, propertyName, {
+            get: getter
+        });
+    }
+}
+
+interface QueryAllPropertyDecorator {
+    (
+        init: {
+            selector: string;
+            withinShadowRoot?: boolean;
+        }
+    ): <E extends HTMLElement>(target: E, propertyKey: keyof E) => void;
+}
+
+const QueryAllProperty: QueryAllPropertyDecorator = function(
+        init: {
+            selector: string;
+            withinShadowRoot?: boolean;
+        }
+    ) {
+    return <E extends HTMLElement>(
+        target: E, propertyKey: keyof E
+    ) => {
+        const {constructor} = target;
+        const {prototype} = constructor;
+        const propertyName = propertyKey.toString();
+        const {selector} = init;
+        const withinShadowRoot = init.withinShadowRoot ?? false;
+        const getter = withinShadowRoot ? function(this: HTMLElement) {
+            return Array.from(this.shadowRoot!.querySelectorAll(selector));
+        } : function(this: HTMLElement) {
+            return Array.from(this.querySelectorAll(selector));
+        };
+        Object.defineProperty(prototype, propertyName, {
+            get: getter
+        });
     }
 }
 
@@ -134,245 +304,376 @@ function Fragment(...nodes: (Node | string)[]): DocumentFragment {
     return fragment;
 }
 
-function TextNode(text: string = ""): Node {
+function TextNode(text: string): Node {
     return document.createTextNode(text);
 }
 
-type _IfEquals<X, Y, A = X, B = never> =
+type IfEquals<X, Y, A = X, B = never> =
   (<T>() => T extends X ? 1 : 2) extends
   (<T>() => T extends Y ? 1 : 2) ? A : B;
 
 type WritableKeys<T> = {
-    [P in keyof T]-?:
-        T[P] extends Function ? never : _IfEquals<
-            { [Q in P]: T[P] },
-            { -readonly [Q in P]: T[P] }
-        , P>
+  [P in keyof T]-?: IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, P, never>
+}[keyof T];
+
+type ReadonlyKeys<T> = {
+  [P in keyof T]-?: IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, never, P>
 }[keyof T];
 
 interface HTMLInit<E extends HTMLElement> {
     options?: ElementCreationOptions,
     properties?: Partial<Pick<E, WritableKeys<E>>>,
     part?: string[],
-    exportparts?: string[],
+    exportParts?: string[],
     attributes?: {[name: string]: number | string | boolean},
-    styles?: {
+    style?: {
         [property: string]: string | [string, string]
     },
-    dataset?: DOMStringMap,
-    children?: Node[] | NodeList | ReactiveChildNodes,
-    listeners?: {
+    dataset?: {
+        [property: string]: string | number | boolean
+    },
+    children?: (Node | string)[] | NodeList | ReactiveChildElements,
+    eventListeners?: {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined]
     }
 }
-
-function HTML<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementTagNameMap>(
-    tagName: K, init?: HTMLInit<E>): E;
-    function HTML(
-        tagName: string, init?: HTMLInit<HTMLElement>): HTMLElement;
-function HTML<K extends keyof HTMLElementTagNameMap>(
-    tagName: K, init?: HTMLInit<HTMLElementTagNameMap[K]>): HTMLElementTagNameMap[K] {
-        const element = document.createElement(tagName, init?.options);
-        if (init && init.options && init.options.is) {
-            element.setAttribute("is", init.options.is)
-        }
-        if (init) {
-            const { properties, part, exportparts, attributes, dataset, children, listeners, styles } = init;
-            if (properties) {
-                const keys = Object.keys(properties) as (keyof Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>)[];
-                keys.forEach((key) => {
-                    const value = properties[key];
-                    if (typeof properties[key] !== "undefined") {
-                        Object.assign(
-                            element, {
-                                [key]: value
-                            }
-                        );
-                    }
-                });
-            }
-            if (part) {
-                part.forEach((part) => {
-                    element.part.add(part);
-                });
-            }
-            if (exportparts) {
-                element.setAttribute("exportparts", exportparts.join(", "));
-            }
-            if (attributes) {
-                Object.keys(attributes).forEach((attributeName) => {
-                    const attributeValue = attributes[attributeName];
-                    if (typeof attributeValue === "boolean") {
-                        if (attributeValue) {
-                            element.setAttribute(camelToTrain(attributeName), "");
-                        }
-                    }
-                    else {
-                        element.setAttribute(camelToTrain(attributeName), attributeValue.toString());
-                    }
-                });
-            }
-            if (styles) {
-                Object.keys(styles).forEach((property) => {
-                    if (Array.isArray(styles[property])) {
-                        element.style.setProperty(property, styles[property][0], styles[property][1]);
-                    }
-                    else {
-                        element.style.setProperty(property, styles[property] as string);
-                    }
-                });
-            }
-            if (dataset) {
-                Object.keys(dataset).forEach((datasetEntry) => {
-                    element.dataset[datasetEntry] = dataset[datasetEntry];
-                });
-            }
-            if (children) {
-                if (typeof children === "function") {
-                    element.replaceChildren(...children(element));
-                }
-                else {
-                    element.replaceChildren(...(Array.isArray(children) ? children : Array.from(children)));
-                }
-            }
-            if (listeners) {
-                Object.entries(listeners).forEach((entry) => {
-                    if (Array.isArray(entry[1])) {
-                        element.addEventListener(entry[0], entry[1][0], entry[1][1]);
-                    }
-                    else {
-                        element.addEventListener(entry[0], entry[1]);
-                    }
-                });
-            }
-        }
-        return element;
+interface HTMLInitMap {
+    "template": HTMLTemplateInit;
 }
 
-type ReactiveNode = Node & {
+interface HTMLTemplateInit extends HTMLInit<HTMLTemplateElement> {
+    content?: (Node | string)[] | NodeList;
+}
+
+function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLInitMap>(
+    tagName: K, init?: HTMLInitMap[K]): E;
+function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementTagNameMap>(
+    tagName: K, init?: HTMLInit<E>): E;
+function element(
+    tagName: string, init?: HTMLInit<HTMLElement>): HTMLElement;
+function element<K extends keyof HTMLElementTagNameMap>(
+    tagName: K, init?: HTMLInit<HTMLElementTagNameMap[K]>): HTMLElementTagNameMap[K] {
+    if (init) {
+        const {options, properties, part, exportParts, attributes, dataset, children, eventListeners, style} = init;
+        const element = document.createElement(tagName, options);
+        if (options) {
+            const {is: isBuiltinElement} = options;
+            if (isBuiltinElement) {
+                element.setAttribute("is", isBuiltinElement)
+            }
+        }
+        if (properties) {
+            const keys = <(keyof Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>)[]>Object.keys(properties);
+            keys.forEach((key_i) => {
+                const value = properties[key_i];
+                if (typeof properties[key_i] !== "undefined") {
+                    Object.assign(
+                        element, {
+                            [key_i]: value
+                        }
+                    );
+                }
+            });
+        }
+        if (properties) {
+            const keys = <(keyof Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>)[]>Object.keys(properties);
+            keys.forEach((key_i) => {
+                const value = properties[key_i];
+                if (typeof properties[key_i] !== "undefined") {
+                    Object.assign(
+                        element, {
+                            [key_i]: value
+                        }
+                    );
+                }
+            });
+        }
+        if (part) {
+            const {part: elementPart} = element;
+            part.forEach((part) => {
+                elementPart.add(part);
+            });
+        }
+        if (exportParts) {
+            element.setAttribute("exportparts", exportParts.join(", "));
+        }
+        if (attributes) {
+            Object.keys(attributes).forEach((attributeName) => {
+                const attributeValue = attributes[attributeName];
+                if (typeof attributeValue == "boolean") {
+                    if (attributeValue) {
+                        element.setAttribute(camelToTrain(attributeName), "");
+                    }
+                }
+                else {
+                    element.setAttribute(camelToTrain(attributeName), attributeValue.toString());
+                }
+            });
+        }
+        if (style) {
+            const {style: elementStyle} = element;
+            Object.keys(style).forEach((property_i) => {
+                if (Array.isArray(style[property_i])) {
+                    elementStyle.setProperty(property_i, style[property_i][0], style[property_i][1]);
+                }
+                else {
+                    elementStyle.setProperty(property_i, <string>style[property_i]);
+                }
+            });
+        }
+        if (dataset) {
+            const {dataset: elementDataset} = element;
+            Object.keys(dataset).forEach((datasetEntry_i) => {
+                elementDataset[datasetEntry_i] = dataset[datasetEntry_i].toString();
+            });
+        }
+        if (children) {
+            if (typeof children == "function") {
+                element.replaceChildren(...children(element));
+            }
+            else {
+                element.replaceChildren(...Array.from(children));
+            }
+        }
+        if (eventListeners) {
+            Object.entries(eventListeners).forEach(([name_i, listener_i]) => {
+                if (Array.isArray(listener_i)) {
+                    element.addEventListener(name_i, listener_i[0], listener_i[1]);
+                }
+                else {
+                    element.addEventListener(name_i, listener_i);
+                }
+            });
+        }
+        switch (tagName) {
+            case "template":
+                const {content} = init as HTMLTemplateInit;
+                if (content) {
+                    (<HTMLTemplateElement>element).content.append(
+                        ...Array.from(content)
+                    );
+                }
+                break;
+        }
+        return element;
+    }
+    return document.createElement(tagName);
+}
+
+type ReactiveElement = Element & {
     _reactiveNodeAttributes: {
         addReactListener: () => void;
         removeReactListener: () => void;
     }
 };
 
-type ReactiveParentNode = Node & {
-    _reactiveParentNodeAttributes: {
-        addReactListener: () => void;
-        removeReactListener: () => void;
+const reactiveElementsMap = new WeakMap<ModelNode, {
+    observerOptions: ModelChangeObserverOptions,
+    reactiveElementsArray: {
+        elementRef: WeakRef<Element>,
+        properties: string[],
+        react: (element: any, property: string, oldValue: any, newValue: any) => void;
+    }[]
+}>();
+
+const reactiveElementsFinalizationRegistry = new FinalizationRegistry((heldValue: {
+    model: ModelNode,
+    reactiveElement: {
+        elementRef: WeakRef<Element>,
+        properties: string[],
+        react: (element: any, property: string, oldValue: any, newValue: any) => void;
     }
-};
+}) => {
+    const {model, reactiveElement} = heldValue;
+    const reactiveElementsMapEntry = reactiveElementsMap.get(model);
+    if (reactiveElementsMapEntry) {
+        const {reactiveElementsArray} = reactiveElementsMapEntry;
+        reactiveElementsArray.splice(reactiveElementsArray.indexOf(reactiveElement), 1);
+    }
+});
 
-function isReactiveNode(node: Node): node is ReactiveNode {
-    return typeof (node as ReactiveNode)._reactiveNodeAttributes === "object" &&
-        typeof (node as ReactiveNode)._reactiveNodeAttributes.addReactListener === "function" &&
-        typeof (node as ReactiveNode)._reactiveNodeAttributes.removeReactListener === "function";
-}
-
-function isReactiveParentNode(node: Node): node is ReactiveParentNode {
-    return typeof (node as ReactiveParentNode)._reactiveParentNodeAttributes === "object" &&
-        typeof (node as ReactiveParentNode)._reactiveParentNodeAttributes.addReactListener === "function" &&
-        typeof (node as ReactiveParentNode)._reactiveParentNodeAttributes.removeReactListener === "function";
-}
-
-function ReactiveNode<Data extends object, N extends Node>
-    (list: ListModel<Data>, node: N, react: (node: N, addedItems: Data[], removedItems: Data[], index: number) => void): N
-function ReactiveNode<Model extends ObjectModel, N extends Node>
-    (object: Model, node: N, react: <K extends Exclude<keyof Model, keyof EventDispatcher>>(node: N, property: K, oldValue: Model[K], newValue: Model[K]) => void): N
-function ReactiveNode<Data extends object, N extends Node>
-    (objectOrList: ObjectModel | ListModel<Data>, node: N, react: (<K extends keyof Data>(node: N, property: K, oldValue: Data[K], newValue: Data[K]) => void)
-    | ((node: N, addedItems: Data[], removedItems: Data[], index: number) => void)): N {
-        if ("clear" in objectOrList) {
-            const listener = ((event: ListModelChangeEvent) => {
-                react(node,  event.detail.addedItems as any, event.detail.removedItems as any, event.detail.index as any);
-            }) as EventListener;
-            Object.assign(
-                node, {
-                    _reactiveNodeAttributes: {
-                        addReactListener: () => {
-                            objectOrList.addEventListener("listmodelchange", listener);
-                        },
-                        removeReactListener: () => {
-                            objectOrList.removeEventListener("listmodelchange", listener);
-                        }
-                    }
+const reactiveElementPropertyObserver = new ModelChangeObserver((records: ModelChangeRecord[]) => {
+    records.forEach((record_i) => {
+        const {target, propertyName, oldValue, newValue} = record_i;
+        const {reactiveElementsArray} = reactiveElementsMap.get(target)!;
+        reactiveElementsArray.forEach((reactiveElement_i) => {
+            const {elementRef, react, properties} = reactiveElement_i;
+            const element = elementRef.deref();
+            if (element) {
+                if (properties.includes(propertyName!)) {
+                    react(element, propertyName!, oldValue, newValue);
                 }
-            ) as ReactiveNode;
+            }
+        });
+    });
+});
+
+function reactiveElement<M extends ModelNode, E extends Element, K extends string>(
+    model: M,
+    element: E,
+    properties: K[],
+    react: (element: E, property: K, oldValue: any, newValue: any) => void
+): E ;
+function reactiveElement<M extends ModelNode, E extends Element>(
+    model: M,
+    element: E,
+    properties: string[],
+    react: (element: E, property: string, oldValue: any, newValue: any) => void
+): E {
+    const elementRef = new WeakRef(element);
+    const reactiveElement = {elementRef, react, properties};
+    const reactiveElementsMapEntry = reactiveElementsMap.get(model);
+    reactiveElementsFinalizationRegistry.register(element, {model, reactiveElement});
+    if (!reactiveElementsMapEntry) {
+        const observerOptions = {
+            properties: true,
+            propertiesFilter: properties
+        };
+        const reactiveElementsArray = [reactiveElement];
+        reactiveElementsMap.set(model, {observerOptions, reactiveElementsArray});
+        reactiveElementPropertyObserver.observe(model, observerOptions);
+    }
+    else {
+        const {reactiveElementsArray, observerOptions} = reactiveElementsMapEntry;
+        const {propertiesFilter} = observerOptions;
+        reactiveElementsArray.push(reactiveElement);
+        observerOptions.propertiesFilter = propertiesFilter ?
+            propertiesFilter.concat(properties.filter(
+                property_i => !propertiesFilter.includes(property_i)
+            )) : Array.from(new Set(properties));
+    }
+    properties.forEach((property_i) => {
+        if (property_i in model) {
+            const value = Reflect.get(model, property_i, model);
+            if (value !== void 0) {
+                react(element, <any>property_i, <any>void 0, value);
+            }
         }
-        else {
-            const listener = ((event: ObjectModelChangeEvent) => {
-                react(node, event.detail.property as any, event.detail.oldValue, event.detail.newValue);
-            }) as EventListener;
-            Object.assign(
-                node, {
-                    _reactiveNodeAttributes: {
-                        addReactListener: () => {
-                            objectOrList.addEventListener("objectmodelchange", listener);
-                        },
-                        removeReactListener: () => {
-                            objectOrList.removeEventListener("objectmodelchange", listener);
-                        }
-                    }
-                }
-            ) as ReactiveNode;
-        }
-        return node;
+    });
+    return element;
 }
 
-interface ReactiveChildNodes {
+interface ReactiveChildElements {
     (parent: Node & ParentNode): (Node | string)[]
 }
 
-function ReactiveChildNodes<Item extends any>(list: ListModel<Item>, map: (item: Item) => Node | string, placeholder?: Node): ReactiveChildNodes {
-    return (parent: Node & ParentNode) => {
-        const mapping = (item: Item) => {
-            const node = map(item);
-            if (node instanceof DocumentFragment) {
-                console.warn("DocumentFragment with several child nodes are not supported in ReactiveChildNodes map.");
-                return node.firstChild || "";
-            }
-            return node;
-        };
-        const listener = ((event: ListModelChangeEvent) => {
-            const listLength = list.length();
-            if (listLength === event.detail.addedItems.length) {
-                parent.replaceChildren("");
-            }
-            if (event.detail.removedItems.length) {
-                for (let i = 0; i < event.detail.removedItems.length; i++) {
-                    if (parent.childNodes.length > event.detail.index) {
-                        parent.childNodes.item(event.detail.index).remove();
-                    }
-                }
-            }
-            if (event.detail.addedItems.length) {
-                const addedNodes = event.detail.addedItems.map(mapping);
-                if (event.detail.index >= listLength - event.detail.addedItems.length) {
-                    parent.append(...addedNodes);
-                }
-                else {
-                    parent.childNodes.item(event.detail.index - event.detail.removedItems.length)!.before(...addedNodes);
-                }
-            }
-            if (listLength === 0 && placeholder) {
-                parent.replaceChildren(placeholder);
-            }
-        }) as EventListener;
-        Object.assign(
-            parent, {
-                _reactiveParentNodeAttributes: {
-                    addReactListener: () => {
-                        list.addEventListener("listmodelchange", listener);
-                    },
-                    removeReactListener: () => {
-                        list.removeEventListener("listmodelchange", listener);
-                    }
-                }
-            }
-        ) as ReactiveParentNode;
-        return list.length() === 0 && placeholder ?
-            [placeholder] : list.getAll().map(mapping);
+const reactiveChildElementsMap = new WeakMap<ModelList, {
+    reactiveChildElementsArray: {
+        parentRef: WeakRef<ParentNode>,
+        mapping: (item: any) => Element,
+        placeholder?: Element
+    }[]
+}>();
+
+const reactiveChildElementsFinalizationRegistry = new FinalizationRegistry((heldValue: {
+    list: ModelList,
+    reactiveChildElement: {
+        parentRef: WeakRef<ParentNode>,
+        mapping: (item: any) => Element,
+        placeholder?: Element
     }
+}) => {
+    const {list, reactiveChildElement} = heldValue;
+    const reactiveChildrenElementsMapEntry = reactiveChildElementsMap.get(list);
+    if (reactiveChildrenElementsMapEntry) {
+        const {reactiveChildElementsArray} = reactiveChildrenElementsMapEntry;
+        reactiveChildElementsArray.splice(reactiveChildElementsArray.indexOf(reactiveChildElement), 1);
+    }
+});
+
+const reactiveChildElementsObserver = new ModelChangeObserver((records: ModelChangeRecord[]) => {
+    let range: null | Range = null;
+    Array.from(records.values()).forEach((record_i) => {
+        const {target} = record_i;
+        const list = <ModelList>target;
+        const {length: listLength} = list;
+        const {reactiveChildElementsArray} = reactiveChildElementsMap.get(list)!;
+        reactiveChildElementsArray.forEach((reactiveChildElements_i) => {
+            const {parentRef, mapping, placeholder} = reactiveChildElements_i;
+            const parent = parentRef.deref();
+            if (parent) {
+                const {firstChild, children} = parent;
+                const {length: childrenCount} = children;
+                if (placeholder && listLength > 0 && firstChild == placeholder) {
+                    parent.removeChild(placeholder);
+                }
+                const {changeType, LIST_INSERT, LIST_REMOVE, LIST_SORT} = record_i;
+                switch (changeType) {
+                    case LIST_INSERT: {
+                        const {insertedIndex, insertedItems} = record_i;
+                        const insertedItemsArray = Array.from(insertedItems.values())
+                            .map(item_i => mapping(item_i));
+                        const {length: childrenCount} = children;
+                        if (insertedIndex < childrenCount) {
+                            children[insertedIndex].before(...insertedItemsArray);
+                        }
+                        else {
+                            parent.append(...insertedItemsArray);
+                        }
+                        break;
+                    }
+                    case LIST_REMOVE: {
+                        const {removedIndex, removedItems} = record_i;
+                        const {length: removedCount} = removedItems;
+                        range = range ?? document.createRange();
+                        const removeEndIndex = removedIndex + (removedCount - 1);
+                        if (removeEndIndex < childrenCount) {
+                            range.setStartBefore(children[removedIndex]);
+                            range.setEndAfter(children[removeEndIndex]);
+                            range.deleteContents();
+                        }
+                        break;
+                    }
+                    case LIST_SORT: {
+                        const {sortedIndices} = record_i;
+                        const childrenArray = Array.from(children);
+                        parent.append(
+                            ...sortedIndices.filter(
+                                index_i => index_i < childrenCount
+                            ).map(
+                                index_i => childrenArray[index_i]
+                            )
+                        );
+                        break;
+                    }
+                }
+                if (listLength == 0 && placeholder) {
+                    parent.append(placeholder);
+                }
+            }
+        });
+    });
+});
+
+function reactiveChildElements<Model extends ModelNode>(
+    list: ModelList<Model>,
+    mapping: (item: Model) => Element,
+    placeholder?: Element
+): ReactiveChildElements {
+    return (parent: Node & ParentNode) => {
+        const parentRef = new WeakRef(parent);
+        const reactiveChildElementsMapEntry = reactiveChildElementsMap.get(list);
+        const reactiveChildElement = {parentRef, mapping, placeholder};
+        reactiveChildElementsFinalizationRegistry.register(parent, {list, reactiveChildElement});
+        if (!reactiveChildElementsMapEntry) {
+            const reactiveChildElementsArray = [reactiveChildElement];
+            reactiveChildElementsMap.set(list, {reactiveChildElementsArray});
+            reactiveChildElementsObserver.observe(list, {
+                childList: true
+            });
+        }
+        else {
+            const {reactiveChildElementsArray} = reactiveChildElementsMapEntry;
+            reactiveChildElementsArray.push(reactiveChildElement);
+        }
+        return list.length == 0 && placeholder ?
+            [placeholder] : Array.from(list.values()).map(mapping);
+    }
+}
+
+interface Collection<E extends Element = Element> {
+    item(index: number): E | null;
+    namedItem(name: string): E | null;
 }
 
 interface AttributeMutationMixin {
@@ -385,21 +686,24 @@ interface AttributeMutationMixin {
 
 type AttributeType = "string" | "boolean" | "list";
 
-function areAttributesMatching(refAttributeType: AttributeType, refAttrName: string, refAttrValue: string, attrName: string, attrValue: string | null): boolean {
-    if (refAttrName == attrName) {
-        switch (refAttributeType) {
+function areAttributesMatching(
+    referenceAttributeType: AttributeType,
+    referenceAttributeName: string, referenceAttributeValue: string,
+    attributeName: string, attributeValue: string | null): boolean {
+    if (referenceAttributeName == attributeName) {
+        switch (referenceAttributeType) {
             case "boolean":
-                return refAttrValue == "" && attrValue == "";
+                return referenceAttributeValue == "" && attributeValue == "";
             case "string":
-                return refAttrValue !== "" && (refAttrValue === attrValue);
+                return referenceAttributeValue !== "" && (referenceAttributeValue == attributeValue);
             case "list":
-                return (refAttrValue !== "" && attrValue !== null) && new RegExp(`${refAttrValue}\s*?`, "g").test(attrValue);
+                return (referenceAttributeValue !== "" && attributeValue !== null) && new RegExp(`${referenceAttributeValue}\s*?`, "g").test(attributeValue );
         }
     }
     return false;
 }
 
-abstract class AttributeMutationMixinBase implements AttributeMutationMixin {
+class AttributeMutationMixinBase implements AttributeMutationMixin {
     readonly attributeName: string;
     readonly attributeValue: string;
     readonly attributeType: AttributeType;
@@ -410,6 +714,11 @@ abstract class AttributeMutationMixinBase implements AttributeMutationMixin {
         this.attributeValue = attributeValue;
     }
 
-    public abstract attach(element: Element): void;
-    public abstract detach(element: Element): void;
+    attach(): void {
+        throw new TypeError("Not implemented method.");
+    }
+
+    detach(): void {
+        throw new TypeError("Not implemented method.");
+    }
 }

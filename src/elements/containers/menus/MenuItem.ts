@@ -1,367 +1,365 @@
-import { HotKey } from "../../../Input";
-import { CustomElement, AttributeProperty, HTML } from "../../Element";
+import { CustomElement, AttributeProperty, QueryProperty, element } from "../../Element";
+import { HTMLEActionElement } from "../actions/Action";
 import { HTMLEMenuElement } from "./Menu";
-import { HTMLEMenuBarElement } from "./MenuBar";
-import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
 
 export { HTMLEMenuItemElement };
-
-type EMenuItemElementType = "button" | "radio" | "checkbox" | "menu" | "submenu";
+export { EMenuItem };
 
 interface HTMLEMenuItemElementConstructor {
     readonly prototype: HTMLEMenuItemElement;
     new(): HTMLEMenuItemElement;
-    readonly observedAttributes: string[];
 }
 
-interface HTMLEMenuItemElement extends HTMLElement {
-    name: string;
+interface HTMLEMenuItemElement extends HTMLEActionElement {
+    readonly shadowRoot: ShadowRoot;
+    readonly menu: HTMLEMenuElement | null;
+    active: boolean;
+    index: number;
     label: string;
-    type: EMenuItemElementType;
-    disabled: boolean;
-    checked: boolean;
-
-    group: HTMLEMenuItemGroupElement | null;
-    parentMenu: HTMLEMenuElement | HTMLEMenuBarElement | null;
-    childMenu: HTMLEMenuElement | null;
-
-    hotkey: HotKey | null;
-    command: string | null;
-    commandArgs: any;
-    
-    connectedCallback(): void;
-    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
+    expanded: boolean;
+    type: "button" | "checkbox" | "radio" | "menu" | "submenu";
+    toggle(force?: boolean): void;
+    expand(): void;
+    collapse(): void;
 }
-
-type HotKeyChangeEvent = CustomEvent<{
-    oldHotKey: HotKey | null;
-    newHotKey: HotKey | null;
-}>;
 
 declare global {
     interface HTMLElementTagNameMap {
         "e-menuitem": HTMLEMenuItemElement,
     }
-
-    interface HTMLElementEventMap {
-        "e_hotkeychange": HotKeyChangeEvent
-    }
 }
+
+var shadowTemplateIconPart: HTMLElement;
+var shadowTemplateArrowPart: HTMLElement;
+var shadowTemplateHotkeyPart: HTMLElement;
+var shadowTemplate: HTMLTemplateElement;
 
 @CustomElement({
     name: "e-menuitem"
 })
-class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemElement {
+class HTMLEMenuItemElementBase extends HTMLEActionElement implements HTMLEMenuItemElement {
 
-    @AttributeProperty({type: "string"})
-    public name!: string;
+    readonly shadowRoot!: ShadowRoot;
     
-    @AttributeProperty({type: "string"})
-    public label!: string;
+    @AttributeProperty({type: Boolean})
+    active!: boolean;
 
-    @AttributeProperty({type: "string"})
-    public type!: EMenuItemElementType;
+    @AttributeProperty({type: String, observed: true})
+    label!: string;
 
-    @AttributeProperty({type: "boolean"})
-    public disabled!: boolean;
+    @AttributeProperty({type: Number})
+    index!: number;
 
-    @AttributeProperty({type: "boolean"})
-    public checked!: boolean;
+    @AttributeProperty({type: Boolean})
+    expanded!: boolean;
 
-    public group: HTMLEMenuItemGroupElement | null;
-    public parentMenu: HTMLEMenuElement | HTMLEMenuBarElement | null;
-    public childMenu: HTMLEMenuElement | null;
+    @AttributeProperty({type: String, defaultValue: "button", observed: true})
+    type!: "button" | "checkbox" | "radio" | "menu" | "submenu";
 
-    public command: string | null;
-    public commandArgs: any;
-
-    private _hotkey: HotKey | null;
-
-    public readonly shadowRoot!: ShadowRoot;
-
-    public static get observedAttributes(): string[] {
-        return ["label", "checked", "type"];
+    static {
+        shadowTemplateIconPart = element("span", {part: ["icon"]});
+        shadowTemplateArrowPart = element("span", {part: ["arrow"]});
+        shadowTemplateHotkeyPart = element("span", {part: ["hotkey"]});
+        shadowTemplate = element("template", {
+            content: [
+                element("span", {
+                    part: ["content"],
+                    children: [
+                        shadowTemplateIconPart,
+                        element("span", {
+                            part: ["label"]
+                        })
+                    ]
+                }),
+                element("slot", {
+                    properties: {
+                        name: "menu"
+                    }
+                })
+            ]
+        });
     }
 
     constructor() {
         super();
-
-        this.attachShadow({mode: "open"}).append(
-            HTML("style", {
-                properties: {
-                    innerText: /*css*/`
-                        :host {
-                            position: relative;
-                            display: inline-block;
-        
-                            user-select: none;
-                            white-space: nowrap;
-        
-                            padding: 2px 6px;
-                            cursor: pointer;
-                        }
-        
-                        :host(:not([type="menu"])) {
-                            padding-left: 12px;
-                            padding-right: 12px;
-                        }
-        
-                        :host(:focus-within) {
-                            color: black;
-                            background-color: lightgray;
-                        }
-        
-                        :host([disabled]) {
-                            color: dimgray;
-                        }
-        
-                        :host([type="submenu"]) ::slotted([slot="menu"]),
-                        :host([type="menu"]) ::slotted([slot="menu"]) {
-                            z-index: 1;
-                            position: absolute;
-                            color: initial;
-                        }
-        
-                        :host([type="menu"]) ::slotted([slot="menu"]) {
-                            top: 100%;
-                            left: 0;
-                        }
-                        
-                        :host([type="submenu"]) ::slotted([slot="menu"]) {
-                            left: 100%;
-                            top: -6px;
-                        }
-                        
-                        :host([type="submenu"]) ::slotted([slot="menu"][overflowing]) {
-                            right: 100%;
-                            left: auto;
-                        }
-                        
-                        :host([type="menu"]) ::slotted([slot="menu"][overflowing]) {
-                            right: 0;
-                            left: auto;
-                        }
-        
-                        :host([type="menu"]) ::slotted([slot="menu"]:not([expanded])),
-                        :host([type="submenu"]) ::slotted([slot="menu"]:not([expanded])) {
-                            opacity: 0;
-                            pointer-events: none !important;
-                        }
-        
-                        [part~="content"] {
-                            flex: auto;
-                            display: flex;
-                            overflow: hidden;
-                            pointer-events: none;
-                        }
-        
-                        [part~="input"] {
-                            display: inline-block;
-                            flex: none;
-                            width: 16px;
-                            height: 16px;
-                            margin: 2px;
-                        }
-        
-                        [part~="label"] {
-                            flex: auto;
-                            text-align: left;
-                        }
-        
-                        [part~="hotkey"] {
-                            flex: none;
-                            text-align: right;
-                            margin-left: 16px;
-                        }
-        
-                        [part~="hotkey"]:empty {
-                            display: none !important;
-                        }
-        
-                        [part~="arrow"] {
-                            display: inline-block;
-                            flex: none;
-                            margin: auto;
-                            color: inherit;
-                            text-align: center;
-                            font-weight: bold;
-                            width: 18px;
-                            height: 18px;
-                        }
-        
-                        [part~="arrow"]::after {
-                            display: inline-block;
-                            text-align: center;
-                            width: 18px;
-                            height: 18px;
-                            position: absolute;
-                            content: "►";
-                            color: dimgray;
-                        }
-        
-                        :host([type="menu"]) [part~="arrow"],
-                        :host([type="menu"]) [part~="input"] {
-                            display: none;
-                        }
-        
-                        :host(:not([type="menu"])) [part~="label"] {
-                            padding-left: 10px;
-                            padding-right: 12px;
-                        }
-                        
-                        :host(:not([type="checkbox"]):not([type="radio"])) [part~="input"] {
-                            visibility: hidden;
-                            pointer-events: none;
-                        }
-                        
-                        :host(:not([type="submenu"])) [part~="arrow"] {
-                            visibility: hidden;
-                            pointer-events: none;
-                        }
-                    `
-                }
-            }),
-            HTML("span", {
-                part: ["content"],
-                children: [
-                    HTML("input", {
-                        part: ["input"],
-                        properties: {
-                            type: "button",
-                            tabIndex: -1
-                        }
-                    }),
-                    HTML("span", {
-                        part: ["label"]
-                    }),
-                    HTML("span", {
-                        part: ["hotkey"]
-                    }),
-                    HTML("span", {
-                        part: ["arrow"]
-                    })
-                ]
-            }),
-            HTML("slot", {
-                properties: {
-                    name: "menu"
-                }
-            })
+        const shadowRoot = this.attachShadow({mode: "open"});
+        shadowRoot.append(
+            shadowTemplate.content.cloneNode(true)
         );
-        this.childMenu = null;
-        this.parentMenu = null;
-        this.group = null;
-        this.command = null;
-        this._hotkey = null;
     }
+    
+    @QueryProperty({selector: "e-menu[slot=menu]"})
+    readonly menu!: HTMLEMenuElement | null;
 
-    public get hotkey(): HotKey | null {
-        return this._hotkey;
-    }
+    @QueryProperty({selector: "[part=arrow]", withinShadowRoot: true})
+    readonly arrowPart!: Element | null;
 
-    public set hotkey(hotkey: HotKey | null) {
-        this.dispatchEvent(
-            new CustomEvent("e_hotkeychange", {
-                bubbles: true,
-                detail: {
-                    oldHotKey: this._hotkey,
-                    newHotKey: hotkey
-                }
-            })
-        );
+    @QueryProperty({selector: "[part=content]", withinShadowRoot: true})
+    readonly contentPart!: Element;
 
-        this._hotkey = hotkey;
+    @QueryProperty({selector: "[part=icon]", withinShadowRoot: true})
+    readonly iconPart!: Element | null;
 
-        const hotkeyPart = this.shadowRoot?.querySelector("[part~=hotkey]");
-        if (hotkeyPart) {
-            hotkeyPart.textContent = hotkey ? hotkey.toString() : "";
-        }
-    }
+    @QueryProperty({selector: "[part=label]", withinShadowRoot: true})
+    readonly labelPart!: Element;
 
-    public connectedCallback() {
-        this.tabIndex = this.tabIndex;
-
-        this.setAttribute("aria-label", this.label);
-
-        this.group = (
-            this.parentElement instanceof HTMLEMenuItemGroupElement
-        ) ? this.parentElement : null;
-
-        this.parentMenu = (
-            this.parentElement instanceof HTMLEMenuElement ||
-            this.parentElement instanceof HTMLEMenuBarElement
-        ) ? this.parentElement : null;
-
-        this.shadowRoot.addEventListener("slotchange", this);
-    }
-
-    public handleEvent(event: Event) {
-        const target = event.target;
-        switch (event.type) {
-            case "slotchange":
-                const slottedMenu = (target as HTMLSlotElement).assignedElements()[0];
-                this.childMenu = (slottedMenu instanceof HTMLEMenuElement) ? slottedMenu : null;
+    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
+        switch (name) {
+            case "label": {
+                const {labelPart} = this;
+                labelPart.textContent = newValue;   
                 break;
-        }
-    }
-
-    public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
-        if (newValue !== oldValue) {
-            switch (name) {
-                case "label":
-                    if (oldValue !== newValue) {
-                        const labelPart = this.shadowRoot?.querySelector("[part~=label]");
-                        if (labelPart) {
-                            labelPart.textContent = newValue;
+            }
+            case "type": {
+                switch (newValue) {
+                    case "submenu": {
+                        const {contentPart, iconPart, arrowPart} = this;
+                        if (arrowPart == null) {
+                            contentPart.append(
+                                shadowTemplateArrowPart.cloneNode(true)
+                            );
                         }
-                    }
-                    break;
-                case "checked":
-                    if (oldValue !== newValue) {
-                        const inputPart = this.shadowRoot?.querySelector<HTMLInputElement>("[part~=input]");
-                        if (inputPart) {
-                            inputPart.checked = (newValue !== null);
-                            this.dispatchEvent(new CustomEvent("e_change", {bubbles: true}));
+                        if (iconPart !== null) {
+                            iconPart.remove();
                         }
+                        break;
                     }
-                    break;
-                case "type":
-                    if (oldValue !== newValue) {
-                        const inputPart = this.shadowRoot?.querySelector<HTMLInputElement>("[part~=input]");
-                        if (inputPart) {
-                            switch (this.type) {
-                                case "radio":
-                                    inputPart.type = "radio";
-                                    break;
-                                case "menu":
-                                    inputPart.type = "hidden";
-                                    break;
-                                default:
-                                    inputPart.type = "checkbox";
-                                    break;
-                            }
+                    case "menu": {
+                        const {iconPart} = this;
+                        if (iconPart !== null) {
+                            iconPart.remove();
                         }
+                        break;
                     }
-                    break;
+                    default: {
+                        const {iconPart, arrowPart} = this;
+                        if (iconPart == null) {
+                            const {contentPart} = this;
+                            contentPart.prepend(
+                                shadowTemplateIconPart.cloneNode(true)
+                            );
+                        }
+                        if (arrowPart !== null) {
+                            arrowPart.remove();
+                        }
+                        break;
+                    }
+                }
+                break;
             }
         }
     }
 
-    public click(): void {
-        super.click();
-        if (!this.disabled) {
-            switch (this.type) {
-                case "checkbox":
-                    this.checked = !this.checked;
-                    break;
-                case "menu":
-                    if (this.childMenu) {
-                        this.childMenu.focusItemAt(0);
-                    }
-                    break;
+    toggle(force?: boolean): void {
+        const {type, expanded} = this;
+        switch (type) {
+            case "menu":
+            case "submenu": {
+                const expand = force ?? !expanded;
+                this.expanded = expand;
+                if (expand) {
+                    this.#positionMenu();
+                }
+                this.dispatchEvent(new Event("toggle", {bubbles: true}));
+                break;
+            }
+        }
+    }
+
+    expand(): void {
+        const {type} = this;
+        switch (type) {
+            case "menu":
+            case "submenu": {
+                if (!this.expanded) {
+                    this.expanded = true;
+                    this.#positionMenu();
+                }
+                break;
+            }
+        }
+    }
+
+    collapse(): void {
+        const {type} = this;
+        switch (type) {
+            case "menu":
+            case "submenu": {
+                if (this.expanded) {
+                    this.expanded = false;
+                }
+                break;
+            }
+        }
+    }
+
+    #positionMenu(): void {
+        const {menu} = this;
+        if (menu !== null) {
+            const {style: menuStyle} = menu;
+            const {top: itemTop, bottom: itemBottom, left: itemLeft, right: itemRight} = this.getBoundingClientRect();
+            const {width: menuWidth, height: menuHeight} = menu.getBoundingClientRect();
+            const {scrollY, scrollX} = window;
+            const {clientWidth, clientHeight} = document.body;
+            const {type} = this;
+            if (type == "menu") {
+                const overflowX = itemRight + menuWidth - clientWidth;
+                const overflowY = itemTop + menuHeight - clientHeight;
+                menuStyle.setProperty("left", `${
+                    overflowX > 0 ?
+                    scrollX + itemLeft - menuWidth :
+                    scrollX + itemLeft
+                }px`);
+                menuStyle.setProperty("top", `${
+                    overflowY > 0 ?
+                    scrollY + itemTop - menuHeight :
+                    scrollY + itemBottom
+                }px`);
+            }
+            else {
+                const closestMenu = this.closest("e-menu");
+                if (closestMenu !== null) {
+                    const {top: closestMenuTop, left: closestMenuLeft} = closestMenu.getBoundingClientRect();
+                    const overflowX = itemRight + menuWidth - clientWidth;
+                    const overflowY = itemTop + menuHeight - clientHeight;
+                    menuStyle.setProperty("left", `${
+                        overflowX > 0 ?
+                        itemLeft - menuWidth - closestMenuLeft :
+                        itemRight - closestMenuLeft
+                    }px`);
+                    const menuComputedStyle = window.getComputedStyle(menu);
+                    const {paddingTop, paddingBottom} = menuComputedStyle;
+                    const menuPaddingTop = parseFloat(paddingTop);
+                    const menuPaddingBottom = parseFloat(paddingBottom);
+                    menuStyle.setProperty("top", `${
+                        overflowY > 0 ?
+                        itemBottom - menuHeight - closestMenuTop + menuPaddingBottom :
+                        itemTop - closestMenuTop - menuPaddingTop
+                    }px`);
+                }
             }
         }
     }
 }
 
 var HTMLEMenuItemElement: HTMLEMenuItemElementConstructor = HTMLEMenuItemElementBase;
+
+interface EMenuItemConstructor {
+    readonly prototype: HTMLEMenuItemElement;
+    new(init: {
+        name: string;
+        label: string;
+        type: "button" | "checkbox" | "radio" | "menu" | "submenu";
+        value?: string;
+        trigger?: () => void;
+        menu?: HTMLEMenuElement;
+    }): HTMLEMenuItemElement;
+    button(init: {
+        name: string;
+        label: string;
+        value?: string;
+        trigger?: () => void;
+    }): HTMLEMenuItemElement;
+    checkbox(init: {
+        name: string;
+        label: string;
+        value?: string;
+        trigger?: () => void;
+    }): HTMLEMenuItemElement;
+    radio(init: {
+        name: string;
+        label: string;
+        value?: string;
+        trigger?: () => void;
+    }): HTMLEMenuItemElement;
+    menu(init: {
+        name: string;
+        label: string;
+        menu: HTMLEMenuElement;
+    }): HTMLEMenuItemElement;
+    submenu(init: {
+        name: string;
+        label: string;
+        menu: HTMLEMenuElement;
+    }): HTMLEMenuItemElement;
+}
+
+var EMenuItem = <EMenuItemConstructor>Object.assign(
+    <Function>function(init: {
+        name: string;
+        label: string;
+        type: "button" | "checkbox" | "radio" | "menu" | "submenu";
+        value?: string;
+        trigger?: () => void;
+        menu?: HTMLEMenuElement;
+    }) {
+        const {label, name, type, value, trigger, menu} = init;
+        if (menu) {
+            menu.slot = "menu";
+        }
+        return element("e-menuitem", {
+            properties: {
+                tabIndex: -1,
+                label: label,
+                title: label,
+                name: name,
+                value: value,
+                type: type
+            },
+            children: menu ? [menu] : void 0,
+            eventListeners: {
+                trigger: trigger
+            }
+        });
+    }, {
+        prototype: HTMLEMenuItemElement.prototype,
+        button(init: {
+            name: string,
+            label: string,
+            value?: string,
+            trigger?: () => void;
+        }) {
+            return new EMenuItem({
+                ...init, type: "button"
+            });
+        },
+        checkbox(init: {
+            name: string;
+            label: string;
+            value?: string;
+            trigger?: () => void;
+        }) {
+            return new EMenuItem({
+                ...init, type: "checkbox"
+            });
+        },
+        radio(init: {
+            name: string;
+            label: string;
+            value?: string;
+            trigger?: () => void;
+        }) {
+            return new EMenuItem({
+                ...init, type: "radio"
+            });
+        },
+        menu(init: {
+            name: string;
+            label: string;
+            menu: HTMLEMenuElement;
+        }) {
+            return new EMenuItem({
+                ...init, type: "menu"
+            });
+        },
+        submenu(init: {
+            name: string;
+            label: string;
+            menu: HTMLEMenuElement;
+        }) {
+            return new EMenuItem({
+                ...init, type: "submenu"
+            });
+        }
+    }
+);

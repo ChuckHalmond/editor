@@ -6,6 +6,7 @@ interface AttributeMixinsObserverConstructor {
 }
 interface AttributeMixinsObserver {
     observe(target: Node): void;
+    trigger(): void;
     disconnect(): void;
 }
 declare var AttributeMixinsObserver: AttributeMixinsObserverConstructor;

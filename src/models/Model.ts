@@ -1,215 +1,814 @@
-export { ObjectModelChangeEvent };
-export { ObjectModel };
-export { ListModelChangeEvent };
-export { ListModel };
+export { ModelChangeRecord };
+export { ModelEvent };
+export { ModelNode };
+export { ModelObject };
+export { ModelProperty };
+export { ModelList };
+export { ModelChangeObserverOptions };
+export { ModelChangeObserver };
 
-interface ObjectModelEventDetail {
-    property: string;
-    oldValue: any;
-    newValue: any;
+interface ModelChangeRecordConstructor {
+    readonly prototype: ModelChangeRecord;
+    new(
+        init: {
+            target: ModelNode | ModelList;
+            changeType: number;
+            propertyName?: string;
+            oldValue?: any;
+            newValue?: any;
+            removedIndex?: number,
+            removedItems?: ModelNode[],
+            insertedIndex?: number,
+            insertedItems?: ModelNode[],
+            sortedIndices?: number[]
+        }
+    ): ModelChangeRecord;
+    readonly PROPERTY_CHANGE: number;
+    readonly LIST_REMOVE: number;
+    readonly LIST_INSERT: number;
+    readonly LIST_SORT: number;
 }
 
-interface ObjectModelChangeEventConstructor {
-    readonly prototype: ObjectModelChangeEvent;
-    new(eventInitDict?: CustomEventInit<ObjectModelEventDetail>): ObjectModelChangeEvent;
+interface ModelChangeRecord {
+    readonly target: ModelNode | ModelList
+    readonly propertyName: string | null;
+    readonly oldValue: any;
+    readonly newValue: any;
+    readonly changeType: number;
+    readonly removedIndex: number;
+    readonly removedItems: ModelNodesList;
+    readonly insertedIndex: number;
+    readonly insertedItems: ModelNodesList;
+    readonly sortedIndices: number[];
+    readonly PROPERTY_CHANGE: number;
+    readonly LIST_REMOVE: number;
+    readonly LIST_INSERT: number;
+    readonly LIST_SORT: number;
 }
 
-interface ObjectModelChangeEvent extends CustomEvent<ObjectModelEventDetail> {
-    type: "objectmodelchange";
-}
+class ModelChangeRecordBase implements ModelChangeRecord {
+    readonly target: ModelNode | ModelList;
+    readonly changeType: number;
+    readonly propertyName: string | null;
+    readonly oldValue: any;
+    readonly newValue: any;
+    readonly removedIndex: number;
+    readonly removedItems: ModelNodesList;
+    readonly insertedIndex: number;
+    readonly insertedItems: ModelNodesList;
+    readonly sortedIndices: number[];
 
-class ObjectModelChangeEventBase extends CustomEvent<ObjectModelEventDetail> {
-    type!: "objectmodelchange";
+    constructor(
+        init: {
+            target: ModelNode | ModelList;
+            changeType: number;
+            propertyName?: string;
+            oldValue?: any;
+            newValue?: any;
+            removedIndex?: number,
+            removedItems?: ModelNode[],
+            insertedIndex?: number,
+            insertedItems?: ModelNode[],
+            sortedIndices?: number[]
+        }
+    ) {
+        this.target = init.target;
+        this.changeType = init.changeType;
+        this.propertyName = init.propertyName ?? null;
+        this.oldValue = init.oldValue ?? void 0;
+        this.newValue = init.newValue ?? void 0;
+        this.removedIndex = init.removedIndex ?? 0;
+        this.removedItems = new ModelNodesList(init.removedItems ?? []);
+        this.insertedIndex = init.insertedIndex ?? 0;
+        this.insertedItems = new ModelNodesList(init.insertedItems ?? []);
+        this.sortedIndices = init.sortedIndices ?? [];
+    }
 
-    constructor(eventInitDict?: CustomEventInit<ObjectModelEventDetail>) {
-        super("objectmodelchange", eventInitDict);
+    static get PROPERTY_CHANGE(): number {
+        return 1;
+    }
+
+    static get LIST_REMOVE(): number {
+        return 2;
+    }
+
+    static get LIST_INSERT(): number {
+        return 3;
+    }
+
+    static get LIST_SORT(): number {
+        return 4;
+    }
+
+    get PROPERTY_CHANGE(): number {
+        return ModelChangeRecordBase.PROPERTY_CHANGE;
+    }
+
+    get LIST_REMOVE(): number {
+        return ModelChangeRecordBase.LIST_REMOVE;
+    }
+
+    get LIST_INSERT(): number {
+        return ModelChangeRecordBase.LIST_INSERT;
+    }
+
+    get LIST_SORT(): number {
+        return ModelChangeRecordBase.LIST_SORT;
     }
 }
 
-interface ObjectModelEventMap {
-    "objectmodelchange": ObjectModelChangeEvent;
+var ModelChangeRecord: ModelChangeRecordConstructor = ModelChangeRecordBase;
+
+interface ModelNodesListConstructor {
+    readonly prototype: ModelNodesList;
+    new(items: any[]): ModelNodesList;
 }
 
-var ObjectModelChangeEvent: ObjectModelChangeEventConstructor = ObjectModelChangeEventBase;
-
-interface ObjectModelConstructor {
-    readonly prototype: ObjectModel;
-    new(): ObjectModel;
+interface ModelNodesList {
+    get length(): number;
+    item(index: number): ModelNode | null;
+    values(): IterableIterator<ModelNode>;
 }
 
-interface ObjectModel extends EventTarget {
-    dispatchEvent(event: Event): boolean;
-    addEventListener<K extends keyof ObjectModelEventMap>(type: K, listener: (this: ObjectModel, ev: ObjectModelEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-    addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-    removeEventListener<K extends keyof ObjectModelEventMap>(type: K, listener: (this: ObjectModel, ev: ObjectModelEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-    removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+class ModelNodesListBase implements ModelNodesList {
+    #items: ModelNode[];
+
+    constructor(items: ModelNode[]) {
+        this.#items = items.slice();
+    }
+
+    get length(): number {
+        return this.#items.length;
+    }
+
+    item(index: number): ModelNode | null {
+        return this.#items[index] ?? null;
+    }
+
+    values(): IterableIterator<ModelNode> {
+        return this.#items.values();
+    }
 }
 
-class ObjectModelBase extends EventTarget implements ObjectModel {
-    private _listmodelListeners: Map<string, EventListener>;
+var ModelNodesList: ModelNodesListConstructor = ModelNodesListBase;
+
+interface ModelEventConstructor {
+    readonly prototype: ModelEvent;
+    new(type: string): ModelEvent;
+}
+
+interface ModelEvent {
+    readonly type: string;
+    readonly currentTarget: ModelEventTarget | null;
+    readonly target: ModelEventTarget | null;
+}
+
+class ModelEventBase implements ModelEvent {
+    readonly type: string;
+
+    #currentTarget: ModelEventTarget | null;
+    #target: ModelEventTarget | null;
+
+    constructor(type: string) {
+        this.type = type;
+        this.#currentTarget = null;
+        this.#target = null;
+    }
+
+    get currentTarget(): ModelEventTarget | null {
+        return this.#currentTarget;
+    }
+
+    get target(): ModelEventTarget | null {
+        return this.#target;
+    }
+
+    static ModelEventTargetAccessor? = new class ModelEventTargetAccessor {
+        setCurrentTarget(event: ModelEvent, currentTarget: ModelEventTarget): void {
+            if (event instanceof ModelEventBase) {
+                event.#currentTarget = currentTarget;
+            }
+        }
+
+        setTarget(event: ModelEvent, target: ModelEventTarget): void {
+            if (event instanceof ModelEventBase) {
+                event.#target = target;
+            }
+        }
+    }
+}
+
+interface ModelEventTargetAccessor {
+    setCurrentTarget(event: ModelEvent, currentTarget: ModelEventTarget): void;
+    setTarget(event: ModelEvent, target: ModelEventTarget): void;
+}
+
+var ModelEventTargetAccessor: ModelEventTargetAccessor = ModelEventBase.ModelEventTargetAccessor!;
+delete ModelEventBase.ModelEventTargetAccessor;
+
+var ModelEvent: ModelEventConstructor = ModelEventBase;
+
+interface ModelEventTargetConstructor {
+    readonly prototype: ModelEventTarget;
+    new(): ModelEventTarget;
+}
+
+interface ModelEventTarget {
+    addEventListener(type: string, callback: (event: ModelEvent) => void): void;
+    removeEventListener(type: string, callback: (event: ModelEvent) => void): void;
+    dispatchEvent(event: ModelEvent): void;
+    receiveEvent(event: ModelEvent): void;
+}
+
+class ModelEventTargetBase implements ModelEventTarget {
+    #callbacks: Map<string, ((event: ModelEvent) => void)[]>;
+
+    constructor() {
+        this.#callbacks = new Map();
+    }
+
+    receiveEvent(event: ModelEvent): void {
+        const {type} = event;
+        const callbacks = this.#callbacks.get(type);
+        ModelEventTargetAccessor.setCurrentTarget(event, this);
+        if (callbacks) {
+            callbacks.forEach((callback_i) => {
+                callback_i(event);
+            });
+        }
+    }
+
+    addEventListener(type: string, callback: (event: ModelEvent) => void): void {
+        const callbacks = this.#callbacks.get(type);
+        if (callbacks) {
+            callbacks.push(callback);
+        }
+        else {
+            this.#callbacks.set(type, [callback]);
+        }
+    }
+
+    removeEventListener(type: string, callback: (event: ModelEvent) => void): void {
+        const callbacks = this.#callbacks.get(type);
+        if (callbacks) {
+            const callbackIndex = callbacks.findIndex(
+                callback_i => callback_i == callback
+            );
+            if (callbackIndex > -1) {
+                callbacks.splice(callbackIndex, 1);
+            }
+            if (callbacks.length == 0) {
+                this.#callbacks.delete(type);
+            }
+        }
+    }
+
+    dispatchEvent(event: ModelEvent): void {
+        ModelEventTargetAccessor.setTarget(event, this);
+        this.receiveEvent(event);
+    }
+}
+
+var ModelEventTarget: ModelEventTargetConstructor = ModelEventTargetBase;
+
+interface ModelNodeConstructor {
+    readonly prototype: ModelNode;
+    new(): ModelNode;
+}
+
+interface ModelNode extends ModelEventTarget {
+    readonly parentNode: ModelNode | null;
+    setParent(parentNode: ModelNode | null): void;
+    getRecords(): ModelChangeRecord[];
+    beginChanges(): void;
+    endChanges(): void;
+}
+
+interface ModelNodeRecordsAccessor {
+    triggerChange(node: ModelNode, property: string, oldValue: any, newValue: any): void;
+    handleRecord(node: ModelNode, record: ModelChangeRecord): void;
+}
+
+class ModelNodeBase extends ModelEventTargetBase implements ModelNode {
+    #parentNode: ModelNode | null;
+    #records: ModelChangeRecord[];
+    #isRecording: boolean;
 
     constructor() {
         super();
-        this._listmodelListeners = new Map();
-        return new Proxy(this, {
-            get: (target: this, property: string, receiver: any) => {
-                const value = Reflect.get(target, property, receiver);
-                return typeof value === "function" ? value.bind(target) : value;
-            },
-            set: (target: this, property: string, value: any, receiver: any) => {
-                const oldValue = Reflect.get(target, property, receiver);
-                if (oldValue instanceof ListModel) {
-                    if (this._listmodelListeners.has(property)) {
-                        const listmodelListener = this._listmodelListeners.get(property)!;
-                        oldValue.removeEventListener("listmodelchange", listmodelListener);
-                        this._listmodelListeners.delete(property);
-                    }
-                }
-                if (value instanceof ListModel) {
-                    const listmodelListener = () => {
-                        target.dispatchEvent(new ObjectModelChangeEvent({detail: {property: property, oldValue: value, newValue: value}}));
-                    };
-                    this._listmodelListeners.set(property, listmodelListener);
-                    value.addEventListener("listmodelchange", listmodelListener);
-                }
-                target.dispatchEvent(new ObjectModelChangeEvent({detail: {property: property, oldValue: oldValue, newValue: value}}));
-                return Reflect.set(target, property, value, receiver);
+        this.#parentNode = null;
+        this.#records = [];
+        this.#isRecording = false;
+    }
+
+    get parentNode(): ModelNode | null {
+        return this.#parentNode;
+    }
+
+    setParent(parentNode: ModelNode | null): void {
+        if (parentNode !== null) {
+            let isCyclicReference = parentNode == this;
+            let {parentNode: ancestorNode} = parentNode;
+            while (!isCyclicReference && ancestorNode !== null) {
+                ({parentNode: ancestorNode} = ancestorNode);
+                isCyclicReference = ancestorNode == this;
             }
+            if (!isCyclicReference) {
+                this.#parentNode = parentNode;
+            }
+            else {
+                throw new TypeError("Failed to set parent on ModelNode: circular reference detected in the hierarchy.");
+            }
+        }
+        else {
+            this.#parentNode = null;
+        }
+    }
+    
+    beginChanges(): void {
+        this.#isRecording = true;
+    }
+
+    endChanges(): void {
+        this.dispatchEvent(new ModelEvent("modelchange"));
+        this.#records.splice(0);
+        this.#isRecording = false;
+    }
+
+    getRecords(): ModelChangeRecord[] {
+        return this.#records.slice();
+    }
+
+    receiveEvent(event: ModelEvent): void {
+        super.receiveEvent(event);
+        const {parentNode} = this;
+        if (parentNode) {
+            parentNode.receiveEvent(event);
+        }
+    }
+
+    #triggerChange(property: string, oldValue: any, newValue: any): void {
+        const records = this.#records;
+        const record = new ModelChangeRecord({
+            target: this,
+            changeType: ModelChangeRecord.PROPERTY_CHANGE,
+            propertyName: property,
+            oldValue, newValue
+        });
+        records.push(record);
+        this.dispatchEvent(new ModelEvent("modelchange"));
+        records.splice(0);
+    }
+
+    #handleRecord(record: ModelChangeRecord): void {
+        this.#records.push(record);
+        if (!this.#isRecording) {
+            this.dispatchEvent(new ModelEvent("modelchange"));
+            this.#records.splice(0);
+        }
+    }
+
+    static ModelNodeRecordsAccessor? = new class ModelNodeRecordsAccessor {
+        triggerChange(node: ModelNode, property: string, oldValue: any, newValue: any): void {
+            if (node instanceof ModelNodeBase) {
+                node.#triggerChange(property, oldValue, newValue);
+            }
+        }
+
+        handleRecord(node: ModelNode, record: ModelChangeRecord): void {
+            if (node instanceof ModelNodeBase) {
+                node.#handleRecord(record);
+            }
+        }
+    }
+}
+
+var ModelNodeRecordsAccessor: ModelNodeRecordsAccessor = ModelNodeBase.ModelNodeRecordsAccessor!;
+delete ModelNodeBase.ModelNodeRecordsAccessor;
+
+var ModelNode: ModelNodeConstructor = ModelNodeBase;
+
+interface ModelPropertyDecorator {
+    (
+        init?: {
+            type: typeof String | typeof Number | typeof Boolean | typeof Date | typeof Object
+        }
+    ): <Model extends ModelObject>(target: Model, property: string) => void;
+}
+
+const ModelProperty: ModelPropertyDecorator = function(
+    init?: {
+        type: typeof String | typeof Number | typeof Boolean | typeof Date | typeof Object
+    }
+) {
+    return (
+        target: ModelObject, property: string
+    ) => {
+        const {constructor} = target;
+        const {prototype} = constructor;
+        /*const observedAttributes = Reflect.get(constructor, "observedAttributes", constructor);
+        if (Array.isArray(observedAttributes)) {
+            observedAttributes.push(property);
+        }
+        else {
+            Object.defineProperty(
+                constructor, "observedAttributes", {
+                    value: [property],
+                    writable: false
+                }
+            );
+        }*/
+        const setter = function(this: ModelObject, value: any) {
+            const oldValue = ModelObjectPropertiesAccessor.getProperty(this, property);
+            ModelObjectPropertiesAccessor.setProperty(this, property, value);
+            if (value !== oldValue) {
+                ModelNodeRecordsAccessor.triggerChange(this, property, oldValue, value);
+            }
+            return true;
+        };
+        const getter = function(this: ModelObject) {
+            return ModelObjectPropertiesAccessor.getProperty(this, property);
+        };
+        Object.defineProperty(prototype, property, {
+            set: setter,
+            get: getter,
+            enumerable: true
         });
     }
 }
 
-var ObjectModel: ObjectModelConstructor = ObjectModelBase;
-
-interface ListModelEventDetail {
-    addedItems: any[];
-    removedItems: any[];
-    index: number;
+interface ModelObjectConstructor {
+    readonly prototype: ModelObject;
+    new(): ModelObject;
 }
 
-interface ListModelChangeEventConstructor {
-    readonly prototype: ListModelChangeEvent;
-    new(eventInitDict?: CustomEventInit<ListModelEventDetail>): ListModelChangeEvent;
+interface ModelObject extends ModelNode {}
+
+interface ModelObjectPropertiesAccessor {
+    setProperty(node: ModelNode, property: string, value: any): void;
+    getProperty(node: ModelNode, property: string,): any;
 }
 
-interface ListModelChangeEvent extends Event {
-    type: "listmodelchange";
-    detail: ListModelEventDetail;
-}
+class ModelObjectBase extends ModelNodeBase implements ModelObject {
+    #properties: Map<string, any>;
 
-class ListModelChangeEventBase extends CustomEvent<ListModelEventDetail> {
-    type!: "listmodelchange";
-
-    constructor(eventInitDict?: CustomEventInit<ListModelEventDetail>) {
-        super("listmodelchange", eventInitDict);
-    }
-}
-
-var ListModelChangeEvent: ListModelChangeEventConstructor = ListModelChangeEventBase;
-
-interface ListModelConstructor {
-    readonly prototype: ListModel;
-    new(): ListModel;
-    new<Item>(items: Item[]): ListModel<Item>;
-}
-
-interface ListModelEventMap {
-    "listmodelchange": ListModelChangeEvent;
-}
-
-interface ListModel<Item = any> extends EventTarget {
-    get(index: number): Item | undefined;
-    getAll(): Item[];
-    length(): number;
-    set(index: number, item: Item): void;
-    setAll(items: Item[]): void;
-    insert(index: number, ...items: Item[]): void;
-    push(...items: Item[]): number;
-    pop(): Item | undefined;
-    remove(item: Item): void;
-    clear(): void;
-
-    addEventListener<K extends keyof ListModelEventMap>(type: K, listener: (this: ListModel, ev: ListModelEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-    addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-    removeEventListener<K extends keyof ListModelEventMap>(type: K, listener: (this: ListModel, ev: ListModelEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-    removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-}
-
-class ListModelBase<Item = any> extends EventTarget implements ListModel<Item> {
-    private _items: Item[];
-    
-    constructor()
-    constructor(items: Item[] = []) {
+    constructor() {
         super();
-        this._items = items.slice();
+        this.#properties = new Map();
     }
 
-    public get(index: number): Item | undefined {
-        return this._items[index];
-    }
-
-    public getAll(): Item[] {
-        return this._items.slice();
-    }
-
-    public length(): number {
-        return this._items.length;
-    }
-
-    public set(index: number, item: Item): void {
-        if (index >= 0 && index < this._items.length) {
-            this._items[index] = item;
-            this.dispatchEvent(new ListModelChangeEvent({detail: {addedItems: [item], removedItems: [], index: index}}));
-        }
-    }
-
-    public setAll(items: Item[]): void {
-        this._items = items.slice();
-    }
-
-    public push(...items: Item[]): number {
-        const newLength = this._items.push(...items);
-        this.dispatchEvent(new ListModelChangeEvent({detail: {addedItems: items, removedItems: [], index: newLength - items.length}}));
-        return newLength;
-    }
-
-    public pop(): Item | undefined {
-        const item = this._items.pop();
-        if (item) {
-            this.dispatchEvent(new ListModelChangeEvent({detail: {addedItems: [], removedItems: [item], index: this._items.length}}));
-        }
-        return item;
-    }
-
-    public insert(index: number, ...items: Item[]): void {
-        if (index > this._items.length) {
-            index = this._items.length;
-        }
-        else if (index < 0) {
-            if (index < -this._items.length) {
-                index = 0;
-            }
-            else {
-                index = this._items.length + index;
+    static ModelObjectPropertiesAccessor? = new class ModelPropertiesAccessor {
+        setProperty(node: ModelObject, property: string, value: any): void {
+            if (node instanceof ModelObjectBase) {
+                node.#properties.set(property, value);
             }
         }
-        this._items.splice(index, 0, ...items);
-        this.dispatchEvent(new ListModelChangeEvent({detail: {addedItems: items, removedItems: [], index: index}}));
-    }
 
-    public remove(item: Item): void {
-        const itemIndex = this._items.indexOf(item);
-        if (itemIndex > -1) {
-            this._items.splice(itemIndex, 1);
-            this.dispatchEvent(new ListModelChangeEvent({detail: {addedItems: [], removedItems: [item], index: itemIndex}}));
+        getProperty(node: ModelObject, property: string): any {
+            if (node instanceof ModelObjectBase) {
+                return node.#properties.get(property);
+            }
         }
-    }
-
-    public clear(): void {
-        const removedItems = this._items.slice();
-        this._items.splice(0, this._items.length);
-        this.dispatchEvent(new ListModelChangeEvent({detail: {addedItems: [], removedItems: removedItems, index: 0}}));
     }
 }
 
-var ListModel: ListModelConstructor = ListModelBase;
+var ModelObjectPropertiesAccessor: ModelObjectPropertiesAccessor = ModelObjectBase.ModelObjectPropertiesAccessor!;
+delete ModelObjectBase.ModelObjectPropertiesAccessor;
+
+var ModelObject: ModelObjectConstructor = ModelObjectBase;
+
+interface ModelListConstructor {
+    readonly prototype: ModelList;
+    new<Model extends ModelNode>(): ModelList<Model>;
+    new<Model extends ModelNode>(items: Model[]): ModelList<Model>;
+}
+
+interface ModelList<Model extends ModelNode = ModelNode> extends ModelNode {
+    readonly parentNode: ModelNode | null;
+    readonly length: number;
+    index(items: Model): number;
+    index(items: Model, fromIndex: number): number;
+    get(index: number): Model | null;
+    values(): IterableIterator<Model>;
+    sort(compareFunction: (item_a: any, item_b: any) => number): void;
+    insert(index: number, ...items: Model[]): void;
+    prepend(...items: Model[]): void;
+    append(...items: Model[]): void;
+    remove(item: Model): void;
+    clear(): void;
+}
+
+class ModelListBase<Model extends ModelNode = ModelNode> extends ModelNodeBase implements ModelList<Model> {
+    #items: Model[];
+
+    constructor()
+    constructor(items: Model[])
+    constructor(items?: Model[]) {
+        super();
+        this.#items = items?.slice() ?? [];
+    }
+
+    setParent(parentNode: ModelNode | null): void {
+        super.setParent(parentNode);
+        this.#items.forEach((item_i) => {
+            item_i.setParent(parentNode);
+        });
+    }
+
+    get length(): number {
+        return this.#items.length;
+    }
+
+    get(index: number): Model | null {
+        return this.#items[index] ?? null;
+    }
+
+    index(item: Model, fromIndex?: number): number {
+        return this.#items.indexOf(item, fromIndex)
+    }
+
+    values(): IterableIterator<Model> {
+        return this.#items.values();
+    }
+
+    sort(compareFunction: (item_a: any, item_b: any) => number): void {
+        const items = this.#items;
+        const indexedItems = items.map(
+            (item_i, i) => {
+                return {
+                    item: item_i,
+                    index: i
+                };
+            }
+        );
+        indexedItems.sort(
+            (indexedItem_a, indexedItem_b) => {
+                return compareFunction(
+                    indexedItem_a.item, indexedItem_b.item
+                )
+            }
+        );
+        this.#items = indexedItems.map(indexedItem_i => indexedItem_i.item);
+        const record = new ModelChangeRecord({
+            target: this,
+            changeType: ModelChangeRecord.LIST_SORT,
+            sortedIndices: indexedItems.map(indexedItem_i => indexedItem_i.index)
+        });
+        ModelNodeRecordsAccessor.handleRecord(this, record);
+    }
+
+    prepend(...items: Model[]): void {
+        const _items = this.#items;
+        const {parentNode} = this;
+        if (parentNode) {
+            items.forEach(item_i => {
+                item_i.setParent(parentNode);
+            });
+        }
+        _items.splice(0, 0, ...items);
+        const record = new ModelChangeRecord({
+            target: this,
+            changeType: ModelChangeRecord.LIST_INSERT,
+            insertedIndex: 0,
+            insertedItems: items
+        });
+        ModelNodeRecordsAccessor.handleRecord(this, record);
+    }
+
+    append(...items: Model[]): void {
+        const _items = this.#items;
+        const {length} = _items;
+        const {parentNode} = this;
+        if (parentNode) {
+            items.forEach(item_i => {
+                item_i.setParent(parentNode);
+            });
+        }
+        _items.push(...items);
+        const record = new ModelChangeRecord({
+            target: this,
+            changeType: ModelChangeRecord.LIST_INSERT,
+            insertedIndex: length,
+            insertedItems: items
+        });
+        ModelNodeRecordsAccessor.handleRecord(this, record);
+    }
+
+    insert(index: number, ...items: Model[]): void {
+        const _items = this.#items;
+        const {length} = _items;
+        const positiveIndex = Math.abs(index);
+        if (positiveIndex <= length) {
+            if (index >= 0) {
+                const {parentNode} = this;
+                items.forEach(item_i => {
+                    item_i.setParent(parentNode);
+                });
+                if (index < length) {
+                    _items.splice(index, 0, ...items);
+                }
+                else {
+                    _items.push(...items);
+                }
+            }
+            else if (index < 0) {
+                index = length - index;
+                const {parentNode} = this;
+                if (parentNode) {
+                    items.forEach(item_i => {
+                        item_i.setParent(parentNode);
+                    });
+                }
+                _items.splice(index, 0, ...items);
+            }
+            const record = new ModelChangeRecord({
+                target: this,
+                changeType: ModelChangeRecord.LIST_INSERT,
+                insertedIndex: index,
+                insertedItems: items.slice()
+            });
+            ModelNodeRecordsAccessor.handleRecord(this, record);
+        }
+    }
+
+    remove(item: Model): void {
+        const _items = this.#items;
+        const index = _items.indexOf(item);
+        if (index > -1) {
+            const item = _items.splice(index, 1)[0];
+            const {parentNode} = this;
+            if (parentNode) {
+                item.setParent(null);
+            }
+            const record = new ModelChangeRecord({
+                target: this,
+                changeType: ModelChangeRecord.LIST_REMOVE,
+                removedIndex: index,
+                removedItems: [item]
+            });
+            ModelNodeRecordsAccessor.handleRecord(this, record);
+        }
+    }
+
+    clear(): void {
+        const items = this.#items;
+        const {length} = items;
+        if (length > 0) {
+            const removedItems = items.splice(0);
+            const {parentNode} = this;
+            if (parentNode) {
+                removedItems.forEach((removedItem_i) => {
+                    removedItem_i.setParent(null);
+                });
+            }
+            const record = new ModelChangeRecord({
+                target: this,
+                changeType: ModelChangeRecord.LIST_REMOVE,
+                removedIndex: 0,
+                removedItems: removedItems
+            });
+            ModelNodeRecordsAccessor.handleRecord(this, record);
+        }
+    }
+};
+
+var ModelList: ModelListConstructor = ModelListBase!;
+
+interface ModelChangeObserverConstructor {
+    readonly prototype: ModelChangeObserver;
+    new(callback: (records: ModelChangeRecord[]) => void): ModelChangeObserver;
+}
+
+interface ModelChangeObserver {
+    observe(node: ModelNode, options: ModelChangeObserverOptions): void;
+    unobserve(node: ModelNode): void;
+    disconnect(): void;
+}
+
+type ModelChangeObserverOptions = {
+    properties?: boolean;
+    propertiesFilter?: string[];
+    childList?: boolean;
+    subtree?: boolean;
+}
+
+class ModelChangeObserverBase implements ModelChangeObserver {
+    #callback: (records: ModelChangeRecord[]) => void;
+    #records: ModelChangeRecord[];
+    #disconnected: boolean;
+
+    #references: WeakMap<ModelNode, {
+        listener: (event: ModelEvent) => void,
+        options: ModelChangeObserverOptions
+    }>;
+
+    constructor(callback: (records: ModelChangeRecord[]) => void) {
+        this.#callback = callback;
+        this.#records = [];
+        this.#disconnected = false;
+        this.#references = new WeakMap();
+    }
+
+    observe(node: ModelNode, options: ModelChangeObserverOptions): void {
+        this.#disconnected = false;
+        const references = this.#references;
+        let reference = references.get(node);
+        if (!reference) {
+            const listener = this.#handleModelEvent.bind(this);
+            node.addEventListener("modelchange", listener);
+            reference = {listener, options};
+            references.set(node, reference);
+        }
+        else {
+            references.set(node, reference);
+        }
+    }
+
+    unobserve(node: ModelNode): void {
+        const references = this.#references;
+        let reference = references.get(node);
+        if (reference) {
+            const {listener} = reference;
+            node.removeEventListener("modelchange", listener);
+        }
+    }
+
+    disconnect(): void {
+        this.#records.splice(0);
+        this.#disconnected = true;
+    }
+
+    #trigger(): void {
+        const records = this.#records.splice(0);
+        if (records.length > 0) {
+            this.#callback(records);
+        }
+    }
+
+    #handleModelEvent(event: ModelEvent): void {
+        if (!this.#disconnected) {
+            const {target, currentTarget} = event;
+            const reference = this.#references.get(<ModelNode>currentTarget);
+            if (reference) {
+                const {options} = reference;
+                const {properties, propertiesFilter, childList, subtree} = options;
+                if (subtree) {
+                    if (properties && target instanceof ModelNode) {
+                        if (propertiesFilter) {
+                            this.#records.push(
+                                ...target.getRecords()
+                                    .filter(record_i => {
+                                        const {propertyName} = record_i;
+                                        return propertiesFilter.includes(
+                                            propertyName!
+                                        )
+                                    })
+                            );
+                        }
+                        else {
+                            this.#records.push(
+                                ...target.getRecords()
+                            );
+                        }
+                        this.#trigger();
+                    }
+                    else if (childList && target instanceof ModelList) {
+                        this.#records.push(
+                            ...target.getRecords()
+                        );
+                        this.#trigger();
+                    }
+                }
+                else if (target == currentTarget) {
+                    if (properties && target instanceof ModelNode) {
+                        if (propertiesFilter) {
+                            this.#records.push(
+                                ...target.getRecords()
+                                    .filter(record_i => {
+                                        const {propertyName} = record_i;
+                                        return propertiesFilter.includes(
+                                            propertyName!
+                                        )
+                                    })
+                            );
+                        }
+                        else {
+                            this.#records.push(
+                                ...target.getRecords()
+                            );
+                        }
+                        this.#trigger();
+                    }
+                    else if (childList && target instanceof ModelList) {
+                        this.#records.push(
+                            ...target.getRecords()
+                        );
+                        this.#trigger();
+                    }
+                }
+            }
+        }
+    }
+}
+
+var ModelChangeObserver: ModelChangeObserverConstructor = ModelChangeObserverBase;

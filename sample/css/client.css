@@ -1,0 +1,81 @@
+:root {
+    --collapsed-symbol: "►";
+    --expanded-symbol: "▼";
+    --default-icon-mask-image: url("assets/blank.png");
+}
+
+@font-face {
+    font-family: "Open Sans";
+    src: url("/sample/assets/fonts/Open_Sans/OpenSans-VariableFont_wdth,wght.ttf") format("truetype")
+}
+
+body {
+    font-family: "Open Sans";
+    font-size: 14px;
+}
+
+e-toolbaritem[name="visibility"][checked] {
+    --icon-color: black;
+    --icon-image: url("/sample/assets/sharp_visibility_black_18dp.png");
+}
+
+e-toolbaritem[name="visibility"] {
+    --icon-color: black;
+    --icon-image: url("/sample/assets/sharp_visibility_off_black_18dp.png");
+}
+
+e-menubutton::part(content) {
+    --icon-color: black;
+    --icon-image: url("/sample/assets/more_horiz_FILL0_wght700_GRAD0_opsz48.svg");
+}
+
+e-menuitem[type="submenu"] {
+    --arrow-color: black;
+    --arrow-image: url("/sample/assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg");
+}
+
+e-menuitem[id="file-import-menu-button"] {
+    --icon-color: black;
+    --icon-image: url("/sample/assets/sharp_file_upload_black_18dp.png");
+}
+
+e-menuitem[id="file-export-menu-button"] {
+    --icon-color: black;
+    --icon-image: url("/assets/sharp_file_download_black_18dp.png");
+}
+
+.c-label {
+    pointer-events: none;
+}
+/*
+e-toolbaritem::part(label) {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}*/
+
+e-treeitem:not([active]):not([selected]) > e-treeitemgroup:hover ~ e-toolbar,
+e-treeitem:not(:hover):not([active]):not([selected]) > e-toolbar {
+    display: none;
+}
+
+e-option[selected],
+e-menuitem[type="checkbox"][checked] {
+    --icon-color: black;
+    --icon-image: url("/sample/assets/done_FILL0_wght400_GRAD0_opsz48.svg");
+}
+
+e-menuitem[type="radio"][checked]::part(icon)::before {
+    --icon-color: black;
+    --icon-image: url("/sample/assets/done_FILL0_wght400_GRAD0_opsz48.svg");
+}
+
+e-listitemgroup[data-default] {
+    border-top: 1px solid black;
+}
+
+e-listitemgroup[data-default] > e-listitem:first-child::part(content)::after {
+    content: "default";
+    order: 1;
+}

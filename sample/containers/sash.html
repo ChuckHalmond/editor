@@ -6,7 +6,6 @@
 
     .box {
         display: flex;
-        margin: 4px;
         width: 100px;
         height: 100px;
         background-color: whitesmoke;
@@ -30,6 +29,10 @@
         flex: 1;
         background-color: dimgray;
     }
+
+    #box {
+        position: absolute;
+    }
 </style>
 <div class="boxes">
     <div class="box x-box">
@@ -51,5 +54,8 @@
         <div class="flex"></div>
         <e-hsash controls="height-b" growdir="top"></e-hsash>
         <div id="height-b" class="resizable">Resize me!</div>
+    </div>
+    <div class="box" id="box">
+        <e-handle controls="box"></e-handle>
     </div>
 </div>

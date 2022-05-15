@@ -3,10 +3,11 @@ interface HTMLEDialogElementConstructor {
     readonly prototype: HTMLEDialogElement;
     new (): HTMLEDialogElement;
 }
-declare type EDialogElementType = "confirm" | "alert";
+declare type DialogElementType = "confirm" | "alert";
 interface HTMLEDialogElement extends HTMLElement {
+    readonly shadowRoot: ShadowRoot;
     name: string;
-    type: EDialogElementType;
+    type: DialogElementType;
     open(): void;
     close(): void;
     cancel(): void;
@@ -17,10 +18,10 @@ declare global {
         "e-dialog": HTMLEDialogElement;
     }
     interface HTMLElementEventMap {
-        "e_open": Event;
-        "e_close": Event;
-        "e_cancel": Event;
-        "e_confirm": Event;
+        "open": Event;
+        "close": Event;
+        "cancel": Event;
+        "confirm": Event;
     }
 }
 declare var HTMLEDialogElement: HTMLEDialogElementConstructor;

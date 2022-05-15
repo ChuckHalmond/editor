@@ -49,6 +49,7 @@ declare enum MouseButton {
     BACK = 5
 }
 declare class HotKey {
+    #private;
     readonly key: Key;
     readonly mod1?: KeyModifier;
     readonly mod2?: KeyModifier;

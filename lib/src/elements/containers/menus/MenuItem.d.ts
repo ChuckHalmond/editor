@@ -1,39 +1,66 @@
-import { HotKey } from "../../../Input";
+import { HTMLEActionElement } from "../actions/Action";
 import { HTMLEMenuElement } from "./Menu";
-import { HTMLEMenuBarElement } from "./MenuBar";
-import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
 export { HTMLEMenuItemElement };
-declare type EMenuItemElementType = "button" | "radio" | "checkbox" | "menu" | "submenu";
+export { EMenuItem };
 interface HTMLEMenuItemElementConstructor {
     readonly prototype: HTMLEMenuItemElement;
     new (): HTMLEMenuItemElement;
-    readonly observedAttributes: string[];
 }
-interface HTMLEMenuItemElement extends HTMLElement {
-    name: string;
+interface HTMLEMenuItemElement extends HTMLEActionElement {
+    readonly shadowRoot: ShadowRoot;
+    readonly menu: HTMLEMenuElement | null;
+    active: boolean;
+    index: number;
     label: string;
-    type: EMenuItemElementType;
-    disabled: boolean;
-    checked: boolean;
-    group: HTMLEMenuItemGroupElement | null;
-    parentMenu: HTMLEMenuElement | HTMLEMenuBarElement | null;
-    childMenu: HTMLEMenuElement | null;
-    hotkey: HotKey | null;
-    command: string | null;
-    commandArgs: any;
-    connectedCallback(): void;
-    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
+    expanded: boolean;
+    type: "button" | "checkbox" | "radio" | "menu" | "submenu";
+    toggle(force?: boolean): void;
+    expand(): void;
+    collapse(): void;
 }
-declare type HotKeyChangeEvent = CustomEvent<{
-    oldHotKey: HotKey | null;
-    newHotKey: HotKey | null;
-}>;
 declare global {
     interface HTMLElementTagNameMap {
         "e-menuitem": HTMLEMenuItemElement;
     }
-    interface HTMLElementEventMap {
-        "e_hotkeychange": HotKeyChangeEvent;
-    }
 }
 declare var HTMLEMenuItemElement: HTMLEMenuItemElementConstructor;
+interface EMenuItemConstructor {
+    readonly prototype: HTMLEMenuItemElement;
+    new (init: {
+        name: string;
+        label: string;
+        type: "button" | "checkbox" | "radio" | "menu" | "submenu";
+        value?: string;
+        trigger?: () => void;
+        menu?: HTMLEMenuElement;
+    }): HTMLEMenuItemElement;
+    button(init: {
+        name: string;
+        label: string;
+        value?: string;
+        trigger?: () => void;
+    }): HTMLEMenuItemElement;
+    checkbox(init: {
+        name: string;
+        label: string;
+        value?: string;
+        trigger?: () => void;
+    }): HTMLEMenuItemElement;
+    radio(init: {
+        name: string;
+        label: string;
+        value?: string;
+        trigger?: () => void;
+    }): HTMLEMenuItemElement;
+    menu(init: {
+        name: string;
+        label: string;
+        menu: HTMLEMenuElement;
+    }): HTMLEMenuItemElement;
+    submenu(init: {
+        name: string;
+        label: string;
+        menu: HTMLEMenuElement;
+    }): HTMLEMenuItemElement;
+}
+declare var EMenuItem: EMenuItemConstructor;

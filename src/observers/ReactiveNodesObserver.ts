@@ -1,4 +1,4 @@
-import { isReactiveNode, isReactiveParentNode } from "../elements/Element";
+/*import { isReactiveNode, isReactiveParentNode } from "../elements/Element";
 
 export { ReactiveNodesObserver };
 
@@ -8,44 +8,48 @@ interface ReactiveNodesObserverConstructor {
 }
 
 interface ReactiveNodesObserver {
+    trigger(): void;
     observe(target: Node): void;
     disconnect(): void;
 }
 
 class ReactiveNodesObserverBase implements ReactiveNodesObserver {
-    private _observer: MutationObserver;
-
+    #observer: MutationObserver;
+    
     constructor() {
-        this._observer = new MutationObserver(
-            this.callback.bind(this)
+        this.#observer = new MutationObserver(
+            this.#callback.bind(this)
         );
     }
 
-    public callback(mutationsList: MutationRecord[]) {
-        mutationsList.forEach((mutation: MutationRecord) => {
-            mutation.addedNodes.forEach((node: Node) => {
-                this.addReactListenersInSubtree(node);
-            });
-            mutation.removedNodes.forEach((node: Node) => {
-                this.removeReactListenersInSubtree(node);
-            });
-        });
+    trigger(): void {
+        this.#callback(this.#observer.takeRecords());
     }
 
-    public observe(target: Node): void  {
-        this._observer.observe(target, {
+    observe(target: Node): void  {
+        this.#observer.observe(target, {
             childList: true,
             subtree: true
         });
-        
-        this.addReactListenersInSubtree(target);
+        this.#addReactListenersInSubtree(target);
     }
 
-    public disconnect(): void {
-        this._observer.disconnect();
+    disconnect(): void {
+        this.#observer.disconnect();
     }
 
-    private addReactListenersInSubtree(node: Node) {
+    #callback(mutationsList: MutationRecord[]) {
+        mutationsList.forEach((mutation: MutationRecord) => {
+            mutation.addedNodes.forEach((node: Node) => {
+                this.#addReactListenersInSubtree(node);
+            });
+            mutation.removedNodes.forEach((node: Node) => {
+                this.#removeReactListenersInSubtree(node);
+            });
+        });
+    }
+
+    #addReactListenersInSubtree(node: Node) {
         if (isReactiveNode(node)) {
             node._reactiveNodeAttributes.addReactListener();
         }
@@ -53,16 +57,17 @@ class ReactiveNodesObserverBase implements ReactiveNodesObserver {
             node._reactiveParentNodeAttributes.addReactListener();
         }
         let childIndex = 0;
-        while (childIndex < node.childNodes.length) {
-            const child = node.childNodes.item(childIndex);
+        const {childNodes} = node;
+        while (childIndex < childNodes.length) {
+            const child = childNodes.item(childIndex);
             if (child !== null) {
-                this.addReactListenersInSubtree(child);
+                this.#addReactListenersInSubtree(child);
             }
             childIndex++;
         }
     }
 
-    private removeReactListenersInSubtree(node: Node) {
+    #removeReactListenersInSubtree(node: Node) {
         if (isReactiveNode(node)) {
             node._reactiveNodeAttributes.removeReactListener();
         }
@@ -70,14 +75,15 @@ class ReactiveNodesObserverBase implements ReactiveNodesObserver {
             node._reactiveParentNodeAttributes.removeReactListener();
         }
         let childIndex = 0;
-        while (childIndex < node.childNodes.length) {
-            const child = node.childNodes.item(childIndex);
+        const {childNodes} = node;
+        while (childIndex < childNodes.length) {
+            const child = childNodes.item(childIndex);
             if (child !== null) {
-                this.removeReactListenersInSubtree(child);
+                this.#removeReactListenersInSubtree(child);
             }
             childIndex++;
         }
     }
 }
 
-var ReactiveNodesObserver: ReactiveNodesObserverConstructor = ReactiveNodesObserverBase;
+var ReactiveNodesObserver: ReactiveNodesObserverConstructor = ReactiveNodesObserverBase;*/

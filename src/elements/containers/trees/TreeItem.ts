@@ -1,345 +1,247 @@
-import { CustomElement, HTML, AttributeProperty } from "../../Element";
+import { CustomElement, element, AttributeProperty } from "../../Element";
 import { HTMLETreeElement } from "./Tree";
+import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
 
 export { HTMLETreeItemElement };
 
 interface HTMLETreeItemElementConstructor {
     readonly prototype: HTMLETreeItemElement;
     new(): HTMLETreeItemElement;
-    readonly observedAttributes: string[];
 }
 
 interface HTMLETreeItemElement extends HTMLElement {
+    readonly shadowRoot: ShadowRoot;
+    readonly group: HTMLETreeItemGroupElement | null;
     name: string;
+    posinset: number;
     label: string;
+    droptarget: boolean;
     expanded: boolean;
-    indent: number;
     selected: boolean;
     active: boolean;
-    leaf: boolean;
-
-    shadowRoot: ShadowRoot;
-    items: HTMLETreeItemElement[];
-    parent: HTMLETreeItemElement | HTMLETreeElement | null;
-
-    deepestVisibleChildItem(): HTMLETreeItemElement;
-    previousVisibleItem(): HTMLETreeItemElement;
-    nextVisibleItem(): HTMLETreeItemElement;
-    nearestParentItem(): HTMLETreeItemElement;
-
-    toggle(): void;
-
-    findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null;
-
+    level: number;
+    type: "leaf" | "parent";
+    toggle(force?: boolean): void;
     connectedCallback(): void;
-    attributeChangedCallback(name: string, oldValue: string, newValue: string): void
+    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void
 }
 
 declare global {
     interface HTMLElementTagNameMap {
         "e-treeitem": HTMLETreeItemElement,
     }
-    
-    interface HTMLElementEventMap {
-        "e_toggle": Event,
-    }
 }
+
+var shadowTemplate: HTMLTemplateElement;
 
 @CustomElement({
     name: "e-treeitem"
 })
 class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemElement {
 
-    @AttributeProperty({type: "string"})
-    public name!: string;
+    readonly shadowRoot!: ShadowRoot;
 
-    @AttributeProperty({type: "string"})
-    public label!: string;
-
-    @AttributeProperty({type: "number"})
-    public indent!: number;
-
-    @AttributeProperty({type: "boolean"})
-    public expanded!: boolean;
-
-    @AttributeProperty({type: "string"})
-    public value!: string;
-
-    @AttributeProperty({type: "boolean"})
-    public selected!: boolean;
-
-    @AttributeProperty({type: "boolean"})
-    public active!: boolean;
-
-    @AttributeProperty({type: "boolean"})
-    public leaf!: boolean;
-
-    public items: HTMLETreeItemElement[];
-    public parent: HTMLETreeItemElement | HTMLETreeElement | null;
-
-    public static get observedAttributes(): string[] {
-        return ["label", "expanded", "indent"];
+    get group(): HTMLETreeItemGroupElement | null {
+        return this.#group;
     }
 
-    public readonly shadowRoot!: ShadowRoot;
+    @AttributeProperty({type: String})
+    name!: string;
 
-    constructor() {
-        super();
+    @AttributeProperty({type: Number})
+    posinset!: number;
 
-        this.attachShadow({mode: "open"}).append(
-            HTML("style", {
+    @AttributeProperty({type: String, observed: true})
+    label!: string;
+
+    @AttributeProperty({type: Boolean, observed: true})
+    expanded!: boolean;
+    
+    @AttributeProperty({type: Boolean})
+    droptarget!: boolean;
+
+    @AttributeProperty({type: Boolean})
+    active!: boolean;
+
+    @AttributeProperty({type: Boolean, observed: true})
+    selected!: boolean;
+
+    @AttributeProperty({type: Number, observed: true})
+    level!: number;
+
+    @AttributeProperty({type: String, defaultValue: "leaf"})
+    type!: "leaf" | "parent";
+
+    #group: HTMLETreeItemGroupElement | null;
+    
+    static {
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
+            element("style", {
                 properties: {
                     textContent: /*css*/`
                         :host {
-                            display: inline-block;
-                        
+                            display: block;
                             user-select: none;
-                            white-space: nowrap;
-                        
-                            padding: 0;
-                            cursor: pointer;
-                        
-                            --indent-width: 6px;
                         }
                         
-                        [part~="content"]:hover,
-                        :host([active]:not([selected])) [part~="content"] {
+                        :host([droptarget]) {
+                            background-color: gainsboro;
+                        }
+
+                        :host([active]) [part="content"] {
+                            background-color: whitesmoke;
+                            outline: 1px solid black;
+                            outline-offset: -1px;
+                        }
+
+                        :host([selected]) [part="content"] {
+                            background-color: gainsboro;
+                        }
+
+                        [part="content"] {
+                            display: flex;
+                            line-height: 22px;
+                            padding-left: calc(var(--level) * var(--indent-width, 12px));
+                        }
+
+                        [part="content"]:hover {
                             background-color: whitesmoke;
                         }
                         
-                        :host([selected]) [part~="content"] {
-                            background-color: gainsboro;
-                        }
-                        
-                        :host(:not([expanded])) [part~="container"] {
+                        :host(:not([type="parent"])) ::slotted([slot="group"]),
+                        :host(:not([expanded])) ::slotted([slot="group"]) {
                             display: none;
                         }
-                        
-                        [part~="content"] {
-                            font-size: 1em;
-                            display: flex;
-                            padding-left: calc(var(--tree-indent) * var(--indent-width));
-                            pointer-events: auto;
-                        }
-                        
-                        [part~="label"],
-                        ::slotted([slot="label"]) {
-                            display: block;
-                            width: 100%;
-                            pointer-events: none;
-                            overflow: hidden;
-                            white-space: nowrap;
-                            text-overflow: ellipsis;
-                        }
-                        
-                        :host([leaf]) [part~="container"],
-                        [part~="container"]:empty {
-                            display: none;
-                        }
-                        
-                        [part~="toggle-arrow"] {
-                            flex: none;
-                            display: inline-block;
-                            width: 18px;
-                            height: 18px;
-                            margin: 2px;
-                            margin-right: 6px;
-                            border-radius: 2px;
-                        }
-                        
-                        :host([leaf]) [part~="toggle-arrow"] {
+
+                        :host(:not([type="parent"])) [part="arrow"]::before {
                             visibility: hidden;
                         }
-                        
-                        [part~="toggle-arrow"]::after {
+
+                        [part="arrow"] {
                             display: inline-block;
                             width: 18px;
                             height: 18px;
-                            position: absolute;
-                            color: dimgray;
-                            text-align: center;
+                            margin: 1px 4px 1px 1px;
+                        }
+
+                        [part="arrow"]::before {
+                            display: inline-block;
+                            width: 18px;
+                            height: 18px;
+                            margin: 1px;
+                            content: "";
+                            mask-size: 18px 18px;
+                            -webkit-mask-size: 18px 18px;
+                            background-color: var(--arrow-color, none);
+                            filter: var(--arrow-filter, none);
                         }
                         
-                        :host(:not([expanded])) [part~="toggle-arrow"]::after {
-                            content: "►";
+                        :host(:not([expanded])) [part="arrow"]::before {
+                            -webkit-mask-image: var(--arrow-image-collapsed, none);
+                            mask-image: var(--arrow-image-collapsed, none);
                         }
                         
-                        :host([expanded]) [part~="toggle-arrow"]::after {
-                            content: "▼";
-                        }
-                        
-                        [part~="state"] {
-                            flex: none;
-                        }
-                        
-                        [part~="container"] {
-                            display: flex;
-                            flex-direction: column;
-                            pointer-events: none;
+                        :host([expanded]) [part="arrow"]::before {
+                            -webkit-mask-image: var(--arrow-image-expanded, none);
+                            mask-image: var(--arrow-image-expanded, none);
                         }
                     `
                 }
             }),
-            HTML("span", {
+            element("div", {
                 part: ["content"],
                 children: [
-                    HTML("span", {
-                        part: ["toggle-arrow"]
+                    element("span", {
+                        part: ["arrow"]
                     }),
-                    HTML("slot", {
-                        properties: {
-                            name: "label",
-                        },
-                        children: [
-                            HTML("span", {
-                                part: ["label"]
-                            }),
-                        ]
-                    })
+                    element("slot")
                 ]
             }),
-            HTML("div", {
-                part: ["container"],
-                children: [
-                    HTML("slot")
-                ]
+            element("slot", {
+                properties: {
+                    name: "group"
+                }
             })
         );
-        
-        this.items = [];
-        this.parent = null;
+    }
+    
+    constructor() {
+        super();
+        const shadowRoot = this.attachShadow({mode: "open"});
+        shadowRoot.append(
+            shadowTemplate.content.cloneNode(true)
+        );
+        shadowRoot.addEventListener("slotchange", this.#handleSlotChangeEvent.bind(this));
+        this.addEventListener("click", this.#handleClickEvent.bind(this));
+        this.#group = null;
     }
 
-    public connectedCallback() {
-        this.tabIndex = this.tabIndex;
-        
-        this.indent = (() => {
-            let indent = 0;
-            let item: Element = this;
-            while (item.parentElement instanceof HTMLETreeItemElement) {
-                indent++;
-                item = item.parentElement;
+    connectedCallback(): void {
+        this.level = (() => {
+            let level = 0;
+            let {parentElement} = this;
+            while (parentElement instanceof HTMLETreeItemGroupElement) {
+                level++;
+                ({parentElement} = parentElement);
+                if (!(parentElement instanceof HTMLETreeItemElement)) {
+                    return level;
+                }
+                ({parentElement} = parentElement);
             }
-            if (item.parentElement instanceof HTMLETreeElement) {
-                indent++;
+            if (parentElement instanceof HTMLETreeElement) {
+                level++;
             }
-            return indent;
+            return level;
         })();
-
-        this.parent = (
-            this.parentElement instanceof HTMLETreeItemElement ||
-            this.parentElement instanceof HTMLETreeElement
-        ) ? this.parentElement : null;
-
-        this.shadowRoot.addEventListener("click", this);
-        this.shadowRoot.addEventListener("slotchange", this);
     }
 
-    public handleEvent(event: Event) {
-        if (!(event.target instanceof Element)) {
-            throw new Error("Target must be of type Element.");
-        }
-        switch (event.type) {
-            case "click":
-                if (event.target.matches("[part~=content]")) {
-                    if (!this.leaf) {
-                        this.toggle();
-                    }
+    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
+        switch (name) {
+            case "expanded": {
+                this.dispatchEvent(new Event("toggle", {bubbles: true}));
+                break;
+            }
+            case "selected": {
+                this.dispatchEvent(new Event("select", {bubbles: true}));
+                break;
+            }
+            case "label": {
+                const labelPart = this.shadowRoot.querySelector("[part=label]");
+                if (labelPart) {
+                    labelPart.textContent = newValue;
                 }
                 break;
-            case "slotchange":
-                if (event.target.matches("slot:not([name])")) {
-                    this.items = (event.target as HTMLSlotElement)
-                        .assignedElements()
-                        .filter(item => item instanceof HTMLETreeItemElement) as HTMLETreeItemElement[];
-                }
+            }
+            case "level": {
+                this.style.setProperty("--level", `${this.level}`);
                 break;
-        }
-    }
-
-    public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
-        if (newValue !== oldValue) {
-            switch (name) {
-                case "label":
-                    const labelPart = this.shadowRoot.querySelector("[part~=label]");
-                    if (labelPart) {
-                        labelPart.textContent = newValue;
-                    }
-                    break;
-                case "expanded":
-                    this.dispatchEvent(new CustomEvent("e_toggle", {bubbles: true}));
-                    break;
-                case "indent":
-                    this.style.setProperty("--tree-indent", newValue);
-                    break;
             }
         }
     }
 
-    public deepestVisibleChildItem(): HTMLETreeItemElement {
-        if (this.expanded && this.items.length > 0) {
-            let lastChildItem = this.items[this.items.length - 1];
-            return lastChildItem.deepestVisibleChildItem();
-        }
-        return this;
+    toggle(force?: boolean): void {
+        this.expanded = force ?? !this.expanded;
     }
 
-    public previousVisibleItem(): HTMLETreeItemElement {
-        if (this.parent) {
-            let indexOfThis = this.parent.items.indexOf(this);
-            if (indexOfThis > 0) {
-                let previousItem = this.parent.items[indexOfThis - 1];
-                return previousItem.deepestVisibleChildItem();
-            }
-            return this.parent instanceof HTMLETreeItemElement ? this.parent : this;
+    #handleClickEvent(event: MouseEvent): void {
+        const {target, shiftKey, ctrlKey} = event;
+        const {type} = this;
+        if (this == target && type == "parent" && !(shiftKey || ctrlKey)) {
+            this.toggle();
         }
-        return this;
     }
 
-    public nextVisibleItem(): HTMLETreeItemElement {
-        if (this.expanded && this.items.length > 0) {
-            return this.items[0];
-        }
-        let nearestItem = this.nearestParentItem();
-        if (nearestItem.parent) {
-            let indexOfNearest = nearestItem.parent.items.indexOf(nearestItem);
-            if (indexOfNearest < nearestItem.parent.items.length - 1) {
-                return nearestItem.parent.items[indexOfNearest + 1];
+    #handleSlotChangeEvent(event: Event): void {
+        const {target} = event;
+        const {name: slotName} = <HTMLSlotElement>target ;
+        switch (slotName) {
+            case "group": {
+                const element = (<HTMLSlotElement>target).assignedElements()[0];
+                this.#group = element instanceof HTMLETreeItemGroupElement ? element : null;
+                break;
             }
         }
-        return this;
-    }
-
-    public nearestParentItem(): HTMLETreeItemElement {
-        if (this.parent instanceof HTMLETreeItemElement) {
-            let indexOfThis = this.parent.items.indexOf(this);
-            if (indexOfThis === this.parent.items.length - 1) {
-                return this.parent.nearestParentItem();
-            }
-        }
-        return this;
-    }
-
-    public toggle(): void {
-        this.expanded = !this.expanded;
-    }
-
-    public findItem(predicate: (item: HTMLETreeItemElement) => boolean, subtree?: boolean): HTMLETreeItemElement | null {
-        let foundItem: HTMLETreeItemElement | null = null;
-        for (let item of this.items) {
-            if (predicate(item)) {
-                return item;
-            }
-            if (subtree && item.items) {
-                for (let subitem of item.items) {
-                    foundItem = subitem.findItem(predicate, subtree);
-                    if (foundItem) {
-                        return foundItem;
-                    }
-                }
-            }
-        }
-        return foundItem;
     }
 }
 

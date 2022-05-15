@@ -5,8 +5,8 @@ interface HTMLEDragzoneElementConstructor {
     new (): HTMLEDragzoneElement;
 }
 interface HTMLEDragzoneElement extends HTMLElement {
-    draggables: HTMLEDraggableElement[];
-    selectedDraggables: HTMLEDraggableElement[];
+    readonly draggables: HTMLEDraggableElement[];
+    readonly selectedDraggables: HTMLEDraggableElement[];
     disabled: boolean;
     selectDraggable(draggable: HTMLEDraggableElement): void;
     unselectDraggable(draggable: HTMLEDraggableElement): void;

@@ -1,69 +1,69 @@
-import { CustomElement, AttributeProperty, HTML } from "../Element";
+import { CustomElement, AttributeProperty, element } from "../Element";
 
 export { HTMLEWidthSashElement };
-
-type EWidthSashDirection = "left" | "right";
 
 interface HTMLEWidthSashElementConstructor {
     readonly prototype: HTMLEWidthSashElement;
     new(): HTMLEWidthSashElement;
-    readonly observedAttributes: string[];
 }
 
 interface HTMLEWidthSashElement extends HTMLElement {
+    readonly shadowRoot: ShadowRoot;
+    readonly target: HTMLElement | null;
     controls: string;
-    growdir: EWidthSashDirection;
-    connectedCallback(): void;
-    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
+    growdir: "right" | "left";
+    max: boolean;
+    setWidth(width: number): void;
 }
 
 declare global {
     interface HTMLElementTagNameMap {
         "e-wsash": HTMLEWidthSashElement;
     }
-
     interface HTMLElementEventMap {
-        "e_resize": Event;
+        "resize": Event;
     }
 }
+
+var shadowTemplate: HTMLTemplateElement;
 
 @CustomElement({
     name: "e-wsash"
 })
 class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashElement {
 
-    @AttributeProperty({type: "string"})
-    public controls!: string;
+    readonly shadowRoot!: ShadowRoot;
 
-    @AttributeProperty({type: "string"})
-    public growdir!: EWidthSashDirection;
-
-    private _target: HTMLElement | null;
-    private _targetStyle: CSSStyleDeclaration | null;
-
-    public static get observedAttributes() {
-        return ["controls"];
+    get target(): HTMLElement | null {
+        return this.#target;
     }
 
-    constructor() {
-        super();
-        
-        this.attachShadow({mode: "open"}).append(
-            HTML("style", {
+    @AttributeProperty({type: String, observed: true})
+    controls!: string;
+
+    @AttributeProperty({type: String, defaultValue: "right"})
+    growdir!: "right" | "left";
+
+    @AttributeProperty({type: Boolean})
+    max!: boolean;
+
+    #target: HTMLElement | null;
+    #onCapture: boolean;
+    #queuedPointerCallback: FrameRequestCallback | null;
+    #pointerMovement: number;
+
+    static {
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
+            element("style", {
                 properties: {
                     innerText: /*css*/`
                         :host {
-                            display: block;
-                            z-index: 1;
-        
-                            min-width: 4px;
-                            width: 4px;
-                            max-width: 4px;
-        
-                            margin-left: -2px;
-                            margin-right: -2px;
+                            display: inline-block;
                             
-                            background-color: rgb(0, 128, 255);
+                            width: 4px;
+                            
+                            background-color: rgb(135, 206, 250);
                             cursor: ew-resize;
         
                             transition-property: opacity;
@@ -81,53 +81,73 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
                 }
             })
         );
-
-        this._target = null;
-        this._targetStyle = null;
     }
 
-    public connectedCallback(): void {
-        this.tabIndex = this.tabIndex;
-
-        let onPointerMove = (event: PointerEvent) => {
-            if (this._target && this._targetStyle) {
-                let width = parseFloat(this._targetStyle.getPropertyValue("width"));
-                let newWidth = Math.trunc(width + ((this.growdir === "left") ? -1 : 1) * event.movementX);
-                this._target.style.setProperty("width", `${newWidth}px`);
-                this.dispatchEvent(new CustomEvent("e_resize"));
-            }
-        };
-
-        this.addEventListener("pointerdown", (event: PointerEvent) => {
-            const target = document.getElementById(this.controls);
-            if (target && this._target !== target) {
-                this._target = target;
-                this._targetStyle = window.getComputedStyle(target);
-            }
-            this.setPointerCapture(event.pointerId);
-            this.addEventListener("pointermove", onPointerMove);
-            this.addEventListener("pointerup", () => {
-                this.removeEventListener("pointermove", onPointerMove);
-                this.releasePointerCapture(event.pointerId);
-            });
-        });
+    constructor() {
+        super();
+        const shadowRoot = this.attachShadow({mode: "open"});
+        shadowRoot.append(
+            shadowTemplate.content.cloneNode(true)
+        );
+        this.#target = null;
+        this.#queuedPointerCallback = null;
+        this.#pointerMovement = 0;
+        this.#onCapture = false;
+        this.addEventListener("pointerdown", this.#handlePointerDownEvent.bind(this));
+        this.addEventListener("pointermove", this.#handlePointerMoveEvent.bind(this));
+        this.addEventListener("pointerup", this.#handlePointerUpEvent.bind(this));
     }
 
-    public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
-        if (newValue !== oldValue) {
-            switch (name) {
-                case "controls":
-                    if (oldValue !== newValue) {
-                        const target = document.getElementById(this.controls);
-                        if (target) {
-                            this._target = target;
-                            this._targetStyle = window.getComputedStyle(target);
-                        }
-                    }
-                    break;
+    setWidth(width: number): void {
+        const target = this.#target;
+        if (target !== null) {
+            const {max} = this;
+            target.style.setProperty("width", `${width}px`);
+            if (max) {
+                target.style.setProperty("max-width", `${width}px`);
             }
         }
     }
+
+    #handlePointerUpEvent(event: PointerEvent): void {
+        const {pointerId} = event;
+        this.releasePointerCapture(pointerId);
+        this.#onCapture = false;
+    }
+
+    #handlePointerDownEvent(event: PointerEvent): void {
+        const {pointerId} = event;
+        const {controls} = this;
+        const rootNode = <ShadowRoot | Document>this.getRootNode();
+        this.#target = rootNode.getElementById(controls);
+        this.setPointerCapture(pointerId);
+        this.#onCapture = true;
+    }
+
+    #handlePointerMoveEvent(event: PointerEvent): void {
+        if (this.#onCapture) {
+            if (this.#queuedPointerCallback == null) {
+                this.#queuedPointerCallback = this.#pointerMoveCallback.bind(this);
+                requestAnimationFrame(this.#queuedPointerCallback);
+            }
+            this.#pointerMovement += event.movementX;
+        }
+    }
+
+    #pointerMoveCallback(): void {
+        const target = this.#target;
+        if (target !== null) {
+            const targetComputedStyle = window.getComputedStyle(target);
+            const {growdir} = this;
+            const movementX = this.#pointerMovement;
+            const width = parseFloat(targetComputedStyle.getPropertyValue("width"));
+            const newWidth = width + (growdir == "right" ? 1 : -1) * movementX;
+            this.setWidth(newWidth);
+            this.dispatchEvent(new Event("resize"));
+        }
+        this.#pointerMovement = 0;
+        this.#queuedPointerCallback = null;
+    }
 }
 
-var HTMLEHeightSashElement: HTMLEWidthSashElementConstructor = HTMLEWidthSashElementBase;
+var HTMLEWidthSashElement: HTMLEWidthSashElementConstructor = HTMLEWidthSashElementBase;

@@ -1,23 +1,15 @@
 import { HTMLEMenuItemElement } from "./MenuItem";
-import { HTMLEMenuElement } from "./Menu";
 export { HTMLEMenuItemGroupElement };
+export { EMenuItemGroup };
 interface HTMLEMenuItemGroupElementConstructor {
     readonly prototype: HTMLEMenuItemGroupElement;
     new (): HTMLEMenuItemGroupElement;
-    readonly observedAttributes: string[];
 }
 interface HTMLEMenuItemGroupElement extends HTMLElement {
+    readonly shadowRoot: ShadowRoot;
     name: string;
     label: string;
-    parentMenu: HTMLEMenuElement | null;
-    items: HTMLEMenuItemElement[];
-    readonly activeIndex: number;
-    readonly activeItem: HTMLEMenuItemElement | null;
-    focusItemAt(index: number, childMenu?: boolean): void;
-    reset(): void;
-    findItem(predicate: (item: HTMLEMenuItemElement) => boolean, subitems?: boolean): HTMLEMenuItemElement | null;
-    connectedCallback(): void;
-    attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
+    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
 }
 declare global {
     interface HTMLElementTagNameMap {
@@ -25,3 +17,18 @@ declare global {
     }
 }
 declare var HTMLEMenuItemGroupElement: HTMLEMenuItemGroupElementConstructor;
+interface EMenuItemGroupConstructor {
+    readonly prototype: HTMLEMenuItemGroupElement;
+    new (init: {
+        name?: string;
+        items: HTMLEMenuItemElement[];
+    }): HTMLEMenuItemGroupElement;
+    radios(init: {
+        name: string;
+        items: {
+            label: string;
+            value: string;
+        }[];
+    }): HTMLEMenuItemGroupElement;
+}
+declare var EMenuItemGroup: EMenuItemGroupConstructor;

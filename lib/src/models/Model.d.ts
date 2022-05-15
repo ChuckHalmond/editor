@@ -1,71 +1,136 @@
-export { ObjectModelChangeEvent };
-export { ObjectModel };
-export { ListModelChangeEvent };
-export { ListModel };
-interface ObjectModelEventDetail {
-    property: string;
-    oldValue: any;
-    newValue: any;
+export { ModelChangeRecord };
+export { ModelEvent };
+export { ModelNode };
+export { ModelObject };
+export { ModelProperty };
+export { ModelList };
+export { ModelChangeObserverOptions };
+export { ModelChangeObserver };
+interface ModelChangeRecordConstructor {
+    readonly prototype: ModelChangeRecord;
+    new (init: {
+        target: ModelNode | ModelList;
+        changeType: number;
+        propertyName?: string;
+        oldValue?: any;
+        newValue?: any;
+        removedIndex?: number;
+        removedItems?: ModelNode[];
+        insertedIndex?: number;
+        insertedItems?: ModelNode[];
+        sortedIndices?: number[];
+    }): ModelChangeRecord;
+    readonly PROPERTY_CHANGE: number;
+    readonly LIST_REMOVE: number;
+    readonly LIST_INSERT: number;
+    readonly LIST_SORT: number;
 }
-interface ObjectModelChangeEventConstructor {
-    readonly prototype: ObjectModelChangeEvent;
-    new (eventInitDict?: CustomEventInit<ObjectModelEventDetail>): ObjectModelChangeEvent;
+interface ModelChangeRecord {
+    readonly target: ModelNode | ModelList;
+    readonly propertyName: string | null;
+    readonly oldValue: any;
+    readonly newValue: any;
+    readonly changeType: number;
+    readonly removedIndex: number;
+    readonly removedItems: ModelNodesList;
+    readonly insertedIndex: number;
+    readonly insertedItems: ModelNodesList;
+    readonly sortedIndices: number[];
+    readonly PROPERTY_CHANGE: number;
+    readonly LIST_REMOVE: number;
+    readonly LIST_INSERT: number;
+    readonly LIST_SORT: number;
 }
-interface ObjectModelChangeEvent extends CustomEvent<ObjectModelEventDetail> {
-    type: "objectmodelchange";
+declare var ModelChangeRecord: ModelChangeRecordConstructor;
+interface ModelNodesListConstructor {
+    readonly prototype: ModelNodesList;
+    new (items: any[]): ModelNodesList;
 }
-interface ObjectModelEventMap {
-    "objectmodelchange": ObjectModelChangeEvent;
+interface ModelNodesList {
+    get length(): number;
+    item(index: number): ModelNode | null;
+    values(): IterableIterator<ModelNode>;
 }
-declare var ObjectModelChangeEvent: ObjectModelChangeEventConstructor;
-interface ObjectModelConstructor {
-    readonly prototype: ObjectModel;
-    new (): ObjectModel;
+declare var ModelNodesList: ModelNodesListConstructor;
+interface ModelEventConstructor {
+    readonly prototype: ModelEvent;
+    new (type: string): ModelEvent;
 }
-interface ObjectModel extends EventTarget {
-    dispatchEvent(event: Event): boolean;
-    addEventListener<K extends keyof ObjectModelEventMap>(type: K, listener: (this: ObjectModel, ev: ObjectModelEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-    addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-    removeEventListener<K extends keyof ObjectModelEventMap>(type: K, listener: (this: ObjectModel, ev: ObjectModelEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-    removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+interface ModelEvent {
+    readonly type: string;
+    readonly currentTarget: ModelEventTarget | null;
+    readonly target: ModelEventTarget | null;
 }
-declare var ObjectModel: ObjectModelConstructor;
-interface ListModelEventDetail {
-    addedItems: any[];
-    removedItems: any[];
-    index: number;
+declare var ModelEvent: ModelEventConstructor;
+interface ModelEventTargetConstructor {
+    readonly prototype: ModelEventTarget;
+    new (): ModelEventTarget;
 }
-interface ListModelChangeEventConstructor {
-    readonly prototype: ListModelChangeEvent;
-    new (eventInitDict?: CustomEventInit<ListModelEventDetail>): ListModelChangeEvent;
+interface ModelEventTarget {
+    addEventListener(type: string, callback: (event: ModelEvent) => void): void;
+    removeEventListener(type: string, callback: (event: ModelEvent) => void): void;
+    dispatchEvent(event: ModelEvent): void;
+    receiveEvent(event: ModelEvent): void;
 }
-interface ListModelChangeEvent extends Event {
-    type: "listmodelchange";
-    detail: ListModelEventDetail;
+declare var ModelEventTarget: ModelEventTargetConstructor;
+interface ModelNodeConstructor {
+    readonly prototype: ModelNode;
+    new (): ModelNode;
 }
-declare var ListModelChangeEvent: ListModelChangeEventConstructor;
-interface ListModelConstructor {
-    readonly prototype: ListModel;
-    new (): ListModel;
-    new <Item>(items: Item[]): ListModel<Item>;
+interface ModelNode extends ModelEventTarget {
+    readonly parentNode: ModelNode | null;
+    setParent(parentNode: ModelNode | null): void;
+    getRecords(): ModelChangeRecord[];
+    beginChanges(): void;
+    endChanges(): void;
 }
-interface ListModelEventMap {
-    "listmodelchange": ListModelChangeEvent;
+declare var ModelNode: ModelNodeConstructor;
+interface ModelPropertyDecorator {
+    (init?: {
+        type: typeof String | typeof Number | typeof Boolean | typeof Date | typeof Object;
+    }): <Model extends ModelObject>(target: Model, property: string) => void;
 }
-interface ListModel<Item = any> extends EventTarget {
-    get(index: number): Item | undefined;
-    getAll(): Item[];
-    length(): number;
-    set(index: number, item: Item): void;
-    setAll(items: Item[]): void;
-    insert(index: number, ...items: Item[]): void;
-    push(...items: Item[]): number;
-    pop(): Item | undefined;
-    remove(item: Item): void;
+declare const ModelProperty: ModelPropertyDecorator;
+interface ModelObjectConstructor {
+    readonly prototype: ModelObject;
+    new (): ModelObject;
+}
+interface ModelObject extends ModelNode {
+}
+declare var ModelObject: ModelObjectConstructor;
+interface ModelListConstructor {
+    readonly prototype: ModelList;
+    new <Model extends ModelNode>(): ModelList<Model>;
+    new <Model extends ModelNode>(items: Model[]): ModelList<Model>;
+}
+interface ModelList<Model extends ModelNode = ModelNode> extends ModelNode {
+    readonly parentNode: ModelNode | null;
+    readonly length: number;
+    index(items: Model): number;
+    index(items: Model, fromIndex: number): number;
+    get(index: number): Model | null;
+    values(): IterableIterator<Model>;
+    sort(compareFunction: (item_a: any, item_b: any) => number): void;
+    insert(index: number, ...items: Model[]): void;
+    prepend(...items: Model[]): void;
+    append(...items: Model[]): void;
+    remove(item: Model): void;
     clear(): void;
-    addEventListener<K extends keyof ListModelEventMap>(type: K, listener: (this: ListModel, ev: ListModelEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-    addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-    removeEventListener<K extends keyof ListModelEventMap>(type: K, listener: (this: ListModel, ev: ListModelEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-    removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }
-declare var ListModel: ListModelConstructor;
+declare var ModelList: ModelListConstructor;
+interface ModelChangeObserverConstructor {
+    readonly prototype: ModelChangeObserver;
+    new (callback: (records: ModelChangeRecord[]) => void): ModelChangeObserver;
+}
+interface ModelChangeObserver {
+    observe(node: ModelNode, options: ModelChangeObserverOptions): void;
+    unobserve(node: ModelNode): void;
+    disconnect(): void;
+}
+declare type ModelChangeObserverOptions = {
+    properties?: boolean;
+    propertiesFilter?: string[];
+    childList?: boolean;
+    subtree?: boolean;
+};
+declare var ModelChangeObserver: ModelChangeObserverConstructor;

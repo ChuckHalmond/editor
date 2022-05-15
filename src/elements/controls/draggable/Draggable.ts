@@ -1,4 +1,4 @@
-import { CustomElement, AttributeProperty, HTML } from "../../Element";
+import { CustomElement, AttributeProperty, element } from "../../Element";
 
 export { HTMLEDraggableElement };
 
@@ -8,16 +8,15 @@ interface HTMLEDraggableElementConstructor {
 }
 
 interface HTMLEDraggableElement extends HTMLElement {
+    readonly referee: this | null;
+    readonly references: this[];
     selected: boolean;
     dragged: boolean;
     dragovered: boolean;
 
     connectedCallback(): void;
     disconnectedCallback(): void;
-
     getReference(): this;
-    readonly referee: this | null;
-    readonly references: this[];
 }
 
 declare global {
@@ -31,26 +30,26 @@ declare global {
 })
 class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableElement {
     
-    @AttributeProperty({type: "boolean"})
-    public selected!: boolean;
+    @AttributeProperty({type: Boolean})
+    selected!: boolean;
 
-    @AttributeProperty({type: "boolean"})
-    public dragovered!: boolean;
+    @AttributeProperty({type: Boolean})
+    dragovered!: boolean;
 
-    @AttributeProperty({type: "boolean"})
-    public dragged!: boolean;
+    @AttributeProperty({type: Boolean})
+    dragged!: boolean;
 
-    @AttributeProperty({type: "boolean"})
-    public disabled!: boolean;
+    @AttributeProperty({type: Boolean})
+    disabled!: boolean;
 
-    private _referee: this | null;
-    public readonly references: this[];
+    #referee: this | null;
+    readonly references: this[];
 
     constructor() {
         super();
 
         this.attachShadow({mode: "open"}).append(
-            HTML("style", {
+            element("style", {
                 properties: {
                     innerText: /*css*/`
                         :host {
@@ -65,8 +64,8 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
         
                         :host([disabled]) {
                             pointer-events: none;
-                            color: gray;
-                            border-color: gray;
+                            color: lightgray;
+                            border-color: lightgray;
                         }
         
                         :host([selected]:active) {
@@ -90,10 +89,10 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
                     `
                 }
             }),
-            HTML("div", {
+            element("div", {
                 part: ["container"],
                 children: [
-                    HTML("slot", {
+                    element("slot", {
                         properties: {
                             textContent: "&nbsp;"
                         }
@@ -103,19 +102,19 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
         );
 
         this.references = [];
-        this._referee = null;
+        this.#referee = null;
     }
 
-    public get referee(): this | null {
-        return this._referee;
+    get referee(): this | null {
+        return this.#referee;
     }
     
-    public connectedCallback(): void {
+    connectedCallback(): void {
         this.tabIndex = this.tabIndex;
         this.draggable = true;
     }
 
-    public disconnectedCallback(): void {
+    disconnectedCallback(): void {
         if (this.referee) {
             const thisRefIndex = this.referee.references.indexOf(this);
             if (thisRefIndex > -1) {
@@ -124,9 +123,9 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
         }
     }
 
-    public getReference(): this {
-        const reference = this.cloneNode(true) as this;
-        reference._referee = this;
+    getReference(): this {
+        const reference = <this>this.cloneNode(true);
+        reference.#referee = this;
         return reference;
     }
 }

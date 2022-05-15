@@ -4,12 +4,12 @@ export { Command };
 export { UndoCommand };
 
 function isCommand(obj: any): obj is Command {
-    return (typeof obj.exec === 'function');
+    return (typeof obj.exec == 'function');
 }
 
 function isUndoCommand(obj: any): obj is UndoCommand {
-    return (typeof obj.exec === 'function')
-        && (typeof obj.undo === 'function');
+    return (typeof obj.exec == 'function')
+        && (typeof obj.undo == 'function');
 }
 
 interface Command {

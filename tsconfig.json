@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "outDir": "./lib",
-    "target": "es2018",
+    "target": "es2021",
     "experimentalDecorators": true,
+    "noImplicitAny": true,
     "module": "esnext",
     "moduleResolution": "node",
     "sourceMap": true,

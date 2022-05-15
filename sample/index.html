@@ -5,27 +5,30 @@
         <title>temp</title>
         <base href="./">
         <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <link rel="stylesheet" href="css/main.css"/>
         <style>
-            body {
-                font-family: consolas;
-            }
-
-            *:focus-within {
-                z-index: 1;
+            :root {
+                
             }
         </style>
     </head>
-    <body tabindex="0">
-        <e-import src="containers/menubar.html"></e-import>
-        <e-import src="containers/menubutton.html"></e-import>
-        <e-import src="containers/tree.html"></e-import>
-        <e-import src="containers/tablist.html"></e-import>
-        <e-import src="containers/dialog.html"></e-import>
-        <e-import src="containers/draggable.html"></e-import>
-        <e-import src="containers/sash.html"></e-import>
+    <body>
+        <!--<e-import src="containers/menubutton.html"></e-import>
         <e-import src="containers/statusbar.html"></e-import>
+        
+        <e-import src="containers/draggable.html"></e-import>-->
+        <!--<e-import src="containers/loaders.html"></e-import>-->
+        <!--<e-import src="containers/dialog.html"></e-import>-->
+        <!--<e-import src="containers/sash.html"></e-import>
+        <e-import src="containers/tree.html"></e-import>-->
+        <e-import src="containers/list.html"></e-import>
+        <e-import src="containers/tablist.html"></e-import>
+        <e-import src="containers/select.html"></e-import>
+        <e-import src="containers/menubar.html"></e-import>
+        <e-import src="containers/toolbar.html"></e-import>
         <e-import id="formdata-import" src="containers/formdata.html"></e-import>
-        <script src="./dist/main.js"></script>
+        <e-import src="containers/grid.html"></e-import>
+        <script src="dist/main.js"></script>
         <script>
             window.main.main();
         </script>

@@ -1,0 +1,23 @@
+e-gridrow {
+    display: table-row;
+}
+
+e-gridrow[droptarget] {
+    background-color: gainsboro;
+}
+
+e-gridcell:hover,
+e-gridcell:focus-within {
+    background-color: var(--focus-background-color);
+}
+
+e-gridrow[active] {
+    outline: 1px solid var(--focus-background-color);
+    outline-offset: -1px;
+}
+
+e-gridrow[selected] {
+    background-color: rgba(135, 206, 250, 0.4);
+    outline: 1px solid rgb(135, 206, 250);
+    outline-offset: -1px;
+}
