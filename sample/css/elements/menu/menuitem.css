@@ -5,7 +5,7 @@ e-menuitem {
     white-space: nowrap;
 }
 
-e-menuitem:is(:focus, :focus-within)::part(content) {
+e-menuitem[active]::part(content) {
     background-color: var(--focused-item-color);
 }
 
@@ -45,7 +45,6 @@ e-menuitem::part(icon) {
     display: inline-block;
     width: 18px;
     height: 18px;
-    margin-left: 6px;
     overflow: hidden;
 }
 

@@ -54,11 +54,11 @@ e-toolbaritem::part(label) {
     height: 0;
     overflow: hidden;
 }*/
-
+/*
 e-menuitem,
 e-menuitem::part(icon) {
     border-radius: 2px;
-}
+}*/
 
 e-treeitem:not([active]):not([selected]) > e-treeitemgroup:hover ~ e-toolbar,
 e-treeitem:not(:hover):not([active]):not([selected]) > e-toolbar {

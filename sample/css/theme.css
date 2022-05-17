@@ -18,12 +18,12 @@
     --background-color: white;
     --background-darker-color: white;
     --background-lighter-color: white;
-
+    
     --hovered-item-color: rgba(135, 206, 250, 0.38);
-    --focused-item-color: rgb(220, 220, 220);
-    --focused-item-outline-color: rgb(135, 206, 250);
-    --selected-item-color: rgba(135, 206, 250, 0.62);
-    --activated-item-color: rgb(135, 206, 250);
+    --focused-item-color: hsl(203, 92%, 50%, 0.5);
+    --focused-item-outline-color: hsl(203, 92%, 75%);
+    --selected-item-color: rgb(135, 206, 250);
+    --activated-item-color: hsl(203, 92%, 50%, 0.5);
 
     --hovered-item-text-color: rgb(0, 0, 0);
     --focused-item-text-color: rgb(0, 0, 0);

@@ -14,10 +14,6 @@ e-menu[contextual] {
     position: absolute;
 }
 
-e-menu e-menuitem {
-    margin: 1px 0;
-}
-
 e-menu > hr {
     margin: 10px 0px 10px 36px;
     border: none;

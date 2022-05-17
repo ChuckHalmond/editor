@@ -168,7 +168,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         if (activeItem !== null && activeItem !== item) {
             activeItem.active = false;
         }
-        if (item !== null && activeItem !== item) {
+        if (item !== null) {
             item.active = true;
             this.#activeIndex = Array.from(items.values()).indexOf(item);
         }
@@ -395,11 +395,13 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                 else {
                     const activeIndex = this.#activeIndex;
                     this.focus({preventScroll: true});
+                    this.#setActiveItem(null);
                     this.#activeIndex = activeIndex;
                 }
             }
             if (!intersectsWithMouse) {
                 this.focus({preventScroll: true});
+                this.#setActiveItem(null);
             }
         }
     }
@@ -430,6 +432,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                     .catch(() => void 0);
             }
             if (targetClosestItem !== null) {
+                this.#setActiveItem(targetClosestItem);
                 targetClosestItem.focus({preventScroll: true});
                 if (targetClosestItem.type == "submenu") {
                     if (!targetClosestItem.expanded) {
