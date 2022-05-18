@@ -1,8 +1,7 @@
 :root {
     --font-color: black;
     --focus-background-color: rgba(135, 206, 250, 0.5);
-
-    --icon-color: black;
+    
     --icon-size: 18px;
     --line-height: 18px;
 
@@ -19,15 +18,11 @@
     --background-darker-color: white;
     --background-lighter-color: white;
     
-    --hovered-item-color: rgba(135, 206, 250, 0.38);
+    --hovered-item-color: hsl(203, 92%, 75%, 0.38);
     --focused-item-color: hsl(203, 92%, 50%, 0.5);
-    --focused-item-outline-color: hsl(203, 92%, 75%);
-    --selected-item-color: rgb(135, 206, 250);
+    --focused-item-outline-color: hsl(203, 92%, 50%);
+    --selected-item-color: hsl(203, 92%, 75%, 75%);
     --activated-item-color: hsl(203, 92%, 50%, 0.5);
-
-    --hovered-item-text-color: rgb(0, 0, 0);
-    --focused-item-text-color: rgb(0, 0, 0);
-    --selected-item-text-color: rgb(0, 0, 0);
 
     --arrow-color: var(--font-color);
     --arrow-icon-collapsed: url("/sample/assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg");

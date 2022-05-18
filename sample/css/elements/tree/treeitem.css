@@ -12,6 +12,10 @@ e-treeitem[active]::part(content) {
     outline-offset: -1px;
 }
 
+e-treeitem::part(content):hover {
+    background-color: var(--hovered-item-color);
+}
+
 e-treeitem[selected]::part(content) {
     background-color: var(--selected-item-color);
 }
@@ -20,10 +24,6 @@ e-treeitem::part(content) {
     display: flex;
     line-height: 22px;
     padding-left: calc(var(--level) * var(--indent-width, 12px));
-}
-
-e-treeitem::part(content):hover {
-    background-color: var(--hovered-item-color);
 }
 
 e-treeitem:not([type="parent"]) [slot="group"],

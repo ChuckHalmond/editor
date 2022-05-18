@@ -305,7 +305,11 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
                 this.#setSelection(target);
             }
             else if (ctrlKey) {
-                (!target.selected) ?
+                const {selected} = target;
+                if (selected) {
+                    target.blur();
+                }
+                (!selected) ?
                     this.#addToSelection(target) :
                     this.#removeFromSelection(target);
                 event.stopPropagation();
