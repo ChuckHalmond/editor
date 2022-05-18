@@ -1,5 +1,4 @@
 import { HTMLETreeItemElement } from "./TreeItem";
-import { HTMLETreeItemCollection } from "./TreeItemCOllection";
 export { HTMLETreeElement };
 interface HTMLETreeElementConstructor {
     readonly prototype: HTMLETreeElement;
@@ -7,7 +6,7 @@ interface HTMLETreeElementConstructor {
 }
 interface HTMLETreeElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly items: HTMLETreeItemCollection;
+    readonly items: HTMLCollectionOf<HTMLETreeItemElement>;
     readonly activeItem: HTMLETreeItemElement | null;
     readonly dropTargetItem: HTMLETreeItemElement | null;
     droptarget: boolean;

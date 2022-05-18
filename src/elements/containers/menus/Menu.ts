@@ -1,7 +1,5 @@
-
 import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEMenuItemElement } from "./MenuItem";
-import { HTMLEMenuItemCollection, HTMLEMenuItemRadioList } from "./MenuItemCollection";
 import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
 
 export { HTMLEMenuElement };
@@ -9,7 +7,7 @@ export { EMenu };
 
 interface HTMLEMenuElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly items: HTMLEMenuItemCollection;
+    readonly items: HTMLCollectionOf<HTMLEMenuItemElement>;
     readonly activeItem: HTMLEMenuItemElement | null;
     readonly activeIndex: number;
     name: string;
@@ -38,7 +36,7 @@ var toggleTimeouts: WeakMap<HTMLEMenuItemElement, {clear(): void;}>;
 class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
 
     readonly shadowRoot!: ShadowRoot;
-    readonly items: HTMLEMenuItemCollection;
+    readonly items: HTMLCollectionOf<HTMLEMenuItemElement>;
 
     get activeItem(): HTMLEMenuItemElement | null {
         return this.items.item(this.#activeIndex);
@@ -78,7 +76,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
             this, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
         );
         this.#activeIndex = -1;
-        this.items = new HTMLEMenuItemCollection(this);
+        this.items = this.getElementsByTagName("e-menuitem");
         const shadowRoot = this.attachShadow({mode: "open"});
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
@@ -114,7 +112,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     }
 
     #collapseSubmenus(): void {
-        Array.from(this.items.values())
+        Array.from(this.items)
             .forEach((item_i) => {
                 if (item_i.expanded) {
                     item_i.collapse();
@@ -170,7 +168,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         }
         if (item !== null) {
             item.active = true;
-            this.#activeIndex = Array.from(items.values()).indexOf(item);
+            this.#activeIndex = Array.from(items).indexOf(item);
         }
         if (item == null) {
             this.#activeIndex = -1;
@@ -180,7 +178,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     #handleClickEvent(event: MouseEvent): void {
         const {target} = event;
         const {items} = this;
-        const targetClosestItem = Array.from(items.values()).find(
+        const targetClosestItem = Array.from(items).find(
             item_i => item_i.contains(<Node>target)
         ) ?? null;
         if (targetClosestItem) {
@@ -191,7 +189,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     #handleFocusInEvent(event: FocusEvent): void {
         const {target} = event;
         const {items} = this;
-        const targetClosestItem = Array.from(items.values()).find(
+        const targetClosestItem = Array.from(items).find(
             item_i => item_i.contains(<Node>target)
         ) ?? null;
         if (targetClosestItem) {
@@ -299,8 +297,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
             }
             case "Escape": {
                 if (activeItem) {
-                    const composedPath = event.composedPath();
-                    const isClosestTargetMenu = composedPath.find(
+                    const isClosestTargetMenu = event.composedPath().find(
                         target_i => target_i instanceof HTMLEMenuElement
                     ) == this;
                     if (!isClosestTargetMenu) {
@@ -313,8 +310,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
             }
             case "ArrowLeft": {
                 if (activeItem) {
-                    const composedPath = event.composedPath();
-                    const isClosestTargetMenu = composedPath.find(
+                    const isClosestTargetMenu = event.composedPath().find(
                         target_i => target_i instanceof HTMLEMenuElement
                     ) == this;
                     if (!isClosestTargetMenu) {
@@ -342,36 +338,13 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                 }
                 break;
             }
-            default: {
-                const {activeIndex, items} = this;
-                const {length: keyLength} = key;
-                if (keyLength == 1) {
-                    const keyCode = key.charCodeAt(0);
-                    const itemsArray = Array.from(items.values());
-                    const firstMatchIndex = itemsArray.findIndex(
-                        item_i => item_i.label.toLowerCase().charCodeAt(0) == keyCode
-                    );
-                    const nextMatchIndex = itemsArray.findIndex(
-                        (item_i, i) => item_i.label.toLowerCase().charCodeAt(0) == keyCode && i > activeIndex
-                    );
-                    const matchIndex = nextMatchIndex > -1 ?
-                        nextMatchIndex :
-                        firstMatchIndex;
-                    const item = items.item(matchIndex);
-                    if (item !== null) {
-                        item.focus({preventScroll: true});
-                    }
-                    event.stopPropagation();
-                }
-                break;
-            }
         }
     }
 
     #handleMouseOutEvent(event: MouseEvent): void {
         const {target, relatedTarget} = event;
         const {items} = this;
-        const targetClosestItem = Array.from(items.values()).find(
+        const targetClosestItem = Array.from(items).find(
             item_i => item_i.contains(<Node>target)
         ) ?? null;
         if (targetClosestItem?.type == "submenu" &&
@@ -409,7 +382,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     #handleMouseOverEvent(event: MouseEvent): void {
         const {target} = event;
         const {items} = this;
-        const targetClosestItem = Array.from(items.values()).find(
+        const targetClosestItem = Array.from(items).find(
             item_i => item_i.contains(<Node>target)
         ) ?? null;
         if (targetClosestItem?.type == "submenu" &&
@@ -468,9 +441,10 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
             if (isClosestTargetMenu) {
                 const {type, name, value} = target;
                 if (type == "radio") {
-                    Array.from(new HTMLEMenuItemRadioList(this, name).values()).forEach((radio_i) => {
-                        radio_i.checked = radio_i.value == value;
-                    });
+                    Array.from(this.items).filter(item_i => item_i.type == "radio" && item_i.name === name).
+                        forEach((radio_i) => {
+                            radio_i.checked = radio_i.value == value;
+                        });
                 }
             }
             if (contextual) {

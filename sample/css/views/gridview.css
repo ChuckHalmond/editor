@@ -1,3 +1,7 @@
+:host {
+    display: block;
+}
+
 e-grid[selectby="row"] e-gridbody e-gridcell:is(:hover, [selected], [active]),
 e-grid[selectby="cell"] e-gridbody e-gridrow:is(:hover, [selected], [active]),
 e-grid e-gridhead e-gridrow:is(:hover, [selected], [active]) {

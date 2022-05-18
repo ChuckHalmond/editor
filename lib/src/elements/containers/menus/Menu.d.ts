@@ -1,11 +1,10 @@
 import { HTMLEMenuItemElement } from "./MenuItem";
-import { HTMLEMenuItemCollection } from "./MenuItemCollection";
 import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
 export { HTMLEMenuElement };
 export { EMenu };
 interface HTMLEMenuElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly items: HTMLEMenuItemCollection;
+    readonly items: HTMLCollectionOf<HTMLEMenuItemElement>;
     readonly activeItem: HTMLEMenuItemElement | null;
     readonly activeIndex: number;
     name: string;

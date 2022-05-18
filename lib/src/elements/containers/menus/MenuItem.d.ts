@@ -11,7 +11,6 @@ interface HTMLEMenuItemElement extends HTMLEActionElement {
     readonly menu: HTMLEMenuElement | null;
     active: boolean;
     index: number;
-    label: string;
     expanded: boolean;
     type: "button" | "checkbox" | "radio" | "menu" | "submenu";
     toggle(force?: boolean): void;

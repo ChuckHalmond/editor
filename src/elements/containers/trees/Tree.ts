@@ -1,6 +1,5 @@
 import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLETreeItemElement } from "./TreeItem";
-import { HTMLETreeItemCollection } from "./TreeItemCOllection";
 import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
 
 export { HTMLETreeElement };
@@ -12,7 +11,7 @@ interface HTMLETreeElementConstructor {
 
 interface HTMLETreeElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly items: HTMLETreeItemCollection;
+    readonly items: HTMLCollectionOf<HTMLETreeItemElement>;
     readonly activeItem: HTMLETreeItemElement | null;
     readonly dropTargetItem: HTMLETreeItemElement | null;
     droptarget: boolean;
@@ -36,7 +35,7 @@ var shadowTemplate: HTMLTemplateElement;
 class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
 
     readonly shadowRoot!: ShadowRoot;
-    readonly items: HTMLETreeItemCollection;
+    readonly items: HTMLCollectionOf<HTMLETreeItemElement>;
 
     get activeIndex(): number {
         return this.#activeIndex;
@@ -65,20 +64,6 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
-            element("style", {
-                properties: {
-                    innerText: /*css*/`
-                        :host {
-                            display: block;
-                        }
-
-                        :host([droptarget]) {
-                            outline: 1px solid black;
-                            outline-offset: -1px;
-                        }
-                    `
-                }
-            }),
             element("slot")
         );
     }
@@ -92,7 +77,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         this.#dropTargetIndex = -1;
         this.#onSelection = false;
         this.#hasSelectionChanged = false;
-        this.items = new HTMLETreeItemCollection(this);
+        this.items = this.getElementsByTagName("e-treeitem");
         const shadowRoot = this.attachShadow({mode: "open"});
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
@@ -107,6 +92,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         this.addEventListener("drop", this.#handleDropEvent.bind(this));
         this.addEventListener("focus", this.#handleFocusEvent.bind(this));
         this.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
+        this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         this.addEventListener("select", this.#handleSelectEvent.bind(this));
         shadowRoot.addEventListener("slotchange", this.#handleSlotChangeEvent.bind(this));
@@ -222,17 +208,22 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         this.endSelection();
     }
 
-    #setActiveItem(item: HTMLETreeItemElement): void {
+    #setActiveItem(item: HTMLETreeItemElement | null): void {
         const {activeItem, items} = this;
         if (activeItem !== null && activeItem !== item) {
             activeItem.active = false;
             activeItem.tabIndex = -1;
         }
-        const walker = this.#walker;
-        walker.currentNode = item;
-        item.active = true;
-        item.tabIndex = 0;
-        this.#activeIndex = Array.from(items.values()).indexOf(item);
+        if (item !== null) {
+            const walker = this.#walker;
+            walker.currentNode = item;
+            item.active = true;
+            item.tabIndex = 0;
+            this.#activeIndex = Array.from(items).indexOf(item);
+        }
+        else {
+            this.#activeIndex = -1;
+        }
     }
     
     #setDropTargetItem(item: HTMLETreeItemElement | null): void {
@@ -243,7 +234,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         if (item !== null) {
             this.droptarget = true;
             item.droptarget = true;
-            this.#dropTargetIndex = Array.from(items.values()).indexOf(item);
+            this.#dropTargetIndex = Array.from(items).indexOf(item);
         }
         else {
             this.droptarget = false;
@@ -277,12 +268,14 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
     #nextItem(item: HTMLETreeItemElement): HTMLETreeItemElement | null {
         const walker = this.#walker;
         walker.currentNode = item;
-        const {expanded} = item;
+        const {type, expanded} = item;
         return <HTMLETreeItemElement | null>(
-            expanded ?
-            walker.nextNode() :
-            walker.nextSibling() ??
-            (walker.parentNode(), walker.nextSibling())
+            type === "leaf" ?
+                walker.nextNode() :
+                expanded ?
+                    walker.nextNode() :
+                    walker.nextSibling() ??
+                    (walker.parentNode(), walker.nextSibling())
         );
     }
 
@@ -523,6 +516,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
             }
             case "Escape": {
                 this.#clearSelection();
+                this.#setActiveItem(null);
                 this.focus();
                 event.stopPropagation();
                 break;
@@ -542,6 +536,15 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         const {target} = event;
         if (target instanceof HTMLETreeItemElement) {
             this.#setActiveItem(target);
+            this.tabIndex = -1;
+        }
+    }
+
+    #handleFocusOutEvent(event: FocusEvent): void {
+        const {relatedTarget} = event;
+        const lostFocusWithin = !this.contains(<Node>relatedTarget);
+        if (lostFocusWithin) {
+            this.tabIndex = 0;
         }
     }
 

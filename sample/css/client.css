@@ -44,7 +44,8 @@ e-menuitem[id="file-export-menu-button"] {
     --icon-image: url("/assets/sharp_file_download_black_18dp.png");
 }
 
-.c-label {
+.label,
+.badge {
     pointer-events: none;
 }
 /*

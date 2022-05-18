@@ -23,6 +23,7 @@
     --focused-item-outline-color: hsl(203, 92%, 50%);
     --selected-item-color: hsl(203, 92%, 75%, 75%);
     --activated-item-color: hsl(203, 92%, 50%, 0.5);
+    --droptarget-item-color: hsl(203, 92%, 50%, 0.5);
 
     --arrow-color: var(--font-color);
     --arrow-icon-collapsed: url("/sample/assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg");

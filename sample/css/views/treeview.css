@@ -1,0 +1,19 @@
+:host {
+    display: block;
+}
+
+.offscreen {
+    position: absolute;
+    top: 100%;
+    display: block;
+}
+
+.dragimage {
+    white-space: nowrap;
+    margin: 1px;
+    display: inline-block;
+    outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;
+    border-radius: 3px; 
+    padding: 2px 4px;
+}

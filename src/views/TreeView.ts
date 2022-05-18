@@ -276,46 +276,6 @@ class TreeViewBase extends View implements TreeView {
 
     renderShadow(): Node {
         const {model} = this;
-        return Fragment(
-            element("style", {
-                properties: {
-                    textContent: /*css*/`
-                        :host {
-                            display: block;
-                        }
-
-                        [part="offscreen"] {
-                            position: absolute;
-                            left: 100%;
-                        }
-
-                        [part="dragimage"] {
-                            white-space: nowrap;
-                            margin: 1px;
-                            display: inline-block;
-                            outline: 1px solid black;
-                            outline-offset: -1px;
-                            border-radius: 2px; 
-                            padding: 2px 4px;
-                        }
-                    `
-                }
-            }),
-            element("div", {
-                properties: {
-                    ariaHidden: "true"
-                },
-                part: ["offscreen"],
-                children: reactiveChildElements(model.items,
-                    item => this.#renderTreeItemDragImage(item)
-                )
-            }),
-            element("slot")
-        );
-    }
-    
-    renderLight(): Node {
-        const {model} = this;
         const treeElement = element("e-tree", {
             properties: {
                 tabIndex: 0,
@@ -331,7 +291,30 @@ class TreeViewBase extends View implements TreeView {
             }
         });
         this.#treeElement = new WeakRef(treeElement);
-        return treeElement;
+        return Fragment(
+            element("link", {
+                properties: {
+                    rel: "stylesheet",
+                    href: "css/main.css"
+                }
+            }),
+            element("link", {
+                properties: {
+                    rel: "stylesheet",
+                    href: "css/views/treeview.css"
+                }
+            }),
+            treeElement,
+            element("div", {
+                properties: {
+                    className: "offscreen",
+                    hidden: true
+                },
+                children: reactiveChildElements(model.items,
+                    item => this.#renderTreeItemDragImage(item)
+                )
+            })
+        );
     }
 
     #renderTreeItem(item: TreeItemModel): Element {
@@ -348,13 +331,28 @@ class TreeViewBase extends View implements TreeView {
                     uri: item.uri
                 },
                 children:
-                    [
+                    ((item.type == "parent") ? [
+                        element("e-treeitemgroup", {
+                            properties: {
+                                slot: "group"
+                            },
+                            children: reactiveChildElements(item.childItems,
+                                item => this.#renderTreeItem(item)
+                            )
+                        })
+                    ] : []).concat([
                         element("span", {
                             properties: {
-                                className: "c-label"
+                                className: "label"
                             }
                         })
-                    ].concat(
+                    ]).concat((item.type == "parent") ? [
+                        element("span", {
+                            properties: {
+                                className: "badge"
+                            }
+                        })
+                    ] : []).concat([
                         element("e-toolbar", {
                             properties: {
                                 tabIndex: 0
@@ -376,35 +374,19 @@ class TreeViewBase extends View implements TreeView {
                                 })
                             ]
                         })
-                    ).concat(
-                        (item.type == "parent") ? [
-                            element("e-treeitemgroup", {
-                                properties: {
-                                    slot: "group"
-                                },
-                                children: reactiveChildElements(item.childItems,
-                                    item => this.#renderTreeItem(item)
-                                )
-                            }),
-                            element("span", {
-                                properties: {
-                                    className: "c-badge"
-                                }
-                            })
-                        ] : []
-                    )
+                    ])
             }),
             ["label", "childCount", "visibility"],
             (treeitem, property, oldValue, newValue) => {
                 switch (property) {
                     case "label":
-                        const label = treeitem.querySelector(":scope > .c-label");
+                        const label = treeitem.querySelector(":scope > .label");
                         if (label) {
                             label.textContent = newValue;
                         }
                         break;
                     case "childCount":
-                        const badge = treeitem.querySelector(":scope > .c-badge");
+                        const badge = treeitem.querySelector(":scope > .badge");
                         if (badge) {
                             badge.textContent = `(${newValue})`;
                         }
@@ -430,7 +412,9 @@ class TreeViewBase extends View implements TreeView {
         const dragImageElement = reactiveElement(
             item,
             element("span", {
-                part: ["dragimage"]
+                properties: {
+                    className: "dragimage"
+                }
             }),
             ["label"],
             (span, property, oldValue, newValue) => {
@@ -544,7 +528,7 @@ class TreeViewBase extends View implements TreeView {
                             element("e-menuitem", {
                                 properties: {
                                     tabIndex: -1,
-                                    label: "Display"
+                                    textContent: "Display"
                                 },
                                 eventListeners: {
                                     trigger: () => {
@@ -557,7 +541,7 @@ class TreeViewBase extends View implements TreeView {
                             element("e-menuitem", {
                                 properties: {
                                     tabIndex: -1,
-                                    label: "Delete"
+                                    textContent: "Delete"
                                 },
                                 eventListeners: {
                                     trigger: () => {
@@ -578,7 +562,7 @@ class TreeViewBase extends View implements TreeView {
                                 properties: {
                                     tabIndex: -1,
                                     type: "checkbox",
-                                    label: activeItem.visibility ? "Hide" : "Show"
+                                    textContent: activeItem.visibility ? "Hide" : "Show"
                                 },
                                 eventListeners: {
                                     trigger: () => {

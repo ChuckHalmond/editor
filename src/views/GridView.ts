@@ -333,7 +333,7 @@ class GridViewBase extends View implements GridView {
                                                             element("e-menuitem",  {
                                                                 properties: {
                                                                     type: "button",
-                                                                    label: "Resize column",
+                                                                    textContent: "Resize column",
                                                                     tabIndex: -1,
                                                                 },
                                                                 eventListeners: {
@@ -352,7 +352,7 @@ class GridViewBase extends View implements GridView {
                                                             element("e-menuitem",  {
                                                                 properties: {
                                                                     type: "submenu",
-                                                                    label: "Sort",
+                                                                    textContent: "Sort",
                                                                     tabIndex: -1,
                                                                 },
                                                                 children: [
@@ -368,7 +368,7 @@ class GridViewBase extends View implements GridView {
                                                                                     properties: {
                                                                                         type: "radio",
                                                                                         name: "sort",
-                                                                                        label: "Ascending",
+                                                                                        textContent: "Ascending",
                                                                                         value: "1",
                                                                                         tabIndex: -1,
                                                                                     }
@@ -377,7 +377,7 @@ class GridViewBase extends View implements GridView {
                                                                                     properties: {
                                                                                         type: "radio",
                                                                                         name: "sort",
-                                                                                        label: "Descending",
+                                                                                        textContent: "Descending",
                                                                                         value: "-1",
                                                                                         tabIndex: -1,
                                                                                     }
@@ -393,14 +393,11 @@ class GridViewBase extends View implements GridView {
                                                                         }),
                                                                         ["sortorder"],
                                                                         (menu, property, oldValue, newValue) => {
-                                                                            const sortItems = menu.items.namedItem("sort");
-                                                                            if (sortItems instanceof HTMLEMenuItemRadioList) {
-                                                                                Array.from(sortItems.values()).forEach(
-                                                                                    (radio_i) => {
-                                                                                        radio_i.checked = parseInt(radio_i.value) === newValue;
-                                                                                    }
-                                                                                );
-                                                                            }
+                                                                            Array.from(menu.items).filter(item_i => item_i.name.startsWith("sort"))
+                                                                                .forEach((sortRadioItem_i => {
+                                                                                    sortRadioItem_i.checked = parseInt(sortRadioItem_i.value) === newValue;
+                                                                                })
+                                                                            );
                                                                         }
                                                                     )
                                                                 ]
@@ -408,7 +405,7 @@ class GridViewBase extends View implements GridView {
                                                             element("e-menuitem",  {
                                                                 properties: {
                                                                     type: "submenu",
-                                                                    label: "Filter",
+                                                                    textContent: "Filter",
                                                                     tabIndex: -1,
                                                                 },
                                                                 children: [
@@ -421,7 +418,7 @@ class GridViewBase extends View implements GridView {
                                                                             element("e-menuitem", {
                                                                                 properties: {
                                                                                     tabIndex: -1,
-                                                                                    label: filter_i.name,
+                                                                                    textContent: filter_i.name,
                                                                                     type: "checkbox",
                                                                                     checked: this.#appliedFilters.includes(filter_i)
                                                                                 },

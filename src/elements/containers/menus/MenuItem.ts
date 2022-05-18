@@ -15,7 +15,6 @@ interface HTMLEMenuItemElement extends HTMLEActionElement {
     readonly menu: HTMLEMenuElement | null;
     active: boolean;
     index: number;
-    label: string;
     expanded: boolean;
     type: "button" | "checkbox" | "radio" | "menu" | "submenu";
     toggle(force?: boolean): void;
@@ -44,9 +43,6 @@ class HTMLEMenuItemElementBase extends HTMLEActionElement implements HTMLEMenuIt
     @AttributeProperty({type: Boolean})
     active!: boolean;
 
-    @AttributeProperty({type: String, observed: true})
-    label!: string;
-
     @AttributeProperty({type: Number})
     index!: number;
 
@@ -67,7 +63,10 @@ class HTMLEMenuItemElementBase extends HTMLEActionElement implements HTMLEMenuIt
                     children: [
                         shadowTemplateIconPart,
                         element("span", {
-                            part: ["label"]
+                            part: ["label"],
+                            children: [
+                                element("slot")
+                            ]
                         }),
                         shadowTemplateArrowPart
                     ]
@@ -91,65 +90,6 @@ class HTMLEMenuItemElementBase extends HTMLEActionElement implements HTMLEMenuIt
     
     @QueryProperty({selector: "e-menu[slot=menu]"})
     readonly menu!: HTMLEMenuElement | null;
-
-    @QueryProperty({selector: "[part=arrow]", withinShadowRoot: true})
-    readonly arrowPart!: Element | null;
-
-    @QueryProperty({selector: "[part=content]", withinShadowRoot: true})
-    readonly contentPart!: Element;
-
-    @QueryProperty({selector: "[part=icon]", withinShadowRoot: true})
-    readonly iconPart!: Element | null;
-
-    @QueryProperty({selector: "[part=label]", withinShadowRoot: true})
-    readonly labelPart!: Element;
-
-    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
-        switch (name) {
-            case "label": {
-                const {labelPart} = this;
-                labelPart.textContent = newValue;   
-                break;
-            }
-            /*case "type": {
-                switch (newValue) {
-                    case "submenu": {
-                        const {contentPart, iconPart, arrowPart} = this;
-                        if (arrowPart == null) {
-                            contentPart.append(
-                                shadowTemplateArrowPart.cloneNode(true)
-                            );
-                        }
-                        if (iconPart !== null) {
-                            iconPart.remove();
-                        }
-                        break;
-                    }
-                    case "menu": {
-                        const {iconPart} = this;
-                        if (iconPart !== null) {
-                            iconPart.remove();
-                        }
-                        break;
-                    }
-                    default: {
-                        const {iconPart, arrowPart} = this;
-                        if (iconPart == null) {
-                            const {contentPart} = this;
-                            contentPart.prepend(
-                                shadowTemplateIconPart.cloneNode(true)
-                            );
-                        }
-                        if (arrowPart !== null) {
-                            arrowPart.remove();
-                        }
-                        break;
-                    }
-                }
-                break;
-            }*/
-        }
-    }
 
     toggle(force?: boolean): void {
         const {type, expanded} = this;
@@ -301,13 +241,12 @@ var EMenuItem = <EMenuItemConstructor>Object.assign(
         return element("e-menuitem", {
             properties: {
                 tabIndex: -1,
-                label: label,
                 title: label,
                 name: name,
                 value: value,
                 type: type
             },
-            children: menu ? [menu] : void 0,
+            children: menu ? [label, menu] : void 0,
             eventListeners: {
                 trigger: trigger
             }

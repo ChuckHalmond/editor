@@ -1,13 +1,12 @@
 input, select, button,
 body {
+    border: 1px solid grey;
     font-family: inherit;
 }
 
 *:focus-visible {
-    /*outline-width: 2px;
-    outline-style: solid;
-    outline-offset: -1px;*/
-    outline: none;
+    outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;
 }
 
 summary {

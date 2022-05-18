@@ -304,7 +304,7 @@ class ListViewBase extends View implements ListView {
                                                 switch (property) {
                                                     case "visibility": {
                                                         const item = <HTMLEMenuItemElement>items.namedItem("visibility");
-                                                        item.label = newValue ? "Hide" : "Show";
+                                                        item.textContent = newValue ? "Hide" : "Show";
                                                         item.title = newValue ? "Hide" : "Show";
                                                     }
                                                 }
@@ -368,7 +368,7 @@ class ListViewBase extends View implements ListView {
                             element("e-menuitem", {
                                 properties: {
                                     tabIndex: -1,
-                                    label: "Display"
+                                    textContent: "Display"
                                 },
                                 eventListeners: {
                                     trigger: () => {
@@ -381,7 +381,7 @@ class ListViewBase extends View implements ListView {
                             element("e-menuitem", {
                                 properties: {
                                     tabIndex: -1,
-                                    label: "Delete"
+                                    textContent: "Delete"
                                 },
                                 eventListeners: {
                                     trigger: () => {
@@ -402,7 +402,7 @@ class ListViewBase extends View implements ListView {
                                 properties: {
                                     tabIndex: -1,
                                     type: "checkbox",
-                                    label: activeItem.visibility ? "Hide" : "Show"
+                                    textContent: activeItem.visibility ? "Hide" : "Show"
                                 },
                                 eventListeners: {
                                     trigger: () => {
