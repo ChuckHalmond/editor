@@ -20,7 +20,6 @@ declare type Constructor = {
     readonly prototype: any;
 };
 declare type GridRowFilter = {
-    name: string;
     filter: (row: GridRowModel) => boolean;
 };
 declare class GridColumnModel<T extends Constructor = Constructor> extends ModelObject {
@@ -28,21 +27,25 @@ declare class GridColumnModel<T extends Constructor = Constructor> extends Model
     readonly label: string;
     readonly type: T;
     readonly extract: (row: GridRowModel) => InstanceType<T>;
-    readonly filters: GridRowFilter[];
+    readonly filters: (GridRowFilter & {
+        name: string;
+    })[];
     sortorder: number | undefined;
     constructor(init: {
         name: string;
         label: string;
         type: T;
         extract: (row: GridRowModel) => InstanceType<T>;
-        filters?: GridRowFilter[];
+        filters?: (GridRowFilter & {
+            name: string;
+        })[];
     });
 }
 declare class GridRowModel extends ModelObject {
-    label: string;
+    name: string;
     age: number;
     constructor(init: {
-        label: string;
+        name: string;
         age: number;
     });
 }

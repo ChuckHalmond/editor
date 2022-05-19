@@ -18,7 +18,7 @@
     --background-darker-color: white;
     --background-lighter-color: white;
     
-    --hovered-item-color: hsl(203, 92%, 75%, 0.38);
+    --hovered-item-color: hsl(203, 92%, 75%, 0.5);
     --focused-item-color: hsl(203, 92%, 50%, 0.5);
     --focused-item-outline-color: hsl(203, 92%, 50%);
     --selected-item-color: hsl(203, 92%, 75%, 75%);

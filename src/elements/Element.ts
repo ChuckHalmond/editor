@@ -429,10 +429,10 @@ function element<K extends keyof HTMLElementTagNameMap>(
         }
         if (children) {
             if (typeof children == "function") {
-                element.replaceChildren(...children(element));
+                element.append(...children(element));
             }
             else {
-                element.replaceChildren(...Array.from(children));
+                element.append(...Array.from(children));
             }
         }
         if (eventListeners) {

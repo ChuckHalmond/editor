@@ -244,9 +244,10 @@ var EMenuItem = <EMenuItemConstructor>Object.assign(
                 title: label,
                 name: name,
                 value: value,
-                type: type
+                type: type,
+                textContent: label
             },
-            children: menu ? [label, menu] : void 0,
+            children: menu ? [menu] : void 0,
             eventListeners: {
                 trigger: trigger
             }

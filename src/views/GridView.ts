@@ -55,16 +55,15 @@ type Constructor = {
 }
 
 type GridRowFilter = {
-    name: string;
     filter: (row: GridRowModel) => boolean;
-};
+}
 
 class GridColumnModel<T extends Constructor = Constructor> extends ModelObject {
     readonly name: string;
     readonly label: string;
     readonly type: T;
     readonly extract: (row: GridRowModel) => InstanceType<T>;
-    readonly filters: GridRowFilter[];
+    readonly filters: (GridRowFilter & {name: string})[];
 
     @ModelProperty()
     sortorder: number | undefined;
@@ -74,7 +73,7 @@ class GridColumnModel<T extends Constructor = Constructor> extends ModelObject {
         label: string,
         type: T,
         extract: (row: GridRowModel) => InstanceType<T>,
-        filters?: GridRowFilter[]
+        filters?: (GridRowFilter & {name: string})[]
     }) {
         super();
         const {name, label, type, extract} = init;
@@ -89,15 +88,15 @@ class GridColumnModel<T extends Constructor = Constructor> extends ModelObject {
 
 class GridRowModel extends ModelObject {
     @ModelProperty()
-    label: string;
+    name: string;
 
     @ModelProperty()
     age: number;
     
-    constructor(init: {label: string, age: number}) {
+    constructor(init: {name: string, age: number}) {
         super();
-        const {label, age} = init;
-        this.label = label;
+        const {name, age} = init;
+        this.name = name;
         this.age = age;
     }
 }
@@ -140,17 +139,17 @@ class GridViewBase extends View implements GridView {
     @AttributeProperty({type: Boolean, observed: true})
     sortable!: boolean;
 
-    #appliedFilters: ({
-        name: string;
-        filter: (row: GridRowModel) => boolean;
-    })[];
+    #displayFilters: (GridRowFilter & {name: string})[];
+    #searchFilter: GridRowFilter | null;
+
     #gridRowElementsMap: WeakMap<GridRowModel, WeakRef<HTMLEGridRowElement>>
     
     constructor()
     constructor(model: GridModel)
     constructor(model?: GridModel) {
         super();
-        this.#appliedFilters = [];
+        this.#displayFilters = [];
+        this.#searchFilter = null;
         this.#gridRowElementsMap = new WeakMap();
         this.attachShadow({mode: "open"});
         this.setModel(model ?? new GridModel());
@@ -210,28 +209,6 @@ class GridViewBase extends View implements GridView {
 
     renderShadow(): Node {
         const {model} = this;
-        const gridElement = element("e-grid", {
-            properties: {
-                tabIndex: 0,
-                selectby: "row"
-            },
-            children: [
-                element("e-gridhead", {
-                    children: [
-                        element("e-gridrow", {
-                            children: reactiveChildElements(
-                                model.columns, column => this.#renderGridColumnHeaderCell(column)
-                            )
-                        })
-                    ]
-                }),
-                element("e-gridbody", {
-                    children: reactiveChildElements(
-                        model.rows, row => this.#renderGridBodyRow(row)
-                    )
-                })
-            ]
-        });
         return Fragment(
             element("link", {
                 properties: {
@@ -245,18 +222,67 @@ class GridViewBase extends View implements GridView {
                     href: "css/views/gridview.css"
                 }
             }),
-            gridElement
+            element("div", {
+                children: [
+                    element("input", {
+                        properties: {
+                            type: "search"
+                        },
+                        eventListeners: {
+                            input: <EventListener>this.#handleSearchInputEvent.bind(this)
+                        }
+                    })
+                ]
+            }),
+            element("e-grid", {
+                properties: {
+                    tabIndex: 0,
+                    selectby: "row"
+                },
+                children: [
+                    element("e-gridhead", {
+                        children: [
+                            element("e-gridrow", {
+                                children: reactiveChildElements(
+                                    model.columns, column => this.#renderGridColumnHeaderCell(column)
+                                )
+                            })
+                        ]
+                    }),
+                    element("e-gridbody", {
+                        children: reactiveChildElements(
+                            model.rows, row => this.#renderGridBodyRow(row)
+                        )
+                    })
+                ]
+            })
         );
     }
 
-    applyFilter(filter: GridRowFilter): void {
-        const appliedFilters = this.#appliedFilters;
-        if (!appliedFilters.includes(filter)) {
-            this.#appliedFilters.push(filter);
+    setSearchFilter(filter: GridRowFilter | null): void {
+        this.#searchFilter = filter;
+        Array.from(this.model.rows.values()).forEach((row_i) => {
+            const rowElement = this.getRowElement(row_i);
+            if (rowElement) {
+                rowElement.hidden =
+                    !this.#displayFilters.some(filter_i => filter_i.filter(row_i))
+                    && !(filter?.filter(row_i) ?? true);
+            }
+        });
+        const {gridElement} = this;
+        gridElement.beginSelection();
+        gridElement.selectedRows().forEach(selectedRow_i => selectedRow_i.selected = false);
+        gridElement.endSelection();
+    }
+
+    addDisplayFilter(filter: (GridRowFilter & {name: string;})): void {
+        const displayFilters = this.#displayFilters;
+        if (!displayFilters.includes(filter)) {
+            this.#displayFilters.push(filter);
             Array.from(this.model.rows.values()).forEach((row_i) => {
                 const rowElement = this.getRowElement(row_i);
                 if (rowElement) {
-                    rowElement.hidden = !this.#appliedFilters.some(filter_i => filter_i.filter(row_i));
+                    rowElement.hidden = !this.#displayFilters.some(filter_i => filter_i.filter(row_i));
                 }
             });
         }
@@ -266,19 +292,22 @@ class GridViewBase extends View implements GridView {
         gridElement.endSelection();
     }
 
-    removeFilter(filter: GridRowFilter): void {
-        const appliedFilters = this.#appliedFilters;
-        const filterIndex = appliedFilters.indexOf(filter);
+    removeDisplayFilter(filter: (GridRowFilter & {name: string;})): void {
+        const displayFilters = this.#displayFilters;
+        const filterIndex = displayFilters.indexOf(filter);
         if (filterIndex > -1) {
-            appliedFilters.splice(filterIndex, 1);
+            displayFilters.splice(filterIndex, 1);
             Array.from(this.model.rows.values()).forEach((row_i) => {
                 const rowElement = this.getRowElement(row_i);
                 if (rowElement) {
-                    rowElement.hidden = !this.#appliedFilters.every(filter_i => filter_i.filter(row_i));
+                    rowElement.hidden = !this.#displayFilters.every(filter_i => filter_i.filter(row_i));
                 }
             });
         }
-        this.gridElement.clearSelection();
+        const {gridElement} = this;
+        gridElement.beginSelection();
+        gridElement.selectedRows().forEach(selectedRow_i => selectedRow_i.selected = false);
+        gridElement.endSelection();
     }
 
     #renderGridColumnHeaderCell(column: GridColumnModel): Element {
@@ -420,7 +449,7 @@ class GridViewBase extends View implements GridView {
                                                                                     tabIndex: -1,
                                                                                     textContent: filter_i.name,
                                                                                     type: "checkbox",
-                                                                                    checked: this.#appliedFilters.includes(filter_i)
+                                                                                    checked: this.#displayFilters.includes(filter_i)
                                                                                 },
                                                                                 eventListeners: {
                                                                                     trigger: (event) => {
@@ -428,10 +457,10 @@ class GridViewBase extends View implements GridView {
                                                                                         if (currentTarget instanceof HTMLEMenuItemElement) {
                                                                                             const {checked} = currentTarget;
                                                                                             if (checked) {
-                                                                                                this.applyFilter(filter_i);
+                                                                                                this.addDisplayFilter(filter_i);
                                                                                             }
                                                                                             else {
-                                                                                                this.removeFilter(filter_i);
+                                                                                                this.removeDisplayFilter(filter_i);
                                                                                             }
                                                                                         }
                                                                                     }
@@ -510,6 +539,16 @@ class GridViewBase extends View implements GridView {
             ]
         });
         return gridCellElement;
+    }
+
+    #handleSearchInputEvent(event: InputEvent) {
+        const {target} = event;
+        if (target instanceof HTMLInputElement) {
+            const {value} = target;
+            this.setSearchFilter(value !== "" ? {
+                filter: (row) => row.name.toLowerCase().startsWith(value.toLowerCase())
+            } : null);
+        }
     }
 
     #handleColumnLabelClickEvent(event: MouseEvent): void {

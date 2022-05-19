@@ -204,7 +204,7 @@ export async function main() {
                     name: "name",
                     label: "Name",
                     type: String,
-                    extract: (row) => row.label
+                    extract: (row) => row.name
                 }),
                 new GridColumnModel({
                     name: "age",
@@ -222,15 +222,15 @@ export async function main() {
             ],
             rows: [
                 new GridRowModel({
-                    label: "Denis",
+                    name: "Denis",
                     age: 13
                 }),
                 new GridRowModel({
-                    label: "Jean-Charles",
+                    name: "Jean-Charles",
                     age: 32
                 }),
                 new GridRowModel({
-                    label: "Charles",
+                    name: "Charles",
                     age: 25
                 })
             ]
