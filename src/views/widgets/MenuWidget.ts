@@ -1,4 +1,4 @@
-import { element } from "../../elements/Element";
+import { CustomWidget, element } from "../../elements/Element";
 import { MenuItemWidget } from "./MenuItemWidget";
 import { Widget } from "./Widget";
 
@@ -17,6 +17,16 @@ interface MenuWidget extends Widget {
 
 }
 
+declare global {
+    interface WidgetNameMap {
+        "menu": MenuWidget;
+    }
+}
+
+console.log("here");
+@CustomWidget({
+    name: "menu"
+})
 class MenuWidgetBase extends Widget implements MenuWidget {
 
     readonly items: MenuItemWidget[];
@@ -33,11 +43,10 @@ class MenuWidgetBase extends Widget implements MenuWidget {
     #toggleTimeouts: WeakMap<MenuItemWidget, {clear(): void;}>;
     #walker: TreeWalker;
 
-    constructor(items: MenuItemWidget[]) {
+    constructor() {
         super();
         const {element} = this;
         this.items = [];
-        this.insertItem(0, ...items);
         this.#activeIndex = -1;
         this.#toggleTimeouts = new WeakMap();
         this.#walker = document.createTreeWalker(

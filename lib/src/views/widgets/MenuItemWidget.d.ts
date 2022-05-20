@@ -23,4 +23,9 @@ interface MenuItemWidget extends Widget {
     expand(): void;
     collapse(): void;
 }
+declare global {
+    interface WidgetNameMap {
+        "menuitem": MenuItemWidget;
+    }
+}
 declare var MenuItemWidget: MenuItemWidgetConstructor;

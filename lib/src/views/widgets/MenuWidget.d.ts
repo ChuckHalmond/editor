@@ -11,4 +11,9 @@ interface MenuWidget extends Widget {
     readonly activeIndex: number;
     insertItem(index: number, ...items: MenuItemWidget[]): void;
 }
+declare global {
+    interface WidgetNameMap {
+        "menu": MenuWidget;
+    }
+}
 declare var MenuWidget: MenuWidgetConstructor;

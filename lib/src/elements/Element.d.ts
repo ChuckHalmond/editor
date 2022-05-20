@@ -1,7 +1,10 @@
+import { Widget } from "../views/widgets/Widget";
 import { ModelList, ModelNode } from "../models/Model";
 export { subtreeNodes };
 export { ancestorNodes };
 export { CustomElement };
+export { CustomWidget };
+export { widget };
 export { Collection };
 export { QueryProperty };
 export { QueryAllProperty };
@@ -48,6 +51,12 @@ interface CustomElementDecorator {
     }): <C extends CustomElementConstructor>(elementCtor: C) => C;
 }
 declare const CustomElement: CustomElementDecorator;
+interface WidgetDecorator {
+    (init: {
+        name: string;
+    }): <W extends CustomWidgetConstructor>(widgetCtor: W) => W;
+}
+declare const CustomWidget: WidgetDecorator;
 declare function subtreeNodes(node: Node): Generator<Node>;
 declare function ancestorNodes(node: Node): Generator<Node>;
 interface QueryPropertyDecorator {
@@ -74,7 +83,7 @@ declare type WritableKeys<T> = {
         -readonly [Q in P]: T[P];
     }, P, never>;
 }[keyof T];
-interface HTMLInit<E extends HTMLElement> {
+interface HTMLElementInit<E extends HTMLElement> {
     options?: ElementCreationOptions;
     properties?: Partial<Pick<E, WritableKeys<E>>>;
     part?: string[];
@@ -93,16 +102,40 @@ interface HTMLInit<E extends HTMLElement> {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined];
     };
 }
-interface HTMLInitMap {
+interface HTMLElementInitMap {
     "template": HTMLTemplateInit;
 }
-interface HTMLTemplateInit extends HTMLInit<HTMLTemplateElement> {
+interface HTMLTemplateInit extends HTMLElementInit<HTMLTemplateElement> {
     content?: (Node | string)[] | NodeList;
 }
-declare function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLInitMap>(tagName: K, init?: HTMLInitMap[K]): E;
-declare function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLInit<E>): E;
-declare function element(tagName: string, init?: HTMLInit<HTMLElement>): HTMLElement;
+declare function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementInitMap>(tagName: K, init?: HTMLElementInitMap[K]): E;
+declare function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLElementInit<E>): E;
+declare function element(tagName: string, init?: HTMLElementInit<HTMLElement>): HTMLElement;
+interface WidgetInit<W extends Widget> {
+    properties?: Partial<Pick<W, WritableKeys<W>>>;
+    part?: string[];
+    exportParts?: string[];
+    attributes?: {
+        [name: string]: number | string | boolean;
+    };
+    style?: {
+        [property: string]: string | [string, string];
+    };
+    dataset?: {
+        [property: string]: string | number | boolean;
+    };
+    children?: (Node | string)[] | NodeList | ReactiveChildElements;
+    eventListeners?: {
+        [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined];
+    };
+}
+interface HTMLTemplateInit extends HTMLElementInit<HTMLTemplateElement> {
+    content?: (Node | string)[] | NodeList;
+}
+declare function widget<W extends WidgetNameMap[K], K extends keyof WidgetNameMap>(name: K, init?: WidgetInit<W>): W;
+declare function widget(name: string, init?: WidgetInit<Widget>): Widget;
 declare function reactiveElement<M extends ModelNode, E extends Element, K extends string>(model: M, element: E, properties: K[], react: (element: E, property: K, oldValue: any, newValue: any) => void): E;
+declare function reactiveElement<M extends ModelNode, W extends Widget, K extends string>(model: M, widget: W, properties: K[], react: (widget: W, property: K, oldValue: any, newValue: any) => void): W;
 interface ReactiveChildElements {
     (parent: Node & ParentNode): (Node | string)[];
 }

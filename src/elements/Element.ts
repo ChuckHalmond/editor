@@ -1,9 +1,12 @@
+import { Widget, widgets } from "../views/widgets/Widget";
 import { ModelList, ModelNode, ModelChangeRecord, ModelChangeObserver, ModelChangeObserverOptions } from "../models/Model";
 import { camelToTrain } from "./Snippets";
 
 export { subtreeNodes };
 export { ancestorNodes };
 export { CustomElement };
+export { CustomWidget };
+export { widget };
 export { Collection };
 export { QueryProperty };
 export { QueryAllProperty };
@@ -185,27 +188,37 @@ const CustomElement: CustomElementDecorator = function(init: {
     return <C extends CustomElementConstructor>(
         elementCtor: C
     ) => {
-        return registerCustomElement(elementCtor, init);
+        const {name, options} = init;
+        if (!customElements.get(name)) {
+            customElements.define(
+                name,
+                elementCtor,
+                options
+            );
+        }
+        return elementCtor;
     }
 }
 
-const registerCustomElement = function<C extends CustomElementConstructor>(
-    elementCtor: C,
-    init: {
-        name: string;
-        options?: ElementDefinitionOptions
-    }): C {
-    const {name, options} = init;
+interface WidgetDecorator {
+    (init: {
+        name: string
+    }): <W extends CustomWidgetConstructor>(widgetCtor: W) => W;
+}
 
-    if (!customElements.get(name)) {
-        customElements.define(
+const CustomWidget: WidgetDecorator = function(init: {
+    name: string;
+}) {
+    return <W extends CustomWidgetConstructor>(
+        widgetCtor: W
+    ) => {
+        const {name} = init;
+        widgets.define(
             name,
-            elementCtor,
-            options
+            widgetCtor
         );
+        return widgetCtor;
     }
-
-    return elementCtor;
 }
 
 function *subtreeNodes(node: Node): Generator<Node> {
@@ -320,7 +333,7 @@ type ReadonlyKeys<T> = {
   [P in keyof T]-?: IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, never, P>
 }[keyof T];
 
-interface HTMLInit<E extends HTMLElement> {
+interface HTMLElementInit<E extends HTMLElement> {
     options?: ElementCreationOptions,
     properties?: Partial<Pick<E, WritableKeys<E>>>,
     part?: string[],
@@ -337,22 +350,23 @@ interface HTMLInit<E extends HTMLElement> {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined]
     }
 }
-interface HTMLInitMap {
+
+interface HTMLElementInitMap {
     "template": HTMLTemplateInit;
 }
 
-interface HTMLTemplateInit extends HTMLInit<HTMLTemplateElement> {
+interface HTMLTemplateInit extends HTMLElementInit<HTMLTemplateElement> {
     content?: (Node | string)[] | NodeList;
 }
 
-function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLInitMap>(
-    tagName: K, init?: HTMLInitMap[K]): E;
+function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementInitMap>(
+    tagName: K, init?: HTMLElementInitMap[K]): E;
 function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementTagNameMap>(
-    tagName: K, init?: HTMLInit<E>): E;
+    tagName: K, init?: HTMLElementInit<E>): E;
 function element(
-    tagName: string, init?: HTMLInit<HTMLElement>): HTMLElement;
+    tagName: string, init?: HTMLElementInit<HTMLElement>): HTMLElement;
 function element<K extends keyof HTMLElementTagNameMap>(
-    tagName: K, init?: HTMLInit<HTMLElementTagNameMap[K]>): HTMLElementTagNameMap[K] {
+    tagName: K, init?: HTMLElementInit<HTMLElementTagNameMap[K]>): HTMLElementTagNameMap[K] {
     if (init) {
         const {options, properties, part, exportParts, attributes, dataset, children, eventListeners, style} = init;
         const element = document.createElement(tagName, options);
@@ -460,12 +474,131 @@ function element<K extends keyof HTMLElementTagNameMap>(
     return document.createElement(tagName);
 }
 
-type ReactiveElement = Element & {
-    _reactiveNodeAttributes: {
-        addReactListener: () => void;
-        removeReactListener: () => void;
+interface WidgetInit<W extends Widget> {
+    properties?: Partial<Pick<W, WritableKeys<W>>>,
+    part?: string[],
+    exportParts?: string[],
+    attributes?: {[name: string]: number | string | boolean},
+    style?: {
+        [property: string]: string | [string, string]
+    },
+    dataset?: {
+        [property: string]: string | number | boolean
+    },
+    children?: (Node | string)[] | NodeList | ReactiveChildElements,
+    eventListeners?: {
+        [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined]
     }
-};
+}
+
+interface WidgetInitMap {
+    //"template": HTMLTemplateInit;
+}
+
+interface HTMLTemplateInit extends HTMLElementInit<HTMLTemplateElement> {
+    content?: (Node | string)[] | NodeList;
+}
+/*
+function widget<W extends WidgetNameMap[K], K extends keyof WidgetInitMap>(
+    name: K, init?: WidgetInitMap[K]): W;*/
+function widget<W extends WidgetNameMap[K], K extends keyof WidgetNameMap>(
+    name: K, init?: WidgetInit<W>): W;
+function widget(
+    name: string, init?: WidgetInit<Widget>): Widget
+function widget<K extends keyof WidgetNameMap>(
+    name: K, init?: WidgetInit<WidgetNameMap[K]>): WidgetNameMap[K] {
+    const widget = widgets.create(name);
+    if (init) {
+        const {element} = widget;
+        const {properties, part, exportParts, attributes, dataset, children, eventListeners, style} = init;
+        if (properties) {
+            const keys = <(keyof Partial<Pick<WidgetNameMap[K], WritableKeys<WidgetNameMap[K]>>>)[]>Object.keys(properties);
+            keys.forEach((key_i) => {
+                const value = properties[key_i];
+                if (typeof properties[key_i] !== "undefined") {
+                    Object.assign(
+                        element, {
+                            [key_i]: value
+                        }
+                    );
+                }
+            });
+        }
+        if (properties) {
+            const keys = <(keyof Partial<Pick<WidgetNameMap[K], WritableKeys<WidgetNameMap[K]>>>)[]>Object.keys(properties);
+            keys.forEach((key_i) => {
+                const value = properties[key_i];
+                if (typeof properties[key_i] !== "undefined") {
+                    Object.assign(
+                        element, {
+                            [key_i]: value
+                        }
+                    );
+                }
+            });
+        }
+        if (part) {
+            const {part: elementPart} = element;
+            part.forEach((part) => {
+                elementPart.add(part);
+            });
+        }
+        if (exportParts) {
+            element.setAttribute("exportparts", exportParts.join(", "));
+        }
+        if (attributes) {
+            Object.keys(attributes).forEach((attributeName) => {
+                const attributeValue = attributes[attributeName];
+                if (typeof attributeValue == "boolean") {
+                    if (attributeValue) {
+                        element.setAttribute(camelToTrain(attributeName), "");
+                    }
+                }
+                else {
+                    element.setAttribute(camelToTrain(attributeName), attributeValue.toString());
+                }
+            });
+        }
+        if (style) {
+            const {style: elementStyle} = element;
+            Object.keys(style).forEach((property_i) => {
+                if (Array.isArray(style[property_i])) {
+                    elementStyle.setProperty(property_i, style[property_i][0], style[property_i][1]);
+                }
+                else {
+                    elementStyle.setProperty(property_i, <string>style[property_i]);
+                }
+            });
+        }
+        if (dataset) {
+            const {dataset: elementDataset} = element;
+            Object.keys(dataset).forEach((datasetEntry_i) => {
+                elementDataset[datasetEntry_i] = dataset[datasetEntry_i].toString();
+            });
+        }
+        if (children) {
+            if (typeof children == "function") {
+                element.append(...children(element));
+            }
+            else {
+                element.append(...Array.from(children));
+            }
+        }
+        if (eventListeners) {
+            Object.entries(eventListeners).forEach(([name_i, listener_i]) => {
+                if (Array.isArray(listener_i)) {
+                    element.addEventListener(name_i, listener_i[0], listener_i[1]);
+                }
+                else {
+                    element.addEventListener(name_i, listener_i);
+                }
+            });
+        }
+        switch (name) {
+        }
+    }
+    return widget;
+}
 
 const reactiveElementsMap = new WeakMap<ModelNode, {
     observerOptions: ModelChangeObserverOptions,
@@ -513,13 +646,20 @@ function reactiveElement<M extends ModelNode, E extends Element, K extends strin
     element: E,
     properties: K[],
     react: (element: E, property: K, oldValue: any, newValue: any) => void
-): E ;
-function reactiveElement<M extends ModelNode, E extends Element>(
+): E;
+function reactiveElement<M extends ModelNode, W extends Widget, K extends string>(
     model: M,
-    element: E,
+    widget: W,
+    properties: K[],
+    react: (widget: W, property: K, oldValue: any, newValue: any) => void
+): W;
+function reactiveElement<M extends ModelNode, E extends Element | Widget>(
+    model: M,
+    elementOrWidget: E,
     properties: string[],
     react: (element: E, property: string, oldValue: any, newValue: any) => void
 ): E {
+    const element = <Element>(elementOrWidget instanceof Widget ? elementOrWidget.element : elementOrWidget);
     const elementRef = new WeakRef(element);
     const reactiveElement = {elementRef, react, properties};
     const reactiveElementsMapEntry = reactiveElementsMap.get(model);
@@ -546,11 +686,11 @@ function reactiveElement<M extends ModelNode, E extends Element>(
         if (property_i in model) {
             const value = Reflect.get(model, property_i, model);
             if (value !== void 0) {
-                react(element, <any>property_i, <any>void 0, value);
+                react(elementOrWidget, <any>property_i, <any>void 0, value);
             }
         }
     });
-    return element;
+    return elementOrWidget;
 }
 
 interface ReactiveChildElements {

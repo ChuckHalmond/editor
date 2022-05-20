@@ -6,8 +6,7 @@ import "./index";
 import { ListItemModel, ListModel, ListView } from "./src/views/ListView";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
 import { element, Fragment } from "./src/elements/Element";
-import { MenuWidget } from "./src/views/widgets/MenuWidget";
-import { MenuItemWidget } from "./src/views/widgets/MenuItemWidget";
+import { MenuItemModel, MenuModel, MenuView } from "./src/views/MenuView";
 
 export async function main() {
     
@@ -238,7 +237,7 @@ export async function main() {
     );
 
     //document.body.append(gridView);
-    const menuWidget = new MenuWidget([
+    /*const menuWidget = new MenuWidget([
         new MenuItemWidget({
             label: "MenuItem A1",
             type: "checkbox"
@@ -252,7 +251,27 @@ export async function main() {
             ])
         })
     ]);
-    document.body.append(menuWidget.element);
+    document.body.append(menuWidget.element);*/
+
+    const menuView = new MenuView(
+        new MenuModel({
+            items: [
+                new MenuItemModel({
+                    name: "MenuItem A1",
+                    label: "MenuItem A1",
+                    type: "submenu",
+                    menu: new MenuModel({
+                        name: "MenuItem A2",
+                        items: [
+                            new MenuItemModel({name: "MenuItem B1", label: "MenuItem B1", type: "checkbox"}),
+                            new MenuItemModel({name: "MenuItem B2", label: "MenuItem B2", type: "checkbox"})
+                        ]
+                    })
+                }),
+            ]
+        })
+    );
+    document.body.append(menuView);
     
     
     const editor = new Editor();

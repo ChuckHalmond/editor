@@ -1,4 +1,4 @@
-import { element } from "../../elements/Element";
+import { CustomWidget, element } from "../../elements/Element";
 import { MenuWidget } from "./MenuWidget";
 import { Widget } from "./Widget";
 
@@ -29,21 +29,18 @@ interface MenuItemWidget extends Widget {
     collapse(): void;
 }
 
+declare global {
+    interface WidgetNameMap {
+        "menuitem": MenuItemWidget;
+    }
+}
+
+@CustomWidget({
+    name: "menuitem"
+})
 class MenuItemWidgetBase extends Widget implements MenuItemWidget {
 
     #menu: MenuWidget | null = null;
-
-    constructor(init: {
-        type: MenuItemType;
-        label: string;
-        menu?: MenuWidget;
-    }) {
-        super();
-        const {label, type, menu} = init;
-        this.label = label;
-        this.type = type;
-        this.menu = menu ?? null;
-    }
 
     render() {
         return element("button", {
