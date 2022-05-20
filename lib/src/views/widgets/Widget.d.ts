@@ -1,10 +1,15 @@
 export { Widget };
 interface WidgetConstructor {
     readonly prototype: Widget;
-    new (element: HTMLElement): Widget;
-    new <Element extends HTMLElement>(element: Element): Widget<Element>;
+    new (): Widget;
+    new <Element extends HTMLElement>(): Widget<Element>;
 }
 interface Widget<Element extends HTMLElement = HTMLElement> {
-    element: Element;
+    readonly element: Element;
+    click(): void;
+    focus(options?: FocusOptions | undefined): void;
+    blur(): void;
+    contains(node: Node): boolean;
+    render(): Element;
 }
 declare var Widget: WidgetConstructor;

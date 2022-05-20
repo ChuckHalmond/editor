@@ -1,92 +1,206 @@
-import { ModelObject, ModelProperty } from "../../..";
 import { element } from "../../elements/Element";
 import { MenuWidget } from "./MenuWidget";
+import { Widget } from "./Widget";
 
-export class MenuItemModel extends ModelObject {
-    @ModelProperty()
-    label: string;
-    
-    @ModelProperty()
-    type: "button" | "menu" | "submenu";
-
-    constructor(init: {label: string, type: "button" | "submenu"}) {
-        super();
-        const {label, type} = init;
-        this.label = label;
-        this.type = type;
-    }
-}
+type MenuItemType = "button" | "radio" | "checkbox" | "menu" | "submenu";
 
 export { MenuItemWidget };
 
 interface MenuItemWidgetConstructor {
     readonly prototype: MenuItemWidget;
-    new(model: MenuItemModel): MenuItemWidget;
+    new(init: {
+        type: MenuItemType;
+        label: string;
+        menu?: MenuWidget;
+    }): MenuItemWidget;
 }
 
-interface MenuItemWidget {
-    readonly itemElement: HTMLButtonElement;
-    readonly menu: MenuWidget | null;
+interface MenuItemWidget extends Widget {
+    type: MenuItemType;
+    label: string;
+    active: boolean;
+    hasPopup: boolean;
+    expanded: boolean;
+    menu: MenuWidget | null;
+    checked: boolean;
+    trigger(): void;
     toggle(force?: boolean): void;
     expand(): void;
     collapse(): void;
 }
 
-class MenuItemWidgetBase implements MenuItemWidget {
+class MenuItemWidgetBase extends Widget implements MenuItemWidget {
 
-    readonly shadowRoot!: ShadowRoot;
-    readonly model: MenuItemModel;
-    readonly itemElement: HTMLButtonElement;
+    #menu: MenuWidget | null = null;
 
-    constructor(model: MenuItemModel) {
-        this.model = model;
-        this.itemElement = this.render();
+    constructor(init: {
+        type: MenuItemType;
+        label: string;
+        menu?: MenuWidget;
+    }) {
+        super();
+        const {label, type, menu} = init;
+        this.label = label;
+        this.type = type;
+        this.menu = menu ?? null;
     }
 
     render() {
-        const {model} = this;
         return element("button", {
             properties: {
-                className: "menuwidget",
-                textContent: model.label
+                className: "menuitem"
             },
             attributes: {
                 role: "menuitem"
-            }
+            },
+            children: [
+                element("span", {
+                    properties: {
+                        className: "content"
+                    },
+                    children: [
+                        element("span", {
+                            properties: {
+                                className: "icon"
+                            }
+                        }),
+                        element("span", {
+                            properties: {
+                                className: "label"
+                            }
+                        }),
+                        element("span", {
+                            properties: {
+                                className: "arrow"
+                            }
+                        })
+                    ]
+                })
+            ]
         });
     }
 
+    get #labelElement() {
+        return this.element.querySelector(":scope > .content > .label")!;
+    }
+
+    get checked(): boolean {
+        return this.element.hasAttribute("aria-checked");
+    }
+
+    set checked(value: boolean) {
+        this.element.toggleAttribute("aria-checked", value);
+    }
+
+    get label(): string {
+        return this.#labelElement.textContent ?? "";
+    }
+
+    set label(value: string) {
+        this.#labelElement.textContent = value;
+    }
+
+    get type(): MenuItemType {
+        return <MenuItemType>this.element.dataset.type ?? "button";
+    }
+
+    set type(value: MenuItemType) {
+        this.element.dataset.type = value;
+    }
+
     get menu(): MenuWidget | null {
-        const menuElement = this.itemElement.querySelector<HTMLElement>("[role='menu']");
-        return menuElement ? MenuWidget.map.get(menuElement) ?? null : null;
+        return this.#menu;
+    }
+
+    set menu(value: MenuWidget | null) {
+        const menu = this.#menu;
+        if (menu !== null && value !== null) {
+            menu.element.replaceWith(value.element);
+            this.hasPopup = true;
+        }
+        else {
+            if (menu !== null) {
+                menu.element.remove();
+                this.hasPopup = false;
+            }
+            if (value !== null) {
+                this.element.append(value.element);
+                this.hasPopup = true;
+            }
+        }
+        this.#menu = value;
+    }
+
+    get active(): boolean {
+        return this.element.hasAttribute("aria-active");
+    }
+
+    set active(value: boolean) {
+        this.element.toggleAttribute("aria-active", value);
+    }
+
+    get hasPopup(): boolean {
+        return this.element.hasAttribute("aria-haspopup");
+    }
+
+    set hasPopup(value: boolean) {
+        this.element.setAttribute("aria-haspopup", value.toString());
+    }
+
+    get expanded(): boolean {
+        return this.element.hasAttribute("aria-expanded");
+    }
+
+    set expanded(value: boolean) {
+        this.element.toggleAttribute("aria-expanded", value);
+    }
+
+    trigger(): void {
+        const {type, element} = this;
+        switch (type) {
+            case "checkbox": {
+                this.checked = !this.checked;
+                break;
+            }
+            case "radio": {
+                this.checked = true;
+                break;
+            }
+            case "menu":
+            case "submenu": {
+                this.toggle();
+                break;
+            }
+        }
+        element.dispatchEvent(new Event("trigger", {
+            bubbles: true
+        }));
     }
 
     toggle(force?: boolean): void {
-        const {itemElement, model} = this;
-        const {type} = model;
+        const {element, type} = this;
         switch (type) {
             case "menu":
             case "submenu": {
-                const expand = force ?? !itemElement.ariaExpanded;
-                itemElement.ariaExpanded = expand.toString();
+                const expand = force ?? !this.expanded;
+                this.expanded = expand;
                 if (expand) {
                     this.#positionMenu();
                 }
-                itemElement.dispatchEvent(new Event("toggle", {bubbles: true}));
+                element.dispatchEvent(new Event("toggle", {bubbles: true}));
                 break;
             }
         }
     }
 
     expand(): void {
-        const {itemElement, model} = this;
-        const {type} = model;
+        const {type} = this;
         switch (type) {
             case "menu":
             case "submenu": {
-                const expanded = !!itemElement.ariaExpanded;
+                const {expanded} = this;
                 if (!expanded) {
-                    itemElement.ariaExpanded = "true";
+                    this.expanded = true;
                     this.#positionMenu();
                 }
                 break;
@@ -95,14 +209,13 @@ class MenuItemWidgetBase implements MenuItemWidget {
     }
 
     collapse(): void {
-        const {itemElement, model} = this;
-        const {type} = model;
+        const {type} = this;
         switch (type) {
             case "menu":
             case "submenu": {
-                const expanded = !!itemElement.ariaExpanded;
+                const {expanded} = this;
                 if (expanded) {
-                    itemElement.ariaExpanded = "false";
+                    this.expanded = false;
                 }
                 break;
             }
@@ -110,16 +223,15 @@ class MenuItemWidgetBase implements MenuItemWidget {
     }
 
     #positionMenu(): void {
-        const {itemElement, menu} = this;
+        const {element, menu} = this;
         if (menu !== null) {
-            const {menuElement} = menu;
+            const {element: menuElement} = menu;
             const {style: menuStyle} = menuElement;
-            const {top: itemTop, bottom: itemBottom, left: itemLeft, right: itemRight} = itemElement.getBoundingClientRect();
+            const {top: itemTop, bottom: itemBottom, left: itemLeft, right: itemRight} = element.getBoundingClientRect();
             const {width: menuWidth, height: menuHeight} = menuElement.getBoundingClientRect();
             const {scrollY, scrollX} = window;
             const {clientWidth, clientHeight} = document.body;
-            const {model} = this;
-            const {type} = model;
+            const {type} = this;
             if (type == "menu") {
                 const overflowX = itemRight + menuWidth - clientWidth;
                 const overflowY = itemTop + menuHeight - clientHeight;
@@ -135,7 +247,7 @@ class MenuItemWidgetBase implements MenuItemWidget {
                 }px`);
             }
             else {
-                const closestMenu = itemElement.closest("[role=menu]");
+                const closestMenu = element.closest(".menu");
                 if (closestMenu !== null) {
                     const {top: closestMenuTop, left: closestMenuLeft} = closestMenu.getBoundingClientRect();
                     const overflowX = itemRight + menuWidth - clientWidth;

@@ -93,3 +93,114 @@ e-menuitem::part(arrow)::after {
     mask-image: var(--arrow-image, none);
     filter: var(--arrow-filter, none);
 }
+
+
+
+
+
+.menuitem {
+    display: flex;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+
+    padding: 3px;
+    background-color: white;
+    width: max-content;
+
+    -webkit-box-shadow: var(--menu-box-shadow);
+    box-shadow: var(--menu-box-shadow);
+}
+
+.menuitem[aria-active] > .content {
+    background-color: var(--focused-item-color);
+}
+
+.menuitem:is([data-type="menu"], [data-type="submenu"]) > .menu {
+    z-index: 1;
+    position: absolute;
+    transform: translateY(-2px);
+}
+
+.menuitem:is([data-type="menu"], [data-type="submenu"]):not([aria-expanded]) > .menu {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.menuitem > .content {
+    flex: auto;
+    display: flex;
+    pointer-events: none;
+}
+
+.menuitem[data-type="submenu"] > .content > .icon {
+    visibility: hidden;
+}
+
+.menuitem:not([data-type="submenu"])> .content > .arrow {
+    display: none;
+}
+
+.menuitem > .content > .icon,
+.menuitem > .content > .label {
+    padding: 2px;
+}
+
+.menuitem > .content > .icon {
+    flex: none;
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    overflow: hidden;
+}
+
+.menuitem > .content > .label {
+    flex: auto;
+    line-height: 18px;
+    margin-left: 10px;
+    margin-right: 10px;
+    text-align: start;
+}
+
+.menuitem:is(:not([data-type]), [data-type="button"], [data-type="radio"], [data-type="checkbox"])[aria-checked] > .content > .icon {
+    background-color: var(--activated-item-color);
+}
+
+.menuitem:is(:not([data-type]), [data-type="button"], [data-type="radio"], [data-type="checkbox"]) > .content > .icon::before {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    content: "";
+    mask-size: 18px 18px;
+    -webkit-mask-size: 18px 18px;
+    background-color: var(--icon-color, none);
+    -webkit-mask-image: var(--icon-image, none);
+    mask-image: var(--icon-image, none);
+    filter: var(--icon-filter, none);
+}
+
+.menuitem > .content > .arrow {
+    flex: none;
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin: 1px 4px 1px 1px;
+}
+
+.menuitem > .content > .arrow::after {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin: 1px;
+    content: "";
+    mask-size: 18px 18px;
+    -webkit-mask-size: 18px 18px;
+    background-color: var(--arrow-color, none);
+    -webkit-mask-image: var(--arrow-image, none);
+    mask-image: var(--arrow-image, none);
+    filter: var(--arrow-filter, none);
+}

@@ -29,7 +29,8 @@ e-menubutton::part(content) {
     --icon-image: url("/sample/assets/more_horiz_FILL0_wght700_GRAD0_opsz48.svg");
 }
 
-e-menuitem[type="submenu"] {
+e-menuitem[type="submenu"],
+.menuitem[data-type="submenu"] {
     --arrow-color: black;
     --arrow-image: url("/sample/assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg");
 }
@@ -67,7 +68,8 @@ e-treeitem:not(:hover):not([active]):not([selected]) > e-toolbar {
 }
 
 e-option[selected],
-e-menuitem[type="checkbox"][checked] {
+e-menuitem[type="checkbox"][checked],
+.menuitem[data-type="checkbox"][aria-checked] {
     --icon-color: black;
     --icon-image: url("/sample/assets/done_FILL0_wght400_GRAD0_opsz48.svg");
 }

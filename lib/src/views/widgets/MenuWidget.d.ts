@@ -1,43 +1,14 @@
-import { ModelList, ModelObject } from "../../models/Model";
-import { MenuItemModel } from "./MenuItemWidget";
-export declare class MenuModel extends ModelObject {
-    readonly childItems: ModelList<MenuItemModel>;
-    constructor();
-    constructor(init: {
-        items: MenuItemModel[];
-    });
+import { MenuItemWidget } from "./MenuItemWidget";
+import { Widget } from "./Widget";
+export { MenuWidget };
+interface MenuWidgetConstructor {
+    readonly prototype: MenuWidget;
+    new (items: MenuItemWidget[]): MenuWidget;
 }
-export declare class MenuWidget {
-    #private;
-    readonly menuElement: HTMLElement;
-    readonly model: MenuModel;
-    readonly items: MenuItemCollection;
-    get activeItem(): HTMLElement | null;
-    get activeIndex(): number;
-    static readonly map: WeakMap<HTMLElement, MenuWidget>;
-    constructor(model: MenuModel);
-    getWidget(menuElement: HTMLElement): MenuWidget | null;
-    render(): HTMLUListElement;
+interface MenuWidget extends Widget {
+    readonly items: MenuItemWidget[];
+    readonly activeItem: MenuItemWidget | null;
+    readonly activeIndex: number;
+    insertItem(index: number, ...items: MenuItemWidget[]): void;
 }
-export { MenuItemRadioList };
-export { MenuItemCollection };
-interface MenuItemCollectionConstructor {
-    readonly prototype: MenuItemCollection;
-    new (root: HTMLElement): MenuItemCollection;
-}
-interface MenuItemCollection {
-    length: number;
-    item(index: number): HTMLElement | null;
-    namedItem(name: string): HTMLElement | MenuItemRadioList | null;
-    values(): IterableIterator<HTMLElement>;
-}
-interface MenuItemRadioListConstructor {
-    readonly prototype: MenuItemRadioList;
-    new (root: HTMLElement, name: string): MenuItemRadioList;
-}
-interface MenuItemRadioList {
-    value: string;
-    values(): IterableIterator<HTMLElement>;
-}
-declare var MenuItemCollection: MenuItemCollectionConstructor;
-declare var MenuItemRadioList: MenuItemRadioListConstructor;
+declare var MenuWidget: MenuWidgetConstructor;

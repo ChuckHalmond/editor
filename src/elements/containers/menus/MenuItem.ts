@@ -28,9 +28,6 @@ declare global {
     }
 }
 
-var shadowTemplateIconPart: HTMLElement;
-var shadowTemplateArrowPart: HTMLElement;
-var shadowTemplateHotkeyPart: HTMLElement;
 var shadowTemplate: HTMLTemplateElement;
 
 @CustomElement({
@@ -53,22 +50,19 @@ class HTMLEMenuItemElementBase extends HTMLEActionElement implements HTMLEMenuIt
     type!: "button" | "checkbox" | "radio" | "menu" | "submenu";
 
     static {
-        shadowTemplateIconPart = element("span", {part: ["icon"]});
-        shadowTemplateArrowPart = element("span", {part: ["arrow"]});
-        shadowTemplateHotkeyPart = element("span", {part: ["hotkey"]});
         shadowTemplate = element("template", {
             content: [
                 element("span", {
                     part: ["content"],
                     children: [
-                        shadowTemplateIconPart,
+                        element("span", {part: ["icon"]}),
                         element("span", {
                             part: ["label"],
                             children: [
                                 element("slot")
                             ]
                         }),
-                        shadowTemplateArrowPart
+                        element("span", {part: ["arrow"]})
                     ]
                 }),
                 element("slot", {

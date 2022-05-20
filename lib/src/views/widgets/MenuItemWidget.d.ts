@@ -1,21 +1,24 @@
-import { ModelObject } from "../../..";
 import { MenuWidget } from "./MenuWidget";
-export declare class MenuItemModel extends ModelObject {
-    label: string;
-    type: "button" | "menu" | "submenu";
-    constructor(init: {
-        label: string;
-        type: "button" | "submenu";
-    });
-}
+import { Widget } from "./Widget";
+declare type MenuItemType = "button" | "radio" | "checkbox" | "menu" | "submenu";
 export { MenuItemWidget };
 interface MenuItemWidgetConstructor {
     readonly prototype: MenuItemWidget;
-    new (model: MenuItemModel): MenuItemWidget;
+    new (init: {
+        type: MenuItemType;
+        label: string;
+        menu?: MenuWidget;
+    }): MenuItemWidget;
 }
-interface MenuItemWidget {
-    readonly itemElement: HTMLButtonElement;
-    readonly menu: MenuWidget | null;
+interface MenuItemWidget extends Widget {
+    type: MenuItemType;
+    label: string;
+    active: boolean;
+    hasPopup: boolean;
+    expanded: boolean;
+    menu: MenuWidget | null;
+    checked: boolean;
+    trigger(): void;
     toggle(force?: boolean): void;
     expand(): void;
     collapse(): void;

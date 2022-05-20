@@ -1,126 +1,99 @@
-import { element, reactiveChildElements, Stylesheet, trimMultilineIndent } from "../../elements/Element";
-import { ModelList, ModelObject, ModelProperty } from "../../models/Model";
-import { MenuItemModel } from "./MenuItemWidget";
+import { element } from "../../elements/Element";
+import { MenuItemWidget } from "./MenuItemWidget";
+import { Widget } from "./Widget";
 
-export class MenuModel extends ModelObject {
-    readonly childItems: ModelList<MenuItemModel>;
-    
-    constructor()
-    constructor(init: {items: MenuItemModel[]})
-    constructor(init?: {items: MenuItemModel[]}) {
-        super();
-        const childItems = new ModelList(init?.items ?? []);
-        childItems.setParent(this);
-        this.childItems = childItems;
-    }
+export { MenuWidget };
+
+interface MenuWidgetConstructor {
+    readonly prototype: MenuWidget;
+    new(items: MenuItemWidget[]): MenuWidget;
 }
 
-function isMenuElement(obj: any): obj is HTMLElement {
-    return obj instanceof HTMLElement &&
-        obj.getAttribute("role") === "menu";
+interface MenuWidget extends Widget {
+    readonly items: MenuItemWidget[];
+    readonly activeItem: MenuItemWidget | null;
+    readonly activeIndex: number;
+    insertItem(index: number, ...items: MenuItemWidget[]): void;
+
 }
 
-function isMenuItemElement(obj: any): obj is HTMLElement {
-    return obj instanceof HTMLElement &&
-        ["menuitem", "menuitemradio", "menuitemcheckbox"]
-        .some(role_i => obj.getAttribute("role") === role_i);
-}
+class MenuWidgetBase extends Widget implements MenuWidget {
 
-export class MenuWidget {
-    readonly menuElement: HTMLElement;
-    readonly model: MenuModel;
+    readonly items: MenuItemWidget[];
 
-    readonly items: MenuItemCollection;
-
-    get activeItem(): HTMLElement | null {
-        return this.items.item(this.#activeIndex);
+    get activeItem(): MenuItemWidget | null {
+        return this.items[this.#activeIndex] ?? null;
     }
 
     get activeIndex(): number {
         return this.#activeIndex;
     }
 
-    static {
-        (document as any).adoptedStyleSheets.push(
-            Stylesheet(trimMultilineIndent(/*css*/`
-                .menuwidget {
-                    margin: 0;
-                }
-            `))
-        );
-    }
-
     #activeIndex: number;
-    #toggleTimeouts: WeakMap<HTMLElement, {clear(): void;}>;
+    #toggleTimeouts: WeakMap<MenuItemWidget, {clear(): void;}>;
     #walker: TreeWalker;
 
-    static readonly map: WeakMap<HTMLElement, MenuWidget> = new WeakMap();
-
-    constructor(model: MenuModel) {
-        this.model = model;
-        this.menuElement = this.render();
-        const {menuElement} = this;
-        this.items = new MenuItemCollection(menuElement);
+    constructor(items: MenuItemWidget[]) {
+        super();
+        const {element} = this;
+        this.items = [];
+        this.insertItem(0, ...items);
         this.#activeIndex = -1;
         this.#toggleTimeouts = new WeakMap();
         this.#walker = document.createTreeWalker(
-            this.menuElement, NodeFilter.SHOW_ELEMENT, <NodeFilter>this.#walkerNodeFilter.bind(this)
+            element, NodeFilter.SHOW_ELEMENT, <NodeFilter>this.#walkerNodeFilter.bind(this)
         );
-        menuElement.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
-        menuElement.addEventListener("mouseout", this.#handleMouseOutEvent.bind(this));
-        menuElement.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
-        menuElement.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
-        menuElement.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
-        //menuElement.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
-        MenuWidget.map.set(this.menuElement, this);
-    }
-
-    getWidget(menuElement: HTMLElement): MenuWidget | null {
-        return MenuWidget.map.get(menuElement) ?? null;
-    }
-
-    #walkerNodeFilter(element: HTMLElement): number {
-        switch (element.getAttribute("role")) {
-            case "menuitem":
-            case "menuitemcheckbox":
-            case "menuitemradio":
-                return NodeFilter.FILTER_ACCEPT;
-            case "group":
-                return NodeFilter.FILTER_SKIP;
-            default:
-                return NodeFilter.FILTER_REJECT;
-        }
+        element.addEventListener("click", this.#handleClickEvent.bind(this));
+        element.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
+        element.addEventListener("mouseout", this.#handleMouseOutEvent.bind(this));
+        element.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
+        element.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
+        element.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
+        element.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
     }
 
     render() {
-        const {model} = this;
-        return element("ul", {
+        return element("menu", {
             properties: {
-                className: "menuwidget"
+                className: "menu",
+                tabIndex: -1
             },
             attributes: {
                 role: "menu"
-            },
-            children: reactiveChildElements(
-                model.childItems,
-                item_i => element("li", {
-                    properties: {
-                        tabIndex: -1,
-                        className: "menuwidget__item",
-                        textContent: item_i.label
-                    },
-                    attributes: {
-                        role: "menuitem"
-                    }
-                })
-            )
+            }
         });
     }
 
+    insertItem(index: number, ...items: MenuItemWidget[]): void {
+        const {element} = this;
+        this.items.splice(index, 0, ...items);
+        if (element.children.length === 0) {
+            element.append(...items.map(item => item.element));
+        }
+        else {
+            element.children.item(Math.max(element.children.length, index))!
+                .before(...items.map(item => item.element)
+            );
+        }
+    }
+
+    #walkerNodeFilter(element: Element): number {
+        const {classList} = element;
+        if (classList.contains("menuitem")) {
+            return NodeFilter.FILTER_ACCEPT;
+        }
+        else if (classList.contains("menuitemgroup")) {
+            return NodeFilter.FILTER_SKIP;
+        }
+        else {
+            return NodeFilter.FILTER_REJECT;
+        }
+    }
+
     #collapseSubmenus(): void {
-        Array.from(this.items.values())
+        Array.from(this.items)
             .forEach((item_i) => {
-                item_i.removeAttribute("aria-expanded")
+                item_i.collapse()
             });
     }
 
@@ -136,47 +109,55 @@ export class MenuWidget {
         return <HTMLElement | null>walker.lastChild();
     }
     
-    #previousItem(item: HTMLElement): HTMLElement | null {
+    #previousItem(item: MenuItemWidget): HTMLElement | null {
         const walker = this.#walker;
-        walker.currentNode = item;
+        walker.currentNode = item.element;
         return <HTMLElement | null>walker.previousNode();
     }
 
-    #nextItem(item: HTMLElement): HTMLElement | null {
+    #nextItem(item: MenuItemWidget): HTMLElement | null {
         const walker = this.#walker;
-        walker.currentNode = item;
+        walker.currentNode = item.element;
         return <HTMLElement | null>walker.nextNode();
     }
 
-    #firstChildItem(item: HTMLElement): HTMLElement | null {
-        const menuElement = item.querySelector<HTMLElement>(":scope > [role=menu]");
-        const menuWidget = menuElement ?
-            MenuWidget.map.get(menuElement) :
-            null;
-        return menuWidget ?
-            menuWidget.#firstItem() :
+    #firstChildItem(item: MenuItemWidget): HTMLElement | null {
+        const {menu} = item;
+        return menu ?
+            menu.items[0]?.element ?? null :
             null;
     }
 
-    #setActiveItem(item: HTMLElement | null): void {
+    #setActiveItem(item: MenuItemWidget | null): void {
         const {activeItem, items} = this;
         if (activeItem !== null && activeItem !== item) {
-            activeItem.toggleAttribute("aria-active", false);
+            activeItem.active = false;
         }
         if (item !== null && activeItem !== item) {
-            item.toggleAttribute("aria-active", true);
-            this.#activeIndex = Array.from(items.values()).indexOf(item);
+            item.active = true;
+            this.#activeIndex = Array.from(items).indexOf(item);
         }
         if (item == null) {
             this.#activeIndex = -1;
         }
     }
 
+    #handleClickEvent(event: MouseEvent): void {
+        const {target} = event;
+        const {items} = this;
+        const targetClosestItem = Array.from(items).find(
+            item_i => item_i.contains(<Node>target)
+        ) ?? null;
+        if (targetClosestItem) {
+            targetClosestItem.trigger();
+        }
+    }
+
     #handleFocusInEvent(event: FocusEvent): void {
         const {target} = event;
         const {items} = this;
-        const targetClosestItem = Array.from(items.values()).find(
-            item_i => item_i.contains(<Node>target)
+        const targetClosestItem = Array.from(items).find(
+            item_i => item_i.contains(<HTMLElement>target)
         ) ?? null;
         if (targetClosestItem) {
             this.#setActiveItem(targetClosestItem);
@@ -185,8 +166,7 @@ export class MenuWidget {
 
     #handleFocusOutEvent(event: FocusEvent): void {
         const {relatedTarget} = event;
-        const {menuElement} = this;
-        const lostFocusWithin = !menuElement.contains(<Node>relatedTarget);
+        const lostFocusWithin = !this.contains(<HTMLElement>relatedTarget);
         if (lostFocusWithin) {
             /*const {contextual} = this;
             if (contextual) {
@@ -194,13 +174,13 @@ export class MenuWidget {
             }
             else {*/
                 const {activeItem} = this;
-                activeItem?.removeAttribute("aria-expanded");
+                activeItem?.collapse();
                 this.#setActiveItem(null);
             //}
         }
     }
 
-    async #setItemTimeout(item: HTMLElement, delay?: number): Promise<void> {
+    async #setItemTimeout(item: MenuItemWidget, delay?: number): Promise<void> {
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
                 resolve(void 0);
@@ -216,7 +196,7 @@ export class MenuWidget {
         });
     }
 
-    #clearItemTimeout(item: HTMLElement): void {
+    #clearItemTimeout(item: MenuItemWidget): void {
         const timeout = this.#toggleTimeouts.get(item);
         if (typeof timeout !== "undefined") {
             this.#toggleTimeouts.delete(item);
@@ -226,7 +206,7 @@ export class MenuWidget {
 
     #handleKeyDownEvent(event: KeyboardEvent) {
         const {key} = event;
-        const {menuElement, activeItem} = this;
+        const {element, activeItem} = this;
         switch (key) {
             case "ArrowUp": {
                 const previousItem = activeItem ?
@@ -258,11 +238,13 @@ export class MenuWidget {
             }
             case "Enter": {
                 if (activeItem) {
-                    const hasPopUp = activeItem.hasAttribute("aria-haspopup");
-                    if (hasPopUp) {
-                        activeItem.toggleAttribute("aria-expanded", true);
-                        const firstChildItem = this.#firstChildItem(activeItem);
-                        firstChildItem?.focus({preventScroll: true});
+                    const {hasPopup} = activeItem;
+                    if (hasPopup) {
+                        activeItem.expand();
+                        if (activeItem.expanded) {
+                            const firstChildItem = this.#firstChildItem(activeItem);
+                            firstChildItem?.focus({preventScroll: true});
+                        }
                     }
                     else {
                         activeItem.click();
@@ -274,10 +256,10 @@ export class MenuWidget {
             case "Escape": {
                 if (activeItem) {
                     const isClosestTargetMenu = event.composedPath().find(
-                        target_i => isMenuElement(target_i)
-                    ) == menuElement;
+                        target_i => target_i instanceof HTMLMenuElement
+                    ) == element;
                     if (!isClosestTargetMenu) {
-                        activeItem.toggleAttribute("aria-expanded", false);
+                        activeItem.collapse();
                         activeItem.focus({preventScroll: true});
                         event.stopPropagation();
                     }
@@ -287,10 +269,10 @@ export class MenuWidget {
             case "ArrowLeft": {
                 if (activeItem) {
                     const isClosestTargetMenu = event.composedPath().find(
-                        target_i => isMenuElement(target_i)
-                    ) == menuElement;
+                        target_i => target_i instanceof HTMLMenuElement
+                    ) == element;
                     if (!isClosestTargetMenu) {
-                        activeItem.toggleAttribute("aria-expanded", false);
+                        activeItem.collapse();
                         activeItem.focus({preventScroll: true});
                         event.stopPropagation();
                     }
@@ -299,9 +281,9 @@ export class MenuWidget {
             }
             case "ArrowRight": {
                 if (activeItem) {
-                    const hasPopUp = activeItem.hasAttribute("aria-haspopup");
-                    if (hasPopUp) {
-                        activeItem.toggleAttribute("aria-expanded", true);
+                    const {hasPopup} = activeItem;
+                    if (hasPopup) {
+                        activeItem.expand();
                         const firstChildItem = this.#firstChildItem(activeItem);
                         firstChildItem?.focus({preventScroll: true});
                         event.stopPropagation();
@@ -312,266 +294,108 @@ export class MenuWidget {
         }
     }
 
+    #closestItem(target: Element): MenuItemWidget | null {
+        const {items} = this;
+        const targetClosestItem = Array.from(items).find(
+            item_i => item_i.contains(<HTMLElement>target)
+        ) ?? null;
+        return targetClosestItem;
+    }
+
     #handleMouseOutEvent(event: MouseEvent): void {
         const {target, relatedTarget} = event;
-        const {items, menuElement} = this;
-        const targetClosestItem = Array.from(items.values()).find(
-            item_i => item_i.contains(<Node>target)
-        ) ?? null;
-        if (targetClosestItem?.hasAttribute("aria-haspopup") && !targetClosestItem.hasAttribute("aria-expanded")) {
-            this.#clearItemTimeout(targetClosestItem);
+        const {element} = this;
+        const targetClosestItemWidget = target instanceof Element ? this.#closestItem(target) : null; 
+        if (targetClosestItemWidget?.hasPopup && !targetClosestItemWidget.expanded) {
+            this.#clearItemTimeout(targetClosestItemWidget);
         }
         const isTargetClosestMenu = event.composedPath().find(
-            target_i => isMenuElement(target_i)
-            ) == menuElement;
+            target_i => target_i instanceof HTMLMenuElement
+            ) == element;
         if (isTargetClosestMenu) {
             const {clientX, clientY} = event;
-            const {left, right, top, bottom} = menuElement.getBoundingClientRect();
+            const {left, right, top, bottom} = element.getBoundingClientRect();
             const intersectsWithMouse = !(
                 left > clientX || right < clientX || top > clientY || bottom < clientY
             );
-            const containsRelatedTarget = menuElement.contains(<Node>relatedTarget);
+            const containsRelatedTarget = element.contains(<Node>relatedTarget);
             if (intersectsWithMouse && containsRelatedTarget) {
-                if (isMenuElement(relatedTarget) && relatedTarget !== menuElement) {
+                if (relatedTarget instanceof HTMLMenuElement && relatedTarget !== element) {
                     relatedTarget.focus({preventScroll: true});
                 }
                 else {
                     const activeIndex = this.#activeIndex;
-                    menuElement.focus({preventScroll: true});
+                    element.focus({preventScroll: true});
+                    this.#setActiveItem(null);
                     this.#activeIndex = activeIndex;
                 }
             }
             if (!intersectsWithMouse) {
-                menuElement.focus({preventScroll: true});
+                element.focus({preventScroll: true});
+                this.#setActiveItem(null);
             }
         }
     }
 
     #handleMouseOverEvent(event: MouseEvent): void {
         const {target} = event;
-        const {items, menuElement} = this;
-        const targetClosestItem = Array.from(items.values()).find(
-            item_i => item_i.contains(<Node>target)
-        ) ?? null;
-        if (targetClosestItem?.hasAttribute("aria-haspopup") && targetClosestItem.hasAttribute("aria-expanded")) {
-            this.#clearItemTimeout(targetClosestItem);
+        const {element} = this;
+        const targetClosestItemWidget = target instanceof Element ? this.#closestItem(target) : null; 
+        if (targetClosestItemWidget?.hasPopup && targetClosestItemWidget.expanded) {
+            this.#clearItemTimeout(targetClosestItemWidget);
         }
         const isTargetClosestMenu = event.composedPath().find(
-            target_i => isMenuElement(target_i)
-        ) == menuElement;
+            target_i => target_i instanceof HTMLMenuElement
+        ) == element;
         if (isTargetClosestMenu) {
             const {activeItem} = this;
-            if (activeItem?.hasAttribute("aria-haspopup") && activeItem.hasAttribute("aria-expanded") && 
-                !activeItem.contains(<Node>target)) {
+            if (activeItem?.hasPopup && activeItem.expanded && 
+                !activeItem.contains(<HTMLElement>target)) {
                 this.#clearItemTimeout(activeItem);
-                this.#setItemTimeout(activeItem, 500)
+                this.#setItemTimeout(activeItem, 400)
                     .then(() => {
-                        activeItem.toggleAttribute("aria-expanded", false)
+                        activeItem.collapse();
                     })
                     .catch(() => void 0);
             }
-            if (targetClosestItem !== null) {
-                targetClosestItem.focus({preventScroll: true});
-                if (targetClosestItem.hasAttribute("aria-haspopup")) {
-                    if (!targetClosestItem.hasAttribute("aria-expanded")) {
-                        this.#clearItemTimeout(targetClosestItem);
-                        this.#setItemTimeout(targetClosestItem, 200)
+            if (targetClosestItemWidget !== null) {
+                this.#setActiveItem(targetClosestItemWidget);
+                targetClosestItemWidget.focus({preventScroll: true});
+                if (targetClosestItemWidget.hasPopup) {
+                    if (!targetClosestItemWidget.expanded) {
+                        this.#clearItemTimeout(targetClosestItemWidget);
+                        this.#setItemTimeout(targetClosestItemWidget, 200)
                             .then(() => {
                                 const {activeItem} = this;
                                 this.#collapseSubmenus();
                                 if (activeItem) {
                                     this.#clearItemTimeout(activeItem);
-                                    activeItem.toggleAttribute("aria-expanded", true);
-                                    const menuElement = activeItem.querySelector<HTMLElement>(":scope > [role=menu]");
-                                    menuElement?.focus({preventScroll: true});
+                                    activeItem.expand();
+                                    activeItem.menu?.focus({preventScroll: true});
                                 }
                             })
                             .catch(() => void 0);
                     }
                     else {
-                        const menuElement = targetClosestItem.querySelector<HTMLElement>(":scope > [role=menu]");
-                        menuElement?.focus({preventScroll: true});
+                        if (activeItem) {
+                            activeItem.menu?.focus({preventScroll: true});
+                        }
                     }
                 }
             }
         }
     }
 
-    /*#handleTriggerEvent(event: Event): void {
+    #handleTriggerEvent(event: Event): void {
         const {target} = event;
-        const composedPath = event.composedPath();
-        const {menuElement} = this;
-        if (isMenuItemElement(target)) {
-            const isClosestTargetMenu = composedPath.find(
-                target_i => isMenuElement(target_i)
-            ) == menuElement;
-            if (isClosestTargetMenu) {
-                const {type, name, value} = target;
-                if (type == "radio") {
-                    Array.from(new HTMLEMenuItemRadioList(this, name).values()).forEach((radio_i) => {
-                        radio_i.checked = radio_i.value == value;
-                    });
-                }
-            }
-            if (contextual) {
-                this.remove();
-            }
-        }
-    }*/
-}
-
-export { MenuItemRadioList };
-export { MenuItemCollection };
-
-interface MenuItemCollectionConstructor {
-    readonly prototype: MenuItemCollection;
-    new(root: HTMLElement): MenuItemCollection;
-}
-
-interface MenuItemCollection {
-    length: number;
-    item(index: number): HTMLElement | null;
-    namedItem(name: string): HTMLElement | MenuItemRadioList | null;
-    values(): IterableIterator<HTMLElement>;
-}
-
-interface MenuItemRadioListConstructor {
-    readonly prototype: MenuItemRadioList;
-    new(root: HTMLElement, name: string): MenuItemRadioList;
-}
-
-interface MenuItemRadioList {
-    value: string;
-    values(): IterableIterator<HTMLElement>;
-}
-
-class MenuItemCollectionBase implements MenuItemCollection {
-    #walker: TreeWalker;
-
-    get length(): number {
-        const walker = this.#walker;
-        walker.currentNode = walker.root;
-        let length = 0;
-        while (walker.nextNode() !== null) length++;
-        return length;
-    }
-
-    constructor(root: HTMLElement) {
-        this.#walker = document.createTreeWalker(
-            root, NodeFilter.SHOW_ELEMENT, <NodeFilter>this.#walkerNodeFilter.bind(this)
-        );
-    }
-
-    #walkerNodeFilter(element: HTMLElement): number {
-        switch (element.getAttribute("role")) {
-            case "menuitem":
-            case "menuitemcheckbox":
-            case "menuitemradio":
-                return NodeFilter.FILTER_ACCEPT;
-            case "group":
-                return NodeFilter.FILTER_SKIP;
-            default:
-                return NodeFilter.FILTER_REJECT;
-        }
-    }
-
-    item(index: number): HTMLElement | null {
-        if (index < 0) {
-            return null;
-        }
-        const walker = this.#walker;
-        walker.currentNode = walker.root;
-        let currentNode = walker.nextNode();
-        let i = 0;
-        while (i < index && currentNode !== null) {
-            currentNode = walker.nextNode();
-            i++;
-        }
-        return <HTMLElement | null>currentNode;
-    }
-
-    namedItem(name: string): HTMLElement | MenuItemRadioList | null {
-        if (!name) {
-            return null;
-        }
-        const walker = this.#walker;
-        const {root} = walker;
-        walker.currentNode = root;
-        let currentNode = <HTMLElement | null>walker.nextNode();
-        while (currentNode !== null && !(currentNode.getAttribute("name") == name)) {
-            currentNode = <HTMLElement | null>walker.nextNode();
-        }
-        if (currentNode?.getAttribute("role") == "menuitemradio") {
-            return new MenuItemRadioList(<HTMLElement>root, name);
-        }
-        return <HTMLElement | null>currentNode;
-    }
-
-    *values(): IterableIterator<HTMLElement> {
-        const walker = this.#walker;
-        walker.currentNode = walker.root;
-        let currentNode = walker.nextNode();
-        while (currentNode !== null) {
-            yield <HTMLElement>currentNode;
-            currentNode = walker.nextNode();
-        }
-    }
-
-    static MenuItemRadioListBase? = class MenuItemRadioListBase implements MenuItemRadioList {
-        #walker: TreeWalker;
-        #name: string;
-
-        get value(): string {
-            const name = this.#name;
-            const walker = this.#walker;
-            walker.currentNode = walker.root;
-            let currentNode = <HTMLElement | null>walker.nextNode();
-            while (currentNode !== null) {
-                if (currentNode.getAttribute("name") == name && currentNode.getAttribute("role") == "menuitemradio" && currentNode.getAttribute("role") == "menuitemradio") {
-                    return currentNode.getAttribute("value") ?? "";
-                }
-                currentNode = <HTMLElement | null>walker.nextNode();
-            }
-            return "";
-        }
-
-        constructor(root: HTMLElement, name: string) {
-            this.#walker = document.createTreeWalker(
-                root, NodeFilter.SHOW_ELEMENT, <NodeFilter>this.#walkerNodeFilter.bind(this)
-            );
-            this.#name = name;
-        }
-        
-        #walkerNodeFilter(element: HTMLElement): number {
-            switch (element.getAttribute("role")) {
-                case "menuitem":
-                case "menuitemcheckbox":
-                case "menuitemradio":
-                    return NodeFilter.FILTER_ACCEPT;
-                case "group":
-                    return NodeFilter.FILTER_SKIP;
-                default:
-                    return NodeFilter.FILTER_REJECT;
-            }
-        }
-
-        *values(): IterableIterator<HTMLElement> {
-            const name = this.#name;
-            const walker = this.#walker;
-            walker.currentNode = walker.root;
-            let currentNode = <HTMLElement | null>walker.nextNode();
-            while (currentNode !== null) {
-                const itemName = currentNode.getAttribute("name");
-                const itemRole = currentNode.getAttribute("role");
-                if (itemName == name && itemRole == "menuitemradio") {
-                    yield currentNode;
-                }
-                currentNode = <HTMLElement | null>walker.nextNode();
-            }
+        const {element} = this;
+        const isClosestTargetMenu = event.composedPath().find(
+            target_i => target_i instanceof HTMLMenuElement
+        ) == element;
+        if (isClosestTargetMenu) {
+            
         }
     }
 }
 
-var MenuItemCollection: MenuItemCollectionConstructor =  MenuItemCollectionBase;
-var MenuItemRadioList: MenuItemRadioListConstructor = MenuItemCollectionBase.MenuItemRadioListBase!;
-delete MenuItemCollectionBase.MenuItemRadioListBase;
+var MenuWidget: MenuWidgetConstructor = MenuWidgetBase;
