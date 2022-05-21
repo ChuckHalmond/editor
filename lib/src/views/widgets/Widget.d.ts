@@ -4,22 +4,21 @@ declare global {
     interface WidgetNameMap {
         "unknown": Widget;
     }
-    interface WidgetConstructor {
-        readonly prototype: Widget;
-        new (): Widget;
-        new <Element extends HTMLElement>(): Widget<Element>;
-    }
     interface CustomWidgetConstructor {
         new (...args: any): Widget;
     }
 }
-interface Widget<Element extends HTMLElement = HTMLElement> {
-    readonly element: Element;
+interface WidgetConstructor {
+    readonly prototype: Widget;
+    new (): Widget;
+}
+interface Widget {
+    readonly rootElement: HTMLElement;
     click(): void;
     focus(options?: FocusOptions | undefined): void;
     blur(): void;
     contains(node: Node): boolean;
-    render(): Element;
+    render(): HTMLElement;
 }
 interface WidgetRegistry {
     define(name: string, widget: WidgetConstructor): void;

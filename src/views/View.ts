@@ -1,12 +1,13 @@
 import { ModelObject } from "../models/Model";
+import { Widget } from "./widgets/Widget";
 
 export { View };
 
 interface View extends HTMLElement {
     readonly model: ModelObject | null;
     setModel(model: ModelObject): void;
-    renderShadow(): Node | undefined;
-    renderLight(): Node | undefined;
+    renderShadow(): Node | Widget | undefined;
+    renderLight(): Node | Widget | undefined;
     refresh(): void;
 }
 
@@ -32,11 +33,11 @@ class ViewBase extends HTMLElement implements View {
         this.#render();            
     }
 
-    renderLight(): Node | undefined {
+    renderLight(): Node | Widget | undefined {
         return;
     }
 
-    renderShadow(): Node | undefined {
+    renderShadow(): Node | Widget | undefined {
         return;
     }
 
@@ -49,12 +50,16 @@ class ViewBase extends HTMLElement implements View {
         const shadow = this.renderShadow();
         if (shadow) {
             if (shadowRoot) {
-                shadowRoot.replaceChildren(shadow);
+                shadowRoot.replaceChildren(
+                    shadow instanceof Widget ? shadow.rootElement : shadow
+                );
             }
         }
         const light = this.renderLight();
         if (light) {
-            this.replaceChildren(light);
+            this.replaceChildren(
+                light instanceof Widget ? light.rootElement : light
+            );
         }
     }
 }

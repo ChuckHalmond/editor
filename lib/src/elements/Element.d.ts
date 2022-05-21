@@ -5,7 +5,6 @@ export { ancestorNodes };
 export { CustomElement };
 export { CustomWidget };
 export { widget };
-export { Collection };
 export { QueryProperty };
 export { QueryAllProperty };
 export { AttributeProperty };
@@ -124,7 +123,7 @@ interface WidgetInit<W extends Widget> {
     dataset?: {
         [property: string]: string | number | boolean;
     };
-    children?: (Node | string)[] | NodeList | ReactiveChildElements;
+    children?: (Widget | Node | string)[] | NodeList | ReactiveChildElements;
     eventListeners?: {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined];
     };
@@ -139,11 +138,7 @@ declare function reactiveElement<M extends ModelNode, W extends Widget, K extend
 interface ReactiveChildElements {
     (parent: Node & ParentNode): (Node | string)[];
 }
-declare function reactiveChildElements<Model extends ModelNode>(list: ModelList<Model>, mapping: (item: Model) => Element, placeholder?: Element): ReactiveChildElements;
-interface Collection<E extends Element = Element> {
-    item(index: number): E | null;
-    namedItem(name: string): E | null;
-}
+declare function reactiveChildElements<Model extends ModelNode>(list: ModelList<Model>, mapping: (item: Model) => Element | Widget, placeholder?: Element): ReactiveChildElements;
 interface AttributeMutationMixin {
     readonly attributeName: string;
     readonly attributeValue: string;

@@ -5,8 +5,13 @@ import { Editor, HotKey, Key, KeyModifier } from "./index";
 import "./index";
 import { ListItemModel, ListModel, ListView } from "./src/views/ListView";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
-import { element, Fragment } from "./src/elements/Element";
+import { element, Fragment, widget } from "./src/elements/Element";
 import { MenuItemModel, MenuModel, MenuView } from "./src/views/MenuView";
+import { MenuItemWidget } from "./src/views/widgets/MenuItemWidget";
+import { MenuWidget } from "./src/views/widgets/MenuWidget";
+
+console.log(MenuWidget);
+console.log(MenuItemWidget);
 
 export async function main() {
     
@@ -272,6 +277,20 @@ export async function main() {
         })
     );
     document.body.append(menuView);
+
+
+    document.body.append(
+        widget("menu", {
+            children: [
+                widget("menuitem", {
+                    properties: {
+                        type: "checkbox",
+                        label: "Hello, World!"
+                    }
+                })
+            ]
+        }).rootElement
+    );
     
     
     const editor = new Editor();

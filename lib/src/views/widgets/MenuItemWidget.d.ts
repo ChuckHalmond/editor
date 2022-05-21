@@ -9,6 +9,7 @@ interface MenuItemWidgetConstructor {
         label: string;
         menu?: MenuWidget;
     }): MenuItemWidget;
+    fromRoot(rootElement: Element): MenuItemWidget | null;
 }
 interface MenuItemWidget extends Widget {
     type: MenuItemType;

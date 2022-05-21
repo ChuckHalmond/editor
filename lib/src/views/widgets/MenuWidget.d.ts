@@ -6,9 +6,7 @@ interface MenuWidgetConstructor {
     new (items: MenuItemWidget[]): MenuWidget;
 }
 interface MenuWidget extends Widget {
-    readonly items: MenuItemWidget[];
     readonly activeItem: MenuItemWidget | null;
-    readonly activeIndex: number;
     insertItem(index: number, ...items: MenuItemWidget[]): void;
 }
 declare global {

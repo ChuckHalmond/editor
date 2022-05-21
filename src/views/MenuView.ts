@@ -32,12 +32,12 @@ class MenuItemModel extends ModelObject {
     label: string;
 
     @ModelProperty()
-    type: string;
+    type: "button" | "radio" | "checkbox" | "menu" | "submenu";
 
     @ModelProperty()
     menu?: MenuModel;
     
-    constructor(init: {name: string, label: string, type: string; menu?: MenuModel;}) {
+    constructor(init: {name: string, label: string, type: "button" | "radio" | "checkbox" | "menu" | "submenu"; menu?: MenuModel;}) {
         super();
         const {name, label, type, menu} = init;
         this.name = name;
@@ -78,14 +78,14 @@ class MenuViewBase extends View {
 
     renderLight() {
         const {model} = this;
-        return this.#renderMenu(model).element;
+        return this.#renderMenu(model);
     }
 
     #renderMenu(menu: MenuModel): MenuWidget {
         return widget("menu", {
             children: reactiveChildElements(
                 menu.items,
-                item_i => this.#renderMenuItem(item_i).element
+                item_i => this.#renderMenuItem(item_i)
             )
         });
     }
@@ -93,11 +93,12 @@ class MenuViewBase extends View {
     #renderMenuItem(item: MenuItemModel): MenuItemWidget {
         return reactiveElement(
             item,
-            widget("menuitem", item.menu ? {
+            widget("menuitem", {
                 properties: {
-                    menu: this.#renderMenu(item.menu)
+                    type: item.type,
+                    menu: item.menu ? this.#renderMenu(item.menu) : null
                 }
-            } : {}),
+            }),
             ["label", "name"],
             (item, property, oldValue, newValue) => {
                 switch (property) {

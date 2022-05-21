@@ -7,7 +7,6 @@ export { ancestorNodes };
 export { CustomElement };
 export { CustomWidget };
 export { widget };
-export { Collection };
 export { QueryProperty };
 export { QueryAllProperty };
 export { AttributeProperty };
@@ -389,19 +388,6 @@ function element<K extends keyof HTMLElementTagNameMap>(
                 }
             });
         }
-        if (properties) {
-            const keys = <(keyof Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>)[]>Object.keys(properties);
-            keys.forEach((key_i) => {
-                const value = properties[key_i];
-                if (typeof properties[key_i] !== "undefined") {
-                    Object.assign(
-                        element, {
-                            [key_i]: value
-                        }
-                    );
-                }
-            });
-        }
         if (part) {
             const {part: elementPart} = element;
             part.forEach((part) => {
@@ -485,7 +471,7 @@ interface WidgetInit<W extends Widget> {
     dataset?: {
         [property: string]: string | number | boolean
     },
-    children?: (Node | string)[] | NodeList | ReactiveChildElements,
+    children?: (Widget | Node | string)[] | NodeList | ReactiveChildElements,
     eventListeners?: {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined]
     }
@@ -509,7 +495,7 @@ function widget<K extends keyof WidgetNameMap>(
     name: K, init?: WidgetInit<WidgetNameMap[K]>): WidgetNameMap[K] {
     const widget = widgets.create(name);
     if (init) {
-        const {element} = widget;
+        const {rootElement} = widget;
         const {properties, part, exportParts, attributes, dataset, children, eventListeners, style} = init;
         if (properties) {
             const keys = <(keyof Partial<Pick<WidgetNameMap[K], WritableKeys<WidgetNameMap[K]>>>)[]>Object.keys(properties);
@@ -517,20 +503,7 @@ function widget<K extends keyof WidgetNameMap>(
                 const value = properties[key_i];
                 if (typeof properties[key_i] !== "undefined") {
                     Object.assign(
-                        element, {
-                            [key_i]: value
-                        }
-                    );
-                }
-            });
-        }
-        if (properties) {
-            const keys = <(keyof Partial<Pick<WidgetNameMap[K], WritableKeys<WidgetNameMap[K]>>>)[]>Object.keys(properties);
-            keys.forEach((key_i) => {
-                const value = properties[key_i];
-                if (typeof properties[key_i] !== "undefined") {
-                    Object.assign(
-                        element, {
+                        widget, {
                             [key_i]: value
                         }
                     );
@@ -538,29 +511,29 @@ function widget<K extends keyof WidgetNameMap>(
             });
         }
         if (part) {
-            const {part: elementPart} = element;
+            const {part: elementPart} = rootElement;
             part.forEach((part) => {
                 elementPart.add(part);
             });
         }
         if (exportParts) {
-            element.setAttribute("exportparts", exportParts.join(", "));
+            rootElement.setAttribute("exportparts", exportParts.join(", "));
         }
         if (attributes) {
             Object.keys(attributes).forEach((attributeName) => {
                 const attributeValue = attributes[attributeName];
                 if (typeof attributeValue == "boolean") {
                     if (attributeValue) {
-                        element.setAttribute(camelToTrain(attributeName), "");
+                        rootElement.setAttribute(camelToTrain(attributeName), "");
                     }
                 }
                 else {
-                    element.setAttribute(camelToTrain(attributeName), attributeValue.toString());
+                    rootElement.setAttribute(camelToTrain(attributeName), attributeValue.toString());
                 }
             });
         }
         if (style) {
-            const {style: elementStyle} = element;
+            const {style: elementStyle} = rootElement;
             Object.keys(style).forEach((property_i) => {
                 if (Array.isArray(style[property_i])) {
                     elementStyle.setProperty(property_i, style[property_i][0], style[property_i][1]);
@@ -571,26 +544,30 @@ function widget<K extends keyof WidgetNameMap>(
             });
         }
         if (dataset) {
-            const {dataset: elementDataset} = element;
+            const {dataset: elementDataset} = rootElement;
             Object.keys(dataset).forEach((datasetEntry_i) => {
                 elementDataset[datasetEntry_i] = dataset[datasetEntry_i].toString();
             });
         }
         if (children) {
             if (typeof children == "function") {
-                element.append(...children(element));
+                rootElement.append(...children(rootElement));
             }
             else {
-                element.append(...Array.from(children));
+                rootElement.append(
+                    ...Array.from(children).map(
+                        child_i => child_i instanceof Widget ? child_i.rootElement : child_i
+                    )
+                );
             }
         }
         if (eventListeners) {
             Object.entries(eventListeners).forEach(([name_i, listener_i]) => {
                 if (Array.isArray(listener_i)) {
-                    element.addEventListener(name_i, listener_i[0], listener_i[1]);
+                    rootElement.addEventListener(name_i, listener_i[0], listener_i[1]);
                 }
                 else {
-                    element.addEventListener(name_i, listener_i);
+                    rootElement.addEventListener(name_i, listener_i);
                 }
             });
         }
@@ -659,7 +636,7 @@ function reactiveElement<M extends ModelNode, E extends Element | Widget>(
     properties: string[],
     react: (element: E, property: string, oldValue: any, newValue: any) => void
 ): E {
-    const element = <Element>(elementOrWidget instanceof Widget ? elementOrWidget.element : elementOrWidget);
+    const element = <Element>(elementOrWidget instanceof Widget ? elementOrWidget.rootElement : elementOrWidget);
     const elementRef = new WeakRef(element);
     const reactiveElement = {elementRef, react, properties};
     const reactiveElementsMapEntry = reactiveElementsMap.get(model);
@@ -700,7 +677,7 @@ interface ReactiveChildElements {
 const reactiveChildElementsMap = new WeakMap<ModelList, {
     reactiveChildElementsArray: {
         parentRef: WeakRef<ParentNode>,
-        mapping: (item: any) => Element,
+        mapping: (item: any) => Element | Widget,
         placeholder?: Element
     }[]
 }>();
@@ -709,7 +686,7 @@ const reactiveChildElementsFinalizationRegistry = new FinalizationRegistry((held
     list: ModelList,
     reactiveChildElement: {
         parentRef: WeakRef<ParentNode>,
-        mapping: (item: any) => Element,
+        mapping: (item: any) => Element | Widget,
         placeholder?: Element
     }
 }) => {
@@ -742,7 +719,10 @@ const reactiveChildElementsObserver = new ModelChangeObserver((records: ModelCha
                     case LIST_INSERT: {
                         const {insertedIndex, insertedItems} = record_i;
                         const insertedItemsArray = Array.from(insertedItems.values())
-                            .map(item_i => mapping(item_i));
+                            .map(item_i => {
+                                const elementOrWidget = mapping(item_i);
+                                return elementOrWidget instanceof Element ? elementOrWidget : elementOrWidget.rootElement;
+                            });
                         const {length: childrenCount} = children;
                         if (insertedIndex < childrenCount) {
                             children[insertedIndex].before(...insertedItemsArray);
@@ -787,7 +767,7 @@ const reactiveChildElementsObserver = new ModelChangeObserver((records: ModelCha
 
 function reactiveChildElements<Model extends ModelNode>(
     list: ModelList<Model>,
-    mapping: (item: Model) => Element,
+    mapping: (item: Model) => Element | Widget,
     placeholder?: Element
 ): ReactiveChildElements {
     return (parent: Node & ParentNode) => {
@@ -807,13 +787,11 @@ function reactiveChildElements<Model extends ModelNode>(
             reactiveChildElementsArray.push(reactiveChildElement);
         }
         return list.length == 0 && placeholder ?
-            [placeholder] : Array.from(list.values()).map(mapping);
+            [placeholder] : Array.from(list.values()).map(item_i => {
+                const elementOrWidget = mapping(item_i);
+                return elementOrWidget instanceof Element ? elementOrWidget : elementOrWidget.rootElement;
+            });
     }
-}
-
-interface Collection<E extends Element = Element> {
-    item(index: number): E | null;
-    namedItem(name: string): E | null;
 }
 
 interface AttributeMutationMixin {

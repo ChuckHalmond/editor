@@ -6,24 +6,23 @@ declare global {
         "unknown": Widget;
     }
 
-    interface WidgetConstructor {
-        readonly prototype: Widget;
-        new(): Widget;
-        new<Element extends HTMLElement>(): Widget<Element>;
-    }
-
     interface CustomWidgetConstructor {
         new(...args: any): Widget;
     }
 }
 
-interface Widget<Element extends HTMLElement = HTMLElement> {
-    readonly element: Element;
+interface WidgetConstructor {
+    readonly prototype: Widget;
+    new(): Widget;
+}
+
+interface Widget {
+    readonly rootElement: HTMLElement;
     click(): void;
     focus(options?: FocusOptions | undefined): void;
     blur(): void;
     contains(node: Node): boolean;
-    render(): Element;
+    render(): HTMLElement;
 }
 
 interface WidgetRegistry {
@@ -39,13 +38,11 @@ class WidgetRegistryBase implements WidgetRegistry {
     }
 
     define(name: string, widget: WidgetConstructor): void {
-        console.log(name);
         this.#map.set(name, widget);
     }
 
     create<K extends keyof WidgetNameMap>(name: K): WidgetNameMap[K] {
         const ctor = <(new() => WidgetNameMap[K]) | undefined>this.#map.get(name);
-        console.log(ctor);
         if (typeof ctor !== "undefined") {
             return new ctor();
         }
@@ -57,30 +54,30 @@ class WidgetRegistryBase implements WidgetRegistry {
 
 var widgets: WidgetRegistry = new WidgetRegistryBase();
 
-class WidgetBase<Element extends HTMLElement = HTMLElement> implements Widget<Element> {
-    readonly element: Element;
+class WidgetBase implements Widget {
+    readonly rootElement: HTMLElement;
 
     constructor() {
-        this.element = this.render();
+        this.rootElement = this.render();
     }
     
     click(): void {
-        this.element.click();
+        this.rootElement.click();
     }
 
     focus(options?: FocusOptions | undefined): void {
-        this.element.focus(options);
+        this.rootElement.focus(options);
     }
 
     blur(): void {
-        this.element.blur();
+        this.rootElement.blur();
     }
 
     contains(node: Node): boolean {
-        return this.element.contains(node);
+        return this.rootElement.contains(node);
     }
 
-    render(): Element {
+    render(): HTMLElement {
         throw new Error();
     }
 }

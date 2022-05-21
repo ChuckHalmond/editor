@@ -15,12 +15,12 @@ declare class MenuModel extends ModelObject {
 declare class MenuItemModel extends ModelObject {
     name: string;
     label: string;
-    type: string;
+    type: "button" | "radio" | "checkbox" | "menu" | "submenu";
     menu?: MenuModel;
     constructor(init: {
         name: string;
         label: string;
-        type: string;
+        type: "button" | "radio" | "checkbox" | "menu" | "submenu";
         menu?: MenuModel;
     });
 }

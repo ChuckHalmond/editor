@@ -174,13 +174,13 @@ class EditorBase implements Editor {
     }*/
     
     public registerWidget(widget: Widget): void {
-        widget.element.addEventListener("focusin", this);
+        widget.rootElement.addEventListener("focusin", this);
         this._widgets.push(widget);
     }
 
     public unregisterWidget(widget: Widget): void {
         if (this._widgets.includes(widget)) {
-            widget.element.removeEventListener("focusin", this);
+            widget.rootElement.removeEventListener("focusin", this);
             this._widgets.splice(this._widgets.indexOf(widget), 1);
         }
     }
