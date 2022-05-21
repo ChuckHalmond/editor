@@ -10,9 +10,6 @@ import { MenuItemModel, MenuModel, MenuView } from "./src/views/MenuView";
 import { MenuItemWidget } from "./src/views/widgets/MenuItemWidget";
 import { MenuWidget } from "./src/views/widgets/MenuWidget";
 
-console.log(MenuWidget);
-console.log(MenuItemWidget);
-
 export async function main() {
     
     /*const menubar = new MenuBarWidget([
@@ -279,18 +276,17 @@ export async function main() {
     document.body.append(menuView);
 
 
-    document.body.append(
-        widget("menu", {
-            children: [
-                widget("menuitem", {
-                    properties: {
-                        type: "checkbox",
-                        label: "Hello, World!"
-                    }
-                })
-            ]
-        }).rootElement
-    );
+    const menu = widget("menu");
+    const items = [
+        widget("menuitem", {
+            properties: {
+                type: "checkbox",
+                label: "Hello, World!"
+            }
+        })
+    ];
+    menu.insertItem(0, ...items);
+    document.body.append(menu.rootElement);
     
     
     const editor = new Editor();

@@ -471,7 +471,7 @@ interface WidgetInit<W extends Widget> {
     dataset?: {
         [property: string]: string | number | boolean
     },
-    children?: (Widget | Node | string)[] | NodeList | ReactiveChildElements,
+    children?: (Node | string)[] | NodeList | ReactiveChildElements,
     eventListeners?: {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined]
     }
@@ -554,11 +554,7 @@ function widget<K extends keyof WidgetNameMap>(
                 rootElement.append(...children(rootElement));
             }
             else {
-                rootElement.append(
-                    ...Array.from(children).map(
-                        child_i => child_i instanceof Widget ? child_i.rootElement : child_i
-                    )
-                );
+                rootElement.append(...Array.from(children));
             }
         }
         if (eventListeners) {
@@ -624,19 +620,12 @@ function reactiveElement<M extends ModelNode, E extends Element, K extends strin
     properties: K[],
     react: (element: E, property: K, oldValue: any, newValue: any) => void
 ): E;
-function reactiveElement<M extends ModelNode, W extends Widget, K extends string>(
+function reactiveElement<M extends ModelNode, E extends Element>(
     model: M,
-    widget: W,
-    properties: K[],
-    react: (widget: W, property: K, oldValue: any, newValue: any) => void
-): W;
-function reactiveElement<M extends ModelNode, E extends Element | Widget>(
-    model: M,
-    elementOrWidget: E,
+    element: E,
     properties: string[],
     react: (element: E, property: string, oldValue: any, newValue: any) => void
 ): E {
-    const element = <Element>(elementOrWidget instanceof Widget ? elementOrWidget.rootElement : elementOrWidget);
     const elementRef = new WeakRef(element);
     const reactiveElement = {elementRef, react, properties};
     const reactiveElementsMapEntry = reactiveElementsMap.get(model);
@@ -663,11 +652,11 @@ function reactiveElement<M extends ModelNode, E extends Element | Widget>(
         if (property_i in model) {
             const value = Reflect.get(model, property_i, model);
             if (value !== void 0) {
-                react(elementOrWidget, <any>property_i, <any>void 0, value);
+                react(element, <any>property_i, <any>void 0, value);
             }
         }
     });
-    return elementOrWidget;
+    return element;
 }
 
 interface ReactiveChildElements {
@@ -677,7 +666,7 @@ interface ReactiveChildElements {
 const reactiveChildElementsMap = new WeakMap<ModelList, {
     reactiveChildElementsArray: {
         parentRef: WeakRef<ParentNode>,
-        mapping: (item: any) => Element | Widget,
+        mapping: (item: any) => Element,
         placeholder?: Element
     }[]
 }>();
@@ -686,7 +675,7 @@ const reactiveChildElementsFinalizationRegistry = new FinalizationRegistry((held
     list: ModelList,
     reactiveChildElement: {
         parentRef: WeakRef<ParentNode>,
-        mapping: (item: any) => Element | Widget,
+        mapping: (item: any) => Element,
         placeholder?: Element
     }
 }) => {
@@ -718,11 +707,7 @@ const reactiveChildElementsObserver = new ModelChangeObserver((records: ModelCha
                 switch (changeType) {
                     case LIST_INSERT: {
                         const {insertedIndex, insertedItems} = record_i;
-                        const insertedItemsArray = Array.from(insertedItems.values())
-                            .map(item_i => {
-                                const elementOrWidget = mapping(item_i);
-                                return elementOrWidget instanceof Element ? elementOrWidget : elementOrWidget.rootElement;
-                            });
+                        const insertedItemsArray = Array.from(insertedItems.values()).map(mapping);
                         const {length: childrenCount} = children;
                         if (insertedIndex < childrenCount) {
                             children[insertedIndex].before(...insertedItemsArray);
@@ -767,7 +752,7 @@ const reactiveChildElementsObserver = new ModelChangeObserver((records: ModelCha
 
 function reactiveChildElements<Model extends ModelNode>(
     list: ModelList<Model>,
-    mapping: (item: Model) => Element | Widget,
+    mapping: (item: Model) => Element,
     placeholder?: Element
 ): ReactiveChildElements {
     return (parent: Node & ParentNode) => {
@@ -787,10 +772,7 @@ function reactiveChildElements<Model extends ModelNode>(
             reactiveChildElementsArray.push(reactiveChildElement);
         }
         return list.length == 0 && placeholder ?
-            [placeholder] : Array.from(list.values()).map(item_i => {
-                const elementOrWidget = mapping(item_i);
-                return elementOrWidget instanceof Element ? elementOrWidget : elementOrWidget.rootElement;
-            });
+            [placeholder] : Array.from(list.values()).map(mapping);
     }
 }
 

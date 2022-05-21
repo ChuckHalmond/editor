@@ -22,7 +22,7 @@ interface Widget {
     focus(options?: FocusOptions | undefined): void;
     blur(): void;
     contains(node: Node): boolean;
-    render(): HTMLElement;
+    renderRoot(): HTMLElement;
 }
 
 interface WidgetRegistry {
@@ -58,7 +58,7 @@ class WidgetBase implements Widget {
     readonly rootElement: HTMLElement;
 
     constructor() {
-        this.rootElement = this.render();
+        this.rootElement = this.renderRoot();
     }
     
     click(): void {
@@ -77,7 +77,7 @@ class WidgetBase implements Widget {
         return this.rootElement.contains(node);
     }
 
-    render(): HTMLElement {
+    renderRoot(): HTMLElement {
         throw new Error();
     }
 }

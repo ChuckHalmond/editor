@@ -18,7 +18,7 @@ interface Widget {
     focus(options?: FocusOptions | undefined): void;
     blur(): void;
     contains(node: Node): boolean;
-    render(): HTMLElement;
+    renderRoot(): HTMLElement;
 }
 interface WidgetRegistry {
     define(name: string, widget: WidgetConstructor): void;

@@ -1,7 +1,7 @@
 import { CustomElement, reactiveChildElements, reactiveElement, widget } from "../elements/Element";
 import { ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { View } from "./View";
-import { MenuItemWidget } from "./widgets/MenuItemWidget";
+import { MenuItemWidget, menuItemWidgets } from "./widgets/MenuItemWidget";
 import { MenuWidget } from "./widgets/MenuWidget";
 
 export { MenuModel };
@@ -81,30 +81,36 @@ class MenuViewBase extends View {
         return this.#renderMenu(model);
     }
 
-    #renderMenu(menu: MenuModel): MenuWidget {
+    #renderMenu(menu: MenuModel) {
         return widget("menu", {
             children: reactiveChildElements(
                 menu.items,
                 item_i => this.#renderMenuItem(item_i)
             )
-        });
+        }).rootElement;
     }
 
-    #renderMenuItem(item: MenuItemModel): MenuItemWidget {
+    #renderMenuItem(item: MenuItemModel): Element {
         return reactiveElement(
             item,
             widget("menuitem", {
                 properties: {
                     type: item.type,
-                    menu: item.menu ? this.#renderMenu(item.menu) : null
-                }
-            }),
+                    hasPopup: item.menu !== void 0
+                },
+                children: item.menu ? [
+                    this.#renderMenu(item.menu)
+                ] : []
+            }).rootElement,
             ["label", "name"],
             (item, property, oldValue, newValue) => {
-                switch (property) {
-                    case "label": {
-                        item.label = newValue;
-                        break;
+                const widget = menuItemWidgets.get(item);
+                if (widget !== void 0) {
+                    switch (property) {
+                        case "label": {
+                            widget.label = newValue;
+                            break;
+                        }
                     }
                 }
             }

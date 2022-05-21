@@ -1,10 +1,11 @@
 import { CustomWidget, element } from "../../elements/Element";
-import { MenuWidget } from "./MenuWidget";
+import { MenuWidget, menuWidgets } from "./MenuWidget";
 import { Widget } from "./Widget";
 
 type MenuItemType = "button" | "radio" | "checkbox" | "menu" | "submenu";
 
 export { MenuItemWidget };
+export { menuItemWidgets };
 
 interface MenuItemWidgetConstructor {
     readonly prototype: MenuItemWidget;
@@ -13,7 +14,6 @@ interface MenuItemWidgetConstructor {
         label: string;
         menu?: MenuWidget;
     }): MenuItemWidget;
-    fromRoot(rootElement: Element): MenuItemWidget | null;
 }
 
 interface MenuItemWidget extends Widget {
@@ -22,7 +22,8 @@ interface MenuItemWidget extends Widget {
     active: boolean;
     hasPopup: boolean;
     expanded: boolean;
-    menu: MenuWidget | null;
+    readonly menu: MenuWidget | null;
+    setMenu(menu: MenuWidget | null): void;
     checked: boolean;
     trigger(): void;
     toggle(force?: boolean): void;
@@ -36,7 +37,7 @@ declare global {
     }
 }
 
-var menuItemWidgets: WeakMap<Element, MenuItemWidgetBase>;
+var menuItemWidgets: WeakMap<Element, MenuItemWidget>;
 
 @CustomWidget({
     name: "menuitem"
@@ -54,11 +55,7 @@ class MenuItemWidgetBase extends Widget implements MenuItemWidget {
         menuItemWidgets.set(this.rootElement, this);
     }
 
-    static fromRoot(rootElement: Element): MenuItemWidget | null {
-        return menuItemWidgets.get(rootElement) ?? null;
-    }
-
-    render() {
+    renderRoot() {
         return element("button", {
             properties: {
                 className: "menuitem"
@@ -97,6 +94,10 @@ class MenuItemWidgetBase extends Widget implements MenuItemWidget {
         return this.rootElement.querySelector(":scope > .content > .label")!;
     }
 
+    get #menuElement() {
+        return this.rootElement.querySelector(":scope > .menu")!;
+    }
+
     get checked(): boolean {
         return this.rootElement.hasAttribute("aria-checked");
     }
@@ -121,29 +122,6 @@ class MenuItemWidgetBase extends Widget implements MenuItemWidget {
         this.rootElement.dataset.type = value;
     }
 
-    get menu(): MenuWidget | null {
-        return this.#menu;
-    }
-
-    set menu(value: MenuWidget | null) {
-        const menu = this.#menu;
-        if (menu !== null && value !== null) {
-            menu.rootElement.replaceWith(value.rootElement);
-            this.hasPopup = true;
-        }
-        else {
-            if (menu !== null) {
-                menu.rootElement.remove();
-                this.hasPopup = false;
-            }
-            if (value !== null) {
-                this.rootElement.append(value.rootElement);
-                this.hasPopup = true;
-            }
-        }
-        this.#menu = value;
-    }
-
     get active(): boolean {
         return this.rootElement.hasAttribute("aria-active");
     }
@@ -166,6 +144,28 @@ class MenuItemWidgetBase extends Widget implements MenuItemWidget {
 
     set expanded(value: boolean) {
         this.rootElement.toggleAttribute("aria-expanded", value);
+    }
+
+    get menu(): MenuWidget | null {
+        return menuWidgets.get(this.#menuElement) ?? null;
+    }
+
+    setMenu(value: MenuWidget | null) {
+        const menu = this.#menu;
+        if (menu !== null && value !== null) {
+            menu.rootElement.replaceWith(value.rootElement);
+            this.hasPopup = true;
+        }
+        else {
+            if (menu !== null) {
+                menu.rootElement.remove();
+                this.hasPopup = false;
+            }
+            if (value !== null) {
+                this.rootElement.append(value.rootElement);
+                this.hasPopup = true;
+            }
+        }
     }
 
     trigger(): void {

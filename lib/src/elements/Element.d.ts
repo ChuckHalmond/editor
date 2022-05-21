@@ -123,7 +123,7 @@ interface WidgetInit<W extends Widget> {
     dataset?: {
         [property: string]: string | number | boolean;
     };
-    children?: (Widget | Node | string)[] | NodeList | ReactiveChildElements;
+    children?: (Node | string)[] | NodeList | ReactiveChildElements;
     eventListeners?: {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined];
     };
@@ -134,11 +134,10 @@ interface HTMLTemplateInit extends HTMLElementInit<HTMLTemplateElement> {
 declare function widget<W extends WidgetNameMap[K], K extends keyof WidgetNameMap>(name: K, init?: WidgetInit<W>): W;
 declare function widget(name: string, init?: WidgetInit<Widget>): Widget;
 declare function reactiveElement<M extends ModelNode, E extends Element, K extends string>(model: M, element: E, properties: K[], react: (element: E, property: K, oldValue: any, newValue: any) => void): E;
-declare function reactiveElement<M extends ModelNode, W extends Widget, K extends string>(model: M, widget: W, properties: K[], react: (widget: W, property: K, oldValue: any, newValue: any) => void): W;
 interface ReactiveChildElements {
     (parent: Node & ParentNode): (Node | string)[];
 }
-declare function reactiveChildElements<Model extends ModelNode>(list: ModelList<Model>, mapping: (item: Model) => Element | Widget, placeholder?: Element): ReactiveChildElements;
+declare function reactiveChildElements<Model extends ModelNode>(list: ModelList<Model>, mapping: (item: Model) => Element, placeholder?: Element): ReactiveChildElements;
 interface AttributeMutationMixin {
     readonly attributeName: string;
     readonly attributeValue: string;

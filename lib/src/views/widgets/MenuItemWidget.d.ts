@@ -2,6 +2,7 @@ import { MenuWidget } from "./MenuWidget";
 import { Widget } from "./Widget";
 declare type MenuItemType = "button" | "radio" | "checkbox" | "menu" | "submenu";
 export { MenuItemWidget };
+export { menuItemWidgets };
 interface MenuItemWidgetConstructor {
     readonly prototype: MenuItemWidget;
     new (init: {
@@ -9,7 +10,6 @@ interface MenuItemWidgetConstructor {
         label: string;
         menu?: MenuWidget;
     }): MenuItemWidget;
-    fromRoot(rootElement: Element): MenuItemWidget | null;
 }
 interface MenuItemWidget extends Widget {
     type: MenuItemType;
@@ -17,7 +17,8 @@ interface MenuItemWidget extends Widget {
     active: boolean;
     hasPopup: boolean;
     expanded: boolean;
-    menu: MenuWidget | null;
+    readonly menu: MenuWidget | null;
+    setMenu(menu: MenuWidget | null): void;
     checked: boolean;
     trigger(): void;
     toggle(force?: boolean): void;
@@ -29,4 +30,5 @@ declare global {
         "menuitem": MenuItemWidget;
     }
 }
+declare var menuItemWidgets: WeakMap<Element, MenuItemWidget>;
 declare var MenuItemWidget: MenuItemWidgetConstructor;

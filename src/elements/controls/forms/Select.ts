@@ -432,10 +432,10 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
             );
         if (options.length > 0) {
             let selectedOption: HTMLEOptionElement | null = null;
-            /*let {value} = this;
+            let {value} = this;
             if (value) {
                 selectedOption = options.find(option => option.value == value) ?? null;
-            }*/
+            }
             if (selectedOption == null) {
                 selectedOption = options.find(option => option.selected) ?? null;
             }
@@ -445,7 +445,6 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
             if (selectedOption == null) {
                 selectedOption = this.#firstOption();
             }
-            console.log(selectedOption);
             options.forEach(option_i => {
                 option_i.selected = option_i == selectedOption
             });
