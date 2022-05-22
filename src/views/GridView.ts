@@ -1,7 +1,7 @@
 import { HTMLEGridElement } from "../elements/containers/grid/Grid";
 import { HTMLEGridCellElement } from "../elements/containers/grid/GridCell";
 import { HTMLEGridRowElement } from "../elements/containers/grid/GridRow";
-import { element, reactiveChildElements, CustomElement, Fragment, AttributeProperty, trimMultilineIndent, reactiveElement } from "../elements/Element";
+import { element, reactiveChildElements, CustomElement, Fragment, AttributeProperty, trimMultilineIndent, reactiveObject } from "../elements/Element";
 import { HTMLEWidthSashElement } from "../elements/utils/WidthSash";
 import { ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { View } from "./View";
@@ -312,7 +312,7 @@ class GridViewBase extends View implements GridView {
 
     #renderGridColumnHeaderCell(column: GridColumnModel): Element {
         const {model} = this;
-        const gridColumnElement = reactiveElement(
+        const gridColumnElement = reactiveObject(
             column,
             element("e-gridcell", {
                 properties: {
@@ -385,7 +385,7 @@ class GridViewBase extends View implements GridView {
                                                                     tabIndex: -1,
                                                                 },
                                                                 children: [
-                                                                    reactiveElement(
+                                                                    reactiveObject(
                                                                         column,
                                                                         element("e-menu",  {
                                                                             properties: {

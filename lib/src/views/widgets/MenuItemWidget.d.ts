@@ -12,13 +12,12 @@ interface MenuItemWidgetConstructor {
     }): MenuItemWidget;
 }
 interface MenuItemWidget extends Widget {
+    readonly menu: MenuWidget | null;
     type: MenuItemType;
     label: string;
     active: boolean;
     hasPopup: boolean;
     expanded: boolean;
-    readonly menu: MenuWidget | null;
-    setMenu(menu: MenuWidget | null): void;
     checked: boolean;
     trigger(): void;
     toggle(force?: boolean): void;
@@ -28,6 +27,9 @@ interface MenuItemWidget extends Widget {
 declare global {
     interface WidgetNameMap {
         "menuitem": MenuItemWidget;
+    }
+    interface WidgetWritablePropertiesMap {
+        "menuitem": Pick<MenuItemWidget, "type" | "label" | "hasPopup">;
     }
 }
 declare var menuItemWidgets: WeakMap<Element, MenuItemWidget>;

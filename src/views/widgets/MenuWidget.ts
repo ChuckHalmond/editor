@@ -13,16 +13,22 @@ interface MenuWidgetConstructor {
 interface MenuWidget extends Widget {
     readonly items: MenuItemWidget[];
     readonly activeItem: MenuItemWidget | null;
-    insertItem(index: number, ...items: MenuItemWidget[]): void;
+    insertItems(index: number, ...items: MenuItemWidget[]): void;
 }
 
 declare global {
     interface WidgetNameMap {
         "menu": MenuWidget;
     }
+
+    interface WidgetWritablePropertiesMap {
+        "menu": Pick<MenuWidget, never>;
+    }
 }
 
+var widgetTemplate: HTMLTemplateElement;
 var menuWidgets: WeakMap<Element, MenuWidget>;
+var toggleTimeouts: WeakMap<MenuItemWidget, {clear(): void;}>;
 
 @CustomWidget({
     name: "menu"
@@ -30,13 +36,13 @@ var menuWidgets: WeakMap<Element, MenuWidget>;
 class MenuWidgetBase extends Widget implements MenuWidget {
 
     get #itemElements() {
-        return this.rootElement.querySelectorAll(":scope > .menuitem, :scope > .menuitemgroup > .menuitem");
+        return this.element.querySelectorAll(":scope > .menuitem, :scope > .menuitemgroup > .menuitem");
     }
 
     get items(): MenuItemWidget[] {
-        return Array.from(this.#itemElements).map(
-            element_i => menuItemWidgets.get(element_i)!
-        );
+        return <MenuItemWidget[]>Array.from(this.#itemElements).map(
+            element_i => menuItemWidgets.get(element_i)
+        ).filter(item_i => item_i !== void 0);
     }
 
     get activeItem(): MenuItemWidget | null {
@@ -44,53 +50,50 @@ class MenuWidgetBase extends Widget implements MenuWidget {
     }
 
     #activeItem: MenuItemWidget | null;
-    #toggleTimeouts: WeakMap<MenuItemWidget, {clear(): void;}>;
     #walker: TreeWalker;
 
     static {
+        widgetTemplate = element("template", {
+            content: [
+                element("menu", {
+                    properties: {
+                        className: "menu",
+                        tabIndex: -1
+                    },
+                    attributes: {
+                        role: "menu"
+                    }
+                })
+            ]
+        });
         menuWidgets = new WeakMap();
+        toggleTimeouts = new WeakMap();
     }
 
     constructor() {
-        super();
-        const {rootElement} = this;
+        super(<HTMLElement>widgetTemplate.content.cloneNode(true).firstChild);
+        const {element} = this;
         this.#activeItem = null;
-        this.#toggleTimeouts = new WeakMap();
         this.#walker = document.createTreeWalker(
-            rootElement, NodeFilter.SHOW_ELEMENT, <NodeFilter>this.#walkerNodeFilter.bind(this)
+            element, NodeFilter.SHOW_ELEMENT, <NodeFilter>this.#walkerNodeFilter.bind(this)
         );
-        rootElement.addEventListener("click", this.#handleClickEvent.bind(this));
-        rootElement.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
-        rootElement.addEventListener("mouseout", this.#handleMouseOutEvent.bind(this));
-        rootElement.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
-        rootElement.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
-        rootElement.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
-        rootElement.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
-        menuWidgets.set(rootElement, this);
+        element.addEventListener("click", this.#handleClickEvent.bind(this));
+        element.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
+        element.addEventListener("mouseout", this.#handleMouseOutEvent.bind(this));
+        element.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
+        element.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
+        element.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
+        element.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
+        menuWidgets.set(element, this);
     }
 
-    renderRoot() {
-        return element("menu", {
-            properties: {
-                className: "menu",
-                tabIndex: -1
-            },
-            attributes: {
-                role: "menu"
-            }
-        });
-    }
-
-    insertItem(index: number, ...items: MenuItemWidget[]): void {
-        const {rootElement} = this;
-        //this.items.splice(index, 0, ...items);
-        if (rootElement.children.length === 0) {
-            rootElement.append(...items.map(item => item.rootElement));
+    insertItems(index: number, ...items: MenuItemWidget[]) {
+        const {items: _items, element} = this;
+        if (_items.length > index) {
+            _items[index].element.after(...items.map(item_i => item_i.element));
         }
         else {
-            rootElement.children.item(Math.max(rootElement.children.length, index))!
-                .before(...items.map(item => item.rootElement)
-            );
+            element.append(...items.map(item_i => item_i.element));
         }
     }
 
@@ -128,13 +131,13 @@ class MenuWidgetBase extends Widget implements MenuWidget {
     
     #previousItem(item: MenuItemWidget): HTMLElement | null {
         const walker = this.#walker;
-        walker.currentNode = item.rootElement;
+        walker.currentNode = item.element;
         return <HTMLElement | null>walker.previousNode();
     }
 
     #nextItem(item: MenuItemWidget): HTMLElement | null {
         const walker = this.#walker;
-        walker.currentNode = item.rootElement;
+        walker.currentNode = item.element;
         return <HTMLElement | null>walker.nextNode();
     }
 
@@ -144,7 +147,7 @@ class MenuWidgetBase extends Widget implements MenuWidget {
             return null;
         }
         const walker = this.#walker;
-        walker.currentNode = menu.rootElement;
+        walker.currentNode = menu.element;
         return <HTMLElement | null>walker.firstChild();
     }
 
@@ -210,28 +213,28 @@ class MenuWidgetBase extends Widget implements MenuWidget {
             const timeout = setTimeout(() => {
                 resolve(void 0);
             }, delay ?? 0);
-            this.#toggleTimeouts.set(item, {
+            toggleTimeouts.set(item, {
                 clear: () => {
                     clearTimeout(timeout);
                     reject();
                 }
             });
         }).then(() => {
-            this.#toggleTimeouts.delete(item);
+            toggleTimeouts.delete(item);
         });
     }
 
     #clearItemTimeout(item: MenuItemWidget): void {
-        const timeout = this.#toggleTimeouts.get(item);
+        const timeout = toggleTimeouts.get(item);
         if (typeof timeout !== "undefined") {
-            this.#toggleTimeouts.delete(item);
+            toggleTimeouts.delete(item);
             timeout.clear();
         }
     }
 
     #handleKeyDownEvent(event: KeyboardEvent) {
         const {key} = event;
-        const {rootElement, activeItem} = this;
+        const {element, activeItem} = this;
         switch (key) {
             case "ArrowUp": {
                 const previousItem = activeItem ?
@@ -282,7 +285,7 @@ class MenuWidgetBase extends Widget implements MenuWidget {
                 if (activeItem) {
                     const isClosestTargetMenu = event.composedPath().find(
                         target_i => target_i instanceof HTMLMenuElement
-                    ) == rootElement;
+                    ) == element;
                     if (!isClosestTargetMenu) {
                         activeItem.collapse();
                         activeItem.focus({preventScroll: true});
@@ -295,7 +298,7 @@ class MenuWidgetBase extends Widget implements MenuWidget {
                 if (activeItem) {
                     const isClosestTargetMenu = event.composedPath().find(
                         target_i => target_i instanceof HTMLMenuElement
-                    ) == rootElement;
+                    ) == element;
                     if (!isClosestTargetMenu) {
                         activeItem.collapse();
                         activeItem.focus({preventScroll: true});
@@ -317,12 +320,13 @@ class MenuWidgetBase extends Widget implements MenuWidget {
                 break;
             }
         }
+        event.preventDefault();
     }
 
     #closestItem(target: Element): MenuItemWidget | null {
-        const {rootElement} = this;
+        const {element} = this;
         const targetElement = target.closest(".menuitem");
-        if (targetElement !== null && rootElement.contains(targetElement)) {
+        if (targetElement !== null && element.contains(targetElement)) {
             const itemWidget = menuItemWidgets.get(targetElement);
             if (itemWidget !== void 0) {
                 return itemWidget;
@@ -333,35 +337,37 @@ class MenuWidgetBase extends Widget implements MenuWidget {
 
     #handleMouseOutEvent(event: MouseEvent): void {
         const {target, relatedTarget} = event;
-        const {rootElement} = this;
+        const {element} = this;
         const targetClosestItemWidget = target instanceof Element ? this.#closestItem(target) : null;
         if (targetClosestItemWidget?.hasPopup && !targetClosestItemWidget.expanded) {
             this.#clearItemTimeout(targetClosestItemWidget);
         }
         const isTargetClosestMenu = event.composedPath().find(
             target_i => target_i instanceof HTMLMenuElement
-        ) == rootElement;
+        ) == element;
         if (isTargetClosestMenu) {
             const {clientX, clientY} = event;
-            const {left, right, top, bottom} = rootElement.getBoundingClientRect();
+            const {left, right, top, bottom} = element.getBoundingClientRect();
             const intersectsWithMouse = !(
                 left > clientX || right < clientX || top > clientY || bottom < clientY
             );
-            const containsRelatedTarget = rootElement.contains(<Node>relatedTarget);
+            const containsRelatedTarget = element.contains(<Node>relatedTarget);
             if (intersectsWithMouse && containsRelatedTarget) {
-                if (relatedTarget instanceof HTMLMenuElement && relatedTarget !== rootElement) {
+                if (relatedTarget instanceof HTMLMenuElement && relatedTarget !== element) {
                     relatedTarget.focus({preventScroll: true});
                 }
                 else {
-                    this.focus({preventScroll: true});
                     /*const {activeItem} = this;
                     if (activeItem !== null) {
                         activeItem.active = false;
                     }*/
+                    this.focus({preventScroll: true});
+                    this.#setActiveItem(null);
                 }
             }
             if (!intersectsWithMouse) {
                 this.focus({preventScroll: true});
+                this.#setActiveItem(null);
                 /*const {activeItem} = this;
                 if (activeItem !== null) {
                     activeItem.active = false;
@@ -372,14 +378,14 @@ class MenuWidgetBase extends Widget implements MenuWidget {
 
     #handleMouseOverEvent(event: MouseEvent): void {
         const {target} = event;
-        const {rootElement} = this;
+        const {element} = this;
         const targetClosestItemWidget = target instanceof Element ? this.#closestItem(target) : null; 
         if (targetClosestItemWidget?.hasPopup && targetClosestItemWidget.expanded) {
             this.#clearItemTimeout(targetClosestItemWidget);
         }
         const isTargetClosestMenu = event.composedPath().find(
             target_i => target_i instanceof HTMLMenuElement
-        ) == rootElement;
+        ) == element;
         if (isTargetClosestMenu) {
             const {activeItem} = this;
             if (activeItem?.hasPopup && activeItem.expanded && 

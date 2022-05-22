@@ -2,27 +2,26 @@ export { Widget };
 export { widgets };
 
 declare global {
-    interface WidgetNameMap {
-        "unknown": Widget;
-    }
+    interface WidgetNameMap {}
 
     interface CustomWidgetConstructor {
         new(...args: any): Widget;
     }
+
+    interface WidgetWritablePropertiesMap {}
 }
 
 interface WidgetConstructor {
     readonly prototype: Widget;
-    new(): Widget;
+    new(element: HTMLElement): Widget;
 }
 
 interface Widget {
-    readonly rootElement: HTMLElement;
+    readonly element: HTMLElement;
     click(): void;
     focus(options?: FocusOptions | undefined): void;
     blur(): void;
     contains(node: Node): boolean;
-    renderRoot(): HTMLElement;
 }
 
 interface WidgetRegistry {
@@ -55,30 +54,26 @@ class WidgetRegistryBase implements WidgetRegistry {
 var widgets: WidgetRegistry = new WidgetRegistryBase();
 
 class WidgetBase implements Widget {
-    readonly rootElement: HTMLElement;
+    readonly element: HTMLElement;
 
-    constructor() {
-        this.rootElement = this.renderRoot();
+    constructor(element: HTMLElement) {
+        this.element = element;
     }
     
     click(): void {
-        this.rootElement.click();
+        this.element.click();
     }
 
     focus(options?: FocusOptions | undefined): void {
-        this.rootElement.focus(options);
+        this.element.focus(options);
     }
 
     blur(): void {
-        this.rootElement.blur();
+        this.element.blur();
     }
 
     contains(node: Node): boolean {
-        return this.rootElement.contains(node);
-    }
-
-    renderRoot(): HTMLElement {
-        throw new Error();
+        return this.element.contains(node);
     }
 }
 

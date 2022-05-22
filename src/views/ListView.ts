@@ -5,7 +5,7 @@ import { EMenuButton } from "../elements/containers/menus/MenuButton";
 import { HTMLEMenuItemElement, EMenuItem } from "../elements/containers/menus/MenuItem";
 import { EMenuItemGroup } from "../elements/containers/menus/MenuItemGroup";
 import { EToolBarItem } from "../elements/containers/toolbars/ToolBarItem";
-import { element, reactiveChildElements, reactiveElement, CustomElement, Fragment } from "../elements/Element";
+import { element, reactiveChildElements, reactiveObject, CustomElement, Fragment } from "../elements/Element";
 import { ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { View } from "./View";
 
@@ -261,7 +261,7 @@ class ListViewBase extends View implements ListView {
                                     name: "settings",
                                     label: "Actions",
                                     menubutton: new EMenuButton({
-                                        menu: reactiveElement(
+                                        menu: reactiveObject(
                                             item,
                                             new EMenu({
                                                 children: [
@@ -312,7 +312,7 @@ class ListViewBase extends View implements ListView {
                                         )
                                     })
                                 }),
-                                reactiveElement(
+                                reactiveObject(
                                     item,
                                     element("e-toolbaritem", {
                                         properties: {

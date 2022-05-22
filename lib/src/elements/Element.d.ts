@@ -8,7 +8,7 @@ export { widget };
 export { QueryProperty };
 export { QueryAllProperty };
 export { AttributeProperty };
-export { reactiveElement };
+export { reactiveObject };
 export { reactiveChildElements };
 export { element };
 export { Fragment };
@@ -110,10 +110,8 @@ interface HTMLTemplateInit extends HTMLElementInit<HTMLTemplateElement> {
 declare function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementInitMap>(tagName: K, init?: HTMLElementInitMap[K]): E;
 declare function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLElementInit<E>): E;
 declare function element(tagName: string, init?: HTMLElementInit<HTMLElement>): HTMLElement;
-interface WidgetInit<W extends Widget> {
-    properties?: Partial<Pick<W, WritableKeys<W>>>;
-    part?: string[];
-    exportParts?: string[];
+interface WidgetInit<K extends keyof WidgetWritablePropertiesMap> {
+    properties?: Partial<WidgetWritablePropertiesMap[K]>;
     attributes?: {
         [name: string]: number | string | boolean;
     };
@@ -131,9 +129,9 @@ interface WidgetInit<W extends Widget> {
 interface HTMLTemplateInit extends HTMLElementInit<HTMLTemplateElement> {
     content?: (Node | string)[] | NodeList;
 }
-declare function widget<W extends WidgetNameMap[K], K extends keyof WidgetNameMap>(name: K, init?: WidgetInit<W>): W;
-declare function widget(name: string, init?: WidgetInit<Widget>): Widget;
-declare function reactiveElement<M extends ModelNode, E extends Element, K extends string>(model: M, element: E, properties: K[], react: (element: E, property: K, oldValue: any, newValue: any) => void): E;
+declare function widget<W extends WidgetNameMap[K], K extends keyof WidgetNameMap>(name: K, init?: WidgetInit<K>): W;
+declare function widget<K extends keyof WidgetNameMap>(name: string, init?: WidgetInit<K>): Widget;
+declare function reactiveObject<M extends ModelNode, O extends object, K extends string>(model: M, object: O, properties: K[], react: (object: O, property: K, oldValue: any, newValue: any) => void): O;
 interface ReactiveChildElements {
     (parent: Node & ParentNode): (Node | string)[];
 }

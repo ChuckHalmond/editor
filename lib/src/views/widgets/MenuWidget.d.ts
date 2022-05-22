@@ -9,11 +9,14 @@ interface MenuWidgetConstructor {
 interface MenuWidget extends Widget {
     readonly items: MenuItemWidget[];
     readonly activeItem: MenuItemWidget | null;
-    insertItem(index: number, ...items: MenuItemWidget[]): void;
+    insertItems(index: number, ...items: MenuItemWidget[]): void;
 }
 declare global {
     interface WidgetNameMap {
         "menu": MenuWidget;
+    }
+    interface WidgetWritablePropertiesMap {
+        "menu": Pick<MenuWidget, never>;
     }
 }
 declare var menuWidgets: WeakMap<Element, MenuWidget>;

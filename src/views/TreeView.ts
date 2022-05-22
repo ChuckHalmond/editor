@@ -2,7 +2,7 @@ import { HTMLEToolBarElement } from "../..";
 import { HTMLEToolBarItemElement } from "../elements/containers/toolbars/ToolBarItem";
 import { HTMLETreeElement } from "../elements/containers/trees/Tree";
 import { HTMLETreeItemElement } from "../elements/containers/trees/TreeItem";
-import { element, reactiveChildElements, reactiveElement, CustomElement, Fragment, TextNode } from "../elements/Element";
+import { element, reactiveChildElements, reactiveObject, CustomElement, Fragment, TextNode } from "../elements/Element";
 import { ModelEvent, ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { View } from "./View";
 
@@ -318,7 +318,7 @@ class TreeViewBase extends View implements TreeView {
     }
 
     #renderTreeItem(item: TreeItemModel): Element {
-        const treeItemElement = reactiveElement(
+        const treeItemElement = reactiveObject(
             item,
             element("e-treeitem", {
                 properties: {
@@ -409,7 +409,7 @@ class TreeViewBase extends View implements TreeView {
     }
 
     #renderTreeItemDragImage(item: TreeItemModel): Element {
-        const dragImageElement = reactiveElement(
+        const dragImageElement = reactiveObject(
             item,
             element("span", {
                 properties: {

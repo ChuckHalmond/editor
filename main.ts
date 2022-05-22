@@ -274,20 +274,47 @@ export async function main() {
         })
     );
     document.body.append(menuView);
-
-
-    const menu = widget("menu");
-    const items = [
+    const submenuItems = [
         widget("menuitem", {
             properties: {
                 type: "checkbox",
-                label: "Hello, World!"
+                label: "First"
+            }
+        }),
+        widget("menuitem", {
+            properties: {
+                type: "button",
+                label: "Second"
             }
         })
     ];
-    menu.insertItem(0, ...items);
-    document.body.append(menu.rootElement);
+    const submenu = widget("menu");
+    submenu.insertItems(0, ...submenuItems);
+
+    const menu = widget("menu", {
+        children: [
+            widget("menuitem", {
+                properties: {
+                    type: "checkbox",
+                    label: "Hello, World!"
+                }
+            }).element,
+            widget("menuitem", {
+                properties: {
+                    type: "submenu",
+                    label: "Submenu",
+                    hasPopup: true
+                },
+                children: [
+                    submenu.element
+                ]
+            }).element,
+        ]
+    });
     
+    menu.items[0].trigger();
+
+    document.body.append(menu.element);
     
     const editor = new Editor();
     editor.setup();

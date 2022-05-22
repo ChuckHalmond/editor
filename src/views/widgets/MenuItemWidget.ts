@@ -17,13 +17,12 @@ interface MenuItemWidgetConstructor {
 }
 
 interface MenuItemWidget extends Widget {
+    readonly menu: MenuWidget | null;
     type: MenuItemType;
     label: string;
     active: boolean;
     hasPopup: boolean;
     expanded: boolean;
-    readonly menu: MenuWidget | null;
-    setMenu(menu: MenuWidget | null): void;
     checked: boolean;
     trigger(): void;
     toggle(force?: boolean): void;
@@ -35,8 +34,13 @@ declare global {
     interface WidgetNameMap {
         "menuitem": MenuItemWidget;
     }
+    
+    interface WidgetWritablePropertiesMap {
+        "menuitem": Pick<MenuItemWidget, "type" | "label" | "hasPopup">;
+    }
 }
 
+var widgetTemplate: HTMLTemplateElement;
 var menuItemWidgets: WeakMap<Element, MenuItemWidget>;
 
 @CustomWidget({
@@ -44,66 +48,65 @@ var menuItemWidgets: WeakMap<Element, MenuItemWidget>;
 })
 class MenuItemWidgetBase extends Widget implements MenuItemWidget {
 
-    #menu: MenuWidget | null = null;
-
     static {
-        menuItemWidgets = new WeakMap();
-    }
-
-    constructor() {
-        super();
-        menuItemWidgets.set(this.rootElement, this);
-    }
-
-    renderRoot() {
-        return element("button", {
-            properties: {
-                className: "menuitem"
-            },
-            attributes: {
-                role: "menuitem"
-            },
-            children: [
-                element("span", {
+        widgetTemplate = element("template", {
+            content: [
+                element("button", {
                     properties: {
-                        className: "content"
+                        className: "menuitem"
+                    },
+                    attributes: {
+                        role: "menuitem"
                     },
                     children: [
                         element("span", {
                             properties: {
-                                className: "icon"
-                            }
-                        }),
-                        element("span", {
-                            properties: {
-                                className: "label"
-                            }
-                        }),
-                        element("span", {
-                            properties: {
-                                className: "arrow"
-                            }
+                                className: "content"
+                            },
+                            children: [
+                                element("span", {
+                                    properties: {
+                                        className: "icon"
+                                    }
+                                }),
+                                element("span", {
+                                    properties: {
+                                        className: "label"
+                                    }
+                                }),
+                                element("span", {
+                                    properties: {
+                                        className: "arrow"
+                                    }
+                                })
+                            ]
                         })
                     ]
                 })
             ]
         });
+        menuItemWidgets = new WeakMap();
+    }
+
+    constructor() {
+        super(<HTMLElement>widgetTemplate.content.cloneNode(true).firstChild);
+        menuItemWidgets.set(this.element, this);
     }
 
     get #labelElement() {
-        return this.rootElement.querySelector(":scope > .content > .label")!;
+        return this.element.querySelector(":scope > .content > .label")!;
     }
 
     get #menuElement() {
-        return this.rootElement.querySelector(":scope > .menu")!;
+        return this.element.querySelector(":scope > .menu")!;
     }
 
     get checked(): boolean {
-        return this.rootElement.hasAttribute("aria-checked");
+        return this.element.hasAttribute("aria-checked");
     }
 
     set checked(value: boolean) {
-        this.rootElement.toggleAttribute("aria-checked", value);
+        this.element.toggleAttribute("aria-checked", value);
     }
 
     get label(): string {
@@ -115,61 +118,43 @@ class MenuItemWidgetBase extends Widget implements MenuItemWidget {
     }
 
     get type(): MenuItemType {
-        return <MenuItemType>this.rootElement.dataset.type ?? "button";
+        return <MenuItemType>this.element.dataset.type ?? "button";
     }
 
     set type(value: MenuItemType) {
-        this.rootElement.dataset.type = value;
+        this.element.dataset.type = value;
     }
 
     get active(): boolean {
-        return this.rootElement.hasAttribute("aria-active");
+        return this.element.hasAttribute("aria-active");
     }
 
     set active(value: boolean) {
-        this.rootElement.toggleAttribute("aria-active", value);
+        this.element.toggleAttribute("aria-active", value);
     }
 
     get hasPopup(): boolean {
-        return this.rootElement.hasAttribute("aria-haspopup");
+        return this.element.hasAttribute("aria-haspopup");
     }
 
     set hasPopup(value: boolean) {
-        this.rootElement.setAttribute("aria-haspopup", value.toString());
+        this.element.setAttribute("aria-haspopup", value.toString());
     }
 
     get expanded(): boolean {
-        return this.rootElement.hasAttribute("aria-expanded");
+        return this.element.hasAttribute("aria-expanded");
     }
 
     set expanded(value: boolean) {
-        this.rootElement.toggleAttribute("aria-expanded", value);
+        this.element.toggleAttribute("aria-expanded", value);
     }
 
     get menu(): MenuWidget | null {
         return menuWidgets.get(this.#menuElement) ?? null;
     }
 
-    setMenu(value: MenuWidget | null) {
-        const menu = this.#menu;
-        if (menu !== null && value !== null) {
-            menu.rootElement.replaceWith(value.rootElement);
-            this.hasPopup = true;
-        }
-        else {
-            if (menu !== null) {
-                menu.rootElement.remove();
-                this.hasPopup = false;
-            }
-            if (value !== null) {
-                this.rootElement.append(value.rootElement);
-                this.hasPopup = true;
-            }
-        }
-    }
-
     trigger(): void {
-        const {type, rootElement} = this;
+        const {type, element} = this;
         switch (type) {
             case "checkbox": {
                 this.checked = !this.checked;
@@ -185,13 +170,13 @@ class MenuItemWidgetBase extends Widget implements MenuItemWidget {
                 break;
             }
         }
-        rootElement.dispatchEvent(new Event("trigger", {
+        element.dispatchEvent(new Event("trigger", {
             bubbles: true
         }));
     }
 
     toggle(force?: boolean): void {
-        const {rootElement, type} = this;
+        const {element, type} = this;
         switch (type) {
             case "menu":
             case "submenu": {
@@ -200,7 +185,7 @@ class MenuItemWidgetBase extends Widget implements MenuItemWidget {
                 if (expand) {
                     this.#positionMenu();
                 }
-                rootElement.dispatchEvent(new Event("toggle", {bubbles: true}));
+                element.dispatchEvent(new Event("toggle", {bubbles: true}));
                 break;
             }
         }
@@ -236,11 +221,11 @@ class MenuItemWidgetBase extends Widget implements MenuItemWidget {
     }
 
     #positionMenu(): void {
-        const {rootElement, menu} = this;
+        const {element, menu} = this;
         if (menu !== null) {
-            const {rootElement: menuElement} = menu;
+            const {element: menuElement} = menu;
             const {style: menuStyle} = menuElement;
-            const {top: itemTop, bottom: itemBottom, left: itemLeft, right: itemRight} = rootElement.getBoundingClientRect();
+            const {top: itemTop, bottom: itemBottom, left: itemLeft, right: itemRight} = element.getBoundingClientRect();
             const {width: menuWidth, height: menuHeight} = menuElement.getBoundingClientRect();
             const {scrollY, scrollX} = window;
             const {clientWidth, clientHeight} = document.body;
@@ -260,7 +245,7 @@ class MenuItemWidgetBase extends Widget implements MenuItemWidget {
                 }px`);
             }
             else {
-                const closestMenu = rootElement.closest(".menu");
+                const closestMenu = element.closest(".menu");
                 if (closestMenu !== null) {
                     const {top: closestMenuTop, left: closestMenuLeft} = closestMenu.getBoundingClientRect();
                     const overflowX = itemRight + menuWidth - clientWidth;
