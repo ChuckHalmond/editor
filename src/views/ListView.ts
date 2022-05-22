@@ -303,9 +303,9 @@ class ListViewBase extends View implements ListView {
                                                 const {items} = menu;
                                                 switch (property) {
                                                     case "visibility": {
-                                                        const item = <HTMLEMenuItemElement>items.namedItem("visibility");
+                                                        /*const item = <HTMLEMenuItemElement>items.namedItem("visibility");
                                                         item.textContent = newValue ? "Hide" : "Show";
-                                                        item.title = newValue ? "Hide" : "Show";
+                                                        item.title = newValue ? "Hide" : "Show";*/
                                                     }
                                                 }
                                             }

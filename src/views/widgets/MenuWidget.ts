@@ -1,4 +1,5 @@
 import { CustomWidget, element } from "../../elements/Element";
+import { Collection } from "../../observers/Collection";
 import { MenuItemWidget, menuItemWidgets } from "./MenuItemWidget";
 import { Widget } from "./Widget";
 
@@ -36,7 +37,7 @@ var toggleTimeouts: WeakMap<MenuItemWidget, {clear(): void;}>;
 class MenuWidgetBase extends Widget implements MenuWidget {
 
     get #itemElements() {
-        return this.element.querySelectorAll(":scope > .menuitem, :scope > .menuitemgroup > .menuitem");
+        return this.#items.values();
     }
 
     get items(): MenuItemWidget[] {
@@ -70,9 +71,12 @@ class MenuWidgetBase extends Widget implements MenuWidget {
         toggleTimeouts = new WeakMap();
     }
 
+    #items: Collection;
+
     constructor() {
         super(<HTMLElement>widgetTemplate.content.cloneNode(true).firstChild);
         const {element} = this;
+        this.#items = new Collection(element, <NodeFilter>this.#walkerNodeFilter.bind(this));
         this.#activeItem = null;
         this.#walker = document.createTreeWalker(
             element, NodeFilter.SHOW_ELEMENT, <NodeFilter>this.#walkerNodeFilter.bind(this)

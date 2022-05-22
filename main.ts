@@ -299,20 +299,30 @@ export async function main() {
                     label: "Hello, World!"
                 }
             }).element,
-            widget("menuitem", {
+            element("div", {
                 properties: {
-                    type: "submenu",
-                    label: "Submenu",
-                    hasPopup: true
+                    className: "menuitemgroup"
                 },
                 children: [
-                    submenu.element
+                    widget("menuitem", {
+                        properties: {
+                            type: "submenu",
+                            label: "Submenu",
+                            hasPopup: true
+                        },
+                        children: [
+                            submenu.element
+                        ]
+                    }).element,
                 ]
-            }).element,
+            })
         ]
     });
     
-    menu.items[0].trigger();
+    console.log(Array.from(menu.items.values()));
+    (window as any)["showItems"] = () => {
+        console.log(Array.from(menu.items.values()));
+    }
 
     document.body.append(menu.element);
     

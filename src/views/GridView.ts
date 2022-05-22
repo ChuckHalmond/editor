@@ -422,11 +422,11 @@ class GridViewBase extends View implements GridView {
                                                                         }),
                                                                         ["sortorder"],
                                                                         (menu, property, oldValue, newValue) => {
-                                                                            Array.from(menu.items).filter(item_i => item_i.name.startsWith("sort"))
+                                                                            /*Array.from(menu.items).filter(item_i => item_i.name.startsWith("sort"))
                                                                                 .forEach((sortRadioItem_i => {
                                                                                     sortRadioItem_i.checked = parseInt(sortRadioItem_i.value) === newValue;
                                                                                 })
-                                                                            );
+                                                                            );*/
                                                                         }
                                                                     )
                                                                 ]
