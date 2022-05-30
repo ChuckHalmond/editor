@@ -8,7 +8,7 @@ export { widget };
 export { QueryProperty };
 export { QueryAllProperty };
 export { AttributeProperty };
-export { reactiveObject };
+export { reactiveElement };
 export { reactiveChildElements };
 export { element };
 export { Fragment };
@@ -53,7 +53,7 @@ declare const CustomElement: CustomElementDecorator;
 interface WidgetDecorator {
     (init: {
         name: string;
-    }): <W extends CustomWidgetConstructor>(widgetCtor: W) => W;
+    }): <W extends Widget>(widget: W) => W;
 }
 declare const CustomWidget: WidgetDecorator;
 declare function subtreeNodes(node: Node): Generator<Node>;
@@ -110,8 +110,8 @@ interface HTMLTemplateInit extends HTMLElementInit<HTMLTemplateElement> {
 declare function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementInitMap>(tagName: K, init?: HTMLElementInitMap[K]): E;
 declare function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLElementInit<E>): E;
 declare function element(tagName: string, init?: HTMLElementInit<HTMLElement>): HTMLElement;
-interface WidgetInit<K extends keyof WidgetWritablePropertiesMap> {
-    properties?: Partial<WidgetWritablePropertiesMap[K]>;
+interface WidgetInit<K extends keyof WidgetNameMap> {
+    properties?: Parameters<WidgetNameMap[K]["create"]>[0];
     attributes?: {
         [name: string]: number | string | boolean;
     };
@@ -126,12 +126,9 @@ interface WidgetInit<K extends keyof WidgetWritablePropertiesMap> {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined];
     };
 }
-interface HTMLTemplateInit extends HTMLElementInit<HTMLTemplateElement> {
-    content?: (Node | string)[] | NodeList;
-}
-declare function widget<W extends WidgetNameMap[K], K extends keyof WidgetNameMap>(name: K, init?: WidgetInit<K>): W;
-declare function widget<K extends keyof WidgetNameMap>(name: string, init?: WidgetInit<K>): Widget;
-declare function reactiveObject<M extends ModelNode, O extends object, K extends string>(model: M, object: O, properties: K[], react: (object: O, property: K, oldValue: any, newValue: any) => void): O;
+declare function widget<K extends keyof WidgetNameMap>(name: K, init?: WidgetInit<K>): ReturnType<WidgetNameMap[K]["create"]>;
+declare function widget<K extends keyof WidgetNameMap>(name: string, init?: WidgetInit<K>): HTMLElement;
+declare function reactiveElement<M extends ModelNode, E extends Element, K extends string>(model: M, element: E, properties: K[], react: (object: E, property: K, oldValue: any, newValue: any) => void): E;
 interface ReactiveChildElements {
     (parent: Node & ParentNode): (Node | string)[];
 }

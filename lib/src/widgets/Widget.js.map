@@ -1,1 +1,0 @@
-{"version":3,"file":"Widget.js","sourceRoot":"","sources":["../../../src/widgets/Widget.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,MAAM,EAAE,CAAC;AAYlB,MAAM,UAAsD,SAAQ,WAAW;IAG3E,YAAY,OAAgB;QACxB,KAAK,EAAE,CAAC;QACR,IAAI,CAAC,OAAO,GAAG,OAAO,CAAC;IAC3B,CAAC;CACJ;AAED,IAAI,MAAM,GAAsB,UAAU,CAAC"}

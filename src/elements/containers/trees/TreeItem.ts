@@ -22,7 +22,6 @@ interface HTMLETreeItemElement extends HTMLElement {
     level: number;
     type: "leaf" | "parent";
     toggle(force?: boolean): void;
-    connectedCallback(): void;
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void
 }
 
@@ -106,25 +105,6 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
         this.#group = null;
     }
 
-    connectedCallback(): void {
-        this.level = (() => {
-            let level = 0;
-            let {parentElement} = this;
-            while (parentElement instanceof HTMLETreeItemGroupElement) {
-                level++;
-                ({parentElement} = parentElement);
-                if (!(parentElement instanceof HTMLETreeItemElement)) {
-                    return level;
-                }
-                ({parentElement} = parentElement);
-            }
-            if (parentElement instanceof HTMLETreeElement) {
-                level++;
-            }
-            return level;
-        })();
-    }
-
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
         switch (name) {
             case "expanded": {
@@ -163,7 +143,7 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
 
     #handleSlotChangeEvent(event: Event): void {
         const {target} = event;
-        const {name: slotName} = <HTMLSlotElement>target ;
+        const {name: slotName} = <HTMLSlotElement>target;
         switch (slotName) {
             case "group": {
                 const element = (<HTMLSlotElement>target).assignedElements()[0];

@@ -5,7 +5,7 @@ import { EMenuButton } from "../elements/containers/menus/MenuButton";
 import { HTMLEMenuItemElement, EMenuItem } from "../elements/containers/menus/MenuItem";
 import { EMenuItemGroup } from "../elements/containers/menus/MenuItemGroup";
 import { EToolBarItem } from "../elements/containers/toolbars/ToolBarItem";
-import { element, reactiveChildElements, reactiveObject, CustomElement, Fragment } from "../elements/Element";
+import { element, reactiveChildElements, reactiveElement, CustomElement, Fragment } from "../elements/Element";
 import { ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { View } from "./View";
 
@@ -241,7 +241,6 @@ class ListViewBase extends View implements ListView {
         const listItemElement = element("e-listitem", {
             properties: {
                 tabIndex: -1,
-                label: item.label,
                 name: item.label,
                 draggable: true
             },
@@ -249,9 +248,14 @@ class ListViewBase extends View implements ListView {
                 index: item.index
             },
             children: [
+                element("span", {
+                    properties: {
+                        textContent: item.label
+                    }
+                }),
                 element("e-toolbar", {
                     properties: {
-                        slot: "toolbar",
+                        //slot: "toolbar",
                         tabIndex: 0
                     },
                     children: [
@@ -261,7 +265,7 @@ class ListViewBase extends View implements ListView {
                                     name: "settings",
                                     label: "Actions",
                                     menubutton: new EMenuButton({
-                                        menu: reactiveObject(
+                                        menu: reactiveElement(
                                             item,
                                             new EMenu({
                                                 children: [
@@ -300,7 +304,7 @@ class ListViewBase extends View implements ListView {
                                             }),
                                             ["visibility"],
                                             (menu, property, oldValue, newValue) => {
-                                                const {items} = menu;
+                                                //const {items} = menu;
                                                 switch (property) {
                                                     case "visibility": {
                                                         /*const item = <HTMLEMenuItemElement>items.namedItem("visibility");
@@ -312,7 +316,7 @@ class ListViewBase extends View implements ListView {
                                         )
                                     })
                                 }),
-                                reactiveObject(
+                                reactiveElement(
                                     item,
                                     element("e-toolbaritem", {
                                         properties: {
@@ -354,10 +358,7 @@ class ListViewBase extends View implements ListView {
             const menu = element("e-menu", {
                 properties: {
                     tabIndex: -1,
-                    contextual: true,
-                    contextX: clientX,
-                    contextY: clientY,
-                    slot: "menu"
+                    contextual: true
                 },
                 children: [
                     element("e-menuitemgroup", {
@@ -425,6 +426,7 @@ class ListViewBase extends View implements ListView {
                 }
             });
             target.append(menu);
+            menu.positionContextual(clientX, clientY);
             menu.focus({preventScroll: true});
             event.preventDefault();
         }

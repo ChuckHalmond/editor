@@ -1,4 +1,6 @@
+import { NodeCollection } from "../../../observers/NodeCollection";
 import { CustomElement, AttributeProperty, element } from "../../Element";
+import { HTMLEMenuElement } from "./Menu";
 import { HTMLEMenuItemElement } from "./MenuItem";
 import { HTMLEMenuItemCollection } from "./MenuItemCollection";
 import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
@@ -12,11 +14,11 @@ interface HTMLEMenuBarElementConstructor {
 
 interface HTMLEMenuBarElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly items: HTMLEMenuItemCollection;
+    readonly items: HTMLCollectionOf<HTMLEMenuItemElement>;
     readonly activeItem: HTMLEMenuItemElement | null;
     readonly activeIndex: number;
     name: string;
-    active: boolean;
+    expanded: boolean;
 }
 
 declare global {
@@ -36,10 +38,10 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
     name!: string;
 
     @AttributeProperty({type: Boolean})
-    active!: boolean;
+    expanded!: boolean;
     
     readonly shadowRoot!: ShadowRoot;
-    readonly items: HTMLEMenuItemCollection;
+    readonly items: HTMLCollectionOf<HTMLEMenuItemElement>;
 
     #activeIndex: number;
     #walker: TreeWalker;
@@ -56,7 +58,8 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
         this.#walker = document.createTreeWalker(
             this, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
         );
-        this.items = new HTMLEMenuItemCollection(this);
+        //this.items = new NodeCollection<HTMLEMenuItemElement>(this, this.#walkerNodeFilter.bind(this));
+        this.items = this.getElementsByTagName("e-menuitem");
         this.#activeIndex = -1;
         const shadowRoot = this.attachShadow({mode: "open"});
         shadowRoot.append(
@@ -103,8 +106,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
     #previousItem(item: HTMLEMenuItemElement): HTMLEMenuItemElement | null {
         const walker = this.#walker;
         walker.currentNode = item;
-        const previousItem = <HTMLEMenuItemElement | null>walker.previousSibling();
-        return previousItem;
+        return <HTMLEMenuItemElement | null>walker.previousSibling();
     }
 
     #nextItem(item: HTMLEMenuItemElement): HTMLEMenuItemElement | null {
@@ -116,36 +118,51 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
     #firstChildItem(item: HTMLEMenuItemElement): HTMLEMenuItemElement | null {
         const {menu} = item;
         if (menu) {
-            return menu.items.item(0);
+            const walker = this.#walker;
+            walker.currentNode = menu;
+            return <HTMLEMenuItemElement | null>walker.firstChild();
         }
         return null;
     }
 
     #setActiveItem(item: HTMLEMenuItemElement | null): void {
-        const {activeItem, active, items} = this;
+        const {activeItem, expanded, items} = this;
         if (activeItem !== null && activeItem !== item) {
             activeItem.collapse();
             activeItem.active = false;
         }
         if (item !== null) {
-            if (active) {
+            if (expanded) {
                 item.expand();
             }
             item.active = true;
-            this.#activeIndex = Array.from(items.values()).indexOf(item);
+            this.#activeIndex = Array.from(items).indexOf(item);
         }
         else {
             this.#activeIndex = -1;
         }
     }
+
+    get #items(): HTMLEMenuItemElement[] {
+        return Array.from(
+            this.querySelectorAll(":is(:scope, :scope > e-menuitemgroup) > e-menuitem")
+        );
+    }
+
+    #isClosestMenu(target: Element): boolean {
+        return target.closest(":is(e-menubar, e-menu)") == this;
+    }
+
+    #nearestItem(target: Element): HTMLEMenuItemElement | null {
+        return this.#items.find(item_i => item_i.contains(target)) ?? null;
+    }
     
     #handleFocusInEvent(event: FocusEvent): void {
         const {target} = event;
-        const {items} = this;
-        const targetClosestItem = Array.from(items.values()).find(
-            item_i => item_i.contains(<Node>target)
-        ) ?? null;
-        this.#setActiveItem(targetClosestItem);
+        if (target instanceof Element) {
+            const nearestItem = this.#nearestItem(target);
+            this.#setActiveItem(nearestItem);
+        }
     }
 
     #handleFocusOutEvent(event: FocusEvent): void {
@@ -157,16 +174,16 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
                 activeItem.collapse();
             }
             this.#setActiveItem(null);
-            this.active = false;
+            this.expanded = false;
         }
     }
 
     #handleMouseOverEvent(event: MouseEvent): void {
         const {target} = event;
-        const {active, activeItem, items} = this;
+        const {expanded, activeItem} = this;
         if (target instanceof HTMLEMenuItemElement) {
-            const includesTarget = Array.from(items.values()).includes(target);
-            if (includesTarget && target !== activeItem && active) {
+            const isClosestMenu = this.#isClosestMenu(target);
+            if (isClosestMenu && target !== activeItem && expanded) {
                 const {menu} = target;
                 if (menu) {
                     target.expand();
@@ -178,13 +195,13 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
 
     #handleClickEvent(event: MouseEvent): void {
         const {target} = event;
-        const {active, activeItem, items} = this;
+        const {expanded, activeItem} = this;
         if (target instanceof HTMLEMenuItemElement) {
-            const includesTarget = Array.from(items.values()).includes(target);
-            if (includesTarget) {
-                const isActive = !active;
-                this.active = isActive;
-                if (isActive) {
+            const isClosestMenu = this.#isClosestMenu(target);
+            if (isClosestMenu) {
+                const isExpanded = !expanded;
+                this.expanded = isExpanded;
+                if (isExpanded) {
                     if (activeItem && !activeItem.expanded) {
                         activeItem.expand();
                     }
@@ -200,7 +217,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
 
     #handleKeyDownEvent(event: KeyboardEvent): void {
         const {key} = event;
-        const {active} = this;
+        const {expanded} = this;
         let {activeItem} = this;
         switch (key) {
             case "ArrowLeft": {
@@ -209,7 +226,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
                     this.#firstItem();
                 previousItem?.focus({preventScroll: true});
                 ({activeItem} = this);
-                if (active && activeItem) {
+                if (expanded && activeItem) {
                     const firstChildItem = this.#firstChildItem(activeItem);
                     firstChildItem?.focus({preventScroll: true});
                 }
@@ -221,7 +238,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
                     this.#lastItem();
                 nextItem?.focus({preventScroll: true});
                 ({activeItem} = this);
-                if (active && activeItem) {
+                if (expanded && activeItem) {
                     const firstChildItem = this.#firstChildItem(activeItem);
                     firstChildItem?.focus({preventScroll: true});
                 }
@@ -229,15 +246,15 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
             }
             case "Enter": {
                 if (activeItem) {
-                    this.active = !active;
+                    this.expanded = !expanded;
                     const firstChildItem = this.#firstChildItem(activeItem);
                     firstChildItem?.focus({preventScroll: true});
                 }
                 break;
             }
             case "Escape": {
-                if (active) {
-                    this.active = false;
+                if (expanded) {
+                    this.expanded = false;
                     if (activeItem) {
                         activeItem.collapse();
                         activeItem.focus({preventScroll: true});
@@ -256,7 +273,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
         if (activeItem?.expanded) {
             activeItem.collapse();
         }
-        this.active = false;
+        this.expanded = false;
         this.focus({preventScroll: true});
     }
 }

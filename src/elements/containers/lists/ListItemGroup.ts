@@ -30,15 +30,6 @@ class HTMLEListItemGroupElementBase extends HTMLElement implements HTMLEListItem
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
-            element("style", {
-                properties: {
-                    textContent: /*css*/`
-                        :host {
-                            display: block;
-                        }
-                    `
-                }
-            }),
             element("slot")
         );
     }

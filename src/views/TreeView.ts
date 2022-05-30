@@ -2,7 +2,7 @@ import { HTMLEToolBarElement } from "../..";
 import { HTMLEToolBarItemElement } from "../elements/containers/toolbars/ToolBarItem";
 import { HTMLETreeElement } from "../elements/containers/trees/Tree";
 import { HTMLETreeItemElement } from "../elements/containers/trees/TreeItem";
-import { element, reactiveChildElements, reactiveObject, CustomElement, Fragment, TextNode } from "../elements/Element";
+import { element, reactiveChildElements, reactiveElement, CustomElement, Fragment, TextNode } from "../elements/Element";
 import { ModelEvent, ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { View } from "./View";
 
@@ -318,7 +318,7 @@ class TreeViewBase extends View implements TreeView {
     }
 
     #renderTreeItem(item: TreeItemModel): Element {
-        const treeItemElement = reactiveObject(
+        const treeItemElement = reactiveElement(
             item,
             element("e-treeitem", {
                 properties: {
@@ -409,7 +409,7 @@ class TreeViewBase extends View implements TreeView {
     }
 
     #renderTreeItemDragImage(item: TreeItemModel): Element {
-        const dragImageElement = reactiveObject(
+        const dragImageElement = reactiveElement(
             item,
             element("span", {
                 properties: {
@@ -515,9 +515,7 @@ class TreeViewBase extends View implements TreeView {
             const menu = element("e-menu", {
                 properties: {
                     tabIndex: -1,
-                    contextual: true,
-                    contextX: clientX,
-                    contextY: clientY
+                    contextual: true
                 },
                 children: [
                     element("e-menuitemgroup", {
@@ -585,6 +583,7 @@ class TreeViewBase extends View implements TreeView {
                 }
             });
             document.body.append(menu);
+            menu.positionContextual(clientX, clientY);
             menu.focus({preventScroll: true});
             event.preventDefault();
         }

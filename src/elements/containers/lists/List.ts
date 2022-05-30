@@ -59,14 +59,7 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
             element("style", {
                 properties: {
                     innerText: /*css*/`
-                        :host {
-                            display: block;
-                        }
 
-                        :host([droptarget]) {
-                            outline: 1px solid black;
-                            outline-offset: -1px;
-                        }
                     `
                 }
             }),
@@ -215,15 +208,17 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
         this.endSelection();
     }
 
-    #setActiveItem(item: HTMLEListItemElement): void {
+    #setActiveItem(item: HTMLEListItemElement | null): void {
         const {activeItem, items} = this;
         if (activeItem !== null && activeItem !== item) {
             activeItem.active = false;
             activeItem.tabIndex = -1;
         }
-        item.active = true;
-        item.tabIndex = 0;
-        this.#activeIndex = Array.from(items).indexOf(item);
+        if (item !== null) {
+            item.active = true;
+            item.tabIndex = 0;
+            this.#activeIndex = Array.from(items).indexOf(item);
+        }
     }
 
     #setDropTargetItem(item: HTMLEListItemElement | null): void {
@@ -458,6 +453,7 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
             }
             case "Escape": {
                 this.#clearSelection();
+                this.#setActiveItem(null);
                 this.focus();
                 event.stopPropagation();
                 break;

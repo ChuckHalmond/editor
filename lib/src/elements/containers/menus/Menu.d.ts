@@ -1,17 +1,14 @@
-import { Collection } from "../../../observers/Collection";
 import { HTMLEMenuItemElement } from "./MenuItem";
 import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
 export { HTMLEMenuElement };
 export { EMenu };
 interface HTMLEMenuElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly items: Collection<HTMLEMenuItemElement>;
     readonly activeItem: HTMLEMenuItemElement | null;
-    readonly activeIndex: number;
+    readonly items: HTMLCollectionOf<HTMLEMenuItemElement>;
     name: string;
     contextual: boolean;
-    contextX: number;
-    contextY: number;
+    positionContextual(x: number, y: number): void;
 }
 interface HTMLEMenuElementConstructor {
     readonly prototype: HTMLEMenuElement;

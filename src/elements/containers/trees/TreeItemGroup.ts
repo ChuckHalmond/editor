@@ -1,4 +1,5 @@
 import { CustomElement, element } from "../../Element";
+import { HTMLETreeElement } from "./Tree";
 import { HTMLETreeItemElement } from "./TreeItem";
 
 export { HTMLETreeItemGroupElement };
@@ -28,19 +29,20 @@ class HTMLETreeItemGroupElementBase extends HTMLElement implements HTMLETreeItem
     readonly shadowRoot!: ShadowRoot;
 
     static {
-        shadowTemplate = element("template");
-        shadowTemplate.content.append(
-            element("style", {
-                properties: {
-                    textContent: /*css*/`
-                        :host {
-                            display: block;
-                        }
-                    `
-                }
-            }),
-            element("slot")
-        );
+        shadowTemplate = element("template", {
+            content: [
+                element("style", {
+                    properties: {
+                        textContent: /*css*/`
+                            :host {
+                                display: block;
+                            }
+                        `
+                    }
+                }),
+                element("slot")
+            ]
+        });
     }
 
     constructor() {
@@ -63,6 +65,15 @@ class HTMLETreeItemGroupElementBase extends HTMLElement implements HTMLETreeItem
             );
         assignedItems.forEach((item_i, i) => {
             item_i.posinset = i;
+            item_i.level = (() => {
+                let level = -1;
+                let closestItem: HTMLETreeItemElement | null = item_i;
+                while (closestItem !== null && closestItem.matches("e-tree :scope")) {
+                    closestItem = closestItem.parentElement?.closest("e-treeitem") ?? null;
+                    level++;
+                }
+                return level;
+            })();
         });
     }
 }

@@ -4,20 +4,22 @@ e-gridcell {
 }
 
 e-gridcell[droptarget] {
-    background-color: gainsboro;
+    background-color: var(--droptarget-item-color);
 }
 
-e-gridcell:hover,
-e-gridcell:focus-within {
+e-gridcell:hover {
+    background-color: var(--hovered-item-color);
+}
+
+e-gridcell:focus {
     background-color: var(--focus-background-color);
 }
 
 e-gridcell[active] {
-    background-color: var(--focus-background-color);
-    outline: 1px solid black;
+    outline: 1px solid var(--focused-item-outline-color);
     outline-offset: -1px;
 }
 
 e-gridcell[selected] {
-    background-color: gainsboro;
+    background-color: var(--selected-item-color);
 }

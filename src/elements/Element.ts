@@ -10,7 +10,7 @@ export { widget };
 export { QueryProperty };
 export { QueryAllProperty };
 export { AttributeProperty };
-export { reactiveObject };
+export { reactiveElement };
 export { reactiveChildElements };
 export { element };
 export { Fragment };
@@ -201,22 +201,22 @@ const CustomElement: CustomElementDecorator = function(init: {
 
 interface WidgetDecorator {
     (init: {
-        name: string
-    }): <W extends CustomWidgetConstructor>(widgetCtor: W) => W;
+        name: string;
+    }): <W extends Widget>(widget: W) => W;
 }
 
 const CustomWidget: WidgetDecorator = function(init: {
     name: string;
 }) {
-    return <W extends CustomWidgetConstructor>(
-        widgetCtor: W
+    return <W extends Widget>(
+        widget: W
     ) => {
         const {name} = init;
         widgets.define(
             name,
-            widgetCtor
+            widget
         );
-        return widgetCtor;
+        return widget;
     }
 }
 
@@ -376,10 +376,10 @@ function element<K extends keyof HTMLElementTagNameMap>(
             }
         }
         if (properties) {
-            const keys = <(keyof Partial<Pick<HTMLElementTagNameMap[K], WritableKeys<HTMLElementTagNameMap[K]>>>)[]>Object.keys(properties);
+            const keys = Object.keys(properties);
             keys.forEach((key_i) => {
-                const value = properties[key_i];
-                if (typeof properties[key_i] !== "undefined") {
+                const value = Reflect.get(properties, key_i, properties);
+                if (value !== void 0) {
                     Object.assign(
                         element, {
                             [key_i]: value
@@ -460,8 +460,8 @@ function element<K extends keyof HTMLElementTagNameMap>(
     return document.createElement(tagName);
 }
 
-interface WidgetInit<K extends keyof WidgetWritablePropertiesMap> {
-    properties?: Partial<WidgetWritablePropertiesMap[K]>,
+interface WidgetInit<K extends keyof WidgetNameMap> {
+    properties?: Parameters<WidgetNameMap[K]["create"]>[0],
     attributes?: {[name: string]: number | string | boolean},
     style?: {
         [property: string]: string | [string, string]
@@ -475,39 +475,15 @@ interface WidgetInit<K extends keyof WidgetWritablePropertiesMap> {
     }
 }
 
-interface WidgetInitMap {
-    //"template": HTMLTemplateInit;
-}
-
-interface HTMLTemplateInit extends HTMLElementInit<HTMLTemplateElement> {
-    content?: (Node | string)[] | NodeList;
-}
-/*
-function widget<W extends WidgetNameMap[K], K extends keyof WidgetInitMap>(
-    name: K, init?: WidgetInitMap[K]): W;*/
-function widget<W extends WidgetNameMap[K], K extends keyof WidgetNameMap>(
-    name: K, init?: WidgetInit<K>): W;
 function widget<K extends keyof WidgetNameMap>(
-    name: string, init?: WidgetInit<K>): Widget
+    name: K, init?: WidgetInit<K>): ReturnType<WidgetNameMap[K]["create"]>;
 function widget<K extends keyof WidgetNameMap>(
-    name: K, init?: WidgetInit<K>): WidgetNameMap[K] {
-    const widget = widgets.create(name);
+    name: string, init?: WidgetInit<K>): HTMLElement
+function widget<K extends keyof WidgetNameMap>(
+    name: K, init?: WidgetInit<K>): HTMLElement {
+    const element = <HTMLElement>widgets.create(name, init?.properties);
     if (init) {
-        const {element} = widget;
-        const {properties, attributes, dataset, children, eventListeners, style} = init;
-        if (properties) {
-            const keys = <(keyof Partial<WidgetWritablePropertiesMap[K]>)[]>Object.keys(properties);
-            keys.forEach((key_i) => {
-                const value = properties[key_i];
-                if (typeof properties[key_i] !== "undefined") {
-                    Object.assign(
-                        widget, {
-                            [key_i]: value
-                        }
-                    );
-                }
-            });
-        }
+        const {attributes, dataset, children, eventListeners, style} = init;
         if (attributes) {
             Object.keys(attributes).forEach((attributeName) => {
                 const attributeValue = attributes[attributeName];
@@ -556,82 +532,80 @@ function widget<K extends keyof WidgetNameMap>(
                 }
             });
         }
-        switch (name) {
-        }
     }
-    return widget;
+    return element;
 }
 
-const reactiveObjectsMap = new WeakMap<ModelNode, {
+const reactiveElementsMap = new WeakMap<ModelNode, {
     observerOptions: ModelChangeObserverOptions,
-    reactiveObjectsArray: {
-        objectRef: WeakRef<object>,
+    reactiveElementsArray: {
+        elementRef: WeakRef<Element>,
         properties: string[],
-        react: (object: any, property: string, oldValue: any, newValue: any) => void;
+        react: (element: any, property: string, oldValue: any, newValue: any) => void;
     }[]
 }>();
 
-const reactiveObjectsFinalizationRegistry = new FinalizationRegistry((heldValue: {
+const reactiveElementsFinalizationRegistry = new FinalizationRegistry((heldValue: {
     model: ModelNode,
-    reactiveObject: {
-        objectRef: WeakRef<object>,
+    reactiveElement: {
+        elementRef: WeakRef<Element>,
         properties: string[],
-        react: (object: any, property: string, oldValue: any, newValue: any) => void;
+        react: (element: any, property: string, oldValue: any, newValue: any) => void;
     }
 }) => {
-    const {model, reactiveObject} = heldValue;
-    const reactiveObjectsMapEntry = reactiveObjectsMap.get(model);
-    if (reactiveObjectsMapEntry !== void 0) {
-        const {reactiveObjectsArray} = reactiveObjectsMapEntry;
-        reactiveObjectsArray.splice(reactiveObjectsArray.indexOf(reactiveObject), 1);
+    const {model, reactiveElement} = heldValue;
+    const reactiveElementsMapEntry = reactiveElementsMap.get(model);
+    if (reactiveElementsMapEntry !== void 0) {
+        const {reactiveElementsArray} = reactiveElementsMapEntry;
+        reactiveElementsArray.splice(reactiveElementsArray.indexOf(reactiveElement), 1);
     }
 });
 
-const reactiveObjectsPropertyObserver = new ModelChangeObserver((records: ModelChangeRecord[]) => {
+const reactiveElementsPropertyObserver = new ModelChangeObserver((records: ModelChangeRecord[]) => {
     records.forEach((record_i) => {
         const {target, propertyName, oldValue, newValue} = record_i;
-        const {reactiveObjectsArray} = reactiveObjectsMap.get(target)!;
-        reactiveObjectsArray.forEach(reactiveObject_i => {
-            const {objectRef, react, properties} = reactiveObject_i;
-            const object = objectRef.deref();
-            if (object) {
+        const {reactiveElementsArray} = reactiveElementsMap.get(target)!;
+        reactiveElementsArray.forEach(reactiveElement_i => {
+            const {elementRef, react, properties} = reactiveElement_i;
+            const element = elementRef.deref();
+            if (element) {
                 if (properties.includes(propertyName!)) {
-                    react(object, propertyName!, oldValue, newValue);
+                    react(element, propertyName!, oldValue, newValue);
                 }
             }
         });
     });
 });
 
-function reactiveObject<M extends ModelNode, O extends object, K extends string>(
+function reactiveElement<M extends ModelNode, E extends Element, K extends string>(
     model: M,
-    object: O,
+    element: E,
     properties: K[],
-    react: (object: O, property: K, oldValue: any, newValue: any) => void
-): O;
-function reactiveObject<M extends ModelNode, O extends object>(
+    react: (object: E, property: K, oldValue: any, newValue: any) => void
+): E;
+function reactiveElement<M extends ModelNode, E extends Element>(
     model: M,
-    object: O,
+    element: E,
     properties: string[],
-    react: (object: O, property: string, oldValue: any, newValue: any) => void
-): O {
-    const objectRef = new WeakRef(object);
-    const reactiveObject = {objectRef, react, properties};
-    const reactiveObjectsMapEntry = reactiveObjectsMap.get(model);
-    reactiveObjectsFinalizationRegistry.register(element, {model, reactiveObject});
-    if (!reactiveObjectsMapEntry) {
+    react: (element: E, property: string, oldValue: any, newValue: any) => void
+): E {
+    const elementRef = new WeakRef(element);
+    const reactiveElement = {elementRef, react, properties};
+    const reactiveElementsMapEntry = reactiveElementsMap.get(model);
+    reactiveElementsFinalizationRegistry.register(element, {model, reactiveElement});
+    if (!reactiveElementsMapEntry) {
         const observerOptions = {
             properties: true,
             propertiesFilter: properties
         };
-        const reactiveObjectsArray = [reactiveObject];
-        reactiveObjectsMap.set(model, {observerOptions, reactiveObjectsArray});
-        reactiveObjectsPropertyObserver.observe(model, observerOptions);
+        const reactiveElementsArray = [reactiveElement];
+        reactiveElementsMap.set(model, {observerOptions, reactiveElementsArray});
+        reactiveElementsPropertyObserver.observe(model, observerOptions);
     }
     else {
-        const {reactiveObjectsArray, observerOptions} = reactiveObjectsMapEntry;
+        const {reactiveElementsArray, observerOptions} = reactiveElementsMapEntry;
         const {propertiesFilter} = observerOptions;
-        reactiveObjectsArray.push(reactiveObject);
+        reactiveElementsArray.push(reactiveElement);
         observerOptions.propertiesFilter = propertiesFilter ?
             propertiesFilter.concat(properties.filter(
                 property_i => !propertiesFilter.includes(property_i)
@@ -641,11 +615,11 @@ function reactiveObject<M extends ModelNode, O extends object>(
         if (property_i in model) {
             const value = Reflect.get(model, property_i, model);
             if (value !== void 0) {
-                react(object, <any>property_i, <any>void 0, value);
+                react(element, <any>property_i, <any>void 0, value);
             }
         }
     });
-    return object;
+    return element;
 }
 
 interface ReactiveChildElements {

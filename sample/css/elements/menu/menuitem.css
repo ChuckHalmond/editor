@@ -97,6 +97,16 @@ e-menuitem::part(arrow)::after {
 
 
 
+.menubar {
+    display: flex;
+    flex-direction: row;
+    width: max-content;
+}
+
+.menubar:focus > .menuitem:hover,
+.menubar:not(:focus-within) > .menuitem:hover {
+    background-color: var(--hovered-item-color);
+}
 
 .menuitem {
     display: flex;
@@ -116,17 +126,16 @@ e-menuitem::part(arrow)::after {
     box-shadow: var(--menu-box-shadow);
 }
 
-.menuitem[aria-active] > .content {
+.menuitem[aria-active] {
     background-color: var(--focused-item-color);
 }
 
-.menuitem:is([data-type="menu"], [data-type="submenu"]) > .menu {
+.menuitem > .menu {
     z-index: 1;
     position: absolute;
-    transform: translateY(-2px);
 }
 
-.menuitem:is([data-type="menu"], [data-type="submenu"]):not([aria-expanded]) > .menu {
+.menuitem:not([aria-expanded]) > .menu {
     opacity: 0;
     pointer-events: none;
 }
@@ -137,12 +146,8 @@ e-menuitem::part(arrow)::after {
     pointer-events: none;
 }
 
-.menuitem[data-type="submenu"] > .content > .icon {
+.menu > .menuitem[aria-haspopup] > .content > .icon {
     visibility: hidden;
-}
-
-.menuitem:not([data-type="submenu"])> .content > .arrow {
-    display: none;
 }
 
 .menuitem > .content > .icon,
@@ -166,11 +171,19 @@ e-menuitem::part(arrow)::after {
     text-align: start;
 }
 
-.menuitem:is(:not([data-type]), [data-type="button"], [data-type="radio"], [data-type="checkbox"])[aria-checked] > .content > .icon {
+.menuitem:not([aria-haspopup])::after {
+    padding: 2px;
+    line-height: 18px;
+    margin-left: 8px;
+    margin-right: 8px;
+    content: attr(aria-keyshortcuts);
+}
+
+.menuitem:not([aria-haspopup])[aria-checked] > .content > .icon {
     background-color: var(--activated-item-color);
 }
 
-.menuitem:is(:not([data-type]), [data-type="button"], [data-type="radio"], [data-type="checkbox"]) > .content > .icon::before {
+.menuitem:not([aria-haspopup]) > .content > .icon::before {
     display: inline-block;
     width: 18px;
     height: 18px;

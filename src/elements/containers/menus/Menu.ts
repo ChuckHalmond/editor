@@ -1,4 +1,3 @@
-import { Collection } from "../../../observers/Collection";
 import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEMenuItemElement } from "./MenuItem";
 import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
@@ -8,13 +7,11 @@ export { EMenu };
 
 interface HTMLEMenuElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly items: Collection<HTMLEMenuItemElement>;
     readonly activeItem: HTMLEMenuItemElement | null;
-    readonly activeIndex: number;
+    readonly items: HTMLCollectionOf<HTMLEMenuItemElement>;
     name: string;
     contextual: boolean;
-    contextX: number;
-    contextY: number;
+    positionContextual(x: number, y: number): void;
 }
 
 interface HTMLEMenuElementConstructor {
@@ -37,14 +34,12 @@ var toggleTimeouts: WeakMap<HTMLEMenuItemElement, {clear(): void;}>;
 class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
 
     readonly shadowRoot!: ShadowRoot;
-    readonly items: Collection<HTMLEMenuItemElement>;
+    readonly items: HTMLCollectionOf<HTMLEMenuItemElement>;
 
     get activeItem(): HTMLEMenuItemElement | null {
-        return this.items.item(this.#activeIndex);
-    }
-
-    get activeIndex(): number {
-        return this.#activeIndex;
+        return this.querySelector<HTMLEMenuItemElement>(
+            ":is(:scope, :scope > e-menuitemgroup) > e-menuitem[active]"
+        );
     }
 
     @AttributeProperty({type: String})
@@ -53,13 +48,6 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     @AttributeProperty({type: Boolean})
     contextual!: boolean;
 
-    @AttributeProperty({type: Number, defaultValue: 0})
-    contextX!: number;
-
-    @AttributeProperty({type: Number, defaultValue: 0})
-    contextY!: number;
-
-    #activeIndex: number;
     #walker: TreeWalker;
 
     static {
@@ -73,15 +61,14 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
 
     constructor() {
         super();
-        this.#walker = document.createTreeWalker(
-            this, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
-        );
-        this.#activeIndex = -1;
-        this.items = <Collection<HTMLEMenuItemElement>>new Collection(this, this.#walkerNodeFilter.bind(this));//this.getElementsByTagName("e-menuitem");
         const shadowRoot = this.attachShadow({mode: "open"});
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
+        this.#walker = document.createTreeWalker(
+            this, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
+        );
+        this.items = this.getElementsByTagName("e-menuitem");
         this.addEventListener("click", this.#handleClickEvent.bind(this));
         this.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
         this.addEventListener("mouseout", this.#handleMouseOutEvent.bind(this));
@@ -91,20 +78,12 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         this.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
     }
 
-    connectedCallback(): void {
-        const {contextual} = this;
-        if (contextual) {
-            this.#position();
-        }
-    }
-
-    #position(): void {
-        const {contextX, contextY} = this;
+    positionContextual(x: number, y: number): void {
         const {style} = this;
         const {width: menuWidth, height: menuHeight} = this.getBoundingClientRect();
         const {scrollX, scrollY} = window;
-        const left = contextX + scrollX;
-        const top = contextY + scrollY;
+        const left = x + scrollX;
+        const top = y + scrollY;
         const {clientWidth, clientHeight} = document.body;
         const overflowX = left + menuWidth - clientWidth;
         const overflowY = top + menuHeight - clientHeight;
@@ -113,12 +92,22 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     }
 
     #collapseSubmenus(): void {
-        Array.from(this.items.values())
-            .forEach((item_i) => {
-                if (item_i.expanded) {
-                    item_i.collapse();
-                }
-            });
+        this.querySelectorAll<HTMLEMenuItemElement>(
+            ":is(:scope, :scope > e-menuitemgroup) > e-menuitem[expanded]"
+        )
+        .forEach((item_i) => {
+            item_i.collapse();
+        });
+    }
+
+    #isClosestMenu(target: Element): boolean {
+        return target.closest(":is(e-menu)") == this;
+    }
+
+    #nearestItem(target: Element): HTMLEMenuItemElement | null {
+        return Array.from(this.querySelectorAll<HTMLEMenuItemElement>(
+            ":is(:scope, :scope > e-menuitemgroup) > e-menuitem"
+        )).find(item_i => item_i.contains(target)) ?? null;
     }
 
     #walkerNodeFilter(node: Node): number {
@@ -163,38 +152,32 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     }
 
     #setActiveItem(item: HTMLEMenuItemElement | null): void {
-        const {activeItem, items} = this;
+        const {activeItem} = this;
         if (activeItem !== null && activeItem !== item) {
             activeItem.active = false;
         }
         if (item !== null) {
             item.active = true;
-            this.#activeIndex = Array.from(items.values()).indexOf(item);
-        }
-        if (item == null) {
-            this.#activeIndex = -1;
         }
     }
 
     #handleClickEvent(event: MouseEvent): void {
         const {target} = event;
-        const {items} = this;
-        const targetClosestItem = Array.from(items.values()).find(
-            item_i => item_i.contains(<Node>target)
-        ) ?? null;
-        if (targetClosestItem) {
-            targetClosestItem.trigger();
+        if (target instanceof HTMLEMenuItemElement) {
+            const isClosestMenu = this.#isClosestMenu(target);
+            if (isClosestMenu) {
+                target.trigger();
+            }
         }
     }
 
     #handleFocusInEvent(event: FocusEvent): void {
         const {target} = event;
-        const {items} = this;
-        const targetClosestItem = Array.from(items.values()).find(
-            item_i => item_i.contains(<Node>target)
-        ) ?? null;
-        if (targetClosestItem) {
-            this.#setActiveItem(targetClosestItem);
+        if (target instanceof HTMLEMenuItemElement) {
+            const nearestItem = this.#nearestItem(target);
+            if (nearestItem) {
+                this.#setActiveItem(nearestItem);
+            }
         }
     }
 
@@ -344,87 +327,94 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
 
     #handleMouseOutEvent(event: MouseEvent): void {
         const {target, relatedTarget} = event;
-        const {items} = this;
-        const targetClosestItem = Array.from(items.values()).find(
-            item_i => item_i.contains(<Node>target)
-        ) ?? null;
-        if (targetClosestItem?.type == "submenu" &&
-            !targetClosestItem.expanded) {
-            this.#clearItemTimeout(targetClosestItem);
-        }
-        const isTargetClosestMenu = event.composedPath().find(
-            target_i => target_i instanceof HTMLEMenuElement
-        ) == this;
-        if (isTargetClosestMenu) {
-            const {clientX, clientY} = event;
-            const {left, right, top, bottom} = this.getBoundingClientRect();
-            const intersectsWithMouse = !(
-                left > clientX || right < clientX || top > clientY || bottom < clientY
-            );
-            const containsRelatedTarget = this.contains(<Node>relatedTarget);
-            if (intersectsWithMouse && containsRelatedTarget) {
-                if (relatedTarget instanceof HTMLEMenuElement && relatedTarget !== this) {
-                    relatedTarget.focus({preventScroll: true});
+        if (target instanceof HTMLEMenuItemElement) {
+            const nearestItem = this.#nearestItem(target);
+            if (nearestItem !== null) {
+                if (nearestItem.type == "submenu" &&
+                    !nearestItem.expanded) {
+                    this.#clearItemTimeout(nearestItem);
                 }
-                else {
-                    const activeIndex = this.#activeIndex;
-                    this.focus({preventScroll: true});
-                    this.#setActiveItem(null);
-                    this.#activeIndex = activeIndex;
+                const isTargetClosestMenu = event.composedPath().find(
+                    target_i => target_i instanceof HTMLEMenuElement
+                ) == this;
+                if (isTargetClosestMenu) {
+                    const {activeItem} = this;
+                    if (activeItem?.type == "submenu" &&
+                        activeItem.expanded) {
+                        this.#clearItemTimeout(activeItem);
+                        this.#setItemTimeout(activeItem, 400)
+                            .then(() => {
+                                activeItem.collapse();
+                            })
+                            .catch(() => void 0);
+                    }
+                    const {clientX, clientY} = event;
+                    const {left, right, top, bottom} = this.getBoundingClientRect();
+                    const intersectsWithMouse = !(
+                        left > clientX || right < clientX || top > clientY || bottom < clientY
+                    );
+                    const containsRelatedTarget = this.contains(<Node>relatedTarget);
+                    if (intersectsWithMouse && containsRelatedTarget) {
+                        if (relatedTarget instanceof HTMLEMenuElement && relatedTarget !== this) {
+                            relatedTarget.focus({preventScroll: true});
+                        }
+                        else {
+                            this.focus({preventScroll: true});
+                            this.#setActiveItem(null);
+                        }
+                    }
+                    if (!intersectsWithMouse) {
+                        this.focus({preventScroll: true});
+                        this.#setActiveItem(null);
+                    }
                 }
-            }
-            if (!intersectsWithMouse) {
-                this.focus({preventScroll: true});
-                this.#setActiveItem(null);
             }
         }
     }
 
     #handleMouseOverEvent(event: MouseEvent): void {
         const {target} = event;
-        const {items} = this;
-        const targetClosestItem = Array.from(items.values()).find(
-            item_i => item_i.contains(<Node>target)
-        ) ?? null;
-        if (targetClosestItem?.type == "submenu" &&
-            targetClosestItem.expanded) {
-            this.#clearItemTimeout(targetClosestItem);
-        }
-        const isTargetClosestMenu = event.composedPath().find(
-            target_i => target_i instanceof HTMLEMenuElement
-        ) == this;
-        if (isTargetClosestMenu) {
-            const {activeItem} = this;
-            if (activeItem?.type == "submenu" &&
-                activeItem.expanded && 
-                !activeItem.contains(<Node>target)) {
-                this.#clearItemTimeout(activeItem);
-                this.#setItemTimeout(activeItem, 400)
-                    .then(() => {
-                        activeItem.collapse();
-                    })
-                    .catch(() => void 0);
-            }
-            if (targetClosestItem !== null) {
-                this.#setActiveItem(targetClosestItem);
-                targetClosestItem.focus({preventScroll: true});
-                if (targetClosestItem.type == "submenu") {
-                    if (!targetClosestItem.expanded) {
-                        this.#clearItemTimeout(targetClosestItem);
-                        this.#setItemTimeout(targetClosestItem, 200)
+        if (target instanceof HTMLEMenuItemElement) {
+            const nearestItem = this.#nearestItem(target);
+            if (nearestItem !== null) {
+                if (nearestItem.type == "submenu" && nearestItem.expanded) {
+                    this.#clearItemTimeout(nearestItem);
+                }
+                const isTargetClosestMenu = event.composedPath().find(
+                    target_i => target_i instanceof HTMLEMenuElement
+                ) == this;
+                if (isTargetClosestMenu) {
+                    const {activeItem} = this;
+                    if (activeItem?.type == "submenu" &&
+                        activeItem.expanded && 
+                        !activeItem.contains(<Node>target)) {
+                        this.#clearItemTimeout(activeItem);
+                        this.#setItemTimeout(activeItem, 400)
                             .then(() => {
-                                const {activeItem} = this;
-                                this.#collapseSubmenus();
-                                if (activeItem) {
-                                    this.#clearItemTimeout(activeItem);
-                                    activeItem.expand();
-                                    activeItem.menu?.focus({preventScroll: true});
-                                }
+                                activeItem.collapse();
                             })
                             .catch(() => void 0);
                     }
-                    else {
-                        targetClosestItem.menu?.focus({preventScroll: true});
+                    this.#setActiveItem(nearestItem);
+                    nearestItem.focus({preventScroll: true});
+                    if (nearestItem.type == "submenu") {
+                        if (!nearestItem.expanded) {
+                            this.#clearItemTimeout(nearestItem);
+                            this.#setItemTimeout(nearestItem, 200)
+                                .then(() => {
+                                    const {activeItem} = this;
+                                    this.#collapseSubmenus();
+                                    if (activeItem) {
+                                        this.#clearItemTimeout(activeItem);
+                                        activeItem.expand();
+                                        activeItem.menu?.focus({preventScroll: true});
+                                    }
+                                })
+                                .catch(() => void 0);
+                        }
+                        else {
+                            nearestItem.menu?.focus({preventScroll: true});
+                        }
                     }
                 }
             }
@@ -433,19 +423,18 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
 
     #handleTriggerEvent(event: Event): void {
         const {target} = event;
-        const composedPath = event.composedPath();
         const {contextual} = this;
         if (target instanceof HTMLEMenuItemElement) {
-            const isClosestTargetMenu = composedPath.find(
-                target_i => target_i instanceof HTMLEMenuElement
-            ) == this;
-            if (isClosestTargetMenu) {
+            const isClosestMenu = this.#isClosestMenu(target);
+            if (isClosestMenu) {
                 const {type, name, value} = target;
                 if (type == "radio") {
-                    Array.from(this.items.values()).filter(item_i => item_i.type == "radio" && item_i.name === name).
-                        forEach((radio_i) => {
-                            radio_i.checked = radio_i.value == value;
-                        });
+                    this.querySelectorAll<HTMLEMenuItemElement>(
+                        `:is(:scope, :scope > e-menuitemgroup) > e-menuitem[type=radio][name=${name}]`
+                    )
+                    .forEach((radio_i) => {
+                        radio_i.checked = radio_i.value == value;
+                    });
                 }
             }
             if (contextual) {

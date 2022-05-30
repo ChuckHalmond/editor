@@ -1,8 +1,7 @@
-import { CustomElement, reactiveChildElements, reactiveObject, widget } from "../elements/Element";
+import { CustomElement, reactiveChildElements, reactiveElement, widget } from "../elements/Element";
 import { ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { View } from "./View";
-import { MenuItemWidget, menuItemWidgets } from "./widgets/MenuItemWidget";
-import { MenuWidget } from "./widgets/MenuWidget";
+import { menuItemWidget } from "./widgets/MenuItemWidget";
 
 export { MenuModel };
 export { MenuItemModel };
@@ -87,17 +86,16 @@ class MenuViewBase extends View {
                 menu.items,
                 item_i => this.#renderMenuItem(item_i)
             )
-        }).element;
+        });
     }
 
     #renderMenuItem(item: MenuItemModel): Element {
         const {type, menu} = item;
-        return reactiveObject(
+        return reactiveElement(
             item,
             widget("menuitem", {
                 properties: {
-                    type: type,
-                    hasPopup: menu !== void 0
+                    type: type
                 },
                 children: menu !== void 0 ? [
                     this.#renderMenu(menu)
@@ -107,12 +105,12 @@ class MenuViewBase extends View {
             (menuitem, property, oldValue, newValue) => {
                 switch (property) {
                     case "label": {
-                        menuitem.label = newValue;
+                        menuItemWidget.setLabel(menuitem, newValue);
                         break;
                     }
                 }
             }
-        ).element;
+        );
     }
 }
 

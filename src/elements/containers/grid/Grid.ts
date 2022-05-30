@@ -39,30 +39,23 @@ declare global {
     }
 }
 
+var shadowTemplate: HTMLTemplateElement;
+
+@CustomElement({
+    name: "e-grid"
+})
 class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
 
     static {
-        CustomElement({
-            name: "e-grid"
-        })(this);
     }
     
-    static readonly #shadowTemplate = element("template", {
-        content: [
-            element("slot")
-        ]
-    });
-    static readonly #shadowStylesheet = Stylesheet(
-        trimMultilineIndent(/*css*/`
-            :host {
-                display: table;
-            }
-
-            :host([droptarget]) {
-                background-color: gainsboro;
-            }
-        `)
-    )
+    static {
+        shadowTemplate = element("template", {
+            content: [
+                element("slot")
+            ]
+        });
+    }
 
     readonly shadowRoot!: ShadowRoot;
     readonly cells: HTMLEGridCellCollection;
@@ -125,12 +118,8 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
         this.cells = new HTMLEGridCellCollection(this);
         this.rows = new HTMLEGridRowCollection(this);
         const shadowRoot = this.attachShadow({mode: "open"});
-        
-        (shadowRoot as any)["adoptedStyleSheets"] = [
-            HTMLEGridElementBase.#shadowStylesheet
-        ];
         shadowRoot.append(
-            HTMLEGridElementBase.#shadowTemplate.content.cloneNode(true)
+            shadowTemplate.content.cloneNode(true)
         );
         this.addEventListener("contextmenu", this.#handleContextMenuEvent.bind(this));
         this.addEventListener("click", this.#handleClickEvent.bind(this));

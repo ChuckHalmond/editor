@@ -7,8 +7,6 @@ import { ListItemModel, ListModel, ListView } from "./src/views/ListView";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
 import { element, Fragment, widget } from "./src/elements/Element";
 import { MenuItemModel, MenuModel, MenuView } from "./src/views/MenuView";
-import { MenuItemWidget } from "./src/views/widgets/MenuItemWidget";
-import { MenuWidget } from "./src/views/widgets/MenuWidget";
 
 export async function main() {
     
@@ -238,24 +236,9 @@ export async function main() {
         })
     );
 
-    //document.body.append(gridView);
-    /*const menuWidget = new MenuWidget([
-        new MenuItemWidget({
-            label: "MenuItem A1",
-            type: "checkbox"
-        }),
-        new MenuItemWidget({
-            label: "MenuItem A2",
-            type: "submenu",
-            menu: new MenuWidget([
-                new MenuItemWidget({label: "MenuItem B1", type: "checkbox"}),
-                new MenuItemWidget({label: "MenuItem B2", type: "checkbox"})
-            ])
-        })
-    ]);
-    document.body.append(menuWidget.element);*/
+    document.body.append(gridView);
 
-    const menuView = new MenuView(
+    /*const menuView = new MenuView(
         new MenuModel({
             items: [
                 new MenuItemModel({
@@ -273,58 +256,111 @@ export async function main() {
             ]
         })
     );
-    document.body.append(menuView);
-    const submenuItems = [
-        widget("menuitem", {
-            properties: {
-                type: "checkbox",
-                label: "First"
-            }
-        }),
-        widget("menuitem", {
-            properties: {
-                type: "button",
-                label: "Second"
-            }
-        })
-    ];
-    const submenu = widget("menu");
-    submenu.insertItems(0, ...submenuItems);
+    document.body.append(menuView);*/
 
-    const menu = widget("menu", {
+    /*const menuView = element("e-menu", {
+        children: [
+            element("e-menuitem", {
+                properties: {
+                    tabIndex: -1,
+                    textContent: "MenuItem 1"
+                }
+            }),
+            element("e-menuitem", {
+                properties: {
+                    tabIndex: -1,
+                    textContent: "MenuItem 2"
+                }
+            })
+        ]
+    });*/
+    const menuView = widget("menubar", {
         children: [
             widget("menuitem", {
                 properties: {
-                    type: "checkbox",
-                    label: "Hello, World!"
-                }
-            }).element,
-            element("div", {
-                properties: {
-                    className: "menuitemgroup"
+                    label: "MenuItem 0",
+                    name: "MenuItem 0",
+                    type: "menu"
                 },
                 children: [
-                    widget("menuitem", {
+                    widget("menu", {
                         properties: {
-                            type: "submenu",
-                            label: "Submenu",
-                            hasPopup: true
+                            name: "menu"
                         },
                         children: [
-                            submenu.element
+                            widget("menuitem", {
+                                properties: {
+                                    label: "MenuItem 1",
+                                    name: "MenuItem 1",
+                                    type: "checkbox"
+                                }
+                            })
                         ]
-                    }).element,
+                    })
+                ]
+            }),
+            widget("menuitem", {
+                properties: {
+                    label: "MenuItem 1",
+                    name: "MenuItem 1",
+                    type: "menu"
+                },
+                children: [
+                    widget("menu", {
+                        properties: {
+                            name: "menu"
+                        },
+                        children: [
+                            widget("menuitemgroup", {
+                                children: [
+                                    widget("menuitem", {
+                                        properties: {
+                                            label: "MenuItem 1",
+                                            type: "checkbox",
+                                            keyshortcut: "Ctrl+B"
+                                        }
+                                    }),
+                                    widget("menuitem", {
+                                        properties: {
+                                            label: "MenuItem 2",
+                                            keyshortcut: "Ctrl+A"
+                                        }
+                                    })
+                                ]
+                            }),
+                            widget("menuitem", {
+                                properties: {
+                                    label: "Submenu",
+                                    type: "submenu"
+                                },
+                                children: [
+                                    widget("menu", {
+                                        properties: {
+                                            name: "submenu"
+                                        },
+                                        children: [
+                                            widget("menuitem", {
+                                                properties: {
+                                                    label: "MenuItem 1",
+                                                    type: "checkbox"
+                                                }
+                                            }),
+                                            widget("menuitem", {
+                                                properties: {
+                                                    label: "MenuItem 2"
+                                                }
+                                            })
+                                        ]
+                                    })
+                                ]
+                            })
+                        ]
+                    })
                 ]
             })
         ]
-    });
-    
-    console.log(Array.from(menu.items.values()));
-    (window as any)["showItems"] = () => {
-        console.log(Array.from(menu.items.values()));
-    }
-
-    document.body.append(menu.element);
+    })
+    document.body.append(menuView);
     
     const editor = new Editor();
     editor.setup();

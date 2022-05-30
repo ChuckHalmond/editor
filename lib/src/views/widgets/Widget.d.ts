@@ -3,26 +3,12 @@ export { widgets };
 declare global {
     interface WidgetNameMap {
     }
-    interface CustomWidgetConstructor {
-        new (...args: any): Widget;
-    }
-    interface WidgetWritablePropertiesMap {
-    }
-}
-interface WidgetConstructor {
-    readonly prototype: Widget;
-    new (element: HTMLElement): Widget;
 }
 interface Widget {
-    readonly element: HTMLElement;
-    click(): void;
-    focus(options?: FocusOptions | undefined): void;
-    blur(): void;
-    contains(node: Node): boolean;
+    create(properties?: object): HTMLElement;
 }
 interface WidgetRegistry {
-    define(name: string, widget: WidgetConstructor): void;
-    create<K extends keyof WidgetNameMap>(name: K): WidgetNameMap[K];
+    define(name: string, widget: Widget): void;
+    create<K extends keyof WidgetNameMap>(name: K, properties?: Parameters<WidgetNameMap[K]["create"]>[0]): ReturnType<WidgetNameMap[K]["create"]>;
 }
 declare var widgets: WidgetRegistry;
-declare var Widget: WidgetConstructor;

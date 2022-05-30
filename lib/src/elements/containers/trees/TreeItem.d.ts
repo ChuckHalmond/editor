@@ -17,7 +17,6 @@ interface HTMLETreeItemElement extends HTMLElement {
     level: number;
     type: "leaf" | "parent";
     toggle(force?: boolean): void;
-    connectedCallback(): void;
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
 }
 declare global {

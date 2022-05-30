@@ -1,80 +1,40 @@
 export { Widget };
+
 export { widgets };
 
 declare global {
     interface WidgetNameMap {}
-
-    interface CustomWidgetConstructor {
-        new(...args: any): Widget;
-    }
-
-    interface WidgetWritablePropertiesMap {}
-}
-
-interface WidgetConstructor {
-    readonly prototype: Widget;
-    new(element: HTMLElement): Widget;
 }
 
 interface Widget {
-    readonly element: HTMLElement;
-    click(): void;
-    focus(options?: FocusOptions | undefined): void;
-    blur(): void;
-    contains(node: Node): boolean;
+    create(properties?: object): HTMLElement;
 }
 
 interface WidgetRegistry {
-    define(name: string, widget: WidgetConstructor): void;
-    create<K extends keyof WidgetNameMap>(name: K): WidgetNameMap[K];
+    define(name: string, widget: Widget): void;
+    create<K extends keyof WidgetNameMap>(name: K, properties?: Parameters<WidgetNameMap[K]["create"]>[0]): ReturnType<WidgetNameMap[K]["create"]>;
 }
 
 class WidgetRegistryBase implements WidgetRegistry {
-    #map: Map<string, WidgetConstructor>;
+    #map: Map<string, Widget>;
 
     constructor() {
         this.#map = new Map();
     }
 
-    define(name: string, widget: WidgetConstructor): void {
+    define(name: string, widget: Widget): void {
         this.#map.set(name, widget);
     }
 
-    create<K extends keyof WidgetNameMap>(name: K): WidgetNameMap[K] {
-        const ctor = <(new() => WidgetNameMap[K]) | undefined>this.#map.get(name);
-        if (typeof ctor !== "undefined") {
-            return new ctor();
+    create<K extends keyof WidgetNameMap>(name: K, properties?: Parameters<WidgetNameMap[K]["create"]>[0]): ReturnType<WidgetNameMap[K]["create"]> {
+        const widget = this.#map.get(name);
+        if (widget !== void 0) {
+            return <ReturnType<WidgetNameMap[K]["create"]>>widget.create(properties);
         }
         else {
-            throw new Error();
+            throw new Error(`Unknown widget ${name}`);
         }
     }
 }
 
 var widgets: WidgetRegistry = new WidgetRegistryBase();
-
-class WidgetBase implements Widget {
-    readonly element: HTMLElement;
-
-    constructor(element: HTMLElement) {
-        this.element = element;
-    }
-    
-    click(): void {
-        this.element.click();
-    }
-
-    focus(options?: FocusOptions | undefined): void {
-        this.element.focus(options);
-    }
-
-    blur(): void {
-        this.element.blur();
-    }
-
-    contains(node: Node): boolean {
-        return this.element.contains(node);
-    }
-}
-
-var Widget: WidgetConstructor = WidgetBase;

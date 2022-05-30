@@ -41,6 +41,8 @@ export * from "./src/elements/utils/Loader";
 export * from "./src/elements/utils/WidthSash";
 export * from "./src/observers/AttributeMixinsObserver";
 export * from "./src/models/Model";
+export * from "./src/views/widgets/MenuBarWidget";
 export * from "./src/views/widgets/MenuWidget";
 export * from "./src/views/widgets/MenuItemWidget";
+export * from "./src/views/widgets/MenuItemGroupWidget";
 export * from "./index";

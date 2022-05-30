@@ -1,5 +1,4 @@
 import { HTMLEMenuItemElement } from "./MenuItem";
-import { HTMLEMenuItemCollection } from "./MenuItemCollection";
 export { HTMLEMenuBarElement };
 interface HTMLEMenuBarElementConstructor {
     readonly prototype: HTMLEMenuBarElement;
@@ -7,11 +6,11 @@ interface HTMLEMenuBarElementConstructor {
 }
 interface HTMLEMenuBarElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly items: HTMLEMenuItemCollection;
+    readonly items: HTMLCollectionOf<HTMLEMenuItemElement>;
     readonly activeItem: HTMLEMenuItemElement | null;
     readonly activeIndex: number;
     name: string;
-    active: boolean;
+    expanded: boolean;
 }
 declare global {
     interface HTMLElementTagNameMap {
