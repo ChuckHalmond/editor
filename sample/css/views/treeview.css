@@ -4,8 +4,11 @@
 
 .offscreen {
     position: absolute;
-    top: 100%;
+    top: 0;
+    left: 0;
+    transform: translateY(-100%);
     display: block;
+    pointer-events: none;
 }
 
 .dragimage {

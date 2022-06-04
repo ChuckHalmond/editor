@@ -63,8 +63,8 @@ class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
             element("style", {
-                properties: {
-                    innerText: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: flex;
                             user-select: none;
@@ -114,13 +114,17 @@ class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
                             pointer-events: none;
                         }
                     `
-                }
+                ]
             }),
             element("span", {
-                part: ["content"],
+                attributes: {
+                    part: "content"
+                },
                 children: [
                     element("span", {
-                        part: ["label"]
+                        attributes: {
+                            part: "label"
+                        }
                     })
                 ]
             })

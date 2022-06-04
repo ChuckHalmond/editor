@@ -40,8 +40,8 @@ class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneEleme
 
         this.attachShadow({mode: "open"}).append(
             element("style", {
-                properties: {
-                    innerText: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: block;
                         }
@@ -63,10 +63,12 @@ class HTMLEDragzoneElementBase extends HTMLElement implements HTMLEDragzoneEleme
                             margin-bottom: 2px;
                         }
                     `
-                }
+                ]
             }),
             element("div", {
-                part: ["container"],
+                attributes: {
+                    part: "container"
+                },
                 children: [
                     element("slot")
                 ]

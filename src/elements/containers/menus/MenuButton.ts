@@ -48,18 +48,24 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
         const shadowRoot = this.attachShadow({mode: "open"});
         shadowRoot.append(
             element("span", {
-                part: ["content"],
+                attributes: {
+                    part: "content"
+                },
                 children: [
                     element("span", {
-                        part: ["icon"]
+                        attributes: {
+                            part: "icon"
+                        }
                     }),
                     element("span", {
-                        part: ["label"]
+                        attributes: {
+                            part: "label"
+                        }
                     })
                 ]
             }),
             element("slot", {
-                properties: {
+                attributes: {
                     name: "menu"
                 }
             })
@@ -181,8 +187,8 @@ var EMenuButton = <EMenuButtonConstructor>Object.assign(
         const {menu} = init;
         menu.slot = "menu";
         return element("e-menubutton", {
-            properties: {
-                tabIndex: -1
+            attributes: {
+                tabindex: -1
             },
             children: [menu]
         });

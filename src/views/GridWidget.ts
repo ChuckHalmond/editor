@@ -93,9 +93,11 @@ class GridWidget {
     static {
         document.head.append(
             element("style", {
-                properties: {
-                    id: "v-grid-style",
-                    textContent: trimMultilineIndent(/*css*/`
+                attributes: {
+                    id: "v-grid-style"
+                },
+                children: [
+                    trimMultilineIndent(/*css*/`
                         .c-grid-view e-gridcell[data-sortorder="-1"]::after {
                             display: inline-block;
                             content: "^";
@@ -106,7 +108,7 @@ class GridWidget {
                             content: "v";
                         }
                     `)
-                }
+                ]
             })
         );
     }
@@ -118,16 +120,16 @@ class GridWidget {
         this.#model = new GridModel();
         this.#cellDelegate = (row: GridRowModel, column: GridColumnModel) => {
             return element("label", {
-                properties: {
-                    textContent: column.extract(row)
-                }
+                children: [
+                    column.extract(row)
+                ]
             });
         };
         this.#columnDelegate = (column: GridColumnModel) => {
             return element("label", {
-                properties: {
-                    textContent: column.label
-                }
+                children: [
+                    column.label
+                ]
             });
         };
         this.#element = this.render();
@@ -161,10 +163,10 @@ class GridWidget {
     render(): HTMLEGridElement {
         const {model} = this;
         const gridElement = element("e-grid", {
-            properties: {
-                tabIndex: 0,
+            attributes: {
+                tabindex: 0,
                 selectby: "row",
-                className: "c-grid-view"
+                class: "c-grid-view"
             },
             children: [
                 element("e-gridhead", {
@@ -195,8 +197,8 @@ class GridWidget {
 
     #renderGridColumnHeaderCell(column: GridColumnModel): Element {
         const gridColumnElement = element("e-gridcell", {
-            properties: {
-                tabIndex: -1,
+            attributes: {
+                tabindex: -1,
                 name: column.name,
                 id: this.resizable ? this.#columnID(column.name) : void 0,
                 type: "columnheader"
@@ -205,15 +207,15 @@ class GridWidget {
                 this.#columnDelegate(column)
             ].concat(
                 this.resizable ? [element("e-wsash", {
-                    properties: {
+                    attributes: {
                         controls: this.#columnID(column.name)
                     },
-                    eventListeners: {
+                    listeners: {
                         resize: <EventListener>this.#handleColumnResizeEvent.bind(this)
                     }
                 })] : []
             ),
-            eventListeners: this.sortable ? Object.assign({
+            listeners: this.sortable ? Object.assign({
                 click: <EventListener>this.#handleColumnClickEvent.bind(this)
             }, {}) : {}
         });
@@ -224,8 +226,8 @@ class GridWidget {
     #renderGridBodyRow(row: GridRowModel): Element {
         const {model} = this;
         const gridRowElement = element("e-gridrow", {
-            properties: {
-                tabIndex: -1
+            attributes: {
+                tabindex: -1
             },
             children: reactiveChildElements(
                 model.columns, column => this.#renderGridDataCell(row, column)
@@ -237,14 +239,14 @@ class GridWidget {
 
     #renderGridDataCell(row: GridRowModel, column: GridColumnModel): Element {
         const gridCellElement = element("e-gridcell", {
-            properties: {
+            attributes: {
                 type: "gridcell"
-            },
-            style: this.resizable ? Object.assign({
-                width:
-                    `var(${this.#columnWidthVariableName(column.name)},` +
+                /*style: this.resizable ?
+                    "width:" +
+                    `var(${this.#columnWidthVariableName(column.name)}, ` +
                     `var(${this.#columnDefaultWidthVariableName()}))`
-            }, {}) : {},
+                 : void 0,*/
+            },
             children: [
                 this.#cellDelegate(row, column)
             ]

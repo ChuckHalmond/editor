@@ -41,8 +41,8 @@ class HTMLEHandleElementBase extends HTMLElement implements HTMLEHandleElement {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
             element("style", {
-                properties: {
-                    innerText: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: block;
                             
@@ -59,7 +59,7 @@ class HTMLEHandleElementBase extends HTMLElement implements HTMLEHandleElement {
                             cursor: move;
                         }
                     `
-                }
+                ]
             })
         );
     }

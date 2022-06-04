@@ -33,14 +33,14 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
         
         this.attachShadow({mode: "open"}).append(
             element("style", {
-                properties: {
-                    innerText: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: block;
                             position: relative;
                         }
                     `
-                }
+                ]
             }),
             element("slot")
         );

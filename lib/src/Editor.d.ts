@@ -1,6 +1,5 @@
 import { HTMLEActionElement } from "./elements/containers/actions/Action";
 import { HotKey } from "./Input";
-import { Widget } from "./views/widgets/Widget";
 export { Editor };
 export { EditorBase };
 interface ButtonAction {
@@ -27,8 +26,6 @@ interface EditorConstructor {
     new (): Editor;
 }
 interface Editor {
-    registerWidget(widget: Widget): void;
-    unregisterWidget(widget: Widget): void;
     registerButtonAction(name: string, trigger: () => void, init?: {
         hotkey?: HotKey;
         key?: string;
@@ -53,7 +50,6 @@ interface Editor {
     setup(): void;
 }
 declare class EditorBase implements Editor {
-    private _widgets;
     private _actions;
     private _actionElements;
     private _hotkeys;
@@ -63,8 +59,6 @@ declare class EditorBase implements Editor {
     constructor();
     private _actionsObserverCallback;
     setup(): void;
-    registerWidget(widget: Widget): void;
-    unregisterWidget(widget: Widget): void;
     handleEvent(event: Event): void;
     registerButtonAction(name: string, trigger: () => void, init?: {
         hotkey?: HotKey;

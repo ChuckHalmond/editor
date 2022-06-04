@@ -4,7 +4,6 @@ import { HTMLEMenuItemElement } from "../elements/containers/menus/MenuItem";
 import { HTMLEMenuItemGroupElement } from "../elements/containers/menus/MenuItemGroup";
 import { element } from "../elements/Element";
 import { HotKey } from "../Input";
-import { Widget } from "./widgets/Widget";
 /*
 export { MenuItemWidget };
 export { MenuItemGroupWidget };
@@ -20,11 +19,11 @@ class MenuItemWidget extends Widget<HTMLEMenuItemElement> {
             menu.element.slot = "menu";
         }
         const itemElement = element("e-menuitem", {
-            properties: {
+            attributes: {
                 label: label,
                 name: name,
                 type: type,
-                tabIndex: -1
+                tabindex: -1
             },
             children: menu ? [menu.element] : void 0
         });
@@ -55,9 +54,9 @@ class MenuItemGroupWidget extends Widget<HTMLEMenuItemGroupElement> {
     constructor(init: {name: string, label?: string, items?: MenuItemWidget[]}) {
         const items = init.items || [];
         const groupElement = element("e-menuitemgroup", {
-            properties: {
+            attributes: {
                 label: init.label,
-                tabIndex: -1
+                tabindex: -1
             },
             children: items.map(item => item.element)
         });
@@ -89,8 +88,8 @@ class MenuWidget extends Widget<HTMLEMenuElement> {
     constructor(init: {name: string, groups?: MenuItemGroupWidget[]}) {
         const groups = init.groups || [];
         const menuElement = element("e-menu", {
-            properties: {
-                tabIndex: -1
+            attributes: {
+                tabindex: -1
             },
             children: groups.map(group => group.element)
         });
@@ -108,8 +107,8 @@ class MenuBarWidget extends Widget<HTMLEMenuBarElement> {
 
     constructor(items: MenuItemWidget[] = []) {
         const menubarElement = element("e-menubar", {
-            properties: {
-                tabIndex: 0
+            attributes: {
+                tabindex: 0
             },
             children: items.map(item => item.element)
         });

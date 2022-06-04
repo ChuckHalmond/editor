@@ -51,8 +51,8 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
         shadowTemplate = element("template");
         shadowTemplate.content.append(
             element("style", {
-                properties: {
-                    innerText: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: inline-block;
                             width: 100%;
@@ -79,7 +79,7 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
                             opacity: 1;
                         }
                     `
-                }
+                ]
             })
         );
     }

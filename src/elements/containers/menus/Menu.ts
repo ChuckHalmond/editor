@@ -51,11 +51,10 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     #walker: TreeWalker;
 
     static {
-        shadowTemplate = element("template", {
-            content: [
-                element("slot")
-            ]
-        });
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
+            element("slot")
+        );
         toggleTimeouts = new WeakMap();
     }
 
@@ -464,9 +463,9 @@ var EMenu = <EMenuConstructor>Object.assign(
     }) {
         const {name, children} = init;
         return element("e-menu", {
-            properties: {
+            attributes: {
                 name: name,
-                tabIndex: -1,
+                tabindex: -1,
             },
             children: children
         });

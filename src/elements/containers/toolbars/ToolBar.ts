@@ -58,14 +58,14 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         shadowTemplate = element("template");
         shadowTemplate.content.append(
             element("style", {
-                properties: {
-                    innerText: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: flex;
                             flex-direction: row;
                         }
                     `
-                }
+                ]
             }),
             element("slot")
         );

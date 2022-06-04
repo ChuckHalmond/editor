@@ -98,13 +98,17 @@ class HTMLEDropzoneElementBase extends HTMLEDragzoneElement implements HTMLEDrop
 
         this.shadowRoot.append(
             element("div", {
-                part: ["appendarea"],
+                attributes: {
+                    part: "appendarea"
+                },
                 children: [
                     element("span", {
-                        part: ["placeholder"],
-                        properties: {
-                            textContent: "&nbsp;"
-                        }
+                        attributes: {
+                            part: "placeholder"
+                        },
+                        children: [
+                            "&nbsp;"
+                        ]
                     })
                 ]
             })

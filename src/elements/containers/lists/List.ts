@@ -57,11 +57,11 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
             element("style", {
-                properties: {
-                    innerText: /*css*/`
+                children: [
+                    /*css*/`
 
                     `
-                }
+                ]
             }),
             element("slot", {
                 children: [

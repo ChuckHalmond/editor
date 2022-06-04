@@ -56,8 +56,8 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
         shadowTemplate = element("template");
         shadowTemplate.content.append(
             element("style", {
-                properties: {
-                    innerText: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: inline-block;
                             
@@ -78,7 +78,7 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
                             opacity: 1;
                         }
                     `
-                }
+                ]
             })
         );
     }

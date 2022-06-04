@@ -31,15 +31,15 @@ class HTMLEGridRowGroupElementBase extends HTMLElement implements HTMLEGridRowGr
         shadowTemplate = element("template");
         shadowTemplate.content.append(
             element("style", {
-                properties: {
-                    textContent: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: table-row-group;
                             /*display: flex;
                             flex-direction: column;*/
                         }
                     `
-                }
+                ]
             }),
             element("slot")
         );

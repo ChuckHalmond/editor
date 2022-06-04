@@ -58,8 +58,8 @@ class HTMLEGridRowElementBase extends HTMLElement implements HTMLEGridRowElement
         shadowTemplate = element("template");
         shadowTemplate.content.append(
             element("style", {
-                properties: {
-                    textContent: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: table-row;
                         }
@@ -83,11 +83,11 @@ class HTMLEGridRowElementBase extends HTMLElement implements HTMLEGridRowElement
                             outline-offset: -1px;
                         }
                     `
-                }
+                ]
             }),
             element("slot"),
             element("slot", {
-                properties: {
+                attributes: {
                     name: "menu"
                 }
             })

@@ -83,25 +83,37 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
         shadowTemplate = element("template");
         shadowTemplate.content.append(
             element("div", {
-                part: ["content"],
+                attributes: {
+                    part: "content"
+                },
                 children: [
                     element("label", {
-                        part: ["label"]
+                        attributes: {
+                            part: "label"
+                        }
                     }),
                     element("output", {
-                        part: ["value"]
+                        attributes: {
+                            part: "value"
+                        }
                     })
                 ]
             }),
             element("div", {
-                part: ["options"],
+                attributes: {
+                    part: "options"
+                },
                 children: [
                     element("slot"),
                     element("hr", {
-                        part: ["separator"]
+                        attributes: {
+                            part: "separator"
+                        }
                     }),
                     element("span", {
-                        part: ["description"]
+                        attributes: {
+                            part: "description"
+                        }
                     })
                 ]
             })

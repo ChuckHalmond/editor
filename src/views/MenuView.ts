@@ -1,7 +1,7 @@
 import { CustomElement, reactiveChildElements, reactiveElement, widget } from "../elements/Element";
 import { ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { View } from "./View";
-import { menuItemWidget } from "./widgets/MenuItemWidget";
+import { menuItemWidget } from "./widgets/menu/MenuItemWidget";
 
 export { MenuModel };
 export { MenuItemModel };
@@ -82,7 +82,10 @@ class MenuViewBase extends View {
 
     #renderMenu(menu: MenuModel) {
         return widget("menu", {
-            children: reactiveChildElements(
+            properties: {
+                
+            },
+            slotted: reactiveChildElements(
                 menu.items,
                 item_i => this.#renderMenuItem(item_i)
             )
@@ -97,9 +100,9 @@ class MenuViewBase extends View {
                 properties: {
                     type: type
                 },
-                children: menu !== void 0 ? [
+                slotted: menu !== void 0 ? [
                     this.#renderMenu(menu)
-                ] : void 0
+                ] : []
             }),
             ["label", "name"],
             (menuitem, property, oldValue, newValue) => {

@@ -37,13 +37,13 @@ class HTMLEGridHeadElementBase extends HTMLElement implements HTMLEGridHeadEleme
         shadowTemplate = element("template");
         shadowTemplate.content.append(
             element("style", {
-                properties: {
-                    textContent: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: table-row-group;
                         }
                     `
-                }
+                    ]
             }),
             element("slot")
         );

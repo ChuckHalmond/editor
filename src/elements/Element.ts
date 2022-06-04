@@ -1,11 +1,11 @@
-import { Widget, widgets } from "../views/widgets/Widget";
+import { widgets, WidgetFactoryConstructor } from "../views/widgets/Widget";
 import { ModelList, ModelNode, ModelChangeRecord, ModelChangeObserver, ModelChangeObserverOptions } from "../models/Model";
 import { camelToTrain } from "./Snippets";
 
 export { subtreeNodes };
 export { ancestorNodes };
 export { CustomElement };
-export { CustomWidget };
+export { Widget };
 export { widget };
 export { QueryProperty };
 export { QueryAllProperty };
@@ -202,19 +202,19 @@ const CustomElement: CustomElementDecorator = function(init: {
 interface WidgetDecorator {
     (init: {
         name: string;
-    }): <W extends Widget>(widget: W) => W;
+    }): <W extends WidgetFactoryConstructor>(widget: W) => W;
 }
 
-const CustomWidget: WidgetDecorator = function(init: {
+const Widget: WidgetDecorator = function(init: {
     name: string;
 }) {
-    return <W extends Widget>(
+    return <W extends WidgetFactoryConstructor>(
         widget: W
     ) => {
         const {name} = init;
-        widgets.define(
+        widgets.set(
             name,
-            widget
+            new widget()
         );
         return widget;
     }
@@ -320,104 +320,39 @@ function TextNode(text: string): Node {
     return document.createTextNode(text);
 }
 
-type IfEquals<X, Y, A = X, B = never> =
-  (<T>() => T extends X ? 1 : 2) extends
-  (<T>() => T extends Y ? 1 : 2) ? A : B;
-
-type WritableKeys<T> = {
-  [P in keyof T]-?: IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, P, never>
-}[keyof T];
-
-type ReadonlyKeys<T> = {
-  [P in keyof T]-?: IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, never, P>
-}[keyof T];
-
-interface HTMLElementInit<E extends HTMLElement> {
+interface HTMLElementInit {
     options?: ElementCreationOptions,
-    properties?: Partial<Pick<E, WritableKeys<E>>>,
-    part?: string[],
-    exportParts?: string[],
-    attributes?: {[name: string]: number | string | boolean},
-    style?: {
-        [property: string]: string | [string, string]
+    attributes?: {
+        [name: string]: number | string | boolean | undefined
     },
     dataset?: {
         [property: string]: string | number | boolean
     },
     children?: (Node | string)[] | NodeList | ReactiveChildElements,
-    eventListeners?: {
+    listeners?: {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined]
     }
 }
 
-interface HTMLElementInitMap {
-    "template": HTMLTemplateInit;
-}
-
-interface HTMLTemplateInit extends HTMLElementInit<HTMLTemplateElement> {
-    content?: (Node | string)[] | NodeList;
-}
-
-function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementInitMap>(
-    tagName: K, init?: HTMLElementInitMap[K]): E;
 function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementTagNameMap>(
-    tagName: K, init?: HTMLElementInit<E>): E;
+    tagName: K, init?: HTMLElementInit): E;
 function element(
-    tagName: string, init?: HTMLElementInit<HTMLElement>): HTMLElement;
+    tagName: string, init?: HTMLElementInit): HTMLElement;
 function element<K extends keyof HTMLElementTagNameMap>(
-    tagName: K, init?: HTMLElementInit<HTMLElementTagNameMap[K]>): HTMLElementTagNameMap[K] {
+    tagName: K, init?: HTMLElementInit): HTMLElementTagNameMap[K] {
     if (init) {
-        const {options, properties, part, exportParts, attributes, dataset, children, eventListeners, style} = init;
+        const {options, attributes, dataset, children, listeners} = init;
         const element = document.createElement(tagName, options);
-        if (options) {
-            const {is: isBuiltinElement} = options;
-            if (isBuiltinElement) {
-                element.setAttribute("is", isBuiltinElement)
-            }
-        }
-        if (properties) {
-            const keys = Object.keys(properties);
-            keys.forEach((key_i) => {
-                const value = Reflect.get(properties, key_i, properties);
-                if (value !== void 0) {
-                    Object.assign(
-                        element, {
-                            [key_i]: value
-                        }
-                    );
-                }
-            });
-        }
-        if (part) {
-            const {part: elementPart} = element;
-            part.forEach((part) => {
-                elementPart.add(part);
-            });
-        }
-        if (exportParts) {
-            element.setAttribute("exportparts", exportParts.join(", "));
-        }
         if (attributes) {
             Object.keys(attributes).forEach((attributeName) => {
                 const attributeValue = attributes[attributeName];
-                if (typeof attributeValue == "boolean") {
-                    if (attributeValue) {
-                        element.setAttribute(camelToTrain(attributeName), "");
+                if (attributeValue !== void 0) {
+                    if (typeof attributeValue == "boolean") {
+                        element.toggleAttribute(camelToTrain(attributeName), attributeValue);
                     }
-                }
-                else {
-                    element.setAttribute(camelToTrain(attributeName), attributeValue.toString());
-                }
-            });
-        }
-        if (style) {
-            const {style: elementStyle} = element;
-            Object.keys(style).forEach((property_i) => {
-                if (Array.isArray(style[property_i])) {
-                    elementStyle.setProperty(property_i, style[property_i][0], style[property_i][1]);
-                }
-                else {
-                    elementStyle.setProperty(property_i, <string>style[property_i]);
+                    else {
+                        element.setAttribute(camelToTrain(attributeName), attributeValue.toString());
+                    }
                 }
             });
         }
@@ -435,8 +370,8 @@ function element<K extends keyof HTMLElementTagNameMap>(
                 element.append(...Array.from(children));
             }
         }
-        if (eventListeners) {
-            Object.entries(eventListeners).forEach(([name_i, listener_i]) => {
+        if (listeners) {
+            Object.entries(listeners).forEach(([name_i, listener_i]) => {
                 if (Array.isArray(listener_i)) {
                     element.addEventListener(name_i, listener_i[0], listener_i[1]);
                 }
@@ -445,16 +380,6 @@ function element<K extends keyof HTMLElementTagNameMap>(
                 }
             });
         }
-        switch (tagName) {
-            case "template":
-                const {content} = init as HTMLTemplateInit;
-                if (content) {
-                    (<HTMLTemplateElement>element).content.append(
-                        ...Array.from(content)
-                    );
-                }
-                break;
-        }
         return element;
     }
     return document.createElement(tagName);
@@ -462,15 +387,16 @@ function element<K extends keyof HTMLElementTagNameMap>(
 
 interface WidgetInit<K extends keyof WidgetNameMap> {
     properties?: Parameters<WidgetNameMap[K]["create"]>[0],
-    attributes?: {[name: string]: number | string | boolean},
-    style?: {
-        [property: string]: string | [string, string]
+    attributes?: {
+        [name: string]: number | string | boolean | undefined
     },
     dataset?: {
         [property: string]: string | number | boolean
     },
-    children?: (Node | string)[] | NodeList | ReactiveChildElements,
-    eventListeners?: {
+    slotted?: {
+        [slot: string]: (Node | string)[] | NodeList | ReactiveChildElements
+    } | ((Node | string)[] | NodeList | ReactiveChildElements),
+    listeners?: {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined]
     }
 }
@@ -481,59 +407,66 @@ function widget<K extends keyof WidgetNameMap>(
     name: string, init?: WidgetInit<K>): HTMLElement
 function widget<K extends keyof WidgetNameMap>(
     name: K, init?: WidgetInit<K>): HTMLElement {
-    const element = <HTMLElement>widgets.create(name, init?.properties);
-    if (init) {
-        const {attributes, dataset, children, eventListeners, style} = init;
-        if (attributes) {
-            Object.keys(attributes).forEach((attributeName) => {
-                const attributeValue = attributes[attributeName];
-                if (typeof attributeValue == "boolean") {
-                    if (attributeValue) {
-                        element.setAttribute(camelToTrain(attributeName), "");
+    const widget = widgets.get(name);
+    if (widget) {
+        const element = <HTMLElement>widget.create(init?.properties);
+        if (init) {
+            const {attributes, dataset, slotted, listeners} = init;
+            if (attributes) {
+                Object.keys(attributes).forEach((attributeName) => {
+                    const attributeValue = attributes[attributeName];
+                    if (attributeValue !== void 0) {
+                        if (typeof attributeValue == "boolean") {
+                            element.toggleAttribute(camelToTrain(attributeName), attributeValue);
+                        }
+                        else {
+                            element.setAttribute(camelToTrain(attributeName), attributeValue.toString());
+                        }
+                    }
+                });
+            }
+            if (dataset) {
+                const {dataset: elementDataset} = element;
+                Object.keys(dataset).forEach((datasetEntry_i) => {
+                    elementDataset[datasetEntry_i] = dataset[datasetEntry_i].toString();
+                });
+            }
+            if (slotted) {
+                if (typeof slotted == "function" || Array.isArray(slotted) || slotted instanceof NodeList) {
+                    const slot = widget.slot(element, null);
+                    if (typeof slotted == "function") {
+                        slot.append(...slotted(element));
+                    }
+                    else {
+                        slot.append(...Array.from(slotted));
                     }
                 }
                 else {
-                    element.setAttribute(camelToTrain(attributeName), attributeValue.toString());
+                    Object.entries(slotted).forEach(([slot_i, slotted]) => {
+                        const slot = widget.slot(element, slot_i);
+                        if (typeof slotted == "function") {
+                            slot.append(...slotted(element));
+                        }
+                        else {
+                            slot.append(...Array.from(slotted));
+                        }
+                    });
                 }
-            });
-        }
-        if (style) {
-            const {style: elementStyle} = element;
-            Object.keys(style).forEach((property_i) => {
-                if (Array.isArray(style[property_i])) {
-                    elementStyle.setProperty(property_i, style[property_i][0], style[property_i][1]);
-                }
-                else {
-                    elementStyle.setProperty(property_i, <string>style[property_i]);
-                }
-            });
-        }
-        if (dataset) {
-            const {dataset: elementDataset} = element;
-            Object.keys(dataset).forEach((datasetEntry_i) => {
-                elementDataset[datasetEntry_i] = dataset[datasetEntry_i].toString();
-            });
-        }
-        if (children) {
-            if (typeof children == "function") {
-                element.append(...children(element));
             }
-            else {
-                element.append(...Array.from(children));
+            if (listeners) {
+                Object.entries(listeners).forEach(([name_i, listener_i]) => {
+                    if (Array.isArray(listener_i)) {
+                        element.addEventListener(name_i, listener_i[0], listener_i[1]);
+                    }
+                    else {
+                        element.addEventListener(name_i, listener_i);
+                    }
+                });
             }
         }
-        if (eventListeners) {
-            Object.entries(eventListeners).forEach(([name_i, listener_i]) => {
-                if (Array.isArray(listener_i)) {
-                    element.addEventListener(name_i, listener_i[0], listener_i[1]);
-                }
-                else {
-                    element.addEventListener(name_i, listener_i);
-                }
-            });
-        }
+        return element;
     }
-    return element;
+    throw new Error(`Unknown widget ${name}.`);
 }
 
 const reactiveElementsMap = new WeakMap<ModelNode, {

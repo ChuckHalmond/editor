@@ -50,11 +50,10 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
     }
     
     static {
-        shadowTemplate = element("template", {
-            content: [
-                element("slot")
-            ]
-        });
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
+            element("slot")
+        );
     }
 
     readonly shadowRoot!: ShadowRoot;
@@ -346,34 +345,44 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
         this.endSelection();
     }
 
-    #setActiveCell(cell: HTMLEGridCellElement): void {
+    #setActiveCell(cell: HTMLEGridCellElement | null): void {
         const {activeCell, cells} = this;
         if (activeCell !== null && activeCell !== cell) {
             activeCell.active = false;
             activeCell.tabIndex = -1;
         }
-        const cellsWalker = this.#cellsWalker;
-        cellsWalker.currentNode = cell;
-        cell.active = true;
-        cell.tabIndex = 0;
-        const closestRow = this.#closestRow(cell);
-        if (closestRow) {
-            this.#setActiveRow(closestRow);
+        else if (cell !== null) {
+            const cellsWalker = this.#cellsWalker;
+            cellsWalker.currentNode = cell;
+            cell.active = true;
+            cell.tabIndex = 0;
+            const closestRow = this.#closestRow(cell);
+            if (closestRow) {
+                this.#setActiveRow(closestRow);
+            }
+            this.#activeCellIndex = Array.from(cells.values()).indexOf(cell);
         }
-        this.#activeCellIndex = Array.from(cells.values()).indexOf(cell);
+        else {
+            this.#activeCellIndex = -1;
+        }
     }
 
-    #setActiveRow(row: HTMLEGridRowElement): void {
+    #setActiveRow(row: HTMLEGridRowElement | null): void {
         const {activeRow, rows} = this;
         if (activeRow !== null && activeRow !== row) {
             activeRow.active = false;
             activeRow.tabIndex = -1;
         }
-        const rowsWalker = this.#rowsWalker;
-        rowsWalker.currentNode = row;
-        row.active = true;
-        row.tabIndex = 0;
-        this.#activeRowIndex = Array.from(rows.values()).indexOf(row);
+        else if (row !== null) {
+            const rowsWalker = this.#rowsWalker;
+            rowsWalker.currentNode = row;
+            row.active = true;
+            row.tabIndex = 0;
+            this.#activeRowIndex = Array.from(rows.values()).indexOf(row);
+        }
+        else {
+            this.#activeRowIndex = -1;
+        }
     }
 
     #firstCell(row: HTMLEGridRowElement): HTMLEGridCellElement | null {
@@ -808,10 +817,12 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
                 switch (selectby) {
                     case "cell": {
                         this.#clearCellsSelection();
+                        this.#setActiveCell(null);
                         break;
                     }
                     case "row": {
                         this.#clearRowsSelection();
+                        this.#setActiveRow(null);
                         break;
                     }
                 }

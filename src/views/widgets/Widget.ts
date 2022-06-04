@@ -1,40 +1,92 @@
-export { Widget };
+export { WidgetFactoryConstructor };
 
+export { WidgetFactory };
 export { widgets };
 
 declare global {
     interface WidgetNameMap {}
 }
 
-interface Widget {
+interface WidgetFactoryConstructor {
+    readonly prototype: WidgetFactory;
+    new(): WidgetFactory;
+}
+
+interface WidgetFactory {
     create(properties?: object): HTMLElement;
+    slot(root: HTMLElement, name: string | null): HTMLElement;
+    get slots(): string[];
 }
 
-interface WidgetRegistry {
-    define(name: string, widget: Widget): void;
-    create<K extends keyof WidgetNameMap>(name: K, properties?: Parameters<WidgetNameMap[K]["create"]>[0]): ReturnType<WidgetNameMap[K]["create"]>;
-}
+var slotsMap: WeakMap<HTMLElement, [WidgetFactory, HTMLElement][]> = new WeakMap();
+var slotsObserver = new MutationObserver(
+    (mutationsList: MutationRecord[]) => {
+        mutationsList.forEach((mutation: MutationRecord) => {
+            const {target, type} = mutation;
+            if (target instanceof HTMLElement) {
+                switch (type) {
+                    case "childList": {
+                        const slotReferences = slotsMap.get(target);
+                        if (slotReferences) {
+                            slotReferences.forEach(slotRef_i => {
+                                const [widget, element] = slotRef_i;
+                                const slottedCallback = (widget as any)["slottedCallback"];
+                                if (typeof slottedCallback == "function") {
+                                    slottedCallback(element, target);
+                                }
+                            });
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+    }
+);
 
-class WidgetRegistryBase implements WidgetRegistry {
-    #map: Map<string, Widget>;
+class WidgetFactoryBase implements WidgetFactory {
 
     constructor() {
-        this.#map = new Map();
+        const widget = <WidgetFactory>this;
+        this.create = new Proxy(
+            this.create, {
+                apply: (target, thisArg, argumentsList) => {
+                    const element = Reflect.apply(target, thisArg, argumentsList);
+                    const targets = widget.slots.map(slot_i => {
+                        return widget.slot(element, slot_i);
+                    }).concat(element);
+                    targets.forEach(target_i => {
+                        slotsObserver.observe(target_i, {
+                            childList: true
+                        });
+                        const slotReferences = slotsMap.get(target_i);
+                        if (Array.isArray(slotReferences)) {
+                            slotReferences.push([widget, element]);
+                        }
+                        else {
+                            slotsMap.set(target_i, new Array([widget, element]));
+                        }
+                    });
+                    return element;
+                }
+            }
+        )
     }
 
-    define(name: string, widget: Widget): void {
-        this.#map.set(name, widget);
+    create(): HTMLElement {
+        throw new Error();
     }
 
-    create<K extends keyof WidgetNameMap>(name: K, properties?: Parameters<WidgetNameMap[K]["create"]>[0]): ReturnType<WidgetNameMap[K]["create"]> {
-        const widget = this.#map.get(name);
-        if (widget !== void 0) {
-            return <ReturnType<WidgetNameMap[K]["create"]>>widget.create(properties);
-        }
-        else {
-            throw new Error(`Unknown widget ${name}`);
-        }
+    setup(): void {}
+
+    slot(root: HTMLElement): HTMLElement {
+        return root;
+    }
+
+    get slots(): string[] {
+        return [];
     }
 }
 
-var widgets: WidgetRegistry = new WidgetRegistryBase();
+var WidgetFactory: WidgetFactoryConstructor = WidgetFactoryBase;
+var widgets: Map<string, WidgetFactory> = new Map();

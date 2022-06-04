@@ -74,24 +74,27 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
     #group: HTMLETreeItemGroupElement | null;
     
     static {
-        shadowTemplate = element("template", {
-            content: [
-                element("div", {
-                    part: ["content"],
-                    children: [
-                        element("span", {
-                            part: ["arrow"]
-                        }),
-                        element("slot")
-                    ]
-                }),
-                element("slot", {
-                    properties: {
-                        name: "group"
-                    }
-                })
-            ]
-        });
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
+            element("div", {
+                attributes: {
+                    part: "content"
+                },
+                children: [
+                    element("span", {
+                        attributes: {
+                            part: "arrow"
+                        }
+                    }),
+                    element("slot")
+                ]
+            }),
+            element("slot", {
+                attributes: {
+                    name: "group"
+                }
+            })
+        );
     }
     
     constructor() {

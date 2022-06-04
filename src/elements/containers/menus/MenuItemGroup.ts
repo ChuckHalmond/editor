@@ -41,14 +41,14 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
         shadowTemplate = element("template");
         shadowTemplate.content.append(
             element("style", {
-                properties: {
-                    textContent: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: flex;
                             flex-direction: column;
                         }
                     `
-                }
+                ]
             }),
             element("slot")
         );
@@ -107,7 +107,7 @@ var EMenuItemGroup = <EMenuItemGroupConstructor>Object.assign(
     }) {
         const {name, items} = init;
         return element("e-menuitemgroup", {
-            properties: {
+            attributes: {
                 name: name
             },
             children: items
@@ -123,7 +123,7 @@ var EMenuItemGroup = <EMenuItemGroupConstructor>Object.assign(
         }) => {
             const {name, items} = init;
             return element("e-menuitemgroup", {
-                properties: {
+                attributes: {
                     name: name
                 },
                 children: items.map(

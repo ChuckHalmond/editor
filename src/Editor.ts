@@ -1,7 +1,6 @@
 import { ActionType, HTMLEActionElement } from "./elements/containers/actions/Action";
 import { subtreeNodes } from "./elements/Element";
 import { HotKey } from "./Input";
-import { Widget } from "./views/widgets/Widget";
 
 export { Editor };
 export { EditorBase };
@@ -43,8 +42,8 @@ interface EditorConstructor {
 }
 
 interface Editor {
-    registerWidget(widget: Widget): void;
-    unregisterWidget(widget: Widget): void;
+    /*registerWidget(widget: Widget): void;
+    unregisterWidget(widget: Widget): void;*/
     
     /*setPair(key: string, value: any): void;
     getPair<T>(key: string): T;
@@ -88,7 +87,7 @@ interface Editor {
 }
 
 class EditorBase implements Editor {
-    private _widgets: Array<Widget>;
+    //private _widgets: Array<Widget>;
     private _actions: Array<Action>;
     private _actionElements: Array<Array<HTMLEActionElement>>;
     private _hotkeys: Array<HotKey>;
@@ -98,7 +97,7 @@ class EditorBase implements Editor {
     private _actionsObserver: MutationObserver;
 
     constructor() {
-        this._widgets = new Array();
+        //this._widgets = new Array();
         this._actions = new Array();
         this._actionElements = new Array();
         this._hotkeys = new Array();
@@ -173,17 +172,17 @@ class EditorBase implements Editor {
         }
     }*/
     
-    public registerWidget(widget: Widget): void {
-        /*widget.element.addEventListener("focusin", this);
-        this._widgets.push(widget);*/
+    /*public registerWidget(widget: Widget): void {
+        widget.element.addEventListener("focusin", this);
+        this._widgets.push(widget);
     }
 
     public unregisterWidget(widget: Widget): void {
-        /*if (this._widgets.includes(widget)) {
+        if (this._widgets.includes(widget)) {
             widget.element.removeEventListener("focusin", this);
             this._widgets.splice(this._widgets.indexOf(widget), 1);
-        }*/
-    }
+        }
+    }*/
 
     public handleEvent(event: Event): void {
         const target = event.target;

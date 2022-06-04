@@ -60,11 +60,10 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
     #walker: TreeWalker;
 
     static {
-        shadowTemplate = element("template", {
-            content: [
-                element("slot")
-            ]
-        });
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
+            element("slot")
+        );
     }
 
     constructor() {

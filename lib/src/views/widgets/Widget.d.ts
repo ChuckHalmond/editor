@@ -1,14 +1,18 @@
-export { Widget };
+export { WidgetFactoryConstructor };
+export { WidgetFactory };
 export { widgets };
 declare global {
     interface WidgetNameMap {
     }
 }
-interface Widget {
+interface WidgetFactoryConstructor {
+    readonly prototype: WidgetFactory;
+    new (): WidgetFactory;
+}
+interface WidgetFactory {
     create(properties?: object): HTMLElement;
+    slot(root: HTMLElement, name: string | null): HTMLElement;
+    get slots(): string[];
 }
-interface WidgetRegistry {
-    define(name: string, widget: Widget): void;
-    create<K extends keyof WidgetNameMap>(name: K, properties?: Parameters<WidgetNameMap[K]["create"]>[0]): ReturnType<WidgetNameMap[K]["create"]>;
-}
-declare var widgets: WidgetRegistry;
+declare var WidgetFactory: WidgetFactoryConstructor;
+declare var widgets: Map<string, WidgetFactory>;

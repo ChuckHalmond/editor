@@ -50,8 +50,8 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
 
         this.attachShadow({mode: "open"}).append(
             element("style", {
-                properties: {
-                    innerText: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: inline-block;
                             padding: 3px 4px;
@@ -87,15 +87,17 @@ class HTMLEDraggableElementBase extends HTMLElement implements HTMLEDraggableEle
                             align-items: center;
                         }
                     `
-                }
+                ]
             }),
             element("div", {
-                part: ["container"],
+                attributes: {
+                    part: "container"
+                },
                 children: [
                     element("slot", {
-                        properties: {
-                            textContent: "&nbsp;"
-                        }
+                        children: [
+                            "&nbsp;"
+                        ]
                     })
                 ]
             })

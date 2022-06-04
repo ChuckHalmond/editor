@@ -1,9 +1,9 @@
-import { Widget } from "../views/widgets/Widget";
+import { WidgetFactoryConstructor } from "../views/widgets/Widget";
 import { ModelList, ModelNode } from "../models/Model";
 export { subtreeNodes };
 export { ancestorNodes };
 export { CustomElement };
-export { CustomWidget };
+export { Widget };
 export { widget };
 export { QueryProperty };
 export { QueryAllProperty };
@@ -53,9 +53,9 @@ declare const CustomElement: CustomElementDecorator;
 interface WidgetDecorator {
     (init: {
         name: string;
-    }): <W extends Widget>(widget: W) => W;
+    }): <W extends WidgetFactoryConstructor>(widget: W) => W;
 }
-declare const CustomWidget: WidgetDecorator;
+declare const Widget: WidgetDecorator;
 declare function subtreeNodes(node: Node): Generator<Node>;
 declare function ancestorNodes(node: Node): Generator<Node>;
 interface QueryPropertyDecorator {
@@ -74,55 +74,33 @@ interface QueryAllPropertyDecorator {
 declare const QueryAllProperty: QueryAllPropertyDecorator;
 declare function Fragment(...nodes: (Node | string)[]): DocumentFragment;
 declare function TextNode(text: string): Node;
-declare type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? A : B;
-declare type WritableKeys<T> = {
-    [P in keyof T]-?: IfEquals<{
-        [Q in P]: T[P];
-    }, {
-        -readonly [Q in P]: T[P];
-    }, P, never>;
-}[keyof T];
-interface HTMLElementInit<E extends HTMLElement> {
+interface HTMLElementInit {
     options?: ElementCreationOptions;
-    properties?: Partial<Pick<E, WritableKeys<E>>>;
-    part?: string[];
-    exportParts?: string[];
     attributes?: {
-        [name: string]: number | string | boolean;
-    };
-    style?: {
-        [property: string]: string | [string, string];
+        [name: string]: number | string | boolean | undefined;
     };
     dataset?: {
         [property: string]: string | number | boolean;
     };
     children?: (Node | string)[] | NodeList | ReactiveChildElements;
-    eventListeners?: {
+    listeners?: {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined];
     };
 }
-interface HTMLElementInitMap {
-    "template": HTMLTemplateInit;
-}
-interface HTMLTemplateInit extends HTMLElementInit<HTMLTemplateElement> {
-    content?: (Node | string)[] | NodeList;
-}
-declare function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementInitMap>(tagName: K, init?: HTMLElementInitMap[K]): E;
-declare function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLElementInit<E>): E;
-declare function element(tagName: string, init?: HTMLElementInit<HTMLElement>): HTMLElement;
+declare function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLElementInit): E;
+declare function element(tagName: string, init?: HTMLElementInit): HTMLElement;
 interface WidgetInit<K extends keyof WidgetNameMap> {
     properties?: Parameters<WidgetNameMap[K]["create"]>[0];
     attributes?: {
-        [name: string]: number | string | boolean;
-    };
-    style?: {
-        [property: string]: string | [string, string];
+        [name: string]: number | string | boolean | undefined;
     };
     dataset?: {
         [property: string]: string | number | boolean;
     };
-    children?: (Node | string)[] | NodeList | ReactiveChildElements;
-    eventListeners?: {
+    slotted?: {
+        [slot: string]: (Node | string)[] | NodeList | ReactiveChildElements;
+    } | ((Node | string)[] | NodeList | ReactiveChildElements);
+    listeners?: {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined];
     };
 }

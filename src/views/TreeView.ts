@@ -277,13 +277,13 @@ class TreeViewBase extends View implements TreeView {
     renderShadow(): Node {
         const {model} = this;
         const treeElement = element("e-tree", {
-            properties: {
-                tabIndex: 0,
+            attributes: {
+                tabindex: 0,
             },
             children: reactiveChildElements(
                 model.childItems, item => this.#renderTreeItem(item)
             ),
-            eventListeners: {
+            listeners: {
                 dragstart: <EventListener>this.#handleDragStartEvent.bind(this),
                 drop: <EventListener>this.#handleDropEvent.bind(this),
                 contextmenu: <EventListener>this.#handleContextMenuEvent.bind(this),
@@ -293,21 +293,21 @@ class TreeViewBase extends View implements TreeView {
         this.#treeElement = new WeakRef(treeElement);
         return Fragment(
             element("link", {
-                properties: {
+                attributes: {
                     rel: "stylesheet",
                     href: "css/main.css"
                 }
             }),
             element("link", {
-                properties: {
+                attributes: {
                     rel: "stylesheet",
                     href: "css/views/treeview.css"
                 }
             }),
             treeElement,
             element("div", {
-                properties: {
-                    className: "offscreen",
+                attributes: {
+                    class: "offscreen",
                     hidden: true
                 },
                 children: reactiveChildElements(model.items,
@@ -321,11 +321,11 @@ class TreeViewBase extends View implements TreeView {
         const treeItemElement = reactiveElement(
             item,
             element("e-treeitem", {
-                properties: {
-                    tabIndex: -1,
+                attributes: {
+                    tabindex: -1,
                     label: item.label,
                     type: item.type,
-                    draggable: true
+                    draggable: "true"
                 },
                 dataset: {
                     uri: item.uri
@@ -333,7 +333,7 @@ class TreeViewBase extends View implements TreeView {
                 children:
                     ((item.type == "parent") ? [
                         element("e-treeitemgroup", {
-                            properties: {
+                            attributes: {
                                 slot: "group"
                             },
                             children: reactiveChildElements(item.childItems,
@@ -342,29 +342,29 @@ class TreeViewBase extends View implements TreeView {
                         })
                     ] : []).concat([
                         element("span", {
-                            properties: {
-                                className: "label"
+                            attributes: {
+                                class: "label"
                             }
                         })
                     ]).concat((item.type == "parent") ? [
                         element("span", {
-                            properties: {
-                                className: "badge"
+                            attributes: {
+                                class: "badge"
                             }
                         })
                     ] : []).concat([
                         element("e-toolbar", {
-                            properties: {
-                                tabIndex: 0
+                            attributes: {
+                                tabindex: 0
                             },
                             children: [
                                 element("e-toolbaritem", {
-                                    properties: {
+                                    attributes: {
                                         name: "visibility",
                                         type: "checkbox",
-                                        tabIndex: -1
+                                        tabindex: -1
                                     },
-                                    eventListeners: {
+                                    listeners: {
                                         trigger: () => {
                                             item.visibility ?
                                                 item.hide() :
@@ -412,8 +412,8 @@ class TreeViewBase extends View implements TreeView {
         const dragImageElement = reactiveElement(
             item,
             element("span", {
-                properties: {
-                    className: "dragimage"
+                attributes: {
+                    class: "dragimage"
                 }
             }),
             ["label"],
@@ -513,22 +513,24 @@ class TreeViewBase extends View implements TreeView {
         if (currentTarget instanceof HTMLETreeElement && target instanceof HTMLETreeItemElement) {
             const activeItem = model.getItemByUri(target.dataset.uri!)!;
             const menu = element("e-menu", {
-                properties: {
-                    tabIndex: -1,
+                attributes: {
+                    tabindex: -1,
                     contextual: true
                 },
                 children: [
                     element("e-menuitemgroup", {
-                        properties: {
-                            tabIndex: -1
+                        attributes: {
+                            tabindex: -1
                         },
                         children: [
                             element("e-menuitem", {
-                                properties: {
-                                    tabIndex: -1,
-                                    textContent: "Display"
+                                attributes: {
+                                    tabindex: -1
                                 },
-                                eventListeners: {
+                                children: [
+                                    "Display"
+                                ],
+                                listeners: {
                                     trigger: () => {
                                         TreeItemList.from(
                                             this.selectedItems()
@@ -537,11 +539,13 @@ class TreeViewBase extends View implements TreeView {
                                 }
                             }),
                             element("e-menuitem", {
-                                properties: {
-                                    tabIndex: -1,
-                                    textContent: "Delete"
+                                attributes: {
+                                    tabindex: -1
                                 },
-                                eventListeners: {
+                                children: [
+                                    "Delete"
+                                ],
+                                listeners: {
                                     trigger: () => {
                                         TreeItemList.from(
                                             this.selectedItems()
@@ -552,17 +556,19 @@ class TreeViewBase extends View implements TreeView {
                         ]
                     }),
                     element("e-menuitemgroup", {
-                        properties: {
-                            tabIndex: -1
+                        attributes: {
+                            tabindex: -1
                         },
                         children: [
                             element("e-menuitem", {
-                                properties: {
-                                    tabIndex: -1,
-                                    type: "checkbox",
-                                    textContent: activeItem.visibility ? "Hide" : "Show"
+                                attributes: {
+                                    tabindex: -1,
+                                    type: "checkbox"
                                 },
-                                eventListeners: {
+                                children: [
+                                    activeItem.visibility ? "Hide" : "Show"
+                                ],
+                                listeners: {
                                     trigger: () => {
                                         const selectedItems = TreeItemList.from(
                                             this.selectedItems()
@@ -576,7 +582,7 @@ class TreeViewBase extends View implements TreeView {
                         ]
                     })
                 ],
-                eventListeners: {
+                listeners: {
                     close: () => {
                         target.focus({preventScroll: true});
                     }

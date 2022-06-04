@@ -49,8 +49,8 @@ class HTMLEDialogElementBase extends HTMLElement implements HTMLEDialogElement {
 
         this.attachShadow({mode: "open"}).append(
             element("style", {
-                properties: {
-                    innerText: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: inline-block;
                             
@@ -91,59 +91,77 @@ class HTMLEDialogElementBase extends HTMLElement implements HTMLEDialogElement {
                             display: none !important;
                         }
                     `
-                }
+                    ]
             }),
             element("div", {
-                part: ["header"],
+                attributes: {
+                    part: "header"
+                },
                 children: [
                     element("button", {
-                        part: ["button", "close-button"],
-                        properties: {
-                            textContent: "x",
+                        attributes: {
+                            part: "button close-button",
                             type: "button",
-                            tabIndex: 0
-                        }
+                            tabindex: 0
+                        },
+                        children: [
+                            "x"
+                        ]
                     })
                 ]
             }),
             element("hr", {
-                part: ["separator"]
+                attributes: {
+                    part: "separator"
+                }
             }),
             element("div", {
-                part: ["body"],
+                attributes: {
+                    part: "body"
+                },
                 children: [
                     element("slot")
                 ]
             }),
             element("hr", {
-                part: ["separator"]
+                attributes: {
+                    part: "separator"
+                }
             }),
             element("div", {
-                part: ["actions"],
+                attributes: {
+                    part: "actions",
+                },
                 children: [
                     element("button", {
-                        part: ["button", "cancel-button"],
-                        properties: {
-                            textContent: "Cancel",
+                        attributes: {
+                            part: "button cancel-button",
                             type: "button",
-                            tabIndex: 0
-                        }
+                            tabindex: 0
+                        },
+                        children: [
+                            "Cancel"
+                        ]
                     }),
                     element("button", {
-                        part: ["button", "confirm-button"],
-                        properties: {
-                            textContent: "Confirm",
+                        attributes: {
+                            part: "button confirm-button",
                             type: "button",
-                            tabIndex: 0
-                        }
+                            tabindex: 0
+                        },
+                        children: [
+                            "Confirm"
+                        ]
                     }),
                     element("button", {
-                        part: ["button", "ok-button"],
-                        properties: {
-                            textContent: "OK",
+                        attributes: {
+                            part: "button ok-button",
                             type: "button",
-                            tabIndex: 0
-                        }
+                            tabindex: 0
+                        },
+                        children: [
+                            "OK"
+                        ]
                     })
                 ]
             }),

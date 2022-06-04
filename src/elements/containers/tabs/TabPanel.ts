@@ -24,8 +24,8 @@ class HTMLETabPanelElementBase extends HTMLElement implements HTMLETabPanelEleme
         
         this.attachShadow({mode: "open"}).append(
             element("style", {
-                properties: {
-                    innerText: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: block;
                         }
@@ -34,7 +34,7 @@ class HTMLETabPanelElementBase extends HTMLElement implements HTMLETabPanelEleme
                             display: none;
                         }
                     `
-                }
+                ]
             }),
             element("slot")
         );

@@ -203,13 +203,13 @@ class ListViewBase extends View implements ListView {
     renderShadow(): Node {
         return Fragment(
             element("style", {
-                properties: {
-                    textContent: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: block;
                         }
                     `
-                }
+                ]
             }),
             element("slot")
         );
@@ -218,8 +218,8 @@ class ListViewBase extends View implements ListView {
     renderLight(): Node {
         const {model} = this;
         const listElement = element("e-list", {
-            properties: {
-                tabIndex: 0
+            attributes: {
+                tabindex: 0
             },
             children: [
                 element("e-listitemgroup", {
@@ -228,7 +228,7 @@ class ListViewBase extends View implements ListView {
                     )
                 })
             ],
-            eventListeners: {
+            listeners: {
                 contextmenu: <EventListener>this.#handleContextMenuEvent.bind(this),
                 keydown: <EventListener>this.#handleKeyDownEvent.bind(this)
             }
@@ -239,24 +239,24 @@ class ListViewBase extends View implements ListView {
 
     #renderListItem(item: ListItemModel): Element {
         const listItemElement = element("e-listitem", {
-            properties: {
-                tabIndex: -1,
+            attributes: {
+                tabindex: -1,
                 name: item.label,
-                draggable: true
+                draggable: "true"
             },
             dataset: {
                 index: item.index
             },
             children: [
                 element("span", {
-                    properties: {
-                        textContent: item.label
-                    }
+                    children: [
+                        item.label
+                    ]
                 }),
                 element("e-toolbar", {
-                    properties: {
+                    attributes: {
                         //slot: "toolbar",
-                        tabIndex: 0
+                        tabindex: 0
                     },
                     children: [
                         element("e-toolbaritemgroup", {
@@ -319,12 +319,12 @@ class ListViewBase extends View implements ListView {
                                 reactiveElement(
                                     item,
                                     element("e-toolbaritem", {
-                                        properties: {
+                                        attributes: {
                                             name: "visibility",
                                             type: "checkbox",
-                                            tabIndex: -1
+                                            tabindex: -1
                                         },
-                                        eventListeners: {
+                                        listeners: {
                                             trigger: () => {
                                                 item.visibility ?
                                                     item.hide() :
@@ -356,22 +356,24 @@ class ListViewBase extends View implements ListView {
                 parseInt(target.dataset.index!)
             )!;
             const menu = element("e-menu", {
-                properties: {
-                    tabIndex: -1,
+                attributes: {
+                    tabindex: -1,
                     contextual: true
                 },
                 children: [
                     element("e-menuitemgroup", {
-                        properties: {
-                            tabIndex: -1
+                        attributes: {
+                            tabindex: -1
                         },
                         children: [
                             element("e-menuitem", {
-                                properties: {
-                                    tabIndex: -1,
-                                    textContent: "Display"
+                                attributes: {
+                                    tabindex: -1
                                 },
-                                eventListeners: {
+                                children: [
+                                    "Display"
+                                ],
+                                listeners: {
                                     trigger: () => {
                                         ListItemList.from(
                                             this.selectedItems()
@@ -380,11 +382,13 @@ class ListViewBase extends View implements ListView {
                                 }
                             }),
                             element("e-menuitem", {
-                                properties: {
-                                    tabIndex: -1,
-                                    textContent: "Delete"
+                                attributes: {
+                                    tabindex: -1
                                 },
-                                eventListeners: {
+                                children: [
+                                    "Delete"
+                                ],
+                                listeners: {
                                     trigger: () => {
                                         ListItemList.from(
                                             this.selectedItems()
@@ -395,17 +399,19 @@ class ListViewBase extends View implements ListView {
                         ]
                     }),
                     element("e-menuitemgroup", {
-                        properties: {
-                            tabIndex: -1
+                        attributes: {
+                            tabindex: -1
                         },
                         children: [
                             element("e-menuitem", {
-                                properties: {
-                                    tabIndex: -1,
-                                    type: "checkbox",
-                                    textContent: activeItem.visibility ? "Hide" : "Show"
+                                attributes: {
+                                    tabindex: -1,
+                                    type: "checkbox"
                                 },
-                                eventListeners: {
+                                children: [
+                                    activeItem.visibility ? "Hide" : "Show"
+                                ],
+                                listeners: {
                                     trigger: () => {
                                         const selectedItems = ListItemList.from(
                                             this.selectedItems()
@@ -419,7 +425,7 @@ class ListViewBase extends View implements ListView {
                         ]
                     })
                 ],
-                eventListeners: {
+                listeners: {
                     close: () => {
                         target.focus({preventScroll: true});
                     }

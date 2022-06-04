@@ -5,7 +5,7 @@ e-menuitem {
     white-space: nowrap;
 }
 
-e-menuitem[active]::part(content) {
+e-menuitem[active] {
     background-color: var(--focused-item-color);
 }
 
@@ -19,12 +19,12 @@ e-menuitem:is([type="menu"], [type="submenu"]):not([expanded]) [slot="menu"] {
     opacity: 0;
     pointer-events: none;
 }
-
+/*
 e-menuitem::part(content) {
     flex: auto;
     display: flex;
     pointer-events: none;
-}
+}*/
 
 e-menuitem[type="submenu"]::part(icon) {
     visibility: hidden;
@@ -33,6 +33,12 @@ e-menuitem[type="submenu"]::part(icon) {
 e-menuitem[type="menu"]::part(icon),
 e-menuitem:not([type="submenu"])::part(arrow) {
     display: none;
+}
+
+e-menuitem::part(icon),
+e-menuitem::part(label),
+e-menuitem::part(arrow) {
+    pointer-events: none;
 }
 
 e-menuitem::part(icon),
@@ -126,7 +132,13 @@ e-menuitem::part(arrow)::after {
     box-shadow: var(--menu-box-shadow);
 }
 
-.menuitem[aria-active] {
+.menu > .separator {
+    margin: 10px 0px 10px 36px;
+    border: none;
+    border-top: 1px solid lightgrey;
+}
+
+.menuitem:focus-within {
     background-color: var(--focused-item-color);
 }
 
@@ -140,35 +152,31 @@ e-menuitem::part(arrow)::after {
     pointer-events: none;
 }
 
-.menuitem > .content {
-    flex: auto;
-    display: flex;
-    pointer-events: none;
-}
-
-.menu > .menuitem[aria-haspopup] > .content > .icon {
+.menu > .menuitem[aria-haspopup] > .icon {
     visibility: hidden;
 }
 
-.menuitem > .content > .icon,
-.menuitem > .content > .label {
+.menuitem > .icon,
+.menuitem > .label {
     padding: 2px;
 }
 
-.menuitem > .content > .icon {
+.menuitem > .icon {
     flex: none;
     display: inline-block;
     width: 18px;
     height: 18px;
     overflow: hidden;
+    pointer-events: none;
 }
 
-.menuitem > .content > .label {
+.menuitem > .label {
     flex: auto;
     line-height: 18px;
     margin-left: 10px;
     margin-right: 10px;
     text-align: start;
+    pointer-events: none;
 }
 
 .menuitem:not([aria-haspopup])::after {
@@ -179,11 +187,11 @@ e-menuitem::part(arrow)::after {
     content: attr(aria-keyshortcuts);
 }
 
-.menuitem:not([aria-haspopup])[aria-checked] > .content > .icon {
+.menuitem:not([aria-haspopup])[aria-checked="true"] > .icon {
     background-color: var(--activated-item-color);
 }
 
-.menuitem:not([aria-haspopup]) > .content > .icon::before {
+.menuitem:not([aria-haspopup]) > .icon::before {
     display: inline-block;
     width: 18px;
     height: 18px;
@@ -196,15 +204,16 @@ e-menuitem::part(arrow)::after {
     filter: var(--icon-filter, none);
 }
 
-.menuitem > .content > .arrow {
+.menuitem > .arrow {
     flex: none;
     display: inline-block;
     width: 18px;
     height: 18px;
     margin: 1px 4px 1px 1px;
+    pointer-events: none;
 }
 
-.menuitem > .content > .arrow::after {
+.menuitem > .arrow::after {
     display: inline-block;
     width: 18px;
     height: 18px;

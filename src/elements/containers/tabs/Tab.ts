@@ -57,8 +57,8 @@ class HTMLETabElementBase extends HTMLElement implements HTMLETabElement {
 
         this.attachShadow({mode: "open"}).append(
             element("style", {
-                properties: {
-                    innerText: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: inline-block;
                             
@@ -78,7 +78,7 @@ class HTMLETabElementBase extends HTMLElement implements HTMLETabElement {
                             background-color: lightgray;
                         }
                     `
-                }
+                ]
             }),
             element("slot")
         );

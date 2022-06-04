@@ -1,3 +1,4 @@
+import { Fragment } from "../../../../lib";
 import { CustomElement, element } from "../../Element";
 import { HTMLETreeElement } from "./Tree";
 import { HTMLETreeItemElement } from "./TreeItem";
@@ -29,20 +30,19 @@ class HTMLETreeItemGroupElementBase extends HTMLElement implements HTMLETreeItem
     readonly shadowRoot!: ShadowRoot;
 
     static {
-        shadowTemplate = element("template", {
-            content: [
-                element("style", {
-                    properties: {
-                        textContent: /*css*/`
-                            :host {
-                                display: block;
-                            }
-                        `
-                    }
-                }),
-                element("slot")
-            ]
-        });
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
+            element("style", {
+                children: [
+                    /*css*/`
+                        :host {
+                            display: block;
+                        }
+                    `
+                ]
+            }),
+            element("slot")
+        );
     }
 
     constructor() {

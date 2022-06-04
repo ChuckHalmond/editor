@@ -36,15 +36,15 @@ class HTMLELoaderElementBase extends HTMLElement implements HTMLELoaderElement {
 
     static {
         const commonStyle = element("style", {
-            properties: {
-                innerText: /*css*/`
+            children: [
+                /*css*/`
                     :host {
                         display: inline-block;
                         --default-loader-color: rgb(0, 128, 255);
                         --default-animation-duration: 2s;
                     }
                 `
-            }
+            ]
         });
         const barStyle = commonStyle.cloneNode(true);
         const circleStyle = commonStyle.cloneNode(true);
@@ -169,13 +169,19 @@ class HTMLELoaderElementBase extends HTMLElement implements HTMLELoaderElement {
         barShadowTemplate.content.append(
             barStyle,
             element("div", {
-                part: ["bar"],
+                attributes: {
+                    part: "bar"
+                },
                 children: [
                     element("div", {
-                        part: ["slider"],
+                        attributes: {
+                            part: "slider"
+                        },
                         children: [
                             element("div", {
-                                part: ["cursor"]
+                                attributes: {
+                                    part: "cursor"
+                                }
                             })
                         ]
                     })
@@ -186,7 +192,9 @@ class HTMLELoaderElementBase extends HTMLElement implements HTMLELoaderElement {
         circleShadowTemplate.content.append(
             circleStyle,
             element("div", {
-                part: ["circle"]
+                attributes: {
+                    part: "circle"
+                }
             })
         )
     }

@@ -30,13 +30,13 @@ class HTMLEOptionGroupElementBase extends HTMLElement implements HTMLEOptionGrou
         shadowTemplate = element("template");
         shadowTemplate.content.append(
             element("style", {
-                properties: {
-                    textContent: /*css*/`
+                children: [
+                    /*css*/`
                         :host {
                             display: block;
                         }
                     `
-                }
+                ]
             }),
             element("slot")
         );

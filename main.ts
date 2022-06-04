@@ -1,12 +1,11 @@
 //import { MenuItemGroupWidget, MenuItemWidget, MenuWidget, MenuBarWidget } from "./src/views/MenuBarWidget";
 import { TreeItemModel, TreeModel, TreeView } from "./src/views/TreeView";
-import { Editor, HotKey, Key, KeyModifier } from "./index";
+import { Editor, HotKey, Key, KeyModifier, menuWidget } from "./index";
 
 import "./index";
 import { ListItemModel, ListModel, ListView } from "./src/views/ListView";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
 import { element, Fragment, widget } from "./src/elements/Element";
-import { MenuItemModel, MenuModel, MenuView } from "./src/views/MenuView";
 
 export async function main() {
     
@@ -181,14 +180,14 @@ export async function main() {
     gridView.setColumnDelegate((column) => {
         return Fragment(
             element("label", {
-                properties: {
-                    textContent: column.label
-                }
+                children: [
+                    column.label
+                ]
             })/*,
             element("e-toolbar", {
                 children: [
                     element("e-toolbaritem", {
-                        properties: {
+                        attributes: {
                             type: "button"
                         }
                     })
@@ -237,57 +236,18 @@ export async function main() {
     );
 
     document.body.append(gridView);
-
-    /*const menuView = new MenuView(
-        new MenuModel({
-            items: [
-                new MenuItemModel({
-                    name: "MenuItem A1",
-                    label: "MenuItem A1",
-                    type: "submenu",
-                    menu: new MenuModel({
-                        name: "MenuItem A2",
-                        items: [
-                            new MenuItemModel({name: "MenuItem B1", label: "MenuItem B1", type: "checkbox"}),
-                            new MenuItemModel({name: "MenuItem B2", label: "MenuItem B2", type: "checkbox"})
-                        ]
-                    })
-                }),
-            ]
-        })
-    );
-    document.body.append(menuView);*/
-
-    /*const menuView = element("e-menu", {
-        children: [
-            element("e-menuitem", {
-                properties: {
-                    tabIndex: -1,
-                    textContent: "MenuItem 1"
-                }
-            }),
-            element("e-menuitem", {
-                properties: {
-                    tabIndex: -1,
-                    textContent: "MenuItem 2"
-                }
-            })
-        ]
-    });*/
+    
     const menuView = widget("menubar", {
-        children: [
+        slotted: [
             widget("menuitem", {
                 properties: {
                     label: "MenuItem 0",
                     name: "MenuItem 0",
                     type: "menu"
                 },
-                children: [
+                slotted: [
                     widget("menu", {
-                        properties: {
-                            name: "menu"
-                        },
-                        children: [
+                        slotted: [
                             widget("menuitem", {
                                 properties: {
                                     label: "MenuItem 1",
@@ -305,14 +265,11 @@ export async function main() {
                     name: "MenuItem 1",
                     type: "menu"
                 },
-                children: [
+                slotted: [
                     widget("menu", {
-                        properties: {
-                            name: "menu"
-                        },
-                        children: [
+                        slotted: [
                             widget("menuitemgroup", {
-                                children: [
+                                slotted: [
                                     widget("menuitem", {
                                         properties: {
                                             label: "MenuItem 1",
@@ -322,32 +279,36 @@ export async function main() {
                                     }),
                                     widget("menuitem", {
                                         properties: {
+                                            type: "button",
                                             label: "MenuItem 2",
                                             keyshortcut: "Ctrl+A"
                                         }
                                     })
                                 ]
                             }),
+                            widget("separator"),
                             widget("menuitem", {
                                 properties: {
                                     label: "Submenu",
                                     type: "submenu"
                                 },
-                                children: [
+                                slotted: [
                                     widget("menu", {
-                                        properties: {
-                                            name: "submenu"
-                                        },
-                                        children: [
+                                        slotted: [
                                             widget("menuitem", {
                                                 properties: {
                                                     label: "MenuItem 1",
-                                                    type: "checkbox"
+                                                    type: "radio",
+                                                    name: "radio",
+                                                    value: "1"
                                                 }
                                             }),
                                             widget("menuitem", {
                                                 properties: {
-                                                    label: "MenuItem 2"
+                                                    type: "radio",
+                                                    label: "MenuItem 2",
+                                                    name: "radio",
+                                                    value: "2"
                                                 }
                                             })
                                         ]

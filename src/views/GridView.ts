@@ -155,16 +155,16 @@ class GridViewBase extends View implements GridView {
         this.setModel(model ?? new GridModel());
         this.#cellDelegate = (row: GridRowModel, column: GridColumnModel) => {
             return element("label", {
-                properties: {
-                    textContent: column.extract(row)
-                }
+                children: [
+                    column.extract(row)
+                ]
             });
         };
         this.#columnDelegate = (column: GridColumnModel) => {
             return element("label", {
-                properties: {
-                    textContent: column.label
-                }
+                children: [
+                    column.label
+                ]
             });
         };
     }
@@ -211,13 +211,13 @@ class GridViewBase extends View implements GridView {
         const {model} = this;
         return Fragment(
             element("link", {
-                properties: {
+                attributes: {
                     rel: "stylesheet",
                     href: "css/main.css"
                 }
             }),
             element("link", {
-                properties: {
+                attributes: {
                     rel: "stylesheet",
                     href: "css/views/gridview.css"
                 }
@@ -225,18 +225,18 @@ class GridViewBase extends View implements GridView {
             element("div", {
                 children: [
                     element("input", {
-                        properties: {
+                        attributes: {
                             type: "search"
                         },
-                        eventListeners: {
+                        listeners: {
                             input: <EventListener>this.#handleSearchInputEvent.bind(this)
                         }
                     })
                 ]
             }),
             element("e-grid", {
-                properties: {
-                    tabIndex: 0,
+                attributes: {
+                    tabindex: 0,
                     selectby: "row"
                 },
                 children: [
@@ -315,57 +315,61 @@ class GridViewBase extends View implements GridView {
         const gridColumnElement = reactiveElement(
             column,
             element("e-gridcell", {
-                properties: {
-                    tabIndex: -1,
+                attributes: {
+                    tabindex: -1,
                     name: column.name,
                     id: this.resizable ? `${column.name}-columnheader` : void 0,
                     type: "columnheader"
                 },
                 children: [
                     element("span", {
-                        properties: {
-                            className: "gridcell-content"
+                        attributes: {
+                            class: "gridcell-content"
                         },
                         children: (<Node[]>[
                             element("label", {
-                                properties: {
-                                    className: "gridcell-label",
-                                    textContent: column.label
+                                attributes: {
+                                    class: "gridcell-label"
                                 },
-                                eventListeners: {
+                                children: [
+                                    column.label
+                                ],
+                                listeners: {
                                     click: <EventListener>this.#handleColumnLabelClickEvent.bind(this)
                                 }
                             }),
                             element("e-toolbar", {
-                                properties: {
-                                    tabIndex: -1,
+                                attributes: {
+                                    tabindex: -1,
                                 },
                                 children: [
                                     element("e-toolbaritem", {
-                                        properties: {
+                                        attributes: {
                                             type: "menubutton",
-                                            tabIndex: -1,
+                                            tabindex: -1,
                                         },
                                         children: [
                                             element("e-menubutton",  {
-                                                properties: {
+                                                attributes: {
                                                     slot: "menubutton",
-                                                    tabIndex: -1,
+                                                    tabindex: -1,
                                                 },
                                                 children: [
                                                     element("e-menu",  {
-                                                        properties: {
+                                                        attributes: {
                                                             slot: "menu",
-                                                            tabIndex: -1,
+                                                            tabindex: -1,
                                                         },
                                                         children: [
                                                             element("e-menuitem",  {
-                                                                properties: {
+                                                                attributes: {
                                                                     type: "button",
-                                                                    textContent: "Resize column",
-                                                                    tabIndex: -1,
+                                                                    tabindex: -1,
                                                                 },
-                                                                eventListeners: {
+                                                                children: [
+                                                                    "Resize Column"
+                                                                ],
+                                                                listeners: {
                                                                     trigger: () => {
                                                                         const columnHeaderElement = this.getColumnHeaderElement(column);
                                                                         if (columnHeaderElement) {
@@ -379,40 +383,44 @@ class GridViewBase extends View implements GridView {
                                                                 }
                                                             }),
                                                             element("e-menuitem",  {
-                                                                properties: {
+                                                                attributes: {
                                                                     type: "submenu",
-                                                                    textContent: "Sort",
-                                                                    tabIndex: -1,
+                                                                    tabindex: -1,
                                                                 },
                                                                 children: [
+                                                                    "Sort",
                                                                     reactiveElement(
                                                                         column,
                                                                         element("e-menu",  {
-                                                                            properties: {
+                                                                            attributes: {
                                                                                 slot: "menu",
-                                                                                tabIndex: -1,
+                                                                                tabindex: -1,
                                                                             },
                                                                             children: [
                                                                                 element("e-menuitem",  {
-                                                                                    properties: {
+                                                                                    attributes: {
                                                                                         type: "radio",
                                                                                         name: "sort",
-                                                                                        textContent: "Ascending",
                                                                                         value: "1",
-                                                                                        tabIndex: -1,
-                                                                                    }
+                                                                                        tabindex: -1,
+                                                                                    },
+                                                                                    children: [
+                                                                                        "Ascending"
+                                                                                    ]
                                                                                 }),
                                                                                 element("e-menuitem",  {
-                                                                                    properties: {
+                                                                                    attributes: {
                                                                                         type: "radio",
                                                                                         name: "sort",
-                                                                                        textContent: "Descending",
                                                                                         value: "-1",
-                                                                                        tabIndex: -1,
-                                                                                    }
+                                                                                        tabindex: -1,
+                                                                                    },
+                                                                                    children: [
+                                                                                        "Descending"
+                                                                                    ]
                                                                                 })
                                                                             ],
-                                                                            eventListeners: {
+                                                                            listeners: {
                                                                                 trigger: (event) => {
                                                                                     const {target} = event;
                                                                                     const sortOrder = (<HTMLEMenuItemElement>target).value;
@@ -422,36 +430,37 @@ class GridViewBase extends View implements GridView {
                                                                         }),
                                                                         ["sortorder"],
                                                                         (menu, property, oldValue, newValue) => {
-                                                                            /*Array.from(menu.items).filter(item_i => item_i.name.startsWith("sort"))
-                                                                                .forEach((sortRadioItem_i => {
-                                                                                    sortRadioItem_i.checked = parseInt(sortRadioItem_i.value) === newValue;
-                                                                                })
-                                                                            );*/
+                                                                            menu.querySelectorAll<HTMLEMenuItemElement>("e-menuitem[name^=sort]")
+                                                                            .forEach(sortRadioItem_i => {
+                                                                                sortRadioItem_i.checked = parseInt(sortRadioItem_i.value) === newValue;
+                                                                            });
                                                                         }
                                                                     )
                                                                 ]
                                                             }),
                                                             element("e-menuitem",  {
-                                                                properties: {
+                                                                attributes: {
                                                                     type: "submenu",
-                                                                    textContent: "Filter",
-                                                                    tabIndex: -1,
+                                                                    tabindex: -1,
                                                                 },
                                                                 children: [
+                                                                    "Filter",
                                                                     element("e-menu",  {
-                                                                        properties: {
+                                                                        attributes: {
                                                                             slot: "menu",
-                                                                            tabIndex: -1,
+                                                                            tabindex: -1,
                                                                         },
                                                                         children: column.filters.map((filter_i, i) =>
                                                                             element("e-menuitem", {
-                                                                                properties: {
-                                                                                    tabIndex: -1,
-                                                                                    textContent: filter_i.name,
+                                                                                attributes: {
+                                                                                    tabindex: -1,
                                                                                     type: "checkbox",
                                                                                     checked: this.#displayFilters.includes(filter_i)
                                                                                 },
-                                                                                eventListeners: {
+                                                                                children: [
+                                                                                    filter_i.name
+                                                                                ],
+                                                                                listeners: {
                                                                                     trigger: (event) => {
                                                                                         const {currentTarget} = event;
                                                                                         if (currentTarget instanceof HTMLEMenuItemElement) {
@@ -481,10 +490,10 @@ class GridViewBase extends View implements GridView {
                         ]).concat(
                             this.resizable ? [
                                 element("e-wsash", {
-                                    properties: {
+                                    attributes: {
                                         controls: `${column.name}-columnheader`
                                     },
-                                    eventListeners: {
+                                    listeners: {
                                         resize: () => {
                                             this.getColumnDataElements(column).forEach(
                                                 cell_i => cell_i.style.removeProperty("max-width")
@@ -517,8 +526,8 @@ class GridViewBase extends View implements GridView {
     #renderGridBodyRow(row: GridRowModel): Element {
         const {model} = this;
         const gridRowElement = element("e-gridrow", {
-            properties: {
-                tabIndex: -1
+            attributes: {
+                tabindex: -1
             },
             children: reactiveChildElements(
                 model.columns, column => this.#renderGridDataCell(row, column)
@@ -530,7 +539,7 @@ class GridViewBase extends View implements GridView {
 
     #renderGridDataCell(row: GridRowModel, column: GridColumnModel): Element {
         const gridCellElement = element("e-gridcell", {
-            properties: {
+            attributes: {
                 type: "gridcell",
                 headers: column.name
             },

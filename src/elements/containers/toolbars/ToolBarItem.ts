@@ -65,31 +65,36 @@ class HTMLEToolBarItemElementBase extends HTMLEActionElement implements HTMLEToo
     #select: HTMLESelectElement | null;
 
     static {
-        shadowTemplate = element("template", {
-            content: [
-                element("span", {
-                    part: ["content"],
-                    children: [
-                        element("span", {
-                            part: ["icon"]
-                        }),
-                        element("span", {
-                            part: ["label"]
-                        }),
-                        element("slot", {
-                            properties: {
-                                name: "select"
-                            }
-                        }),
-                        element("slot", {
-                            properties: {
-                                name: "menubutton"
-                            }
-                        })
-                    ]
-                })
-            ]
-        });
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
+            element("span", {
+                attributes: {
+                    part: "content"
+                },
+                children: [
+                    element("span", {
+                        attributes: {
+                            part: "icon"
+                        }
+                    }),
+                    element("span", {
+                        attributes: {
+                            part: "label"
+                        }
+                    }),
+                    element("slot", {
+                        attributes: {
+                            name: "select"
+                        }
+                    }),
+                    element("slot", {
+                        attributes: {
+                            name: "menubutton"
+                        }
+                    })
+                ]
+            })
+        )
         slottedKeyboardListeners = new WeakMap();
         slottedTriggerListeners = new WeakMap();
     }
@@ -299,15 +304,15 @@ var EToolBarItem = <EToolBarItemConstructor>Object.assign(
             select.slot = "select";
         }
         return element("e-toolbaritem", {
-            properties: {
-                tabIndex: -1,
+            attributes: {
+                tabindex: -1,
                 title: label,
                 name: name,
                 value: value,
                 type: type
             },
             children: menubutton ? [menubutton] : select ? [select] : void 0,
-            eventListeners: {
+            listeners: {
                 trigger: trigger
             }
         });

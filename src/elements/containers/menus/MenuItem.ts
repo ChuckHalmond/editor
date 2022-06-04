@@ -50,28 +50,32 @@ class HTMLEMenuItemElementBase extends HTMLEActionElement implements HTMLEMenuIt
     type!: "button" | "checkbox" | "radio" | "menu" | "submenu";
 
     static {
-        shadowTemplate = element("template", {
-            content: [
-                element("span", {
-                    part: ["content"],
-                    children: [
-                        element("span", {part: ["icon"]}),
-                        element("span", {
-                            part: ["label"],
-                            children: [
-                                element("slot")
-                            ]
-                        }),
-                        element("span", {part: ["arrow"]})
-                    ]
-                }),
-                element("slot", {
-                    properties: {
-                        name: "menu"
-                    }
-                })
-            ]
-        });
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
+            element("span", {
+                attributes: {
+                    part: "icon"
+                }
+            }),
+            element("span", {
+                attributes: {
+                    part: "label"
+                },
+                children: [
+                    element("slot")
+                ]
+            }),
+            element("span", {
+                attributes: {
+                    part: "arrow"
+                }
+            }),
+            element("slot", {
+                attributes: {
+                    name: "menu"
+                }
+            })
+        );
     }
 
     constructor() {
@@ -233,16 +237,20 @@ var EMenuItem = <EMenuItemConstructor>Object.assign(
             menu.slot = "menu";
         }
         return element("e-menuitem", {
-            properties: {
-                tabIndex: -1,
+            attributes: {
+                tabindex: -1,
                 title: label,
                 name: name,
                 value: value,
-                type: type,
-                textContent: label
+                type: type
             },
-            children: menu ? [menu] : void 0,
-            eventListeners: {
+            children: menu ? [
+                label,
+                menu
+            ] : [
+                label
+            ],
+            listeners: {
                 trigger: trigger
             }
         });
