@@ -10,8 +10,8 @@ interface WidgetFactoryConstructor {
     new (): WidgetFactory;
 }
 interface WidgetFactory {
-    create(properties?: object): HTMLElement;
-    slot(root: HTMLElement, name: string | null): HTMLElement;
+    create(init?: object): HTMLElement;
+    slot(root: HTMLElement, name: string | null): HTMLElement | null;
     get slots(): string[];
 }
 declare var WidgetFactory: WidgetFactoryConstructor;

@@ -30,6 +30,6 @@ declare var menubarWidget: {
     "__#49@#handleClickEvent"(event: MouseEvent): void;
     "__#49@#handleKeyDownEvent"(event: KeyboardEvent): void;
     "__#49@#handleTriggerEvent"(event: Event): void;
-    slot(root: HTMLElement, name: string | null): HTMLElement;
+    slot(root: HTMLElement, name: string | null): HTMLElement | null;
     readonly slots: string[];
 };

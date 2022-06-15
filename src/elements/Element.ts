@@ -434,21 +434,25 @@ function widget<K extends keyof WidgetNameMap>(
             if (slotted) {
                 if (typeof slotted == "function" || Array.isArray(slotted) || slotted instanceof NodeList) {
                     const slot = widget.slot(element, null);
-                    if (typeof slotted == "function") {
-                        slot.append(...slotted(element));
-                    }
-                    else {
-                        slot.append(...Array.from(slotted));
-                    }
-                }
-                else {
-                    Object.entries(slotted).forEach(([slot_i, slotted]) => {
-                        const slot = widget.slot(element, slot_i);
+                    if (slot) {
                         if (typeof slotted == "function") {
                             slot.append(...slotted(element));
                         }
                         else {
                             slot.append(...Array.from(slotted));
+                        }
+                    }
+                }
+                else {
+                    Object.entries(slotted).forEach(([slot_i, slotted]) => {
+                        const slot = widget.slot(element, slot_i);
+                        if (slot) {
+                            if (typeof slotted == "function") {
+                                slot.append(...slotted(element));
+                            }
+                            else {
+                                slot.append(...Array.from(slotted));
+                            }
                         }
                     });
                 }
@@ -466,7 +470,7 @@ function widget<K extends keyof WidgetNameMap>(
         }
         return element;
     }
-    throw new Error(`Unknown widget ${name}.`);
+    throw new Error(`Unknown widget ${name}`);
 }
 
 const reactiveElementsMap = new WeakMap<ModelNode, {

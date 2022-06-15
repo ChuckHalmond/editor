@@ -13,7 +13,8 @@ interface MenuItemGroupWidgetFactory extends WidgetFactory {
     create(): HTMLElement;
 }
 
-var menuItemGroupWidget = new (Widget({
+var menuItemGroupWidget = new (
+Widget({
     name: "menuitemgroup"
 })(class MenuItemGroupWidgetFactoryBase extends WidgetFactory {
     #template: HTMLElement;

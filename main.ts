@@ -243,7 +243,8 @@ export async function main() {
                 properties: {
                     label: "MenuItem 0",
                     name: "MenuItem 0",
-                    type: "menu"
+                    type: "menu",
+                    disabled: true
                 },
                 slotted: [
                     widget("menu", {
@@ -274,7 +275,9 @@ export async function main() {
                                         properties: {
                                             label: "MenuItem 1",
                                             type: "checkbox",
-                                            keyshortcut: "Ctrl+B"
+                                            keyshortcut: "Ctrl+B",
+                                            disabled: true,
+                                            checked: true
                                         }
                                     }),
                                     widget("menuitem", {

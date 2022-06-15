@@ -14,6 +14,7 @@ interface MenuItemWidgetFactory extends WidgetFactory {
         name?: string;
         keyshortcut?: string;
         value?: string;
+        disabled?: boolean;
     }): HTMLElement;
     slottedCallback(item: HTMLElement, slot: HTMLElement): void;
     getMenu(item: HTMLElement): HTMLElement | null;
@@ -41,6 +42,7 @@ interface MenuItemWidgetFactory extends WidgetFactory {
 declare var menuItemWidget: {
     "__#48@#iconPartTemplate": HTMLElement;
     "__#48@#arrowPartTemplate": HTMLElement;
+    "__#48@#keyshortcutsPartTemplate": HTMLElement;
     "__#48@#template": HTMLElement;
     "__#48@#types": MenuItemType[];
     "__#48@#typesFeatures": {
@@ -70,14 +72,16 @@ declare var menuItemWidget: {
             hasArrow: boolean;
         };
     };
-    create(properties?: {
+    create(init?: {
         type: MenuItemType;
         checked?: boolean | undefined;
         label?: string | undefined;
         name?: string | undefined;
         keyshortcut?: string | undefined;
         value?: string | undefined;
+        disabled?: boolean | undefined;
     } | undefined): HTMLElement;
+    slot(root: HTMLElement, name: string | null): HTMLElement | null;
     slottedCallback(item: HTMLElement, slot: HTMLElement): void;
     "__#48@#label"(item: HTMLElement): HTMLElement;
     getMenu(item: HTMLElement): HTMLElement | null;
@@ -91,17 +95,17 @@ declare var menuItemWidget: {
     setValue(item: HTMLElement, value: string): void;
     getName(item: HTMLElement): string;
     setName(item: HTMLElement, value: string): void;
-    getChecked(item: HTMLElement): any;
+    getChecked(item: HTMLElement): boolean;
     setChecked(item: HTMLElement, value: boolean): void;
-    setDisabled(item: HTMLElement, value: boolean): void;
     getDisabled(item: HTMLElement): boolean;
+    setDisabled(item: HTMLElement, value: boolean): void;
     setExpanded(item: HTMLElement, value: boolean): void;
     getExpanded(item: HTMLElement): boolean;
     trigger(item: HTMLElement): void;
     toggle(item: HTMLElement, force?: boolean | undefined): void;
     expand(item: HTMLElement): void;
     collapse(item: HTMLElement): void;
+    "__#48@#handleClickEvent"(event: MouseEvent): void;
     "__#48@#positionMenu"(item: HTMLElement): void;
-    slot(root: HTMLElement, name: string | null): HTMLElement;
     readonly slots: string[];
 };

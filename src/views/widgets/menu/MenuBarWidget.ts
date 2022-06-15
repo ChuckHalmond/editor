@@ -14,7 +14,8 @@ interface MenuBarWidgetFactory extends WidgetFactory {
     getExpanded(menubar: HTMLElement): boolean;
 }
 
-var menubarWidget = new (Widget({
+var menubarWidget = new (
+Widget({
     name: "menubar"
 })(class MenubarWidgetFactoryBase extends WidgetFactory {
     #template: HTMLElement;
@@ -25,8 +26,8 @@ var menubarWidget = new (Widget({
         this.#template = element("div", {
             attributes: {
                 class: "menubar",
-                tabindex: -1,
-                role: "menubar"
+                role: "menubar",
+                tabindex: -1
             }
         });
         this.#walker = document.createTreeWalker(
@@ -242,13 +243,17 @@ var menubarWidget = new (Widget({
     }
 
     #handleTriggerEvent(event: Event): void {
-        const {currentTarget} = event;
+        const {target, currentTarget} = event;
         const menubar = <HTMLElement>currentTarget;
-        const activeItem = this.#getActiveItem(menubar);
-        if (activeItem !== null && menuItemWidget.getExpanded(activeItem)) {
-            menuItemWidget.collapse(activeItem);
+        const expanded = this.getExpanded(menubar);
+        if (expanded && target instanceof HTMLElement && target.classList.contains("menuitem")) {
+            const targetType = menuItemWidget.getType(target);
+            const activeItem = this.#getActiveItem(menubar);
+            if (target !== activeItem && targetType !== "menu" && targetType !== "submenu") {
+                menuItemWidget.collapse(target);
+                this.setExpanded(menubar, false);
+                menubar.focus({preventScroll: true});
+            }
         }
-        this.setExpanded(menubar, false);
-        menubar.focus({preventScroll: true});
     }
 }));

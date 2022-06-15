@@ -13,7 +13,8 @@ interface SeparatorWidgetFactory extends WidgetFactory {
 
 }
 
-var separatorWidget = new (Widget({
+var separatorWidget = new (
+Widget({
     name: "separator"
 })(class SeparatorWidgetFactory extends WidgetFactory {
     #template: HTMLElement;

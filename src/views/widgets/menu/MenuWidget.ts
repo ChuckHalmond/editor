@@ -12,18 +12,19 @@ declare global {
 
 interface MenuWidgetFactory extends WidgetFactory {
     create(properties?: {
-        id?: string;
         contextual?: boolean;
     }): HTMLElement;
     positionContextual(menu: HTMLElement, x: number, y: number): void;
     getContextual(menu: HTMLElement): boolean;
     setContextual(menu: HTMLElement, value: boolean): void;
-    getId(menu: HTMLElement): string;
-    setId(menu: HTMLElement, value: string): void;
     items(menu: HTMLElement): HTMLElement[];
 }
 
-var menuWidget = new (Widget({
+var mouseOverExpandDelay = 0_200;
+var mouseOutCollapseDelay = 0_400;
+
+var menuWidget = new (
+Widget({
     name: "menu"
 })(class MenuWidgetFactoryBase extends WidgetFactory implements MenuWidgetFactory {
 
@@ -36,8 +37,8 @@ var menuWidget = new (Widget({
         this.#template = element("div", {
             attributes: {
                 class: "menu",
-                tabindex: -1,
-                role: "menu"
+                role: "menu",
+                tabindex: -1
             }
         });
         this.#walker = document.createTreeWalker(
@@ -46,22 +47,17 @@ var menuWidget = new (Widget({
         this.#toggleTimeouts = new WeakMap();
     }
 
-    create(properties?: {
-        id?: string;
+    create(init?: {
         contextual?: boolean;
-    }) {
+    }): HTMLElement {
         const menu = <HTMLElement>this.#template.cloneNode(true);
-        menu.addEventListener("click", this.#handleClickEvent.bind(this));
         menu.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
         menu.addEventListener("mouseout", this.#handleMouseOutEvent.bind(this));
         menu.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         menu.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         menu.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
-        if (properties !== void 0) {
-            const {id, contextual} = properties;
-            if (id !== void 0) {
-                this.setId(menu, id);
-            }
+        if (init !== void 0) {
+            const {contextual} = init;
             if (contextual !== void 0) {
                 this.setContextual(menu, contextual);
             }
@@ -97,21 +93,13 @@ var menuWidget = new (Widget({
         }
     }
 
-    getId(menu: HTMLElement): string {
-        return menu.id ?? "";
-    }
-
-    setId(menu: HTMLElement, value: string): void {
-        menu.id = value;
-    }
-
-    items(menu: HTMLElement) {
+    items(menu: HTMLElement): HTMLElement[] {
         return Array.from(menu.querySelectorAll<HTMLElement>(
             ":is(:scope, :scope > .menuitemgroup) > .menuitem"
         ));
     }
 
-    #walkerNodeFilter(node: Node) {
+    #walkerNodeFilter(node: Node): number {
         if (node instanceof HTMLElement) {
             const {classList} = node;
             if (classList.contains("menuitem")) {
@@ -130,7 +118,7 @@ var menuWidget = new (Widget({
     }
 
     #isClosestMenu(menu: HTMLElement, target: HTMLElement): boolean {
-        return target.closest(":is(.menu)") == menu;
+        return target.closest(".menu") == menu;
     }
 
     #nearestItem(menu: HTMLElement, target: HTMLElement): HTMLElement | null {
@@ -179,37 +167,6 @@ var menuWidget = new (Widget({
         );
     }
 
-    #handleClickEvent(event: MouseEvent): void {
-        const {target, currentTarget} = event;
-        const menu = <HTMLElement>currentTarget;
-        if (target instanceof HTMLElement && target.classList.contains("menuitem")) {
-            const isClosestMenu = this.#isClosestMenu(menu, target);
-            if (isClosestMenu) {
-                menuItemWidget.trigger(target);
-            }
-        }
-    }
-
-    #handleFocusOutEvent(event: FocusEvent): void {
-        const {target, currentTarget, relatedTarget} = event;
-        const menu = <HTMLElement>currentTarget;
-        const lostFocusWithin = !menu.contains(<Node>relatedTarget);
-        if (lostFocusWithin && target instanceof HTMLElement) {
-            const contextual = this.getContextual(menu);
-            if (contextual) {
-                try {
-                    menu.remove();
-                } catch (error) {};
-            }
-            else {
-                const nearestItem = this.#nearestItem(menu, target);
-                if (nearestItem) {
-                    menuItemWidget.collapse(nearestItem);
-                }
-            }
-        }
-    }
-
     async #setItemTimeout(item: HTMLElement, delay?: number): Promise<void> {
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
@@ -234,7 +191,27 @@ var menuWidget = new (Widget({
         }
     }
 
-    #handleKeyDownEvent(event: KeyboardEvent) {
+    #handleFocusOutEvent(event: FocusEvent): void {
+        const {target, currentTarget, relatedTarget} = event;
+        const menu = <HTMLElement>currentTarget;
+        const lostFocusWithin = !menu.contains(<Node>relatedTarget);
+        if (lostFocusWithin && target instanceof HTMLElement) {
+            const contextual = this.getContextual(menu);
+            if (contextual) {
+                try {
+                    menu.remove();
+                } catch (error) {};
+            }
+            else {
+                const nearestItem = this.#nearestItem(menu, target);
+                if (nearestItem) {
+                    menuItemWidget.collapse(nearestItem);
+                }
+            }
+        }
+    }
+
+    #handleKeyDownEvent(event: KeyboardEvent): void {
         const {currentTarget, key} = event;
         const menu = <HTMLElement>currentTarget;
         const activeItem = this.#getActiveItem(menu);
@@ -276,15 +253,12 @@ var menuWidget = new (Widget({
                             menuItemWidget.expand(activeItem);
                             const firstChildItem = this.#firstChildItem(activeItem);
                             firstChildItem?.focus({preventScroll: true});
-                            break;
-                        }
-                        default: {
-                            menuItemWidget.trigger(activeItem);
+                            event.preventDefault();
                             break;
                         }
                     }
                     event.stopPropagation();
-                    event.preventDefault();
+                    
                 }
                 break;
             }
@@ -333,7 +307,6 @@ var menuWidget = new (Widget({
                 break;
             }
         }
-        event.preventDefault();
     }
 
     #handleMouseOutEvent(event: MouseEvent): void {
@@ -355,7 +328,7 @@ var menuWidget = new (Widget({
                         menuItemWidget.getType(activeItem) == "submenu" &&
                         menuItemWidget.getExpanded(activeItem)) {
                         this.#clearItemTimeout(activeItem);
-                        this.#setItemTimeout(activeItem, 400)
+                        this.#setItemTimeout(activeItem, mouseOutCollapseDelay)
                             .then(() => {
                                 menuItemWidget.collapse(activeItem);
                             })
@@ -403,7 +376,7 @@ var menuWidget = new (Widget({
                             menuItemWidget.getExpanded(activeItem) && 
                             !activeItem.contains(<HTMLElement>target)) {
                             this.#clearItemTimeout(activeItem);
-                            this.#setItemTimeout(activeItem, 400)
+                            this.#setItemTimeout(activeItem, mouseOutCollapseDelay)
                                 .then(() => {
                                     menuItemWidget.collapse(activeItem);
                                 })
@@ -414,7 +387,7 @@ var menuWidget = new (Widget({
                     if (menuItemWidget.getType(nearestItem) == "submenu") {
                         if (!menuItemWidget.getExpanded(nearestItem)) {
                             this.#clearItemTimeout(nearestItem);
-                            this.#setItemTimeout(nearestItem, 200)
+                            this.#setItemTimeout(nearestItem, mouseOverExpandDelay)
                                 .then(() => {
                                     const activeItem = this.#getActiveItem(menu);
                                     this.#collapseSubmenus(menu);

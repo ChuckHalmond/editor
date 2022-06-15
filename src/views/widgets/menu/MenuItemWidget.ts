@@ -19,6 +19,7 @@ interface MenuItemWidgetFactory extends WidgetFactory {
         name?: string;
         keyshortcut?: string;
         value?: string;
+        disabled?: boolean;
     }): HTMLElement;
     slottedCallback(item: HTMLElement, slot: HTMLElement): void;
     getMenu(item: HTMLElement): HTMLElement | null;
@@ -44,11 +45,14 @@ interface MenuItemWidgetFactory extends WidgetFactory {
     collapse(item: HTMLElement): void;
 }
 
-var menuItemWidget = new (Widget({
+var menuItemWidget = new(
+Widget({
     name: "menuitem"
-})(class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetFactory {
+})(
+class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetFactory {
     #iconPartTemplate: HTMLElement;
     #arrowPartTemplate : HTMLElement;
+    #keyshortcutsPartTemplate: HTMLElement;
     #template: HTMLElement;
     #types: MenuItemType[];
     #typesFeatures: {
@@ -71,12 +75,17 @@ var menuItemWidget = new (Widget({
                 class: "arrow"
             }
         });
+        this.#keyshortcutsPartTemplate = element("span", {
+            attributes: {
+                class: "keyshortcuts"
+            }
+        });
         this.#template = element("button", {
             attributes: {
                 class: "menuitem",
-                tabindex: -1,
+                role: "menuitem",
                 type: "button",
-                role: "menuitem"
+                tabindex: -1
             },
             children: [
                 this.#iconPartTemplate.cloneNode(true),
@@ -117,17 +126,19 @@ var menuItemWidget = new (Widget({
         }
     }
 
-    create(properties?: {
+    create(init?: {
         type: MenuItemType;
         checked?: boolean;
         label?: string;
         name?: string;
         keyshortcut?: string;
         value?: string;
+        disabled?: boolean;
     }): HTMLElement {
         const item = <HTMLElement>this.#template.cloneNode(true);
-        if (properties !== void 0) {
-            const {keyshortcut, checked, type, label, name, value} = properties;
+        item.addEventListener("click", this.#handleClickEvent.bind(this));
+        if (init !== void 0) {
+            const {keyshortcut, checked, type, label, name, value, disabled} = init;
             if (keyshortcut !== void 0) {
                 this.setKeyShortcut(item, keyshortcut);
             }
@@ -146,8 +157,15 @@ var menuItemWidget = new (Widget({
             if (value !== void 0) {
                 this.setValue(item, value);
             }
+            if (disabled !== void 0) {
+                this.setDisabled(item, disabled);
+            }
         }
         return item;
+    }
+
+    slot(root: HTMLElement, name: string | null): HTMLElement | null {
+        return root;
     }
 
     slottedCallback(item: HTMLElement, slot: HTMLElement): void {
@@ -157,36 +175,51 @@ var menuItemWidget = new (Widget({
         item.setAttribute("aria-haspopup", hasChildMenu.toString());
     }
 
-    #label(item: HTMLElement) {
-        return item.querySelector<HTMLElement>(":scope > .label")!;
+    #label(item: HTMLElement): HTMLElement {
+        const label = item.querySelector<HTMLElement>(":scope > .label");
+        if (!label) {
+            throw new Error(`No label found.`);
+        }
+        return label;
     }
 
-    getMenu(item: HTMLElement) {
+    getMenu(item: HTMLElement): HTMLElement | null {
         return item.querySelector<HTMLElement>(":scope > .menu");
     }
 
-    getKeyShortcut(item: HTMLElement) {
+    getKeyShortcut(item: HTMLElement): string | null {
         return item.getAttribute("aria-keyshortcuts");
     }
 
-    setKeyShortcut(item: HTMLElement, value: string | null) {
+    setKeyShortcut(item: HTMLElement, value: string | null): void {
+        let keyshortcutsPart = item.querySelector(":scope > .keyshortcuts");
         if (value !== null) {
             item.setAttribute("aria-keyshortcuts", value);
+            if (!keyshortcutsPart) {
+                const labelPart = this.#label(item);
+                const keyshortcutsPartTemplate = this.#keyshortcutsPartTemplate;
+                keyshortcutsPart = <HTMLElement>keyshortcutsPartTemplate.cloneNode(true);
+                labelPart.after(keyshortcutsPart);
+            }
+            keyshortcutsPart.textContent = value;
         }
         else {
             item.removeAttribute("aria-keyshortcuts");
+            if (keyshortcutsPart) {
+                keyshortcutsPart.remove();
+            }
         }
     }
 
-    getLabel(item: HTMLElement) {
+    getLabel(item: HTMLElement): string {
         return this.#label(item).textContent ?? "";
     }
 
-    setLabel(item: HTMLElement, value: string) {
+    setLabel(item: HTMLElement, value: string): void {
         this.#label(item).textContent = value;
     }
     
-    getType(item: HTMLElement) {
+    getType(item: HTMLElement): MenuItemType | null {
         const types = this.#types;
         const {classList} = item;
         for (let type_i of types) {
@@ -197,7 +230,7 @@ var menuItemWidget = new (Widget({
         return null;
     }
 
-    setType(item: HTMLElement, type: MenuItemType) {
+    setType(item: HTMLElement, type: MenuItemType): void {
         const typesFeatures = this.#typesFeatures;
         const iconPartTemplate = this.#iconPartTemplate;
         const arrowPartTemplate = this.#arrowPartTemplate;
@@ -209,7 +242,7 @@ var menuItemWidget = new (Widget({
         }
         classList.add(`menuitem-${type}`);
         item.setAttribute("role", role);
-        const labelPart = item.querySelector(":scope > .label");
+        const labelPart = this.#label(item);
         const iconPart = item.querySelector(":scope > .icon");
         const arrowPart = item.querySelector(":scope > .arrow");
         if (hasIcon) {
@@ -234,92 +267,111 @@ var menuItemWidget = new (Widget({
         }
     }
 
-    getValue(item: HTMLElement) {
+    getValue(item: HTMLElement): string {
         return item.getAttribute("value") ?? "";
     }
 
-    setValue(item: HTMLElement, value: string) {
+    setValue(item: HTMLElement, value: string): void {
         item.setAttribute("value", value);
     }
     
-    getName(item: HTMLElement) {
+    getName(item: HTMLElement): string {
         return item.getAttribute("name") ?? "";
     }
 
-    setName(item: HTMLElement, value: string) {
+    setName(item: HTMLElement, value: string): void {
         item.setAttribute("name", value);
     }
 
-    getChecked(item: HTMLElement) {
+    getChecked(item: HTMLElement): boolean {
         return JSON.parse(item.getAttribute("aria-checked") ?? false.toString());
     }
 
-    setChecked(item: HTMLElement, value: boolean) {
+    setChecked(item: HTMLElement, value: boolean): void {
         item.setAttribute("aria-checked", value.toString());
     }
 
-    setDisabled(item: HTMLElement, value: boolean) {
-        item.toggleAttribute("disabled", value);
+    getDisabled(item: HTMLElement): boolean {
+        return item.hasAttribute("aria-disabled");
     }
 
-    getDisabled(item: HTMLElement) {
-        return item.hasAttribute("disabled");
+    setDisabled(item: HTMLElement, value: boolean): void {
+        item.toggleAttribute("aria-disabled", value);
     }
 
-    setExpanded(item: HTMLElement, value: boolean) {
+    setExpanded(item: HTMLElement, value: boolean): void {
         item.toggleAttribute("aria-expanded", value);
     }
 
-    getExpanded(item: HTMLElement) {
+    getExpanded(item: HTMLElement): boolean {
         return item.hasAttribute("aria-expanded");
     }
 
-    trigger(item: HTMLElement) {
-        const type = this.getType(item);
-        switch (type) {
-            case "checkbox": {
-                this.setChecked(item, !this.getChecked(item));
-                break;
+    trigger(item: HTMLElement): void {
+        const disabled = this.getDisabled(item);
+        if (!disabled) {
+            const type = this.getType(item);
+            switch (type) {
+                case "checkbox": {
+                    this.setChecked(item, !this.getChecked(item));
+                    break;
+                }
+                case "radio": {
+                    this.setChecked(item, true);
+                    break;
+                }
+                case "menu":
+                case "submenu": {
+                    this.toggle(item);
+                    break;
+                }
             }
-            case "radio": {
-                this.setChecked(item, true);
-                break;
+            item.dispatchEvent(new Event("trigger", {
+                bubbles: true
+            }));
+        }
+    }
+
+    toggle(item: HTMLElement, force?: boolean): void {
+        const disabled = this.getDisabled(item);
+        if (!disabled) {
+            const expand = force ?? !this.getExpanded(item);
+            this.setExpanded(item, expand);
+            if (expand) {
+                this.#positionMenu(item);
             }
-            case "menu":
-            case "submenu": {
-                this.toggle(item);
-                break;
+        }
+    }
+
+    expand(item: HTMLElement): void {
+        const disabled = this.getDisabled(item);
+        if (!disabled) {
+            const expanded = this.getExpanded(item);
+            if (!expanded) {
+                this.setExpanded(item, true);
+                this.#positionMenu(item);
             }
         }
-        item.dispatchEvent(new Event("trigger", {
-            bubbles: true
-        }));
     }
 
-    toggle(item: HTMLElement, force?: boolean) {
-        const expand = force ?? !this.getExpanded(item);
-        this.setExpanded(item, expand);
-        if (expand) {
-            this.#positionMenu(item);
+    collapse(item: HTMLElement): void {
+        const disabled = this.getDisabled(item);
+        if (!disabled) {
+            const expanded = this.getExpanded(item);
+            if (expanded) {
+                this.setExpanded(item, false);
+            }
         }
     }
 
-    expand(item: HTMLElement) {
-        const expanded = this.getExpanded(item);
-        if (!expanded) {
-            this.setExpanded(item, true);
-            this.#positionMenu(item);
+    #handleClickEvent(event: MouseEvent): void {
+        const {target, currentTarget} = event;
+        if (target == currentTarget) {
+            this.trigger(<HTMLElement>currentTarget);
         }
     }
 
-    collapse(item: HTMLElement) {
-        const expanded = this.getExpanded(item);
-        if (expanded) {
-            this.setExpanded(item, false);
-        }
-    }
-
-    #positionMenu(item: HTMLElement) {
+    #positionMenu(item: HTMLElement): void {
         const menu = this.getMenu(item);
         if (menu !== null) {
             const {style: menuStyle} = menu;

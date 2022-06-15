@@ -1,63 +1,66 @@
+/*import { Widget } from "../../../elements/Element";
 import { CustomElement, AttributeProperty, element } from "../../Element";
-import { HTMLETreeItemElement } from "./TreeItem";
-import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
+import { WidgetFactory } from "../Widget";
 
 export { HTMLETreeElement };
 
-interface HTMLETreeElementConstructor {
-    readonly prototype: HTMLETreeElement;
-    new(): HTMLETreeElement;
-}
-
-interface HTMLETreeElement extends HTMLElement {
-    readonly shadowRoot: ShadowRoot;
-    readonly items: HTMLCollectionOf<HTMLETreeItemElement>;
-    readonly activeItem: HTMLETreeItemElement | null;
-    readonly dropTargetItem: HTMLETreeItemElement | null;
-    droptarget: boolean;
-    name: string;
-    selectedItems(): HTMLETreeItemElement[];
-    beginSelection(): void;
-    endSelection(): void;
+interface TreeWidgetFactory extends WidgetFactory {
+    create(properties?: {
+        contextual?: boolean;
+    }): HTMLElement;
+    items(tree: HTMLElement): HTMLElement[];
+    selectedItems(tree: HTMLElement): HTMLElement[];
+    beginSelection(tree: HTMLElement): void;
+    endSelection(tree: HTMLElement): void;
 }
 
 declare global {
-    interface HTMLElementTagNameMap {
-        "e-tree": HTMLETreeElement,
+    interface WidgetNameMap {
+        "tree": TreeWidgetFactory,
     }
 }
 
 var shadowTemplate: HTMLTemplateElement;
 
-@CustomElement({
-    name: "e-tree"
-})
-class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
+var treeWidget = new (
+Widget({
+    name: "tree"
+})(class TreeWidgetFactoryBase extends WidgetFactory implements TreeWidgetFactory {
 
-    readonly shadowRoot!: ShadowRoot;
-    readonly items: HTMLCollectionOf<HTMLETreeItemElement>;
+    #template: HTMLElement;
+    #walker: TreeWalker;
 
-    get activeItem(): HTMLETreeItemElement | null {
-        return this.querySelector<HTMLETreeItemElement>(
+    #getActiveItem(tree: HTMLElement): HTMLElement | null {
+        return tree.querySelector<HTMLElement>(
             "e-treeitem[active]"
         );
     }
 
-    get dropTargetItem(): HTMLETreeItemElement | null {
-        return this.querySelector<HTMLETreeItemElement>(
+    #getDropTargetItem(tree: HTMLElement): HTMLElement | null {
+        return tree.querySelector<HTMLElement>(
             "e-treeitem[droptarget]"
         );
     }
     
-    @AttributeProperty({type: Boolean})
-    droptarget!: boolean;
+    #getDropTarget(tree: HTMLElement): boolean {
+        const {classList} = tree;
+        return classList.contains("droptarget");
+    }
 
-    @AttributeProperty({type: String})
-    name!: string;
+    #setDropTarget(tree: HTMLElement, droptarget: boolean): void {
+        const {classList} = tree;
+        if (droptarget) {
+            if (!this.#getDropTarget(tree)) {
+                classList.add("droptarget");
+            }
+        }
+        else {
+            classList.remove("droptarget");
+        }
+    }
 
-    #onSelection: boolean;
-    #hasSelectionChanged: boolean;
-    #walker: TreeWalker;
+    #onSelection: WeakMap<HTMLElement, boolean>;
+    #hasSelectionChanged: WeakMap<HTMLElement, boolean>;
 
     static {
         shadowTemplate = element("template");
@@ -68,36 +71,44 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
 
     constructor() {
         super();
+        this.#template = element("div", {
+            attributes: {
+                class: "tree",
+                role: "tree",
+                tabindex: 0
+            }
+        });
+        this.#onSelection = new WeakMap();
+        this.#hasSelectionChanged = new WeakMap();
         this.#walker = document.createTreeWalker(
-            this, NodeFilter.SHOW_ELEMENT, this.#nodeFilter.bind(this)
+            document, NodeFilter.SHOW_ELEMENT, this.#nodeFilter.bind(this)
         );
-        this.#onSelection = false;
-        this.#hasSelectionChanged = false;
-        this.items = this.getElementsByTagName("e-treeitem");
-        const shadowRoot = this.attachShadow({mode: "open"});
-        shadowRoot.append(
-            shadowTemplate.content.cloneNode(true)
-        );
-        this.addEventListener("click", this.#handleClickEvent.bind(this));
-        this.addEventListener("contextmenu", this.#handleContextMenuEvent.bind(this), true);
-        this.addEventListener("dragend", this.#handleDragEndEvent.bind(this));
-        this.addEventListener("dragenter", this.#handleDragEnterEvent.bind(this));
-        this.addEventListener("dragleave", this.#handleDragLeaveEvent.bind(this));
-        this.addEventListener("dragover", this.#handleDragOverEvent.bind(this));
-        this.addEventListener("dragstart", this.#handleDragStartEvent.bind(this));
-        this.addEventListener("drop", this.#handleDropEvent.bind(this));
-        this.addEventListener("focus", this.#handleFocusEvent.bind(this));
-        this.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
-        this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
-        this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
-        this.addEventListener("select", this.#handleSelectEvent.bind(this));
-        shadowRoot.addEventListener("slotchange", this.#handleSlotChangeEvent.bind(this));
     }
 
-    selectedItems(): HTMLETreeItemElement[] {
+    create(): HTMLElement {
+        const tree = <HTMLElement>this.#template.cloneNode(true);
+        tree.addEventListener("click", this.#handleClickEvent.bind(this));
+        tree.addEventListener("contextmenu", this.#handleContextMenuEvent.bind(this), true);
+        tree.addEventListener("dragend", this.#handleDragEndEvent.bind(this));
+        tree.addEventListener("dragenter", this.#handleDragEnterEvent.bind(this));
+        tree.addEventListener("dragleave", this.#handleDragLeaveEvent.bind(this));
+        tree.addEventListener("dragover", this.#handleDragOverEvent.bind(this));
+        tree.addEventListener("dragstart", this.#handleDragStartEvent.bind(this));
+        tree.addEventListener("drop", this.#handleDropEvent.bind(this));
+        tree.addEventListener("focus", this.#handleFocusEvent.bind(this));
+        tree.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
+        tree.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
+        tree.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
+        tree.addEventListener("select", this.#handleSelectEvent.bind(this));
+        this.#onSelection.set(tree, false);
+        this.#hasSelectionChanged.set(tree, false);
+        return tree;
+    }
+
+    selectedItems(tree: HTMLElement): HTMLETreeItemElement[] {
         const selectedItems = [];
         const walker = this.#walker;
-        walker.currentNode = walker.root;
+        walker.currentNode = tree;
         let item = this.#firstItem();
         while (item !== null) {
             if (item.selected) {
@@ -108,15 +119,15 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         return selectedItems;
     }
 
-    beginSelection(): void {
-        this.#onSelection = true;
+    beginSelection(tree: HTMLElement): void {
+        this.#onSelection.set(tree, true);
     }
 
-    endSelection(): void {
-        this.#onSelection = false;
-        if (this.#hasSelectionChanged) {
-            this.dispatchEvent(new Event("selectionchange", {bubbles: true}));
-            this.#hasSelectionChanged = false;
+    endSelection(tree: HTMLElement): void {
+        this.#onSelection.set(tree, false);
+        if (this.#hasSelectionChanged.get(tree)) {
+            tree.dispatchEvent(new Event("selectionchange", {bubbles: true}));
+            this.#hasSelectionChanged.set(tree, false);
         }
     }
 
@@ -130,7 +141,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         return NodeFilter.FILTER_REJECT;
     }
 
-    #getItemsRange(from: HTMLETreeItemElement, to: HTMLETreeItemElement): HTMLETreeItemElement[] {
+    #getItemsRange(from: HTMLElement, to: HTMLElement): HTMLETreeItemElement[] {
         if (from == to) {
             return [from];
         }
@@ -158,30 +169,31 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         return [];
     }
 
-    #setSelection(...items: HTMLETreeItemElement[]): void {
-        const selectedItems = this.selectedItems();
-        this.beginSelection();
+    #setSelection(tree: HTMLElement, ...items: HTMLETreeItemElement[]): void {
+        const selectedItems = this.selectedItems(tree);
+        this.beginSelection(tree);
         selectedItems.forEach((selectedItem_i) => {
             if (!items.includes(selectedItem_i)) {
+                //TODO: widget setSelected()
                 selectedItem_i.selected = false;
             }
         });
         items.forEach((item_i) => {
-            if (this.contains(item_i) && !item_i.selected) {
+            if (tree.contains(item_i) && !item_i.selected) {
                 item_i.selected = true;
             }
         });
-        this.endSelection();
+        this.endSelection(tree);
     }
 
-    #addToSelection(...items: HTMLETreeItemElement[]): void {
-        this.beginSelection();
+    #addToSelection(tree: HTMLElement, ...items: HTMLETreeItemElement[]): void {
+        this.beginSelection(tree);
         items.forEach((item_i) => {
             if (!item_i.selected) {
                 item_i.selected = true;
             }
         });
-        this.endSelection();
+        this.endSelection(tree);
     }
 
     #removeFromSelection(...items: HTMLETreeItemElement[]): void {
@@ -561,4 +573,4 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
     }
 }
 
-var HTMLETreeElement: HTMLETreeElementConstructor = HTMLETreeElementBase;
+var HTMLETreeElement: HTMLETreeElementConstructor = HTMLETreeElementBase;*/

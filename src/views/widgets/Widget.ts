@@ -13,12 +13,12 @@ interface WidgetFactoryConstructor {
 }
 
 interface WidgetFactory {
-    create(properties?: object): HTMLElement;
-    slot(root: HTMLElement, name: string | null): HTMLElement;
+    create(init?: object): HTMLElement;
+    slot(root: HTMLElement, name: string | null): HTMLElement | null;
     get slots(): string[];
 }
 
-var slotsMap: WeakMap<HTMLElement, [WidgetFactory, HTMLElement][]> = new WeakMap();
+var slotsMap: WeakMap<HTMLElement, [WidgetFactory, WeakRef<HTMLElement>][]> = new WeakMap();
 var slotsObserver = new MutationObserver(
     (mutationsList: MutationRecord[]) => {
         mutationsList.forEach((mutation: MutationRecord) => {
@@ -29,10 +29,10 @@ var slotsObserver = new MutationObserver(
                         const slotReferences = slotsMap.get(target);
                         if (slotReferences) {
                             slotReferences.forEach(slotRef_i => {
-                                const [widget, element] = slotRef_i;
+                                const [widget, elementRef] = slotRef_i;
                                 const slottedCallback = (widget as any)["slottedCallback"];
                                 if (typeof slottedCallback == "function") {
-                                    slottedCallback(element, target);
+                                    slottedCallback(elementRef.deref(), target);
                                 }
                             });
                         }
@@ -51,33 +51,33 @@ class WidgetFactoryBase implements WidgetFactory {
         this.create = new Proxy(
             this.create, {
                 apply: (target, thisArg, argumentsList) => {
-                    const element = Reflect.apply(target, thisArg, argumentsList);
-                    const targets = widget.slots.map(slot_i => {
-                        return widget.slot(element, slot_i);
-                    }).concat(element);
-                    targets.forEach(target_i => {
-                        slotsObserver.observe(target_i, {
-                            childList: true
-                        });
-                        const slotReferences = slotsMap.get(target_i);
-                        if (Array.isArray(slotReferences)) {
-                            slotReferences.push([widget, element]);
-                        }
-                        else {
-                            slotsMap.set(target_i, new Array([widget, element]));
+                    const root = Reflect.apply(target, thisArg, argumentsList);
+                    const slots =(<(string | null)[]>widget.slots).concat(null).map(slot_i => {
+                        return widget.slot(root, slot_i);
+                    });
+                    slots.forEach(slot_i => {
+                        if (slot_i) {
+                            slotsObserver.observe(slot_i, {
+                                childList: true
+                            });
+                            const slotReferences = slotsMap.get(slot_i);
+                            if (Array.isArray(slotReferences)) {
+                                slotReferences.push([widget, new WeakRef(root)]);
+                            }
+                            else {
+                                slotsMap.set(slot_i, new Array([widget, new WeakRef(root)]));
+                            }
                         }
                     });
-                    return element;
+                    return root;
                 }
             }
         )
     }
 
     create(): HTMLElement {
-        throw new Error();
+        throw new Error(`create method is not implemented`);
     }
-
-    setup(): void {}
 
     slot(root: HTMLElement): HTMLElement {
         return root;

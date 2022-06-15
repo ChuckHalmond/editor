@@ -1,5 +1,4 @@
 import { CustomElement, element, AttributeProperty } from "../../Element";
-import { HTMLEMenuElement } from "../menus/Menu";
 
 export { HTMLEGridCellElement };
 

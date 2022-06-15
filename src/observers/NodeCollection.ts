@@ -33,7 +33,6 @@ class NodeCollectionBase<N extends Node = Node> {
         this.#observer.observe(root, {
             childList: true
         });
-        //console.log(root.childNodes);
         this.#handleAddedNodes(root.childNodes);
     }
 
