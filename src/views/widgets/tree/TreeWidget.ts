@@ -1,13 +1,11 @@
-/*import { Widget } from "../../../elements/Element";
-import { CustomElement, AttributeProperty, element } from "../../Element";
+import { element, Widget } from "../../../elements/Element";
 import { WidgetFactory } from "../Widget";
+import { treeitemWidget } from "./TreeItemWidget";
 
-export { HTMLETreeElement };
+export { treeWidget };
 
 interface TreeWidgetFactory extends WidgetFactory {
-    create(properties?: {
-        contextual?: boolean;
-    }): HTMLElement;
+    create(): HTMLElement;
     items(tree: HTMLElement): HTMLElement[];
     selectedItems(tree: HTMLElement): HTMLElement[];
     beginSelection(tree: HTMLElement): void;
@@ -29,49 +27,12 @@ Widget({
 
     #template: HTMLElement;
     #walker: TreeWalker;
-
-    #getActiveItem(tree: HTMLElement): HTMLElement | null {
-        return tree.querySelector<HTMLElement>(
-            "e-treeitem[active]"
-        );
-    }
-
-    #getDropTargetItem(tree: HTMLElement): HTMLElement | null {
-        return tree.querySelector<HTMLElement>(
-            "e-treeitem[droptarget]"
-        );
-    }
-    
-    #getDropTarget(tree: HTMLElement): boolean {
-        const {classList} = tree;
-        return classList.contains("droptarget");
-    }
-
-    #setDropTarget(tree: HTMLElement, droptarget: boolean): void {
-        const {classList} = tree;
-        if (droptarget) {
-            if (!this.#getDropTarget(tree)) {
-                classList.add("droptarget");
-            }
-        }
-        else {
-            classList.remove("droptarget");
-        }
-    }
-
     #onSelection: WeakMap<HTMLElement, boolean>;
     #hasSelectionChanged: WeakMap<HTMLElement, boolean>;
 
-    static {
-        shadowTemplate = element("template");
-        shadowTemplate.content.append(
-            element("slot")
-        );
-    }
-
     constructor() {
         super();
-        this.#template = element("div", {
+        this.#template = element("ul", {
             attributes: {
                 class: "tree",
                 role: "tree",
@@ -105,13 +66,49 @@ Widget({
         return tree;
     }
 
-    selectedItems(tree: HTMLElement): HTMLETreeItemElement[] {
+    #getActiveItem(tree: HTMLElement): HTMLElement | null {
+        return tree.querySelector<HTMLElement>(
+            ".treeitem.active"
+        );
+    }
+
+    #getDropTargetItem(tree: HTMLElement): HTMLElement | null {
+        return tree.querySelector<HTMLElement>(
+            ".treeitem.droptarget"
+        );
+    }
+    
+    #getDropTarget(tree: HTMLElement): boolean {
+        const {classList} = tree;
+        return classList.contains("droptarget");
+    }
+
+    #setDropTarget(tree: HTMLElement, droptarget: boolean): void {
+        const {classList} = tree;
+        if (droptarget) {
+            if (!classList.contains("droptarget")) {
+                classList.add("droptarget");
+            }
+        }
+        else {
+            classList.remove("droptarget");
+        }
+    }
+
+    items(menu: HTMLElement): HTMLElement[] {
+        return Array.from(menu.querySelectorAll<HTMLElement>(
+            ":is(:scope, :scope > .treeitemgroup) > .treeitem"
+        ));
+    }
+
+    selectedItems(tree: HTMLElement): HTMLElement[] {
         const selectedItems = [];
         const walker = this.#walker;
         walker.currentNode = tree;
-        let item = this.#firstItem();
+        let item = this.#firstItem(tree);
         while (item !== null) {
-            if (item.selected) {
+            const selected = treeitemWidget.getSelected(item);
+            if (selected) {
                 selectedItems.push(item);
             }
             item = this.#nextItem(item);
@@ -132,16 +129,19 @@ Widget({
     }
 
     #nodeFilter(node: Node): number {
-        if (node instanceof HTMLETreeItemElement) {
-            return NodeFilter.FILTER_ACCEPT;
-        }
-        if (node instanceof HTMLETreeItemGroupElement) {
-            return NodeFilter.FILTER_SKIP;
+        if (node instanceof HTMLElement) {
+            const {classList} = node;
+            if (classList.contains("treeitem")) {
+                return NodeFilter.FILTER_ACCEPT;
+            }
+            else if (classList.contains("treeitemgroup")) {
+                return NodeFilter.FILTER_SKIP;
+            }
         }
         return NodeFilter.FILTER_REJECT;
     }
 
-    #getItemsRange(from: HTMLElement, to: HTMLElement): HTMLETreeItemElement[] {
+    #getItemsRange(from: HTMLElement, to: HTMLElement): HTMLElement[] {
         if (from == to) {
             return [from];
         }
@@ -169,109 +169,108 @@ Widget({
         return [];
     }
 
-    #setSelection(tree: HTMLElement, ...items: HTMLETreeItemElement[]): void {
+    #setSelection(tree: HTMLElement, ...items: HTMLElement[]): void {
         const selectedItems = this.selectedItems(tree);
         this.beginSelection(tree);
-        selectedItems.forEach((selectedItem_i) => {
-            if (!items.includes(selectedItem_i)) {
-                //TODO: widget setSelected()
-                selectedItem_i.selected = false;
+        selectedItems.forEach((item_i) => {
+            if (!items.includes(item_i)) {
+                treeitemWidget.setSelected(item_i, false);
             }
         });
         items.forEach((item_i) => {
-            if (tree.contains(item_i) && !item_i.selected) {
-                item_i.selected = true;
+            const selected = treeitemWidget.getSelected(item_i);
+            if (tree.contains(item_i) && !selected) {
+                treeitemWidget.setSelected(item_i, true);
             }
         });
         this.endSelection(tree);
     }
 
-    #addToSelection(tree: HTMLElement, ...items: HTMLETreeItemElement[]): void {
+    #addToSelection(tree: HTMLElement, ...items: HTMLElement[]): void {
         this.beginSelection(tree);
         items.forEach((item_i) => {
-            if (!item_i.selected) {
-                item_i.selected = true;
+            if (!treeitemWidget.getSelected(item_i)) {
+                treeitemWidget.setSelected(item_i, true);
             }
         });
         this.endSelection(tree);
     }
 
-    #removeFromSelection(...items: HTMLETreeItemElement[]): void {
-        const selectedItems = this.selectedItems();
-        this.beginSelection();
+    #removeFromSelection(tree: HTMLElement, ...items: HTMLElement[]): void {
+        const selectedItems = this.selectedItems(tree);
+        this.beginSelection(tree);
         items.forEach((item_i) => {
             if (selectedItems.includes(item_i)) {
-                item_i.selected = false;
+                treeitemWidget.setSelected(item_i, false);
             }
         });
-        this.endSelection();
+        this.endSelection(tree);
     }
 
-    #clearSelection(): void {
-        const selectedItems = this.selectedItems();
-        this.beginSelection();
+    #clearSelection(tree: HTMLElement): void {
+        const selectedItems = this.selectedItems(tree);
+        this.beginSelection(tree);
         selectedItems.forEach((item_i) => {
-            item_i.selected = false;
+            treeitemWidget.setSelected(item_i, false);
         });
-        this.endSelection();
+        this.endSelection(tree);
     }
 
-    #setActiveItem(item: HTMLETreeItemElement | null): void {
-        const {activeItem} = this;
+    #setActiveItem(tree: HTMLElement, item: HTMLElement | null): void {
+        const activeItem = this.#getActiveItem(tree);
         if (activeItem !== null && activeItem !== item) {
-            activeItem.active = false;
+            treeitemWidget.setActive(activeItem, false);
             activeItem.tabIndex = -1;
         }
         if (item !== null) {
             const walker = this.#walker;
             walker.currentNode = item;
-            item.active = true;
+            treeitemWidget.setActive(item, true);
             item.tabIndex = 0;
         }
     }
     
-    #setDropTargetItem(item: HTMLETreeItemElement | null): void {
-        const {dropTargetItem} = this;
+    #setDropTargetItem(tree: HTMLElement, item: HTMLElement | null): void {
+        const dropTargetItem = this.#getDropTargetItem(tree);
         if (dropTargetItem !== null && dropTargetItem !== item) {
-            dropTargetItem.droptarget = false;
+            treeitemWidget.setDropTarget(dropTargetItem, false);
         }
         if (item !== null) {
-            this.droptarget = true;
-            item.droptarget = true;
+            this.#setDropTarget(tree, true);
+            treeitemWidget.setDropTarget(item, false);
         }
         else {
-            this.droptarget = false;
+            this.#setDropTarget(tree, false);
         }
     }
 
-    #firstItem(): HTMLETreeItemElement | null {
+    #firstItem(tree: HTMLElement): HTMLElement | null {
         const walker = this.#walker;
-        const {root} = walker;
-        walker.currentNode = root;
-        return <HTMLETreeItemElement | null>walker.firstChild();
+        walker.currentNode = tree;
+        return <HTMLElement | null>walker.firstChild();
     }
 
-    #lastItem(): HTMLETreeItemElement | null {
+    #lastItem(tree: HTMLElement): HTMLElement | null {
         const walker = this.#walker;
-        const {root} = walker;
-        walker.currentNode = root;
-        return <HTMLETreeItemElement | null>walker.lastChild();
+        walker.currentNode = tree;
+        return <HTMLElement | null>walker.lastChild();
     }
     
-    #previousItem(item: HTMLETreeItemElement): HTMLETreeItemElement | null {
+    #previousItem(item: HTMLElement): HTMLElement | null {
         const walker = this.#walker;
         walker.currentNode = item;
-        const previousSibling = <HTMLETreeItemElement | null>walker.previousSibling();
+        const previousSibling = <HTMLElement | null>walker.previousSibling();
         return previousSibling ?
             this.#deepestItem(previousSibling) :
-            <HTMLETreeItemElement | null>walker.parentNode();
+            <HTMLElement | null>walker.parentNode();
     }
 
-    #nextItem(item: HTMLETreeItemElement): HTMLETreeItemElement | null {
+    #nextItem(item: HTMLElement): HTMLElement | null {
         const walker = this.#walker;
         walker.currentNode = item;
-        const {type, expanded} = item;
-        return <HTMLETreeItemElement | null>(
+        const type = treeitemWidget.getType(item);
+        const expanded = treeitemWidget.getExpanded(item);
+        return <HTMLElement | null>(
             type === "leaf" ?
                 walker.nextNode() :
                 expanded ?
@@ -281,10 +280,11 @@ Widget({
         );
     }
 
-    #deepestItem(item: HTMLETreeItemElement): HTMLETreeItemElement {
-        if (item.expanded) {
+    #deepestItem(item: HTMLElement): HTMLElement {
+        const expanded = treeitemWidget.getExpanded(item);
+        if (expanded) {
             const walker = this.#walker;
-            const lastItem = <HTMLETreeItemElement>walker.lastChild();
+            const lastItem = <HTMLElement>walker.lastChild();
             if (lastItem) {
                 return this.#deepestItem(lastItem);
             }
@@ -293,20 +293,22 @@ Widget({
     }
 
     #handleClickEvent(event: MouseEvent): void {
-        const {target, ctrlKey, shiftKey} = event;
-        const selectedItems = this.selectedItems();
-        if (target instanceof HTMLETreeItemElement) {
+        const {currentTarget, target, ctrlKey, shiftKey} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".treeitem");
+        const selectedItems = this.selectedItems(targetTree);
+        if (targetItem) {
             if (!shiftKey && !ctrlKey) {
-                this.#setSelection(target);
+                this.#setSelection(targetTree, targetItem);
             }
             else if (ctrlKey) {
-                const {selected} = target;
+                const selected = treeitemWidget.getSelected(targetItem);
                 if (selected) {
-                    target.blur();
+                    targetItem.blur();
                 }
                 (!selected) ?
-                    this.#addToSelection(target) :
-                    this.#removeFromSelection(target);
+                    this.#addToSelection(targetTree, targetItem) :
+                    this.#removeFromSelection(targetTree, targetItem);
                 event.stopPropagation();
             }
             else if (shiftKey) {
@@ -314,19 +316,19 @@ Widget({
                 if (lastSelectedItem) {
                     const range = this.#getItemsRange(
                         lastSelectedItem,
-                        target
+                        targetItem
                     );
                     if (range) {
-                        if (selectedItems.includes(target)) {
-                            this.#removeFromSelection(...range);
+                        if (selectedItems.includes(targetItem)) {
+                            this.#removeFromSelection(targetTree, ...range);
                         }
                         else {
-                            this.#addToSelection(...range);
+                            this.#addToSelection(targetTree, ...range);
                         }
                     }
                 }
                 else {
-                    this.#setSelection(target);
+                    this.#setSelection(targetTree, targetItem);
                 }
                 event.stopPropagation();
             }
@@ -334,28 +336,34 @@ Widget({
     }
 
     #handleContextMenuEvent(event: MouseEvent): void {
-        const {target} = event;
-        if (target instanceof HTMLETreeItemElement) {
-            const selectedItems = this.selectedItems();
-            if (!selectedItems.includes(target)) {
-                this.#setSelection(target);
+        const {currentTarget, target} = event;
+        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".treeitem");
+        const targetTree = <HTMLElement>currentTarget;
+        if (targetItem) {
+            const selectedItems = this.selectedItems(targetTree);
+            if (!selectedItems.includes(targetItem)) {
+                this.#setSelection(targetTree, targetItem);
             }
             event.preventDefault();
         }
     }
 
-    #handleDragEndEvent(): void {
-        this.#setDropTargetItem(null);
+    #handleDragEndEvent(event: DragEvent): void {
+        const {currentTarget} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        this.#setDropTargetItem(targetTree, null);
     }
 
     #handleDragEnterEvent(event: DragEvent): void {
-        const {target} = event;
-        if (target instanceof HTMLETreeItemElement) {
-            const {type} = target;
+        const {currentTarget, target} = event;
+        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".treeitem");
+        const targetTree = <HTMLElement>currentTarget;
+        if (targetItem) {
+            const type = treeitemWidget.getType(targetItem);
             if (type == "parent") {
-                target.toggle(true);
+                treeitemWidget.toggle(targetItem, true);
             }
-            this.#setDropTargetItem(target);
+            this.#setDropTargetItem(targetTree, targetItem);
         }
         event.preventDefault();
     }
@@ -365,49 +373,53 @@ Widget({
     }
 
     #handleDragLeaveEvent(event: DragEvent): void {
-        const {relatedTarget} = event;
+        const {currentTarget, relatedTarget} = event;
+        const targetTree = <HTMLElement>currentTarget;
         if (relatedTarget) {
             const relatedTargetRoot = (<Node>relatedTarget).getRootNode();
             const relatedTargetHost =
                 relatedTargetRoot instanceof ShadowRoot ?
                 relatedTargetRoot.host :
                 relatedTarget;
-            if (!this.contains(<Node>relatedTargetHost)) {
-                this.#setDropTargetItem(null);
+            if (!targetTree.contains(<Node>relatedTargetHost)) {
+                this.#setDropTargetItem(targetTree, null);
             }
         }
     }
 
     #handleDragStartEvent(event: DragEvent): void {
-        const {target} = event;
-        if (target instanceof HTMLETreeItemElement) {
-            const selectedItems = this.selectedItems();
+        const {currentTarget, target} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        if (target instanceof HTMLElement && target.classList.contains("treeitem")) {
+            const selectedItems = this.selectedItems(targetTree);
             if (!selectedItems.includes(target)) {
-                this.#setSelection(target);
+                this.#setSelection(targetTree, target);
             }
         }
     }
 
-    #handleDropEvent(): void {
-        this.#setDropTargetItem(null);
+    #handleDropEvent(event: DragEvent): void {
+        const {currentTarget} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        this.#setDropTargetItem(targetTree, null);
     }
 
     #handleKeyDownEvent(event: KeyboardEvent): void {
-        const {key} = event;
-        const {activeItem} = this;
+        const {currentTarget, key} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        const activeItem = this.#getActiveItem(targetTree);
         switch (key) {
             case "a": {
                 const {ctrlKey} = event;
                 if (ctrlKey) {
                     if (activeItem) {
                         const walker = this.#walker;
-                        const {root} = walker;
                         walker.currentNode = activeItem;
-                        const firstItem = <HTMLETreeItemElement>(
-                            walker.currentNode = walker.parentNode() ?? root, walker.firstChild()
+                        const firstItem = <HTMLElement>(
+                            walker.currentNode = walker.parentNode() ?? targetTree, walker.firstChild()
                         );
-                        const lastItem = <HTMLETreeItemElement>(
-                            walker.currentNode = walker.parentNode() ?? root, walker.lastChild()
+                        const lastItem = <HTMLElement>(
+                            walker.currentNode = walker.parentNode() ?? targetTree, walker.lastChild()
                         );
                         if (firstItem && lastItem) {
                             const range = this.#getItemsRange(
@@ -415,7 +427,7 @@ Widget({
                                 this.#deepestItem(lastItem)
                             );
                             if (range) {
-                                this.#setSelection(...range);
+                                this.#setSelection(targetTree, ...range);
                             }
                         }
                     }
@@ -425,12 +437,13 @@ Widget({
             }
             case "ArrowLeft": {
                 if (activeItem) {
-                    if (activeItem.expanded) {
-                        activeItem.toggle();
+                    const expanded = treeitemWidget.getExpanded(activeItem);
+                    if (expanded) {
+                        treeitemWidget.toggle(activeItem);
                     }
                     else {
                         const walker = this.#walker;
-                        const parentItem = <HTMLETreeItemElement>walker.parentNode();
+                        const parentItem = <HTMLElement>walker.parentNode();
                         if (parentItem) {
                             parentItem.focus({preventScroll: true});
                         }
@@ -441,8 +454,9 @@ Widget({
             }
             case "ArrowRight": {
                 if (activeItem) {
-                    if (!activeItem.expanded) {
-                        activeItem.toggle();
+                    const expanded = treeitemWidget.getExpanded(activeItem);
+                    if (!expanded) {
+                        treeitemWidget.toggle(activeItem);
                     }
                 }
                 event.stopPropagation();
@@ -455,14 +469,15 @@ Widget({
                         previousItem.focus({preventScroll: true});
                         const {shiftKey} = event;
                         if (shiftKey) {
-                            previousItem.selected ?
-                                this.#removeFromSelection(previousItem) :
-                                this.#addToSelection(previousItem);
+                            const selected = treeitemWidget.getSelected(previousItem);
+                            selected ?
+                                this.#removeFromSelection(targetTree, previousItem) :
+                                this.#addToSelection(targetTree, previousItem);
                         }
                     }
                 }
                 else {
-                    const firstItem = this.#firstItem();
+                    const firstItem = this.#firstItem(targetTree);
                     if (firstItem) {
                         firstItem.focus({preventScroll: true});
                     }
@@ -477,14 +492,15 @@ Widget({
                         nextItem.focus({preventScroll: true});
                         const {shiftKey} = event;
                         if (shiftKey) {
-                            nextItem.selected ?
-                                this.#removeFromSelection(nextItem) :
-                                this.#addToSelection(nextItem);
+                            const selected = treeitemWidget.getSelected(nextItem);
+                            selected ?
+                                this.#removeFromSelection(targetTree, nextItem) :
+                                this.#addToSelection(targetTree, nextItem);
                         }
                     }
                 }
                 else {
-                    const lastItem = this.#lastItem();
+                    const lastItem = this.#lastItem(targetTree);
                     if (lastItem) {
                         lastItem.focus({preventScroll: true});
                     }
@@ -493,7 +509,7 @@ Widget({
                 break;
             }
             case "Home": {
-                const firstItem = this.#firstItem();
+                const firstItem = this.#firstItem(targetTree);
                 if (firstItem) {
                     firstItem.focus({preventScroll: true});
                 }
@@ -501,7 +517,7 @@ Widget({
                 break;
             }
             case "End": {
-                const lastItem = this.#lastItem();
+                const lastItem = this.#lastItem(targetTree);
                 if (lastItem) {
                     lastItem.focus({preventScroll: true});
                 }
@@ -510,16 +526,16 @@ Widget({
             }
             case "Enter": {
                 if (activeItem) {
-                    this.#setSelection(activeItem);
+                    this.#setSelection(targetTree, activeItem);
                     activeItem.click();
                 }
                 event.stopPropagation();
                 break;
             }
             case "Escape": {
-                this.#clearSelection();
-                this.#setActiveItem(null);
-                this.focus();
+                this.#clearSelection(targetTree);
+                this.#setActiveItem(targetTree, null);
+                targetTree.focus();
                 event.stopPropagation();
                 break;
             }
@@ -527,50 +543,55 @@ Widget({
     }
 
     #handleFocusEvent(event: FocusEvent): void {
-        const {relatedTarget} = event;
-        const {activeItem} = this;
+        const {currentTarget, relatedTarget} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        const activeItem = this.#getActiveItem(targetTree);
         if (activeItem && relatedTarget !== activeItem) {
             activeItem.focus();
         }
     }
 
     #handleFocusInEvent(event: FocusEvent): void {
-        const {target} = event;
-        if (target instanceof HTMLETreeItemElement) {
-            this.#setActiveItem(target);
-            this.tabIndex = -1;
+        const {currentTarget, target} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        if (target instanceof HTMLElement && target.classList.contains("treeitem")) {
+            this.#setActiveItem(targetTree, target);
+            targetTree.tabIndex = -1;
         }
     }
 
     #handleFocusOutEvent(event: FocusEvent): void {
-        const {relatedTarget} = event;
-        const lostFocusWithin = !this.contains(<Node>relatedTarget);
+        const {currentTarget, relatedTarget} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        const lostFocusWithin = !targetTree.contains(<Node>relatedTarget);
         if (lostFocusWithin) {
-            this.tabIndex = 0;
+            targetTree.tabIndex = 0;
         }
     }
 
-    #handleSelectEvent(): void {
-        if (this.#onSelection) {
-            this.#hasSelectionChanged = true;
-        }
-        else {
-            this.dispatchEvent(new Event("selectionchange", {bubbles: true}));
+    #handleSelectEvent(event: Event): void {
+        const {target} = event;
+        const targetTree = <HTMLElement>target;
+        if (target instanceof HTMLElement && target.classList.contains("treeitem")) {
+            if (this.#onSelection.get(targetTree)) {
+                this.#hasSelectionChanged.set(target, true);
+            }
+            else {
+                targetTree.dispatchEvent(new Event("selectionchange", {bubbles: true}));
+            }
         }
     }
 
     #handleSlotChangeEvent(event: Event): void {
         const {target} = event;
-        const assignedItems = <HTMLETreeItemElement[]>(<HTMLSlotElement>target)
+        const assignedItems = <HTMLElement[]>(<HTMLSlotElement>target)
             .assignedElements()
             .filter(
-                element_i => element_i instanceof HTMLETreeItemElement
+                element_i => element_i instanceof HTMLElement
             );
         assignedItems.forEach((item_i, i) => {
-            item_i.posinset = i;
-            item_i.level = 0;
+            treeitemWidget.setPosInSet(item_i, i);
+            treeitemWidget.setLevel(item_i, 0);
         });
     }
-}
-
-var HTMLETreeElement: HTMLETreeElementConstructor = HTMLETreeElementBase;*/
+}));

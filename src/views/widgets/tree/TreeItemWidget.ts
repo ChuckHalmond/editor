@@ -1,174 +1,279 @@
-/*import { CustomElement, element, AttributeProperty } from "../../Element";
-import { HTMLETreeElement } from "./Tree";
-import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
+import { element, Widget } from "../../../elements/Element";
+import { WidgetFactory } from "../Widget";
 
-export { HTMLETreeItemElement };
+export { treeitemWidget };
 
-interface HTMLETreeItemElementConstructor {
-    readonly prototype: HTMLETreeItemElement;
-    new(): HTMLETreeItemElement;
-}
+type TreeItemType = "parent" | "leaf";
 
-interface HTMLETreeItemElement extends HTMLElement {
-    readonly shadowRoot: ShadowRoot;
-    readonly group: HTMLETreeItemGroupElement | null;
-    name: string;
-    posinset: number;
-    label: string;
-    droptarget: boolean;
-    expanded: boolean;
-    selected: boolean;
-    active: boolean;
-    level: number;
-    type: "leaf" | "parent";
-    toggle(force?: boolean): void;
-    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void
+interface TreeItemWidgetFactory extends WidgetFactory {
+    create(init?: {
+        type: TreeItemType;
+        label?: string;
+        disabled?: boolean;
+    }): HTMLElement;
+    getGroup(item: HTMLElement): HTMLElement | null;
+    setPosInSet(item: HTMLElement, value: number): void;
+    getPosInSet(item: HTMLElement): number;
+    getLabel(item: HTMLElement): string;
+    setLabel(item: HTMLElement, value: string): void;
+    setActive(item: HTMLElement, value: boolean): void;
+    getActive(item: HTMLElement): boolean;
+    setDropTarget(item: HTMLElement, value: boolean): void;
+    getDropTarget(item: HTMLElement): boolean;
+    setSelected(item: HTMLElement, value: boolean): void;
+    getSelected(item: HTMLElement): boolean;
+    setDisabled(item: HTMLElement, value: boolean): void;
+    getDisabled(item: HTMLElement): boolean;
+    setExpanded(item: HTMLElement, value: boolean): void;
+    getExpanded(item: HTMLElement): boolean;
+    getType(item: HTMLElement): TreeItemType | null;
+    setType(item: HTMLElement, value: TreeItemType): void;
+    toggle(item: HTMLElement, force?: boolean): void;
 }
 
 declare global {
-    interface HTMLElementTagNameMap {
-        "treeitem": HTMLETreeItemElement,
+    interface WidgetNameMap {
+        "treeitem": TreeItemWidgetFactory,
     }
 }
-
-var shadowTemplate: HTMLTemplateElement;
 
 var treeitemWidget = new (
 Widget({
     name: "treeitem"
-})(class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemElement {
+})(class TreeItemWidgetFactoryBase extends WidgetFactory implements TreeItemWidgetFactory {
+    #arrowPartTemplate : HTMLElement;
+    #template: HTMLElement;
+    #types: TreeItemType[];
+    #typesFeatures: {
+        [key in TreeItemType]: {
+            role: string,
+            hasArrow: boolean
+        }
+    };
 
-    readonly shadowRoot!: ShadowRoot;
-
-    get group(): HTMLETreeItemGroupElement | null {
-        return this.#group;
-    }
-
-    @AttributeProperty({type: String})
-    name!: string;
-
-    @AttributeProperty({type: Number})
-    posinset!: number;
-
-    @AttributeProperty({type: String, observed: true})
-    label!: string;
-
-    @AttributeProperty({type: Boolean, observed: true})
-    expanded!: boolean;
-    
-    @AttributeProperty({type: Boolean})
-    droptarget!: boolean;
-
-    @AttributeProperty({type: Boolean})
-    active!: boolean;
-
-    @AttributeProperty({type: Boolean, observed: true})
-    selected!: boolean;
-
-    @AttributeProperty({type: Number, observed: true})
-    level!: number;
-
-    @AttributeProperty({type: String, defaultValue: "leaf"})
-    type!: "leaf" | "parent";
-
-    #group: HTMLETreeItemGroupElement | null;
-    
-    static {
-        shadowTemplate = element("template");
-        shadowTemplate.content.append(
-            element("div", {
-                attributes: {
-                    part: "content"
-                },
-                children: [
-                    element("span", {
-                        attributes: {
-                            part: "arrow"
-                        }
-                    }),
-                    element("slot")
-                ]
-            }),
-            element("slot", {
-                attributes: {
-                    name: "group"
-                }
-            })
-        );
-    }
-    
     constructor() {
         super();
-        const shadowRoot = this.attachShadow({mode: "open"});
-        shadowRoot.append(
-            shadowTemplate.content.cloneNode(true)
-        );
-        shadowRoot.addEventListener("slotchange", this.#handleSlotChangeEvent.bind(this));
-        this.addEventListener("click", this.#handleClickEvent.bind(this));
-        this.#group = null;
+        this.#arrowPartTemplate = element("span", {
+            attributes: {
+                class: "arrow"
+            }
+        });
+        this.#template = element("li", {
+            attributes: {
+                class: "treeitem",
+                role: "treeitem",
+                type: "treeitem-leaf",
+                tabindex: -1
+            },
+            children: [
+                element("span", {
+                    attributes: {
+                        class: "content"
+                    },
+                    children: [
+                        element("span", {
+                            attributes: {
+                                class: "label"
+                            }
+                        }),
+                        element("slot")
+                    ]
+                }),
+                element("slot", {
+                    attributes: {
+                        name: "group"
+                    }
+                })
+            ]
+        });
+        this.#types = ["parent", "leaf"];
+        this.#typesFeatures = {
+            parent: {
+                role: "treeitem",
+                hasArrow: true
+            },
+            leaf: {
+                role: "treeitem",
+                hasArrow: false
+            }
+        };
+    }
+
+    getGroup(item: HTMLElement): HTMLElement | null {
+        return item.querySelector<HTMLElement>(":scope > .treeitemgroup");
+    }
+
+    create(init?: {
+        type: TreeItemType;
+        label?: string;
+        disabled?: boolean;
+    }): HTMLElement {
+        const item = <HTMLElement>this.#template.cloneNode(true);
+        item.addEventListener("click", this.#handleClickEvent.bind(this));
+        if (init !== void 0) {
+            const {type, label, disabled} = init;
+            if (type !== void 0) {
+                this.setType(item, type);
+            }
+            if (label !== void 0) {
+                this.setLabel(item, label);
+            }
+            if (disabled !== void 0) {
+                this.setDisabled(item, disabled);
+            }
+        }
+        return item;
+    }
+
+    #content(item: HTMLElement): HTMLElement {
+        const content = item.querySelector<HTMLElement>(":scope > .content");
+        if (!content) {
+            throw new Error(`No content found.`);
+        }
+        return content;
+    }
+
+    #label(item: HTMLElement): HTMLElement {
+        const label = item.querySelector<HTMLElement>(":scope > .content > .label");
+        if (!label) {
+            throw new Error(`No label found.`);
+        }
+        return label;
+    }
+
+    getLabel(item: HTMLElement): string {
+        return this.#label(item).textContent ?? "";
+    }
+
+    setLabel(item: HTMLElement, value: string): void {
+        this.#label(item).textContent = value;
+    }
+
+    setPosInSet(item: HTMLElement, value: number): void {
+        item.setAttribute("aria-posinset", value.toString());
+    }
+
+    getPosInSet(item: HTMLElement): number {
+        const posInSet = item.getAttribute("aria-posinset");
+        return posInSet ? parseInt(posInSet) : -1;
+    }
+
+    getType(item: HTMLElement): TreeItemType | null {
+        const types = this.#types;
+        const {classList} = item;
+        for (let type_i of types) {
+            if (classList.contains(`treeitem-${type_i}`)) {
+                return type_i;
+            }
+        }
+        return null;
+    }
+
+    setType(item: HTMLElement, type: TreeItemType): void {
+        const typesFeatures = this.#typesFeatures;
+        const arrowPartTemplate = this.#arrowPartTemplate;
+        const {role, hasArrow} = typesFeatures[type];
+        const oldType = this.getType(item);
+        const {classList} = item;
+        if (oldType) {
+            classList.remove(`treeitem-${oldType}`);
+        }
+        classList.add(`treeitem-${type}`);
+        item.setAttribute("role", role);
+        const contentPart = this.#content(item);
+        const arrowPart = item.querySelector(":scope > .arrow");
+        if (hasArrow) {
+            if (!arrowPart && contentPart) {
+                contentPart.prepend(arrowPartTemplate.cloneNode(true));
+            }
+        }
+        else {
+            if (arrowPart) {
+                arrowPart.remove();
+            }
+        }
     }
 
     setExpanded(item: HTMLElement, value: boolean): void {
         item.toggleAttribute("aria-expanded", value);
+        item.dispatchEvent(new Event("toggle", {bubbles: true}));
     }
 
     getExpanded(item: HTMLElement): boolean {
         return item.hasAttribute("aria-expanded");
     }
 
+    setActive(item: HTMLElement, value: boolean): void {
+        const {classList} = item;
+        if (value) {
+            if (!classList.contains("active")) {
+                classList.add("active");
+            }
+        }
+        else {
+            classList.remove("active");
+        }
+    }
+
+    getActive(item: HTMLElement): boolean {
+        const {classList} = item;
+        return classList.contains("active");
+    }
+
+    setDropTarget(item: HTMLElement, value: boolean): void {
+        const {classList} = item;
+        if (value) {
+            if (!classList.contains("droptarget")) {
+                classList.add("droptarget");
+            }
+        }
+        else {
+            classList.remove("droptarget");
+        }
+    }
+
+    getDropTarget(item: HTMLElement): boolean {
+        const {classList} = item;
+        return classList.contains("droptarget");
+    }
+
+    setDisabled(item: HTMLElement, value: boolean): void {
+        item.toggleAttribute("aria-disabled", value);
+    }
+
+    getDisabled(item: HTMLElement): boolean {
+        return item.hasAttribute("aria-disabled");
+    }
+
     setSelected(item: HTMLElement, value: boolean): void {
         item.toggleAttribute("aria-selected", value);
+        item.dispatchEvent(new Event("select", {bubbles: true}));
     }
 
     getSelected(item: HTMLElement): boolean {
         return item.hasAttribute("aria-selected");
     }
 
-    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
-        switch (name) {
-            case "expanded": {
-                this.dispatchEvent(new Event("toggle", {bubbles: true}));
-                break;
-            }
-            case "selected": {
-                this.dispatchEvent(new Event("select", {bubbles: true}));
-                break;
-            }
-            case "label": {
-                const labelPart = this.shadowRoot.querySelector("[part=label]");
-                if (labelPart) {
-                    labelPart.textContent = newValue;
-                }
-                break;
-            }
-            case "level": {
-                this.style.setProperty("--level", `${this.level}`);
-                break;
-            }
-        }
+    setLevel(item: HTMLElement, value: number): void {
+        item.style.setProperty("--level", value.toString());
     }
 
-    toggle(force?: boolean): void {
-        this.expanded = force ?? !this.expanded;
+    getLevel(item: HTMLElement): number {
+        return parseInt(item.style.getPropertyValue("--level"));
+    }
+
+    toggle(item: HTMLElement, force?: boolean): void {
+        this.setExpanded(item, force ?? !this.getExpanded(item));
     }
 
     #handleClickEvent(event: MouseEvent): void {
-        const {target, shiftKey, ctrlKey} = event;
-        const {type} = this;
-        if (this == target && type == "parent" && !(shiftKey || ctrlKey)) {
-            this.toggle();
-        }
-    }
-
-    #handleSlotChangeEvent(event: Event): void {
-        const {target} = event;
-        const {name: slotName} = <HTMLSlotElement>target;
-        switch (slotName) {
-            case "group": {
-                const element = (<HTMLSlotElement>target).assignedElements()[0];
-                this.#group = element instanceof HTMLETreeItemGroupElement ? element : null;
-                break;
+        const {target, currentTarget, shiftKey, ctrlKey} = event;
+        const targetClosestItem = <HTMLElement>(<HTMLElement>target).closest(".treeitem");
+        if (targetClosestItem == currentTarget) {
+            const type = this.getType(targetClosestItem);
+            if (type == "parent" && !(shiftKey || ctrlKey)) {
+                this.toggle(targetClosestItem);
             }
         }
     }
-});*/
+}));

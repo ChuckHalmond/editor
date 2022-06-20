@@ -325,6 +325,39 @@ export async function main() {
         ]
     })
     document.body.append(menuView);
+
+
+    const tree = widget("tree", {
+        slotted: [
+            widget("treeitem", {
+                properties: {
+                    label: "treeitem 0",
+                    type: "parent",
+                    disabled: true
+                },
+                slotted: [
+                    widget("treeitemgroup", {
+                        slotted: [
+                            widget("treeitem", {
+                                properties: {
+                                    label: "treeitem 1",
+                                    type: "leaf"
+                                }
+                            })
+                        ]
+                    })
+                ]
+            }),
+            widget("treeitem", {
+                properties: {
+                    label: "treeitem 1",
+                    name: "treeitem 1",
+                    type: "leaf"
+                }
+            })
+        ]
+    })
+    document.body.append(tree);
     
     const editor = new Editor();
     editor.setup();

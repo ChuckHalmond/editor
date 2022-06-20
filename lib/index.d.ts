@@ -46,4 +46,7 @@ export * from "./src/views/widgets/menu/MenuBarWidget";
 export * from "./src/views/widgets/menu/MenuWidget";
 export * from "./src/views/widgets/menu/MenuItemWidget";
 export * from "./src/views/widgets/menu/MenuItemGroupWidget";
+export * from "./src/views/widgets/tree/TreeWidget";
+export * from "./src/views/widgets/tree/TreeItemWidget";
+export * from "./src/views/widgets/tree/TreeItemGroupWidget";
 export * from "./index";

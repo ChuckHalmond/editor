@@ -1,0 +1,131 @@
+.menubar {
+    display: flex;
+    flex-direction: row;
+    width: max-content;
+}
+
+.menubar:focus > .menuitem:hover,
+.menubar:not(:focus-within) > .menuitem:hover {
+    background-color: var(--hovered-item-color);
+}
+
+.menuitem {
+    display: flex;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.menuitem[aria-disabled] {
+    opacity: 0.38;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+
+    padding: 3px;
+    background-color: white;
+    width: max-content;
+
+    -webkit-box-shadow: var(--menu-box-shadow);
+    box-shadow: var(--menu-box-shadow);
+}
+
+.menu > .separator {
+    margin: 10px 0px 10px 36px;
+    border: none;
+    border-top: 1px solid lightgrey;
+}
+
+.menuitem:focus-within {
+    background-color: var(--focused-item-color);
+}
+
+.menuitem > .menu {
+    z-index: 1;
+    position: absolute;
+}
+
+.menuitem:not([aria-expanded]) > .menu {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.menu > .menuitem[aria-haspopup] > .icon {
+    visibility: hidden;
+}
+
+.menuitem > .icon,
+.menuitem > .label {
+    padding: 2px;
+}
+
+.menuitem > .icon {
+    flex: none;
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.menuitem > .label {
+    flex: auto;
+    line-height: 18px;
+    margin-left: 10px;
+    margin-right: 10px;
+    text-align: start;
+    pointer-events: none;
+}
+
+.menuitem[aria-keyshortcuts] > .keyshortcuts {
+    padding: 2px;
+    line-height: 18px;
+    margin-left: 8px;
+    margin-right: 8px;
+    pointer-events: none;
+}
+
+.menuitem:not([aria-haspopup])[aria-checked="true"] > .icon {
+    background-color: var(--activated-item-color);
+}
+
+.menuitem:not([aria-haspopup]) > .icon::before {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    content: "";
+    mask-size: 18px 18px;
+    -webkit-mask-size: 18px 18px;
+    background-color: var(--icon-color, none);
+    -webkit-mask-image: var(--icon-image, none);
+    mask-image: var(--icon-image, none);
+    filter: var(--icon-filter, none);
+}
+
+.menuitem > .arrow {
+    flex: none;
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin: 1px 4px 1px 1px;
+    pointer-events: none;
+}
+
+.menuitem[aria-disabled] {
+    filter: grayscale(100%);
+}
+
+.menuitem > .arrow::after {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin: 1px;
+    content: "";
+    mask-size: 18px 18px;
+    -webkit-mask-size: 18px 18px;
+    background-color: var(--arrow-color, none);
+    -webkit-mask-image: var(--arrow-image, none);
+    mask-image: var(--arrow-image, none);
+    filter: var(--arrow-filter, none);
+}
