@@ -9,8 +9,9 @@ interface TreeItemGroupWidgetFactory extends WidgetFactory {
     create(): HTMLElement;
 }
 declare var treeItemGroupWidget: {
-    "__#63@#template": HTMLElement;
+    "__#13861@#template": HTMLElement;
     create(): HTMLElement;
     slot(root: HTMLElement, name: string | null): HTMLElement | null;
+    slottedCallback(item: HTMLElement, slot: HTMLElement): void;
     readonly slots: string[];
 };

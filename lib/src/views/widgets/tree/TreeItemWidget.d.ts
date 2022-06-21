@@ -32,10 +32,10 @@ declare global {
     }
 }
 declare var treeitemWidget: {
-    "__#17185@#arrowPartTemplate": HTMLElement;
-    "__#17185@#template": HTMLElement;
-    "__#17185@#types": TreeItemType[];
-    "__#17185@#typesFeatures": {
+    "__#52@#arrowPartTemplate": HTMLElement;
+    "__#52@#template": HTMLElement;
+    "__#52@#types": TreeItemType[];
+    "__#52@#typesFeatures": {
         parent: {
             role: string;
             hasArrow: boolean;
@@ -51,8 +51,8 @@ declare var treeitemWidget: {
         label?: string | undefined;
         disabled?: boolean | undefined;
     } | undefined): HTMLElement;
-    "__#17185@#content"(item: HTMLElement): HTMLElement;
-    "__#17185@#label"(item: HTMLElement): HTMLElement;
+    "__#52@#content"(item: HTMLElement): HTMLElement;
+    "__#52@#label"(item: HTMLElement): HTMLElement;
     getLabel(item: HTMLElement): string;
     setLabel(item: HTMLElement, value: string): void;
     setPosInSet(item: HTMLElement, value: number): void;
@@ -72,7 +72,7 @@ declare var treeitemWidget: {
     setLevel(item: HTMLElement, value: number): void;
     getLevel(item: HTMLElement): number;
     toggle(item: HTMLElement, force?: boolean | undefined): void;
-    "__#17185@#handleClickEvent"(event: MouseEvent): void;
+    "__#52@#handleClickEvent"(event: MouseEvent): void;
     slot(root: HTMLElement, name: string | null): HTMLElement | null;
     readonly slots: string[];
 };

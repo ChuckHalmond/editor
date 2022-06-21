@@ -18,8 +18,6 @@ declare global {
     }
 }
 
-var shadowTemplate: HTMLTemplateElement;
-
 var treeWidget = new (
 Widget({
     name: "tree"
@@ -64,6 +62,19 @@ Widget({
         this.#onSelection.set(tree, false);
         this.#hasSelectionChanged.set(tree, false);
         return tree;
+    }
+
+    slot(root: HTMLElement, name: string | null): HTMLElement | null {
+        return root;
+    }
+
+    slottedCallback(item: HTMLElement, slot: HTMLElement): void {
+        Array.from(slot.childNodes).forEach((item_i, i) => {
+            if (item_i instanceof HTMLElement) {
+                treeitemWidget.setPosInSet(item_i, i);
+                treeitemWidget.setLevel(item_i, 0);
+            }
+        });
     }
 
     #getActiveItem(tree: HTMLElement): HTMLElement | null {
