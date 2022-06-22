@@ -2,7 +2,7 @@ import { HTMLEToolBarElement } from "../..";
 import { HTMLEToolBarItemElement } from "../elements/containers/toolbars/ToolBarItem";
 import { HTMLETreeElement } from "../elements/containers/trees/Tree";
 import { HTMLETreeItemElement } from "../elements/containers/trees/TreeItem";
-import { element, reactiveChildElements, reactiveElement, CustomElement, Fragment, TextNode } from "../elements/Element";
+import { element, reactiveChildElements, reactiveElement, CustomElement, fragment } from "../elements/Element";
 import { ModelEvent, ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { View } from "./View";
 
@@ -291,7 +291,7 @@ class TreeViewBase extends View implements TreeView {
             }
         });
         this.#treeElement = new WeakRef(treeElement);
-        return Fragment(
+        return fragment(
             element("link", {
                 attributes: {
                     rel: "stylesheet",

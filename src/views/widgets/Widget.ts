@@ -44,6 +44,30 @@ var slotsObserver = new MutationObserver(
     }
 );
 
+var elementsMap: WeakMap<HTMLElement, WidgetFactory> = new WeakMap();
+var attributesObserver = new MutationObserver(
+    (mutationsList: MutationRecord[]) => {
+        mutationsList.forEach((mutation: MutationRecord) => {
+            const {target, type} = mutation;
+            if (target instanceof HTMLElement) {
+                switch (type) {
+                    case "attributes": {
+                        const {attributeName, oldValue} = mutation;
+                        const widget = elementsMap.get(target);
+                        if (widget) {
+                            const attributeChangedCallback = (widget as any)["attributeChangedCallback"];
+                            if (typeof attributeChangedCallback == "function") {
+                                attributeChangedCallback(target, attributeName, oldValue, target.getAttribute(attributeName!));
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+    }
+);
+
 class WidgetFactoryBase implements WidgetFactory {
 
     constructor() {
@@ -51,9 +75,9 @@ class WidgetFactoryBase implements WidgetFactory {
         this.create = new Proxy(
             this.create, {
                 apply: (target, thisArg, argumentsList) => {
-                    const root = Reflect.apply(target, thisArg, argumentsList);
+                    const element = Reflect.apply(target, thisArg, argumentsList);
                     const slots =(<(string | null)[]>widget.slots).concat(null).map(slot_i => {
-                        return widget.slot(root, slot_i);
+                        return widget.slot(element, slot_i);
                     });
                     slots.forEach(slot_i => {
                         if (slot_i) {
@@ -62,14 +86,23 @@ class WidgetFactoryBase implements WidgetFactory {
                             });
                             const slotReferences = slotsMap.get(slot_i);
                             if (Array.isArray(slotReferences)) {
-                                slotReferences.push([widget, new WeakRef(root)]);
+                                slotReferences.push([widget, new WeakRef(element)]);
                             }
                             else {
-                                slotsMap.set(slot_i, new Array([widget, new WeakRef(root)]));
+                                slotsMap.set(slot_i, new Array([widget, new WeakRef(element)]));
                             }
                         }
                     });
-                    return root;
+                    const observedAttributes = (widget as any)["observedAttributes"];
+                    if (Array.isArray(observedAttributes)) {
+                        elementsMap.set(element, widget);
+                        attributesObserver.observe(element, {
+                            attributes: true,
+                            attributeFilter: observedAttributes,
+                            attributeOldValue: true
+                        });
+                    }
+                    return element;
                 }
             }
         )

@@ -39,7 +39,6 @@ interface MenuItemWidgetFactory extends WidgetFactory {
     getDisabled(item: HTMLElement): boolean;
     setExpanded(item: HTMLElement, value: boolean): void;
     getExpanded(item: HTMLElement): boolean;
-    trigger(item: HTMLElement): void;
     toggle(item: HTMLElement, force?: boolean): void;
     expand(item: HTMLElement): void;
     collapse(item: HTMLElement): void;
@@ -307,67 +306,49 @@ class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetF
         return item.hasAttribute("aria-expanded");
     }
 
-    trigger(item: HTMLElement): void {
-        const disabled = this.getDisabled(item);
-        if (!disabled) {
-            const type = this.getType(item);
-            switch (type) {
-                case "checkbox": {
-                    this.setChecked(item, !this.getChecked(item));
-                    break;
-                }
-                case "radio": {
-                    this.setChecked(item, true);
-                    break;
-                }
-                case "menu":
-                case "submenu": {
-                    this.toggle(item);
-                    break;
-                }
-            }
-            item.dispatchEvent(new Event("trigger", {
-                bubbles: true
-            }));
-        }
-    }
-
     toggle(item: HTMLElement, force?: boolean): void {
-        const disabled = this.getDisabled(item);
-        if (!disabled) {
-            const expand = force ?? !this.getExpanded(item);
-            this.setExpanded(item, expand);
-            if (expand) {
-                this.#positionMenu(item);
-            }
+        const expand = force ?? !this.getExpanded(item);
+        this.setExpanded(item, expand);
+        if (expand) {
+            this.#positionMenu(item);
         }
     }
 
     expand(item: HTMLElement): void {
-        const disabled = this.getDisabled(item);
-        if (!disabled) {
-            const expanded = this.getExpanded(item);
-            if (!expanded) {
-                this.setExpanded(item, true);
-                this.#positionMenu(item);
-            }
+        const expanded = this.getExpanded(item);
+        if (!expanded) {
+            this.setExpanded(item, true);
+            this.#positionMenu(item);
         }
     }
 
     collapse(item: HTMLElement): void {
-        const disabled = this.getDisabled(item);
-        if (!disabled) {
-            const expanded = this.getExpanded(item);
-            if (expanded) {
-                this.setExpanded(item, false);
-            }
+        const expanded = this.getExpanded(item);
+        if (expanded) {
+            this.setExpanded(item, false);
         }
     }
 
     #handleClickEvent(event: MouseEvent): void {
         const {target, currentTarget} = event;
-        if (target == currentTarget) {
-            this.trigger(<HTMLElement>currentTarget);
+        const targetItem = <HTMLElement>(<HTMLElement>target).closest(".menuitem");
+        if (targetItem == currentTarget) {
+            const type = this.getType(targetItem);
+            switch (type) {
+                case "checkbox": {
+                    this.setChecked(targetItem, !this.getChecked(targetItem));
+                    break;
+                }
+                case "radio": {
+                    this.setChecked(targetItem, true);
+                    break;
+                }
+                case "menu":
+                case "submenu": {
+                    this.toggle(targetItem);
+                    break;
+                }
+            }
         }
     }
 

@@ -1,11 +1,13 @@
 //import { MenuItemGroupWidget, MenuItemWidget, MenuWidget, MenuBarWidget } from "./src/views/MenuBarWidget";
 import { TreeItemModel, TreeModel, TreeView } from "./src/views/TreeView";
-import { Editor, HotKey, Key, KeyModifier, menuWidget } from "./index";
 
 import "./index";
 import { ListItemModel, ListModel, ListView } from "./src/views/ListView";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
-import { element, Fragment, widget } from "./src/elements/Element";
+import { element, fragment, widget } from "./src/elements/Element";
+import { treeitemWidget } from "./src/views/widgets/tree/TreeItemWidget";
+import { Editor } from "./src/Editor";
+import { menuWidget } from "./lib";
 
 export async function main() {
     
@@ -178,7 +180,7 @@ export async function main() {
     gridView.resizable = true;
     gridView.sortable = true;
     gridView.setColumnDelegate((column) => {
-        return Fragment(
+        return fragment(
             element("label", {
                 children: [
                     column.label
@@ -329,6 +331,66 @@ export async function main() {
 
     const tree = widget("tree", {
         slotted: [
+            widget("treeitem", {
+                properties: {
+                    label: "treeitem 0",
+                    type: "parent",
+                    //disabled: true
+                },
+                slotted: [
+                    widget("treeitemgroup", {
+                        slotted: [
+                            widget("treeitem", {
+                                properties: {
+                                    label: "treeitem 1",
+                                    type: "leaf"
+                                }
+                            })
+                        ]
+                    })
+                ],
+                listeners: {
+                    contextmenu: <EventListener>((event: MouseEvent) => {
+                        const {target, clientX, clientY} = event;
+                        const targetItem = <HTMLElement>(<HTMLElement>target).closest(".treeitem");
+                        const menu = widget("menu", {
+                            properties: {
+                                contextual: true
+                            },
+                            slotted: [
+                                widget("menuitemgroup", {
+                                    slotted: [
+                                        widget("menuitem", {
+                                            properties: {
+                                                label: "Display"
+                                            },
+                                            listeners: {
+                                                click: () => {
+                                                    console.log(treeitemWidget.getLabel(targetItem));
+                                                }
+                                            }
+                                        }),
+                                        widget("menuitem", {
+                                            properties: {
+                                                label: "Delete"
+                                            },
+                                            listeners: {
+                                                click: () => {
+                                                    targetItem.remove();
+                                                }
+                                            }
+                                        })
+                                    ]
+                                }),
+                            ]
+                        });
+                        targetItem.append(menu);
+                        menuWidget.positionContextual(menu, clientX, clientY);
+                        menu.focus({preventScroll: true});
+                        event.preventDefault();
+                    })
+                }
+            }),
             widget("treeitem", {
                 properties: {
                     label: "treeitem 0",

@@ -11,8 +11,8 @@ export { AttributeProperty };
 export { reactiveElement };
 export { reactiveChildElements };
 export { element };
-export { Fragment };
-export { TextNode };
+export { fragment };
+export { textNode };
 export { AttributeMutationMixin };
 export { AttributeType };
 export { areAttributesMatching };
@@ -72,8 +72,8 @@ interface QueryAllPropertyDecorator {
     }): <E extends HTMLElement>(target: E, propertyKey: keyof E) => void;
 }
 declare const QueryAllProperty: QueryAllPropertyDecorator;
-declare function Fragment(...nodes: (Node | string)[]): DocumentFragment;
-declare function TextNode(text: string): Node;
+declare function fragment(...nodes: (Node | string)[]): DocumentFragment;
+declare function textNode(text: string): Node;
 interface HTMLElementInit {
     options?: ElementCreationOptions;
     attributes?: {

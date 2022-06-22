@@ -13,8 +13,8 @@ export { AttributeProperty };
 export { reactiveElement };
 export { reactiveChildElements };
 export { element };
-export { Fragment };
-export { TextNode };
+export { fragment };
+export { textNode };
 export { AttributeMutationMixin };
 export { AttributeType };
 export { areAttributesMatching };
@@ -310,13 +310,13 @@ const QueryAllProperty: QueryAllPropertyDecorator = function(
     }
 }
 
-function Fragment(...nodes: (Node | string)[]): DocumentFragment {
+function fragment(...nodes: (Node | string)[]): DocumentFragment {
     const fragment = document.createDocumentFragment();
     fragment.append(...nodes);
     return fragment;
 }
 
-function TextNode(text: string): Node {
+function textNode(text: string): Node {
     return document.createTextNode(text);
 }
 

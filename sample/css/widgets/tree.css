@@ -5,6 +5,12 @@
 .treeitem {
     display: block;
     user-select: none;
+    white-space: nowrap;
+}
+
+.treeitem[aria-disabled] {
+    opacity: 0.38;
+    pointer-events: none;
 }
 
 .treeitem.droptarget {
@@ -21,7 +27,7 @@
     padding-left: calc(var(--level) * var(--indent-width, 12px));
 }
 
-.treeitem.active > .content {
+.tree:focus-within .treeitem.active > .content {
     outline: 1px solid var(--focused-item-outline-color);
     outline-offset: -1px;
 }

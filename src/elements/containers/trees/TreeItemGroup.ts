@@ -1,4 +1,3 @@
-import { Fragment } from "../../../../lib";
 import { CustomElement, element } from "../../Element";
 import { HTMLETreeElement } from "./Tree";
 import { HTMLETreeItemElement } from "./TreeItem";

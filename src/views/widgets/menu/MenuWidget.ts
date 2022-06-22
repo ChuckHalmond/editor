@@ -51,11 +51,12 @@ Widget({
         contextual?: boolean;
     }): HTMLElement {
         const menu = <HTMLElement>this.#template.cloneNode(true);
+        menu.addEventListener("click", this.#handleClickEvent.bind(this));
         menu.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
         menu.addEventListener("mouseout", this.#handleMouseOutEvent.bind(this));
         menu.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         menu.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
-        menu.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
+        //menu.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
         if (init !== void 0) {
             const {contextual} = init;
             if (contextual !== void 0) {
@@ -102,7 +103,7 @@ Widget({
     #walkerNodeFilter(node: Node): number {
         if (node instanceof HTMLElement) {
             const {classList} = node;
-            if (classList.contains("menuitem")) {
+            if (classList.contains("menuitem") && !menuItemWidget.getDisabled(node)) {
                 return NodeFilter.FILTER_ACCEPT;
             }
             else if (classList.contains("menuitemgroup")) {
@@ -191,19 +192,51 @@ Widget({
         }
     }
 
-    #handleFocusOutEvent(event: FocusEvent): void {
-        const {target, currentTarget, relatedTarget} = event;
+    #handleClickEvent(event: MouseEvent): void {
+        const {target, currentTarget} = event;
         const menu = <HTMLElement>currentTarget;
-        const lostFocusWithin = !menu.contains(<Node>relatedTarget);
-        if (lostFocusWithin && target instanceof HTMLElement) {
+        if (target instanceof HTMLElement && target.classList.contains("menuitem")) {
             const contextual = this.getContextual(menu);
             if (contextual) {
                 try {
                     menu.remove();
-                } catch (error) {};
+                }
+                catch (error) {};
             }
             else {
-                const nearestItem = this.#nearestItem(menu, target);
+                const isClosestMenu = this.#isClosestMenu(menu, target);
+                if (isClosestMenu) {
+                    const type = menuItemWidget.getType(target);
+                    const name = menuItemWidget.getName(target);
+                    const value = menuItemWidget.getValue(target);
+                    if (type == "radio") {
+                        menu.querySelectorAll<HTMLElement>(
+                            `:is(:scope, :scope > .menuitemgroup) > .menuitem-radio[name=${name}]`
+                        )
+                        .forEach((radio_i) => {
+                            menuItemWidget.setChecked(radio_i, menuItemWidget.getValue(radio_i) == value);
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    #handleFocusOutEvent(event: FocusEvent): void {
+        const {target, currentTarget, relatedTarget} = event;
+        const menu = <HTMLElement>currentTarget;
+        const lostFocusWithin = !menu.contains(<Node>relatedTarget);
+        if (lostFocusWithin) {
+            const contextual = this.getContextual(menu);
+            if (contextual) {
+                try {
+                    menu.remove();
+                } catch (error) {
+                    void 0;
+                }
+            }
+            else {
+                const nearestItem = this.#nearestItem(menu, <HTMLElement>target);
                 if (nearestItem) {
                     menuItemWidget.collapse(nearestItem);
                 }
@@ -402,36 +435,6 @@ Widget({
                         else {
                             menuItemWidget.getMenu(nearestItem)?.focus({preventScroll: true});
                         }
-                    }
-                }
-            }
-        }
-    }
-
-    #handleTriggerEvent(event: Event): void {
-        const {target, currentTarget} = event;
-        const menu = <HTMLElement>currentTarget;
-        if (target instanceof HTMLElement && target.classList.contains("menuitem")) {
-            const contextual = this.getContextual(menu);
-            if (contextual) {
-                try {
-                    menu.remove();
-                }
-                catch (error) {};
-            }
-            else {
-                const isClosestMenu = this.#isClosestMenu(menu, target);
-                if (isClosestMenu) {
-                    const type = menuItemWidget.getType(target);
-                    const name = menuItemWidget.getName(target);
-                    const value = menuItemWidget.getValue(target);
-                    if (type == "radio") {
-                        menu.querySelectorAll<HTMLElement>(
-                            `:is(:scope, :scope > .menuitemgroup) > .menuitem-radio[name=${name}]`
-                        )
-                        .forEach((radio_i) => {
-                            menuItemWidget.setChecked(radio_i, menuItemWidget.getValue(radio_i) == value);
-                        });
                     }
                 }
             }

@@ -78,15 +78,11 @@ Widget({
     }
 
     #getActiveItem(tree: HTMLElement): HTMLElement | null {
-        return tree.querySelector<HTMLElement>(
-            ".treeitem.active"
-        );
+        return tree.querySelector<HTMLElement>(".treeitem.active");
     }
 
     #getDropTargetItem(tree: HTMLElement): HTMLElement | null {
-        return tree.querySelector<HTMLElement>(
-            ".treeitem.droptarget"
-        );
+        return tree.querySelector<HTMLElement>(".treeitem.droptarget");
     }
     
     #getDropTarget(tree: HTMLElement): boolean {
@@ -142,7 +138,7 @@ Widget({
     #nodeFilter(node: Node): number {
         if (node instanceof HTMLElement) {
             const {classList} = node;
-            if (classList.contains("treeitem")) {
+            if (classList.contains("treeitem") && !treeitemWidget.getDisabled(node)) {
                 return NodeFilter.FILTER_ACCEPT;
             }
             else if (classList.contains("treeitemgroup")) {
@@ -591,18 +587,5 @@ Widget({
                 targetTree.dispatchEvent(new Event("selectionchange", {bubbles: true}));
             }
         }
-    }
-
-    #handleSlotChangeEvent(event: Event): void {
-        const {target} = event;
-        const assignedItems = <HTMLElement[]>(<HTMLSlotElement>target)
-            .assignedElements()
-            .filter(
-                element_i => element_i instanceof HTMLElement
-            );
-        assignedItems.forEach((item_i, i) => {
-            treeitemWidget.setPosInSet(item_i, i);
-            treeitemWidget.setLevel(item_i, 0);
-        });
     }
 }));

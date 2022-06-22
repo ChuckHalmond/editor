@@ -27,7 +27,7 @@ Widget({
             attributes: {
                 class: "menubar",
                 role: "menubar",
-                tabindex: -1
+                tabindex: 0
             }
         });
         this.#walker = document.createTreeWalker(
@@ -42,7 +42,7 @@ Widget({
         menubar.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         menubar.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
         menubar.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
-        menubar.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
+        //menubar.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
         return menubar;
     }
 
@@ -57,7 +57,7 @@ Widget({
     #walkerNodeFilter(node: Node) {
         if (node instanceof HTMLElement) {
             const {classList} = node;
-            if (classList.contains("menuitem")) {
+            if (classList.contains("menuitem") && !menuItemWidget.getDisabled(node)) {
                 return NodeFilter.FILTER_ACCEPT;
             }
             else if (classList.contains("menuitemgroup")) {
@@ -242,7 +242,7 @@ Widget({
         }
     }
 
-    #handleTriggerEvent(event: Event): void {
+    /*#handleTriggerEvent(event: Event): void {
         const {target, currentTarget} = event;
         const menubar = <HTMLElement>currentTarget;
         const expanded = this.getExpanded(menubar);
@@ -255,5 +255,5 @@ Widget({
                 menubar.focus({preventScroll: true});
             }
         }
-    }
+    }*/
 }));

@@ -125,14 +125,6 @@ Widget({
         return item;
     }
 
-    #content(item: HTMLElement): HTMLElement {
-        const content = item.querySelector<HTMLElement>(":scope > .content");
-        if (!content) {
-            throw new Error(`No content found.`);
-        }
-        return content;
-    }
-
     #label(item: HTMLElement): HTMLElement {
         const label = item.querySelector<HTMLElement>(":scope > .content > .label");
         if (!label) {
@@ -180,11 +172,11 @@ Widget({
         }
         classList.add(`treeitem-${type}`);
         item.setAttribute("role", role);
-        const contentPart = this.#content(item);
+        const labelPart = this.#label(item);
         const arrowPart = item.querySelector(":scope > .arrow");
         if (hasArrow) {
-            if (!arrowPart && contentPart) {
-                contentPart.prepend(arrowPartTemplate.cloneNode(true));
+            if (!arrowPart && labelPart) {
+                labelPart.before(arrowPartTemplate.cloneNode(true));
             }
         }
         else {
@@ -268,11 +260,11 @@ Widget({
 
     #handleClickEvent(event: MouseEvent): void {
         const {target, currentTarget, shiftKey, ctrlKey} = event;
-        const targetClosestItem = <HTMLElement>(<HTMLElement>target).closest(".treeitem");
-        if (targetClosestItem == currentTarget) {
-            const type = this.getType(targetClosestItem);
+        const targetItem = <HTMLElement>(<HTMLElement>target).closest(".treeitem");
+        if (targetItem == currentTarget) {
+            const type = this.getType(targetItem);
             if (type == "parent" && !(shiftKey || ctrlKey)) {
-                this.toggle(targetClosestItem);
+                this.toggle(targetItem);
             }
         }
     }

@@ -5,7 +5,7 @@ import { EMenuButton } from "../elements/containers/menus/MenuButton";
 import { HTMLEMenuItemElement, EMenuItem } from "../elements/containers/menus/MenuItem";
 import { EMenuItemGroup } from "../elements/containers/menus/MenuItemGroup";
 import { EToolBarItem } from "../elements/containers/toolbars/ToolBarItem";
-import { element, reactiveChildElements, reactiveElement, CustomElement, Fragment } from "../elements/Element";
+import { element, reactiveChildElements, reactiveElement, CustomElement, fragment } from "../elements/Element";
 import { ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { View } from "./View";
 
@@ -201,7 +201,7 @@ class ListViewBase extends View implements ListView {
     }
 
     renderShadow(): Node {
-        return Fragment(
+        return fragment(
             element("style", {
                 children: [
                     /*css*/`
