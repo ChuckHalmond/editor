@@ -7,7 +7,7 @@ import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/
 import { element, fragment, widget } from "./src/elements/Element";
 import { treeitemWidget } from "./src/views/widgets/tree/TreeItemWidget";
 import { Editor } from "./src/Editor";
-import { menuWidget } from "./lib";
+import { menuWidget } from "./index";
 
 export async function main() {
     

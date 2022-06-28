@@ -15,9 +15,9 @@ interface MenuWidgetFactory extends WidgetFactory {
     items(menu: HTMLElement): HTMLElement[];
 }
 declare var menuWidget: {
-    "__#20549@#template": HTMLElement;
-    "__#20549@#walker": TreeWalker;
-    "__#20549@#toggleTimeouts": WeakMap<HTMLElement, {
+    "__#49@#template": HTMLElement;
+    "__#49@#walker": TreeWalker;
+    "__#49@#toggleTimeouts": WeakMap<HTMLElement, {
         clear(): void;
     }>;
     create(init?: {
@@ -27,23 +27,23 @@ declare var menuWidget: {
     getContextual(menu: HTMLElement): boolean;
     setContextual(menu: HTMLElement, value: boolean): void;
     items(menu: HTMLElement): HTMLElement[];
-    "__#20549@#walkerNodeFilter"(node: Node): number;
-    "__#20549@#collapseSubmenus"(menu: HTMLElement): void;
-    "__#20549@#isClosestMenu"(menu: HTMLElement, target: HTMLElement): boolean;
-    "__#20549@#nearestItem"(menu: HTMLElement, target: HTMLElement): HTMLElement | null;
-    "__#20549@#firstItem"(menu: HTMLElement): HTMLElement | null;
-    "__#20549@#lastItem"(menu: HTMLElement): HTMLElement | null;
-    "__#20549@#previousItem"(item: HTMLElement): HTMLElement | null;
-    "__#20549@#nextItem"(item: HTMLElement): HTMLElement | null;
-    "__#20549@#firstChildItem"(item: HTMLElement): HTMLElement | null;
-    "__#20549@#getActiveItem"(menu: HTMLElement): HTMLElement | null;
-    "__#20549@#setItemTimeout"(item: HTMLElement, delay?: number | undefined): Promise<void>;
-    "__#20549@#clearItemTimeout"(item: HTMLElement): void;
-    "__#20549@#handleClickEvent"(event: MouseEvent): void;
-    "__#20549@#handleFocusOutEvent"(event: FocusEvent): void;
-    "__#20549@#handleKeyDownEvent"(event: KeyboardEvent): void;
-    "__#20549@#handleMouseOutEvent"(event: MouseEvent): void;
-    "__#20549@#handleMouseOverEvent"(event: MouseEvent): void;
+    "__#49@#walkerNodeFilter"(node: Node): number;
+    "__#49@#collapseSubmenus"(menu: HTMLElement): void;
+    "__#49@#isClosestMenu"(menu: HTMLElement, target: HTMLElement): boolean;
+    "__#49@#nearestItem"(menu: HTMLElement, target: HTMLElement): HTMLElement | null;
+    "__#49@#firstItem"(menu: HTMLElement): HTMLElement | null;
+    "__#49@#lastItem"(menu: HTMLElement): HTMLElement | null;
+    "__#49@#previousItem"(item: HTMLElement): HTMLElement | null;
+    "__#49@#nextItem"(item: HTMLElement): HTMLElement | null;
+    "__#49@#firstChildItem"(item: HTMLElement): HTMLElement | null;
+    "__#49@#getActiveItem"(menu: HTMLElement): HTMLElement | null;
+    "__#49@#setItemTimeout"(item: HTMLElement, delay?: number | undefined): Promise<void>;
+    "__#49@#clearItemTimeout"(item: HTMLElement): void;
+    "__#49@#handleClickEvent"(event: MouseEvent): void;
+    "__#49@#handleFocusOutEvent"(event: FocusEvent): void;
+    "__#49@#handleKeyDownEvent"(event: KeyboardEvent): void;
+    "__#49@#handleMouseOutEvent"(event: MouseEvent): void;
+    "__#49@#handleMouseOverEvent"(event: MouseEvent): void;
     slot(root: HTMLElement, name: string | null): HTMLElement | null;
     readonly slots: string[];
 };
