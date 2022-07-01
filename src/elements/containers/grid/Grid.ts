@@ -1,4 +1,4 @@
-import { CustomElement, AttributeProperty, trimMultilineIndent, Stylesheet, element } from "../../Element";
+import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEGridBodyElement } from "./GridBody";
 import { HTMLEGridCellElement } from "./GridCell";
 import { HTMLEGridCellCollection } from "./GridCellCollection";
@@ -47,9 +47,6 @@ var shadowTemplate: HTMLTemplateElement;
 class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
 
     static {
-    }
-    
-    static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
             element("slot")
@@ -77,15 +74,11 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
     }
 
     get body(): HTMLEGridBodyElement | null {
-        return <HTMLEGridBodyElement>Array.from(this.childNodes).find(
-            node_i => node_i instanceof HTMLEGridBodyElement
-        ) ?? null;
+        return this.querySelector<HTMLEGridBodyElement>(":scope > e-gridbody");
     }
 
     get head(): HTMLEGridHeadElement | null {
-        return <HTMLEGridHeadElement>Array.from(this.childNodes).find(
-            node_i => node_i instanceof HTMLEGridHeadElement
-        ) ?? null;
+        return this.querySelector<HTMLEGridHeadElement>(":scope > e-gridhead");
     }
 
     @AttributeProperty({type: String})

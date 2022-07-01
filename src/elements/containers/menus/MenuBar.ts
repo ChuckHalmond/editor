@@ -70,7 +70,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
         this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         this.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
-        this.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
+        //this.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
     }
 
     get activeIndex(): number {
@@ -268,14 +268,14 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
         }
     }
 
-    #handleTriggerEvent(): void {
+    /*#handleTriggerEvent(): void {
         const {activeItem} = this;
         if (activeItem?.expanded) {
             activeItem.collapse();
         }
         this.expanded = false;
         this.focus({preventScroll: true});
-    }
+    }*/
 }
 
 var HTMLEMenuBarElement: HTMLEMenuBarElementConstructor = HTMLEMenuBarElementBase;

@@ -85,8 +85,8 @@ class HTMLEMenuItemElementBase extends HTMLEActionElement implements HTMLEMenuIt
             shadowTemplate.content.cloneNode(true)
         );
     }
-    
-    @QueryProperty({selector: "e-menu[slot=menu]"})
+
+    @QueryProperty({selector: ":scope > e-menu[slot=menu]"})
     readonly menu!: HTMLEMenuElement | null;
 
     toggle(force?: boolean): void {

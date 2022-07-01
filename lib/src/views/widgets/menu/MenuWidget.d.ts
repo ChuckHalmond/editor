@@ -21,8 +21,8 @@ declare var menuWidget: {
         clear(): void;
     }>;
     create(init?: {
-        contextual?: boolean | undefined;
-    } | undefined): HTMLElement;
+        contextual?: boolean;
+    }): HTMLElement;
     positionContextual(menu: HTMLElement, x: number, y: number): void;
     getContextual(menu: HTMLElement): boolean;
     setContextual(menu: HTMLElement, value: boolean): void;
@@ -37,7 +37,7 @@ declare var menuWidget: {
     "__#49@#nextItem"(item: HTMLElement): HTMLElement | null;
     "__#49@#firstChildItem"(item: HTMLElement): HTMLElement | null;
     "__#49@#getActiveItem"(menu: HTMLElement): HTMLElement | null;
-    "__#49@#setItemTimeout"(item: HTMLElement, delay?: number | undefined): Promise<void>;
+    "__#49@#setItemTimeout"(item: HTMLElement, delay?: number): Promise<void>;
     "__#49@#clearItemTimeout"(item: HTMLElement): void;
     "__#49@#handleClickEvent"(event: MouseEvent): void;
     "__#49@#handleFocusOutEvent"(event: FocusEvent): void;
