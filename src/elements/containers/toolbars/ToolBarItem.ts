@@ -118,7 +118,7 @@ class HTMLEToolBarItemElementBase extends HTMLEActionElement implements HTMLEToo
                 if (menubutton) {
                     menubutton.toggle();
                     if (menubutton.expanded) {
-                        menubutton.menu?.items.item(0)?.focus({preventScroll: true});
+                        menubutton.firstItem?.focus({preventScroll: true});
                     }
                 }
                 break;

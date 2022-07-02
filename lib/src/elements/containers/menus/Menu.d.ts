@@ -5,7 +5,7 @@ export { EMenu };
 interface HTMLEMenuElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     readonly activeItem: HTMLEMenuItemElement | null;
-    readonly items: HTMLCollectionOf<HTMLEMenuItemElement>;
+    items(): HTMLEMenuItemElement[];
     name: string;
     contextual: boolean;
     positionContextual(x: number, y: number): void;

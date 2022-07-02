@@ -5,7 +5,7 @@ e-menuitem {
     white-space: nowrap;
 }
 
-e-menuitem[active] {
+e-menuitem:focus-within {
     background-color: var(--focused-item-color);
 }
 

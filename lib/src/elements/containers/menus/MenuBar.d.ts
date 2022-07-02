@@ -6,7 +6,7 @@ interface HTMLEMenuBarElementConstructor {
 }
 interface HTMLEMenuBarElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly items: HTMLCollectionOf<HTMLEMenuItemElement>;
+    items(): HTMLEMenuItemElement[];
     readonly activeItem: HTMLEMenuItemElement | null;
     readonly activeIndex: number;
     name: string;

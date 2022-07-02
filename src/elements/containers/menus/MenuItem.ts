@@ -1,5 +1,4 @@
 import { CustomElement, AttributeProperty, QueryProperty, element } from "../../Element";
-import { HTMLEActionElement } from "../actions/Action";
 import { HTMLEMenuElement } from "./Menu";
 
 export { HTMLEMenuItemElement };
@@ -10,11 +9,14 @@ interface HTMLEMenuItemElementConstructor {
     new(): HTMLEMenuItemElement;
 }
 
-interface HTMLEMenuItemElement extends HTMLEActionElement {
+interface HTMLEMenuItemElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     readonly menu: HTMLEMenuElement | null;
-    active: boolean;
-    index: number;
+    name: string;
+    value: string;
+    hotkey: string;
+    disabled: boolean;
+    checked: boolean;
     expanded: boolean;
     type: "button" | "checkbox" | "radio" | "menu" | "submenu";
     toggle(force?: boolean): void;
@@ -33,15 +35,24 @@ var shadowTemplate: HTMLTemplateElement;
 @CustomElement({
     name: "e-menuitem"
 })
-class HTMLEMenuItemElementBase extends HTMLEActionElement implements HTMLEMenuItemElement {
+class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemElement {
 
     readonly shadowRoot!: ShadowRoot;
-    
-    @AttributeProperty({type: Boolean})
-    active!: boolean;
 
-    @AttributeProperty({type: Number})
-    index!: number;
+    @AttributeProperty({type: String})
+    name!: string;
+
+    @AttributeProperty({type: String})
+    value!: string;
+
+    @AttributeProperty({type: String})
+    hotkey!: string;
+
+    @AttributeProperty({type: Boolean})
+    disabled!: boolean;
+
+    @AttributeProperty({type: Boolean})
+    checked!: boolean;
 
     @AttributeProperty({type: Boolean})
     expanded!: boolean;
@@ -84,6 +95,7 @@ class HTMLEMenuItemElementBase extends HTMLEActionElement implements HTMLEMenuIt
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
+        this.addEventListener("click", this.#handleClickEvent.bind(this));
     }
 
     @QueryProperty({selector: ":scope > e-menu[slot=menu]"})
@@ -175,6 +187,28 @@ class HTMLEMenuItemElementBase extends HTMLEActionElement implements HTMLEMenuIt
                         itemBottom - menuHeight - closestMenuTop + menuPaddingBottom :
                         itemTop - closestMenuTop - menuPaddingTop
                     }px`);
+                }
+            }
+        }
+    }
+
+    #handleClickEvent(event: MouseEvent): void {
+        const {target} = event;
+        if (target == this) {
+            const {type} = this;
+            switch (type) {
+                case "checkbox": {
+                    this.checked = !this.checked;
+                    break;
+                }
+                case "radio": {
+                    this.checked = true;
+                    break;
+                }
+                case "menu":
+                case "submenu": {
+                    this.toggle();
+                    break;
                 }
             }
         }

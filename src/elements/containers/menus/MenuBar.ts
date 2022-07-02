@@ -1,8 +1,5 @@
-import { NodeCollection } from "../../../observers/NodeCollection";
 import { CustomElement, AttributeProperty, element } from "../../Element";
-import { HTMLEMenuElement } from "./Menu";
 import { HTMLEMenuItemElement } from "./MenuItem";
-import { HTMLEMenuItemCollection } from "./MenuItemCollection";
 import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
 
 export { HTMLEMenuBarElement };
@@ -14,7 +11,7 @@ interface HTMLEMenuBarElementConstructor {
 
 interface HTMLEMenuBarElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly items: HTMLCollectionOf<HTMLEMenuItemElement>;
+    items(): HTMLEMenuItemElement[];
     readonly activeItem: HTMLEMenuItemElement | null;
     readonly activeIndex: number;
     name: string;
@@ -41,7 +38,6 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
     expanded!: boolean;
     
     readonly shadowRoot!: ShadowRoot;
-    readonly items: HTMLCollectionOf<HTMLEMenuItemElement>;
 
     #activeIndex: number;
     #walker: TreeWalker;
@@ -58,8 +54,6 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
         this.#walker = document.createTreeWalker(
             this, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
         );
-        //this.items = new NodeCollection<HTMLEMenuItemElement>(this, this.#walkerNodeFilter.bind(this));
-        this.items = this.getElementsByTagName("e-menuitem");
         this.#activeIndex = -1;
         const shadowRoot = this.attachShadow({mode: "open"});
         shadowRoot.append(
@@ -70,7 +64,12 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
         this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         this.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
-        //this.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
+    }
+
+    items(): HTMLEMenuItemElement[] {
+        return Array.from(this.querySelectorAll<HTMLEMenuItemElement>(
+            ":is(:scope, :scope > e-menuitemgroup) > e-menuitem"
+        ));
     }
 
     get activeIndex(): number {
@@ -78,7 +77,10 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
     }
 
     get activeItem(): HTMLEMenuItemElement | null {
-        return this.items.item(this.#activeIndex) ?? null;
+        const {activeIndex} = this;
+        return this.querySelector<HTMLEMenuItemElement>(
+            ":is(:scope, :scope > e-menuitemgroup) > e-menuitem:focus-within"
+        ) ?? activeIndex > -1 ? this.items()[activeIndex] ?? null : null;
     }
 
     #walkerNodeFilter(node: Node): number {
@@ -126,17 +128,15 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
     }
 
     #setActiveItem(item: HTMLEMenuItemElement | null): void {
-        const {activeItem, expanded, items} = this;
+        const {activeItem, expanded} = this;
         if (activeItem !== null && activeItem !== item) {
             activeItem.collapse();
-            activeItem.active = false;
         }
         if (item !== null) {
             if (expanded) {
                 item.expand();
             }
-            item.active = true;
-            this.#activeIndex = Array.from(items).indexOf(item);
+            this.#activeIndex = this.items().indexOf(item);
         }
         else {
             this.#activeIndex = -1;
@@ -166,14 +166,15 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
     }
 
     #handleFocusOutEvent(event: FocusEvent): void {
-        const {relatedTarget} = event;
+        const {target, relatedTarget} = event;
+        if (target instanceof HTMLElement && !target.contains(<Element>relatedTarget)) {
+            const nearestItem = this.#nearestItem(target);
+            if (nearestItem) {
+                nearestItem.collapse();
+            }
+        }
         const lostFocusWithin = !this.contains(<Node>relatedTarget);
         if (lostFocusWithin) {
-            const {activeItem} = this;
-            if (activeItem?.expanded) {
-                activeItem.collapse();
-            }
-            this.#setActiveItem(null);
             this.expanded = false;
         }
     }
@@ -244,7 +245,8 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
                 }
                 break;
             }
-            case "Enter": {
+            case "Enter":
+            case " ": {
                 if (activeItem) {
                     this.expanded = !expanded;
                     const firstChildItem = this.#firstChildItem(activeItem);

@@ -1,5 +1,6 @@
 import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEMenuElement } from "./Menu";
+import { HTMLEMenuItemElement } from "./MenuItem";
 
 export { HTMLEMenuButtonElement };
 export { EMenuButton };
@@ -12,6 +13,7 @@ interface HTMLEMenuButtonElementConstructor {
 interface HTMLEMenuButtonElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     readonly menu: HTMLEMenuElement | null;
+    readonly firstItem: HTMLEMenuItemElement | null;
     name: string;
     disabled: boolean;
     expanded: boolean;
@@ -77,6 +79,8 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
         shadowRoot.addEventListener("slotchange", this.#handleSlotChangeEvent.bind(this));
     }
 
+
+
     toggle(force?: boolean): void {
         const expand = force ?? !this.expanded;
         expand ? this.expand() : this.collapse();
@@ -93,6 +97,12 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
         if (this.expanded) {
             this.expanded = false;
         }
+    }
+
+    get firstItem(): HTMLEMenuItemElement | null {
+        return this.querySelector<HTMLEMenuItemElement>(
+            ":scope > :is(e-menu, e-menu > e-menuitemgroup) > e-menuitem"
+        );
     }
 
     #positionMenu(): void {
@@ -145,7 +155,7 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
             case "Enter":
                 if (!expanded) {
                     this.expand();
-                    this.menu?.items.item(0)?.focus({preventScroll: true});
+                    this.firstItem?.focus({preventScroll: true});
                     event.stopPropagation();
                 }
                 break;

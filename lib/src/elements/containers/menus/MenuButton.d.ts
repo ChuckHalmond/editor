@@ -1,4 +1,5 @@
 import { HTMLEMenuElement } from "./Menu";
+import { HTMLEMenuItemElement } from "./MenuItem";
 export { HTMLEMenuButtonElement };
 export { EMenuButton };
 interface HTMLEMenuButtonElementConstructor {
@@ -8,6 +9,7 @@ interface HTMLEMenuButtonElementConstructor {
 interface HTMLEMenuButtonElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     readonly menu: HTMLEMenuElement | null;
+    readonly firstItem: HTMLEMenuItemElement | null;
     name: string;
     disabled: boolean;
     expanded: boolean;

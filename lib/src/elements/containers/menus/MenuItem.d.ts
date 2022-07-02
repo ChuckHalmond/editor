@@ -1,4 +1,3 @@
-import { HTMLEActionElement } from "../actions/Action";
 import { HTMLEMenuElement } from "./Menu";
 export { HTMLEMenuItemElement };
 export { EMenuItem };
@@ -6,11 +5,14 @@ interface HTMLEMenuItemElementConstructor {
     readonly prototype: HTMLEMenuItemElement;
     new (): HTMLEMenuItemElement;
 }
-interface HTMLEMenuItemElement extends HTMLEActionElement {
+interface HTMLEMenuItemElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     readonly menu: HTMLEMenuElement | null;
-    active: boolean;
-    index: number;
+    name: string;
+    value: string;
+    hotkey: string;
+    disabled: boolean;
+    checked: boolean;
     expanded: boolean;
     type: "button" | "checkbox" | "radio" | "menu" | "submenu";
     toggle(force?: boolean): void;

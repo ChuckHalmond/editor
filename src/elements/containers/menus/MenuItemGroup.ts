@@ -73,7 +73,7 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
                 element_i => element_i instanceof HTMLEMenuItemElement
             );
         assignedItems.forEach((item_i, i) => {
-            item_i.index = i;
+            //item_i.index = i;
         });
     }
 

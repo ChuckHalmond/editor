@@ -8,7 +8,7 @@ export { EMenu };
 interface HTMLEMenuElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     readonly activeItem: HTMLEMenuItemElement | null;
-    readonly items: HTMLCollectionOf<HTMLEMenuItemElement>;
+    items(): HTMLEMenuItemElement[];
     name: string;
     contextual: boolean;
     positionContextual(x: number, y: number): void;
@@ -34,12 +34,22 @@ var toggleTimeouts: WeakMap<HTMLEMenuItemElement, {clear(): void;}>;
 class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
 
     readonly shadowRoot!: ShadowRoot;
-    readonly items: HTMLCollectionOf<HTMLEMenuItemElement>;
+
+    items(): HTMLEMenuItemElement[] {
+        return Array.from(this.querySelectorAll<HTMLEMenuItemElement>(
+            ":is(:scope, :scope > e-menuitemgroup) > e-menuitem"
+        ));
+    }
+
+    get activeIndex(): number {
+        return this.#activeIndex;
+    }
 
     get activeItem(): HTMLEMenuItemElement | null {
+        const {activeIndex} = this;
         return this.querySelector<HTMLEMenuItemElement>(
-            ":is(:scope, :scope > e-menuitemgroup) > e-menuitem[active]"
-        );
+            ":is(:scope, :scope > e-menuitemgroup) > e-menuitem:focus-within"
+        ) ?? activeIndex > -1 ? this.items()[activeIndex] ?? null : null;
     }
 
     @AttributeProperty({type: String})
@@ -49,6 +59,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     contextual!: boolean;
 
     #walker: TreeWalker;
+    #activeIndex: number;
 
     static {
         shadowTemplate = element("template");
@@ -61,20 +72,19 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     constructor() {
         super();
         const shadowRoot = this.attachShadow({mode: "open"});
+        this.#activeIndex = -1;
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
         this.#walker = document.createTreeWalker(
             this, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
         );
-        this.items = this.getElementsByTagName("e-menuitem");
         this.addEventListener("click", this.#handleClickEvent.bind(this));
         this.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
         this.addEventListener("mouseout", this.#handleMouseOutEvent.bind(this));
         this.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
         this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
-        this.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
     }
 
     positionContextual(x: number, y: number): void {
@@ -151,21 +161,58 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     }
 
     #setActiveItem(item: HTMLEMenuItemElement | null): void {
-        const {activeItem} = this;
-        if (activeItem !== null && activeItem !== item) {
-            activeItem.active = false;
-        }
         if (item !== null) {
-            item.active = true;
+            this.#activeIndex = this.items().indexOf(item);
+        }
+    }
+
+    async #setItemTimeout(item: HTMLEMenuItemElement, delay?: number): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                resolve(void 0);
+            }, delay ?? 0);
+            toggleTimeouts.set(item, {
+                clear: () => {
+                    clearTimeout(timeout);
+                    reject();
+                }
+            });
+        }).then(() => {
+            toggleTimeouts.delete(item);
+        });
+    }
+
+    #clearItemTimeout(item: HTMLEMenuItemElement): void {
+        const timeout = toggleTimeouts.get(item);
+        if (typeof timeout !== "undefined") {
+            toggleTimeouts.delete(item);
+            timeout.clear();
         }
     }
 
     #handleClickEvent(event: MouseEvent): void {
         const {target} = event;
         if (target instanceof HTMLEMenuItemElement) {
-            const isClosestMenu = this.#isClosestMenu(target);
-            if (isClosestMenu) {
-                target.trigger();
+            const {contextual} = this;
+            if (contextual) {
+                try {
+                    this.remove();
+                }
+                catch (error) {};
+            }
+            else {
+                const isClosestMenu = this.#isClosestMenu(target);
+                if (isClosestMenu) {
+                    const {type, name, value} = target;
+                    if (type == "radio") {
+                        this.querySelectorAll<HTMLEMenuItemElement>(
+                            `:is(:scope, :scope > e-menuitemgroup) > e-menuitem[type=radio][name=${name}]`
+                        )
+                        .forEach((radio_i) => {
+                            radio_i.checked = radio_i.value == value;
+                        });
+                    }
+                }
             }
         }
     }
@@ -201,30 +248,6 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         }
     }
 
-    async #setItemTimeout(item: HTMLEMenuItemElement, delay?: number): Promise<void> {
-        return new Promise((resolve, reject) => {
-            const timeout = setTimeout(() => {
-                resolve(void 0);
-            }, delay ?? 0);
-            toggleTimeouts.set(item, {
-                clear: () => {
-                    clearTimeout(timeout);
-                    reject();
-                }
-            });
-        }).then(() => {
-            toggleTimeouts.delete(item);
-        });
-    }
-
-    #clearItemTimeout(item: HTMLEMenuItemElement): void {
-        const timeout = toggleTimeouts.get(item);
-        if (typeof timeout !== "undefined") {
-            toggleTimeouts.delete(item);
-            timeout.clear();
-        }
-    }
-
     #handleKeyDownEvent(event: KeyboardEvent) {
         const {key} = event;
         const {activeItem} = this;
@@ -257,7 +280,8 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                 event.stopPropagation();
                 break;
             }
-            case "Enter": {
+            case "Enter":
+            case " ": {
                 if (activeItem) {
                     const {type} = activeItem;
                     switch (type) {
@@ -267,10 +291,6 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                                 const firstChildItem = this.#firstChildItem(activeItem);
                                 firstChildItem?.focus({preventScroll: true});
                             }
-                            break;
-                        }
-                        default: {
-                            activeItem.trigger();
                             break;
                         }
                     }
@@ -416,31 +436,6 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    #handleTriggerEvent(event: Event): void {
-        const {target} = event;
-        const {contextual} = this;
-        if (target instanceof HTMLEMenuItemElement) {
-            const isClosestMenu = this.#isClosestMenu(target);
-            if (isClosestMenu) {
-                const {type, name, value} = target;
-                if (type == "radio") {
-                    this.querySelectorAll<HTMLEMenuItemElement>(
-                        `:is(:scope, :scope > e-menuitemgroup) > e-menuitem[type=radio][name=${name}]`
-                    )
-                    .forEach((radio_i) => {
-                        radio_i.checked = radio_i.value == value;
-                    });
-                }
-            }
-            if (contextual) {
-                try {
-                    this.remove();
-                }
-                catch (error) {};
             }
         }
     }
