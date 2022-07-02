@@ -88,10 +88,14 @@ interface TreeItem {
 }
 
 class TreeItemList implements TreeItem {
-    #items: TreeItemModel[];
+    readonly items: TreeItemModel[];
 
     constructor(items: TreeItemModel[]) {
-        this.#items = items;
+        this.items = items;
+    }
+
+    get count(): number {
+        return this.items.length;
     }
 
     static from(items: TreeItemModel[]): TreeItemList {
@@ -103,24 +107,22 @@ class TreeItemList implements TreeItem {
     }
 
     show(): void {
-        console.log(this.#items);
-        this.#items.forEach(item_i => item_i.show());
+        this.items.forEach(item_i => item_i.show());
     }
 
     hide(): void {
-        this.#items.forEach(item_i => item_i.hide());
+        this.items.forEach(item_i => item_i.hide());
     }
 
     display(): void {
-        const items = this.#items;
-        const result = items.reduce(
+        const result = this.items.reduce(
             (result, item_i) => `${result} ${item_i.label}`, ""
         );
         console.log(result);
     }
 
     remove(): void {
-        const items = this.#items;
+        const {items} = this;
         const removedItemsGroups = items.reduce((map, item_i) => {
             const {parentNode} = item_i;
             if (parentNode instanceof TreeItemModel || parentNode instanceof TreeModel) {
@@ -135,7 +137,6 @@ class TreeItemList implements TreeItem {
             ([list_i, children_i]) => {
                 list_i.beginChanges();
                 children_i.forEach((child_i) => {
-                    
                     list_i.remove(child_i);
                 });
                 list_i.endChanges();
@@ -365,7 +366,7 @@ class TreeViewBase extends View implements TreeView {
                                         tabindex: -1
                                     },
                                     listeners: {
-                                        trigger: () => {
+                                        click: () => {
                                             item.visibility ?
                                                 item.hide() :
                                                 item.show();
@@ -475,13 +476,26 @@ class TreeViewBase extends View implements TreeView {
                     ).filter(
                         item_i => item_i !== null
                     );
-                    //TODO: handle items with same label (replace or cancel)
                     const {type: targetType, parentItem: targetParentItem} = targetItem;
                     const targetList = targetType == "parent" ?
                         targetItem.childItems :
                         targetParentItem ?
                         targetParentItem.childItems :
                         model.childItems;
+                    const targetItems = Array.from(targetList.values());
+                    targetItems.forEach((item_i) => {
+                        const sameLabelIndex = transferedItems.findIndex(item_j => item_j.label == item_i.label);
+                        if (sameLabelIndex > -1) {
+                            const doReplace = confirm(`Replace ${item_i.label}?`);
+                            if (doReplace) {
+                                targetList.remove(item_i);
+                            }
+                            else {
+                                transferedItems.copyWithin(sameLabelIndex, sameLabelIndex + 1);
+                                transferedItems.length--;
+                            }
+                        }
+                    });
                     TreeItemList.from(transferedItems).remove();
                     if (sortFunction) {
                         targetList.beginChanges();
@@ -496,11 +510,9 @@ class TreeViewBase extends View implements TreeView {
                         item_i => this.getTreeItemElement(item_i)!
                     );
                     currentTarget.beginSelection();
-                    newElements.forEach(
-                        (element_i) => {
-                            element_i.selected = true;
-                        }
-                    );
+                    newElements.forEach((element_i) => {
+                        element_i.selected = true;
+                    });
                     currentTarget.endSelection();
                 }
             }
@@ -531,7 +543,7 @@ class TreeViewBase extends View implements TreeView {
                                     "Display"
                                 ],
                                 listeners: {
-                                    trigger: () => {
+                                    click: () => {
                                         TreeItemList.from(
                                             this.selectedItems()
                                         ).display();
@@ -546,10 +558,14 @@ class TreeViewBase extends View implements TreeView {
                                     "Delete"
                                 ],
                                 listeners: {
-                                    trigger: () => {
-                                        TreeItemList.from(
-                                            this.selectedItems()
-                                        ).remove();
+                                    click: () => {
+                                        const itemsList = TreeItemList.from(this.selectedItems());
+                                        const {count} = itemsList;
+                                        const doRemove = confirm(`Remove ${count} items?`);
+                                        if (doRemove) {
+                                            itemsList.remove();
+                                        }
+                                        currentTarget.focus();
                                     }
                                 }
                             })
@@ -569,7 +585,7 @@ class TreeViewBase extends View implements TreeView {
                                     activeItem.visibility ? "Hide" : "Show"
                                 ],
                                 listeners: {
-                                    trigger: () => {
+                                    click: () => {
                                         const selectedItems = TreeItemList.from(
                                             this.selectedItems()
                                         );
@@ -600,9 +616,13 @@ class TreeViewBase extends View implements TreeView {
         if (currentTarget instanceof HTMLETreeElement) {
             switch (key) {
                 case "Delete": {
-                    TreeItemList.from(
-                        this.selectedItems()
-                    ).remove();
+                    const itemsList = TreeItemList.from(this.selectedItems());
+                    const {count} = itemsList;
+                    const doRemove = confirm(`Remove ${count} items?`);
+                    if (doRemove) {
+                        itemsList.remove();
+                    }
+                    currentTarget.focus();
                     event.preventDefault();
                     break;
                 }

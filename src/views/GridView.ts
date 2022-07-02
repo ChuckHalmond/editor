@@ -373,8 +373,9 @@ class GridViewBase extends View implements GridView {
                                                                     trigger: () => {
                                                                         const columnHeaderElement = this.getColumnHeaderElement(column);
                                                                         if (columnHeaderElement) {
-                                                                            columnHeaderElement.style.removeProperty("width");
-                                                                            columnHeaderElement.style.removeProperty("max-width");
+                                                                            const {style} = columnHeaderElement;
+                                                                            style.removeProperty("width");
+                                                                            style.removeProperty("max-width");
                                                                             this.getColumnDataElements(column).forEach(
                                                                                 cell_i => cell_i.style.maxWidth = "unset"
                                                                             );
@@ -569,7 +570,7 @@ class GridViewBase extends View implements GridView {
             if (targetCell) {
                 const targetColumn = Array.from(columns.values()).find(column_i => column_i.name == targetCell.name);
                 if (targetColumn) {
-                    const sortorder = typeof targetColumn.sortorder !== "undefined" ? -targetColumn.sortorder : 1;
+                    const sortorder = targetColumn.sortorder !== undefined ? -targetColumn.sortorder : 1;
                     model.sortByColumn(targetColumn, sortorder);
                 }
             }

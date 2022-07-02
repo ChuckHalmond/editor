@@ -32,10 +32,10 @@ declare global {
     }
 }
 declare var treeitemWidget: {
-    "__#51@#arrowPartTemplate": HTMLElement;
-    "__#51@#template": HTMLElement;
-    "__#51@#types": TreeItemType[];
-    "__#51@#typesFeatures": {
+    "__#48@#arrowPartTemplate": HTMLElement;
+    "__#48@#template": HTMLElement;
+    "__#48@#types": TreeItemType[];
+    "__#48@#typesFeatures": {
         parent: {
             role: string;
             hasArrow: boolean;
@@ -48,10 +48,10 @@ declare var treeitemWidget: {
     getGroup(item: HTMLElement): HTMLElement | null;
     create(init?: {
         type: TreeItemType;
-        label?: string;
-        disabled?: boolean;
-    }): HTMLElement;
-    "__#51@#label"(item: HTMLElement): HTMLElement;
+        label?: string | undefined;
+        disabled?: boolean | undefined;
+    } | undefined): HTMLElement;
+    "__#48@#label"(item: HTMLElement): HTMLElement;
     getLabel(item: HTMLElement): string;
     setLabel(item: HTMLElement, value: string): void;
     setPosInSet(item: HTMLElement, value: number): void;
@@ -70,8 +70,8 @@ declare var treeitemWidget: {
     getSelected(item: HTMLElement): boolean;
     setLevel(item: HTMLElement, value: number): void;
     getLevel(item: HTMLElement): number;
-    toggle(item: HTMLElement, force?: boolean): void;
-    "__#51@#handleClickEvent"(event: MouseEvent): void;
+    toggle(item: HTMLElement, force?: boolean | undefined): void;
+    "__#48@#handleClickEvent"(event: MouseEvent): void;
     slot(root: HTMLElement, name: string | null): HTMLElement | null;
     readonly slots: string[];
 };
