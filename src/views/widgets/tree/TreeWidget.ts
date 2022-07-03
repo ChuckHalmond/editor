@@ -64,11 +64,11 @@ Widget({
         return tree;
     }
 
-    slot(root: HTMLElement, name: string | null): HTMLElement | null {
+    slot(root: HTMLElement) {
         return root;
     }
 
-    slottedCallback(item: HTMLElement, slot: HTMLElement): void {
+    slottedCallback(item: HTMLElement, slot: HTMLElement) {
         Array.from(slot.childNodes).forEach((item_i, i) => {
             if (item_i instanceof HTMLElement) {
                 treeitemWidget.setPosInSet(item_i, i);
@@ -83,11 +83,6 @@ Widget({
 
     #getDropTargetItem(tree: HTMLElement): HTMLElement | null {
         return tree.querySelector<HTMLElement>(".treeitem.droptarget");
-    }
-    
-    #getDropTarget(tree: HTMLElement): boolean {
-        const {classList} = tree;
-        return classList.contains("droptarget");
     }
 
     #setDropTarget(tree: HTMLElement, droptarget: boolean): void {
@@ -301,8 +296,8 @@ Widget({
         const {currentTarget, target, ctrlKey, shiftKey} = event;
         const targetTree = <HTMLElement>currentTarget;
         const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".treeitem");
-        const selectedItems = this.selectedItems(targetTree);
         if (targetItem) {
+            const selectedItems = this.selectedItems(targetTree);
             if (!shiftKey && !ctrlKey) {
                 this.#setSelection(targetTree, targetItem);
             }
@@ -310,10 +305,11 @@ Widget({
                 const selected = treeitemWidget.getSelected(targetItem);
                 if (selected) {
                     targetItem.blur();
-                }
-                (!selected) ?
-                    this.#addToSelection(targetTree, targetItem) :
                     this.#removeFromSelection(targetTree, targetItem);
+                }
+                else {
+                    this.#addToSelection(targetTree, targetItem);
+                }
                 event.stopPropagation();
             }
             else if (shiftKey) {
@@ -558,9 +554,10 @@ Widget({
 
     #handleFocusInEvent(event: FocusEvent): void {
         const {currentTarget, target} = event;
+        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".treeitem");
         const targetTree = <HTMLElement>currentTarget;
-        if (target instanceof HTMLElement && target.classList.contains("treeitem")) {
-            this.#setActiveItem(targetTree, target);
+        if (targetItem) {
+            this.#setActiveItem(targetTree, targetItem);
             targetTree.tabIndex = -1;
         }
     }

@@ -1,17 +1,13 @@
 import { element, Widget } from "../../../elements/Element";
 import { WidgetFactory } from "../Widget";
 
-export { treeitemWidget };
+export { listitemWidget };
 
-type TreeItemType = "parent" | "leaf";
-
-interface TreeItemWidgetFactory extends WidgetFactory {
+interface ListItemWidgetFactory extends WidgetFactory {
     create(init?: {
-        type: TreeItemType;
         label?: string;
         disabled?: boolean;
     }): HTMLElement;
-    getGroup(item: HTMLElement): HTMLElement | null;
     setPosInSet(item: HTMLElement, value: number): void;
     getPosInSet(item: HTMLElement): number;
     getLabel(item: HTMLElement): string;
@@ -24,45 +20,26 @@ interface TreeItemWidgetFactory extends WidgetFactory {
     getSelected(item: HTMLElement): boolean;
     setDisabled(item: HTMLElement, value: boolean): void;
     getDisabled(item: HTMLElement): boolean;
-    setExpanded(item: HTMLElement, value: boolean): void;
-    getExpanded(item: HTMLElement): boolean;
-    getType(item: HTMLElement): TreeItemType | null;
-    setType(item: HTMLElement, value: TreeItemType): void;
-    toggle(item: HTMLElement, force?: boolean): void;
 }
 
 declare global {
     interface WidgetNameMap {
-        "treeitem": TreeItemWidgetFactory,
+        "listitem": ListItemWidgetFactory,
     }
 }
 
-var treeitemWidget = new (
+var listitemWidget = new (
 Widget({
-    name: "treeitem"
-})(class TreeItemWidgetFactoryBase extends WidgetFactory implements TreeItemWidgetFactory {
-    #arrowPartTemplate : HTMLElement;
+    name: "listitem"
+})(class ListItemWidgetFactoryBase extends WidgetFactory implements ListItemWidgetFactory {
     #template: HTMLElement;
-    #types: TreeItemType[];
-    #typesFeatures: {
-        [key in TreeItemType]: {
-            role: string,
-            hasArrow: boolean
-        }
-    };
 
     constructor() {
         super();
-        this.#arrowPartTemplate = element("span", {
-            attributes: {
-                class: "arrow"
-            }
-        });
         this.#template = element("li", {
             attributes: {
-                class: "treeitem",
-                role: "treeitem",
-                type: "treeitem-leaf",
+                class: "listitem",
+                role: "listitem",
                 tabindex: -1
             },
             children: [
@@ -80,35 +57,15 @@ Widget({
                 })
             ]
         });
-        this.#types = ["parent", "leaf"];
-        this.#typesFeatures = {
-            parent: {
-                role: "treeitem",
-                hasArrow: true
-            },
-            leaf: {
-                role: "treeitem",
-                hasArrow: false
-            }
-        };
-    }
-
-    getGroup(item: HTMLElement): HTMLElement | null {
-        return item.querySelector<HTMLElement>(":scope > .treeitemgroup");
     }
 
     create(init?: {
-        type: TreeItemType;
         label?: string;
         disabled?: boolean;
     }): HTMLElement {
         const item = <HTMLElement>this.#template.cloneNode(true);
-        item.addEventListener("click", this.#handleClickEvent.bind(this));
         if (init !== void 0) {
-            const {type, label, disabled} = init;
-            if (type !== void 0) {
-                this.setType(item, type);
-            }
+            const {label, disabled} = init;
             if (label !== void 0) {
                 this.setLabel(item, label);
             }
@@ -117,6 +74,10 @@ Widget({
             }
         }
         return item;
+    }
+
+    group(item: HTMLElement): HTMLElement | null {
+        return item.querySelector<HTMLElement>(":scope > .listitemgroup");
     }
 
     #label(item: HTMLElement): HTMLElement {
@@ -142,51 +103,6 @@ Widget({
     getPosInSet(item: HTMLElement): number {
         const posInSet = item.getAttribute("aria-posinset");
         return posInSet ? parseInt(posInSet) : -1;
-    }
-
-    getType(item: HTMLElement): TreeItemType | null {
-        const types = this.#types;
-        const {classList} = item;
-        for (let type_i of types) {
-            if (classList.contains(`treeitem-${type_i}`)) {
-                return type_i;
-            }
-        }
-        return null;
-    }
-
-    setType(item: HTMLElement, type: TreeItemType): void {
-        const typesFeatures = this.#typesFeatures;
-        const arrowPartTemplate = this.#arrowPartTemplate;
-        const oldType = this.getType(item);
-        const {classList} = item;
-        if (oldType) {
-            classList.remove(`treeitem-${oldType}`);
-        }
-        classList.add(`treeitem-${type}`);
-        const {role, hasArrow} = typesFeatures[type];
-        item.setAttribute("role", role);
-        const labelPart = this.#label(item);
-        const arrowPart = item.querySelector(":scope > .arrow");
-        if (hasArrow) {
-            if (!arrowPart && labelPart) {
-                labelPart.before(arrowPartTemplate.cloneNode(true));
-            }
-        }
-        else {
-            if (arrowPart) {
-                arrowPart.remove();
-            }
-        }
-    }
-
-    setExpanded(item: HTMLElement, value: boolean): void {
-        item.toggleAttribute("aria-expanded", value);
-        item.dispatchEvent(new Event("toggle", {bubbles: true}));
-    }
-
-    getExpanded(item: HTMLElement): boolean {
-        return item.hasAttribute("aria-expanded");
     }
 
     setActive(item: HTMLElement, value: boolean): void {
@@ -238,28 +154,5 @@ Widget({
 
     getSelected(item: HTMLElement): boolean {
         return item.hasAttribute("aria-selected");
-    }
-
-    setLevel(item: HTMLElement, value: number): void {
-        item.style.setProperty("--level", value.toString());
-    }
-
-    getLevel(item: HTMLElement): number {
-        return parseInt(item.style.getPropertyValue("--level"));
-    }
-
-    toggle(item: HTMLElement, force?: boolean): void {
-        this.setExpanded(item, force ?? !this.getExpanded(item));
-    }
-
-    #handleClickEvent(event: MouseEvent): void {
-        const {target, currentTarget, shiftKey, ctrlKey} = event;
-        const targetItem = <HTMLElement>(<HTMLElement>target).closest(".treeitem");
-        if (targetItem == currentTarget) {
-            const type = this.getType(targetItem);
-            if (type == "parent" && !(shiftKey || ctrlKey)) {
-                this.toggle(targetItem);
-            }
-        }
     }
 }));

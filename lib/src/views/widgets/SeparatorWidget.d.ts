@@ -8,7 +8,7 @@ declare global {
 interface SeparatorWidgetFactory extends WidgetFactory {
 }
 declare var separatorWidget: {
-    "__#43@#template": HTMLElement;
+    "__#41@#template": HTMLElement;
     create(): HTMLElement;
     slot(root: HTMLElement, name: string | null): HTMLElement | null;
     readonly slots: string[];

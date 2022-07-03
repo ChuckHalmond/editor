@@ -26,6 +26,14 @@ li, ul {
     padding: 0;
 }
 
+table {
+    border-spacing: 0;
+}
+
+td {
+    border: none;
+}
+
 summary {
     padding: 0;
     margin: 0;

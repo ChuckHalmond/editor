@@ -1,0 +1,28 @@
+.grid {
+    display: table;
+}
+
+.gridrow {
+    display: table-row;
+}
+
+.gridcell,
+.gridheader {
+    display: table-cell;
+}
+
+.grid:is(:not([data-selectby]), [data-selectby="cell"]) .gridcell:hover,
+.grid:is([data-selectby="row"]) .gridrow:hover {
+    background-color: var(--hovered-item-color);
+}
+
+.grid:is(:not([data-selectby]), [data-selectby="cell"]) .gridcell.active,
+.grid:is([data-selectby="row"]) .gridrow.active {
+    outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;
+}
+
+.grid:is(:not([data-selectby]), [data-selectby="cell"]) .gridcell[aria-selected],
+.grid:is([data-selectby="row"]) .gridrow[aria-selected] {
+    background-color: var(--selected-item-color);
+}

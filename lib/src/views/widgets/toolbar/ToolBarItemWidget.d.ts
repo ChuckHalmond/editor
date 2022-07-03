@@ -33,19 +33,19 @@ interface ToolBarItemWidgetFactory extends WidgetFactory {
     setType(item: HTMLElement, value: ToolBarItemType): void;
 }
 declare var toolbarItemWidget: {
-    "__#17204@#template": HTMLElement;
-    "__#17204@#types": ToolBarItemType[];
+    "__#52@#template": HTMLElement;
+    "__#52@#types": ToolBarItemType[];
     getMenu(item: HTMLElement): HTMLElement | null;
     create(init?: {
         type: ToolBarItemType;
-        pressed?: boolean;
-        label?: string;
-        name?: string;
-        keyshortcut?: string;
-        value?: string;
-        disabled?: boolean;
-    }): HTMLElement;
-    "__#17204@#label"(item: HTMLElement): HTMLElement;
+        pressed?: boolean | undefined;
+        label?: string | undefined;
+        name?: string | undefined;
+        keyshortcut?: string | undefined;
+        value?: string | undefined;
+        disabled?: boolean | undefined;
+    } | undefined): HTMLElement;
+    "__#52@#label"(item: HTMLElement): HTMLElement;
     slottedCallback(item: HTMLElement, slot: HTMLElement): void;
     setExpanded(item: HTMLElement, value: boolean): void;
     getExpanded(item: HTMLElement): boolean;
@@ -53,7 +53,7 @@ declare var toolbarItemWidget: {
     setLabel(item: HTMLElement, value: string): void;
     getKeyShortcut(item: HTMLElement): string | null;
     setKeyShortcut(item: HTMLElement, value: string | null): void;
-    toggle(item: HTMLElement, force?: boolean): void;
+    toggle(item: HTMLElement, force?: boolean | undefined): void;
     expand(item: HTMLElement): void;
     collapse(item: HTMLElement): void;
     getType(item: HTMLElement): ToolBarItemType | null;
@@ -68,8 +68,8 @@ declare var toolbarItemWidget: {
     setDisabled(item: HTMLElement, value: boolean): void;
     setActive(item: HTMLElement, value: boolean): void;
     getActive(item: HTMLElement): boolean;
-    "__#17204@#handleClickEvent"(event: MouseEvent): void;
-    "__#17204@#positionMenu"(item: HTMLElement): void;
+    "__#52@#handleClickEvent"(event: MouseEvent): void;
+    "__#52@#positionMenu"(item: HTMLElement): void;
     slot(root: HTMLElement, name: string | null): HTMLElement | null;
     readonly slots: string[];
 };

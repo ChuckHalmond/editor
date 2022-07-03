@@ -1,15 +1,15 @@
 import { WidgetFactory } from "../Widget";
-export { treeItemGroupWidget };
+export { listItemGroupWidget };
 declare global {
     interface WidgetNameMap {
-        "treeitemgroup": TreeItemGroupWidgetFactory;
+        "listitemgroup": ListItemGroupWidgetFactory;
     }
 }
-interface TreeItemGroupWidgetFactory extends WidgetFactory {
+interface ListItemGroupWidgetFactory extends WidgetFactory {
     create(): HTMLElement;
 }
-declare var treeItemGroupWidget: {
-    "__#48@#template": HTMLElement;
+declare var listItemGroupWidget: {
+    "__#51@#template": HTMLElement;
     create(): HTMLElement;
     slot(root: HTMLElement): HTMLElement;
     slottedCallback(item: HTMLElement, slot: HTMLElement): void;

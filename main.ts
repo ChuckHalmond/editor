@@ -459,6 +459,90 @@ export async function main() {
             ]
         })
     );
+
+    document.body.append(
+        widget("list", {
+            slotted: [
+                widget("listitemgroup",  {
+                    slotted: [   
+                        widget("listitem",  {
+                            properties: {
+                                label: "First item"
+                            }
+                        })
+                    ]
+                }),
+                widget("listitem",  {
+                    properties: {
+                        label: "Second item"
+                    }
+                }),
+                widget("listitem",  {
+                    properties: {
+                        label: "Third item",
+                        disabled: true,
+                    }
+                }),
+                widget("listitem",  {
+                    properties: {
+                        label: "Fourth item"
+                    }
+                })
+            ]
+        })
+    );
+
+    document.body.append(
+        widget("grid", {
+            properties: {
+                selectby: "row"
+            },
+            slotted: {
+                headers: [
+                    widget("gridheader",  {
+                        properties: {
+                            label: "First header"
+                        }
+                    }),
+                    widget("gridheader",  {
+                        properties: {
+                            label: "Second header"
+                        }
+                    })
+                ],
+                rows: [
+                    widget("gridrow",  {
+                        slotted: [   
+                            widget("gridcell",  {
+                                properties: {
+                                    label: "First cell"
+                                }
+                            }),
+                            widget("gridcell",  {
+                                properties: {
+                                    label: "Second cell"
+                                }
+                            })
+                        ]
+                    }),
+                    widget("gridrow",  {
+                        slotted: [   
+                            widget("gridcell",  {
+                                properties: {
+                                    label: "Third cell"
+                                }
+                            }),
+                            widget("gridcell",  {
+                                properties: {
+                                    label: "Fourth cell"
+                                }
+                            })
+                        ]
+                    })
+                ]
+            }
+        })
+    );
     
     const editor = new Editor();
     editor.setup();

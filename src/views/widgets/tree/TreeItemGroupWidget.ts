@@ -17,7 +17,7 @@ interface TreeItemGroupWidgetFactory extends WidgetFactory {
 var treeItemGroupWidget = new (
 Widget({
     name: "treeitemgroup"
-})(class TreeItemGroupWidgetFactoryBase extends WidgetFactory {
+})(class TreeItemGroupWidgetFactoryBase extends WidgetFactory implements TreeItemGroupWidgetFactory {
     #template: HTMLElement;
 
     constructor() {
@@ -34,11 +34,11 @@ Widget({
         return <HTMLElement>this.#template.cloneNode(true);
     }
 
-    slot(root: HTMLElement, name: string | null): HTMLElement | null {
+    slot(root: HTMLElement) {
         return root;
     }
 
-    slottedCallback(item: HTMLElement, slot: HTMLElement): void {
+    slottedCallback(item: HTMLElement, slot: HTMLElement) {
         Array.from(slot.childNodes).forEach((item_i, i) => {
             if (item_i instanceof HTMLElement) {
                 treeitemWidget.setPosInSet(item_i, i);

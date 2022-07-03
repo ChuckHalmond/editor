@@ -140,32 +140,10 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
     }
 
     selectedCells(): HTMLEGridCellElement[] {
-        /*const selectedCells = <HTMLEGridCellElement[]>[];
-        const cellsWalker = this.#cellsWalker;
-        cellsWalker.currentNode = cellsWalker.root;
-        let cell = <HTMLEGridCellElement | null>cellsWalker.firstChild();
-        while (cell !== null) {
-            if (cell.selected) {
-                selectedCells.push(cell);
-            }
-            cell = <HTMLEGridCellElement | null>cellsWalker.nextNode();
-        }
-        return selectedCells;*/
         return Array.from(this.querySelectorAll("e-gridcell[selected]"));
     }
 
     selectedRows(): HTMLEGridRowElement[] {
-        /*const selectedRows = <HTMLEGridRowElement[]>[];
-        const rowsWalker = this.#rowsWalker;
-        rowsWalker.currentNode = rowsWalker.root;
-        let row = <HTMLEGridRowElement | null>rowsWalker.firstChild();
-        while (row !== null) {
-            if (row.selected) {
-                selectedRows.push(row);
-            }
-            row = <HTMLEGridRowElement | null>rowsWalker.nextNode();
-        }
-        return selectedRows;*/
         return Array.from(this.querySelectorAll("e-gridrow[selected]"));
     }
 

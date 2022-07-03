@@ -26,4 +26,6 @@
 
 @import "widgets/menu.css" layer(base);
 @import "widgets/tree.css" layer(base);
+@import "widgets/list.css" layer(base);
 @import "widgets/toolbar.css" layer(base);
+@import "widgets/grid.css" layer(base);
