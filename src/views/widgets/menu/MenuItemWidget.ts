@@ -163,7 +163,7 @@ class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetF
         return item;
     }
 
-    slot(root: HTMLElement, name: string | null): HTMLElement | null {
+    slot(root: HTMLElement): HTMLElement | null {
         return root;
     }
 

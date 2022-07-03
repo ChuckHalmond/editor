@@ -75,14 +75,8 @@ Widget({
                             attributes: {
                                 class: "label"
                             }
-                        }),
-                        element("slot")
+                        })
                     ]
-                }),
-                element("slot", {
-                    attributes: {
-                        name: "group"
-                    }
                 })
             ]
         });

@@ -3,6 +3,7 @@ import { menuItemWidget } from "./MenuItemWidget";
 import { WidgetFactory } from "../Widget";
 
 export { menubarWidget };
+
 declare global {
     interface WidgetNameMap {
         "menubar": MenuBarWidgetFactory
@@ -42,7 +43,6 @@ Widget({
         menubar.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         menubar.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
         menubar.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
-        //menubar.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
         return menubar;
     }
 
@@ -241,19 +241,4 @@ Widget({
             }
         }
     }
-
-    /*#handleTriggerEvent(event: Event): void {
-        const {target, currentTarget} = event;
-        const menubar = <HTMLElement>currentTarget;
-        const expanded = this.getExpanded(menubar);
-        if (expanded && target instanceof HTMLElement && target.classList.contains("menuitem")) {
-            const targetType = menuItemWidget.getType(target);
-            const activeItem = this.#getActiveItem(menubar);
-            if (target !== activeItem && targetType !== "menu" && targetType !== "submenu") {
-                menuItemWidget.collapse(target);
-                this.setExpanded(menubar, false);
-                menubar.focus({preventScroll: true});
-            }
-        }
-    }*/
 }));

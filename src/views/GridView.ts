@@ -1,12 +1,10 @@
 import { HTMLEGridElement } from "../elements/containers/grid/Grid";
 import { HTMLEGridCellElement } from "../elements/containers/grid/GridCell";
 import { HTMLEGridRowElement } from "../elements/containers/grid/GridRow";
-import { element, reactiveChildElements, CustomElement, fragment, AttributeProperty, trimMultilineIndent, reactiveElement } from "../elements/Element";
-import { HTMLEWidthSashElement } from "../elements/utils/WidthSash";
+import { element, reactiveChildElements, CustomElement, fragment, AttributeProperty, reactiveElement } from "../elements/Element";
 import { ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { View } from "./View";
 import { HTMLEMenuItemElement } from "../elements/containers/menus/MenuItem";
-import { HTMLEMenuItemRadioList } from "../elements/containers/menus/MenuItemCollection";
 
 export { GridModel };
 export { GridRowModel };

@@ -315,6 +315,14 @@ export async function main() {
                                                     name: "radio",
                                                     value: "2"
                                                 }
+                                            }),
+                                            widget("menuitem", {
+                                                properties: {
+                                                    type: "radio",
+                                                    label: "MenuItem 3",
+                                                    name: "radio",
+                                                    value: "3"
+                                                }
                                             })
                                         ]
                                     })
@@ -413,13 +421,44 @@ export async function main() {
             widget("treeitem", {
                 properties: {
                     label: "treeitem 1",
-                    name: "treeitem 1",
                     type: "leaf"
                 }
             })
         ]
     })
     document.body.append(tree);
+
+    document.body.append(
+        widget("toolbar", {
+            slotted: [
+                widget("toolbaritem",  {
+                    properties: {
+                        label: "First item",
+                        type: "button"
+                    }
+                }),
+                widget("toolbaritem",  {
+                    properties: {
+                        label: "Second item",
+                        type: "checkbox"
+                    }
+                }),
+                widget("toolbaritem",  {
+                    properties: {
+                        label: "Third item",
+                        type: "checkbox",
+                        disabled: true,
+                    }
+                }),
+                widget("toolbaritem",  {
+                    properties: {
+                        label: "Fourth item",
+                        type: "checkbox"
+                    }
+                })
+            ]
+        })
+    );
     
     const editor = new Editor();
     editor.setup();

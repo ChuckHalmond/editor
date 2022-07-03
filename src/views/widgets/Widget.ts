@@ -76,9 +76,10 @@ class WidgetFactoryBase implements WidgetFactory {
             this.create, {
                 apply: (target, thisArg, argumentsList) => {
                     const element = Reflect.apply(target, thisArg, argumentsList);
-                    const slots =(<(string | null)[]>widget.slots).concat(null).map(slot_i => {
-                        return widget.slot(element, slot_i);
-                    });
+                    const {slots: slotNames} = widget;
+                    const slots = (<(string | null)[]>[null])
+                        .concat(slotNames)
+                        .map(slot_i => widget.slot(element, slot_i));
                     slots.forEach(slot_i => {
                         if (slot_i) {
                             slotsObserver.observe(slot_i, {
@@ -105,7 +106,7 @@ class WidgetFactoryBase implements WidgetFactory {
                     return element;
                 }
             }
-        )
+        );
     }
 
     create(): HTMLElement {

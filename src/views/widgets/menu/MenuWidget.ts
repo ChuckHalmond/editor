@@ -56,7 +56,6 @@ Widget({
         menu.addEventListener("mouseout", this.#handleMouseOutEvent.bind(this));
         menu.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         menu.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
-        //menu.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
         if (init !== void 0) {
             const {contextual} = init;
             if (contextual !== void 0) {
@@ -64,7 +63,7 @@ Widget({
             }
         }
         return menu;
-    };
+    }
 
     positionContextual(menu: HTMLElement, x: number, y: number): void {
         const {style} = menu;
@@ -291,7 +290,6 @@ Widget({
                         }
                     }
                     event.stopPropagation();
-                    
                 }
                 break;
             }

@@ -16,11 +16,11 @@
 .treeitem.droptarget {
     background-color: var(--droptarget-item-color);
 }
-
+/*
 .treeitem.active:focus-visible {
     outline: none;
 }
-
+*/
 .treeitem > .content {
     display: flex;
     line-height: 22px;
@@ -32,9 +32,11 @@
     outline-offset: -1px;
 }
 
+/*
 .treeitem:focus > .content {
-    background-color: var(--focus-background-color);
+    background-color: var(--focused-item-color);
 }
+*/
 
 .treeitem > .content:hover {
     background-color: var(--hovered-item-color);

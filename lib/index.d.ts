@@ -49,4 +49,7 @@ export * from "./src/views/widgets/menu/MenuItemGroupWidget";
 export * from "./src/views/widgets/tree/TreeWidget";
 export * from "./src/views/widgets/tree/TreeItemWidget";
 export * from "./src/views/widgets/tree/TreeItemGroupWidget";
+export * from "./src/views/widgets/toolbar/ToolBarWidget";
+export * from "./src/views/widgets/toolbar/ToolBarItemWidget";
+export * from "./src/views/widgets/toolbar/ToolBarItemGroupWidget";
 export * from "./index";

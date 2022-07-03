@@ -1,0 +1,38 @@
+.toolbar {
+    display: flex;
+    flex-direction: row;
+}
+
+.toolbaritemgroup {
+    display: flex;
+    width: max-content;
+    flex-direction: row;
+}
+
+.toolbaritem {
+    display: flex;
+    user-select: none;
+    white-space: nowrap;
+    cursor: pointer;
+    line-height: 22px;
+}
+
+.toolbaritem[aria-disabled] {
+    opacity: 0.38;
+    pointer-events: none;
+}
+
+.toolbar:focus-within .toolbaritem.active {
+    outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;
+}
+
+.toolbaritem:hover {
+    background-color: var(--hovered-item-color);
+}
+
+/*
+.toolbaritem:focus-within {
+    background-color: var(--focused-item-color);
+}
+*/

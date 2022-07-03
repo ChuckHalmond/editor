@@ -105,7 +105,6 @@ interface WidgetInit<K extends keyof WidgetNameMap> {
     };
 }
 declare function widget<K extends keyof WidgetNameMap>(name: K, init?: WidgetInit<K>): ReturnType<WidgetNameMap[K]["create"]>;
-declare function widget<K extends keyof WidgetNameMap>(name: string, init?: WidgetInit<K>): HTMLElement;
 declare function reactiveElement<M extends ModelNode, E extends Element, K extends string>(model: M, element: E, properties: K[], react: (object: E, property: K, oldValue: any, newValue: any) => void): E;
 interface ReactiveChildElements {
     (parent: Node & ParentNode): (Node | string)[];

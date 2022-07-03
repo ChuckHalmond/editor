@@ -404,8 +404,6 @@ interface WidgetInit<K extends keyof WidgetNameMap> {
 function widget<K extends keyof WidgetNameMap>(
     name: K, init?: WidgetInit<K>): ReturnType<WidgetNameMap[K]["create"]>;
 function widget<K extends keyof WidgetNameMap>(
-    name: string, init?: WidgetInit<K>): HTMLElement
-function widget<K extends keyof WidgetNameMap>(
     name: K, init?: WidgetInit<K>): HTMLElement {
     const widget = widgets.get(name);
     if (widget) {
@@ -470,7 +468,7 @@ function widget<K extends keyof WidgetNameMap>(
         }
         return element;
     }
-    throw new Error(`Unknown widget ${name}`);
+    throw new Error(`Unknown widget ${name}.`);
 }
 
 const reactiveElementsMap = new WeakMap<ModelNode, {

@@ -1,9 +1,8 @@
 import { HTMLEToolBarItemElement } from "./ToolBarItem";
-import { HTMLEToolBarItemCollection } from "./ToolBarItemCollection";
 export { HTMLEToolBarElement };
 interface HTMLEToolBarElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly items: HTMLEToolBarItemCollection;
+    items(): HTMLEToolBarItemElement[];
     readonly activeItem: HTMLEToolBarItemElement | null;
     readonly activeIndex: number;
     name: string;

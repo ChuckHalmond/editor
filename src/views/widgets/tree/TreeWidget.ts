@@ -230,8 +230,6 @@ Widget({
             activeItem.tabIndex = -1;
         }
         if (item !== null) {
-            const walker = this.#walker;
-            walker.currentNode = item;
             treeitemWidget.setActive(item, true);
             item.tabIndex = 0;
         }

@@ -1,7 +1,6 @@
 import { HTMLESelectElement } from "../../controls/forms/Select";
 import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEToolBarItemElement } from "./ToolBarItem";
-import { HTMLEToolBarItemCollection, HTMLEToolBarItemRadioList } from "./ToolBarItemCollection";
 import { HTMLEToolBarItemGroupElement } from "./ToolBarItemGroup";
 
 export { HTMLEToolBarElement };
@@ -10,7 +9,7 @@ type ToolBarOrientation = "horizontal" | "vertical";
 
 interface HTMLEToolBarElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly items: HTMLEToolBarItemCollection;
+    items(): HTMLEToolBarItemElement[];
     readonly activeItem: HTMLEToolBarItemElement | null;
     readonly activeIndex: number;
     name: string;
@@ -35,10 +34,17 @@ var shadowTemplate: HTMLTemplateElement;
 class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement {
 
     readonly shadowRoot!: ShadowRoot;
-    readonly items: HTMLEToolBarItemCollection;
 
     get activeItem(): HTMLEToolBarItemElement | null {
-        return this.items.item(this.#activeIndex) ?? null;
+        return this.querySelector<HTMLEToolBarItemElement>(
+            "e-toolbaritem[active]"
+        );
+    }
+
+    items(): HTMLEToolBarItemElement[] {
+        return Array.from(this.querySelectorAll<HTMLEToolBarItemElement>(
+            ":is(:scope, :scope > e-toolbaritemgroup) > e-toolbaritem"
+        ));
     }
 
     get activeIndex(): number {
@@ -77,7 +83,6 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         this.#walker = document.createTreeWalker(
             this, NodeFilter.SHOW_ELEMENT, this.#nodeFilter.bind(this)
         );
-        this.items = new HTMLEToolBarItemCollection(this);
         const shadowRoot = this.attachShadow({mode: "open"});
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
@@ -126,13 +131,13 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
     }
 
     #setActiveItem(item: HTMLEToolBarItemElement | null): void {
-        const {activeItem, items} = this;
+        const {activeItem} = this;
         if (activeItem !== null && activeItem !== item) {
             activeItem.active = false;
         }
         if (item !== null) {
             item.active = true;
-            this.#activeIndex = Array.from(items.values()).indexOf(item);
+            this.#activeIndex = this.items().indexOf(item);
         }
         else {
             this.#activeIndex = -1;
@@ -190,8 +195,7 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
 
     #handleFocusInEvent(event: FocusEvent): void {
         const {target} = event;
-        const {items} = this;
-        const activeItem = Array.from(items.values()).find(
+        const activeItem = this.items().find(
             item_i => item_i.contains(<Node>target)
         ) ?? null;
         this.#setActiveItem(activeItem);
@@ -319,7 +323,9 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         if (target instanceof HTMLEToolBarItemElement) {
             const {type, name, value} = target;
             if (type == "radio") {
-                Array.from(new HTMLEToolBarItemRadioList(this, name).values()).forEach((radio_i) => {
+                this.querySelectorAll<HTMLEToolBarItemElement>(
+                    `:is(:scope, :scope > e-toolbaritemgroup) > e-toolbaritem[type=radio][name=${name}]`
+                ).forEach((radio_i) => {
                     radio_i.checked = radio_i.value == value;
                 });
             }
