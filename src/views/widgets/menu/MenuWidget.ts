@@ -259,7 +259,7 @@ Widget({
             case "ArrowDown": {
                 const nextItem = activeItem ?
                     this.#nextItem(activeItem) ?? this.#firstItem(menu) :
-                    this.#lastItem(menu);
+                    this.#firstItem(menu);
                 nextItem?.focus({preventScroll: true});
                 event.stopPropagation();
                 break;

@@ -37,15 +37,8 @@ Widget({
             children: [
                 element("span", {
                     attributes: {
-                        class: "content"
-                    },
-                    children: [
-                        element("span", {
-                            attributes: {
-                                class: "label"
-                            }
-                        })
-                    ]
+                        class: "label"
+                    }
                 })
             ]
         });
@@ -64,14 +57,6 @@ Widget({
         return header;
     }
 
-    #label(header: HTMLElement): HTMLElement {
-        const label = header.querySelector<HTMLElement>(":scope > .content > .label");
-        if (!label) {
-            throw new Error(`No label found.`);
-        }
-        return label;
-    }
-
     getLabel(header: HTMLElement): string {
         return this.#label(header).textContent ?? "";
     }
@@ -83,9 +68,7 @@ Widget({
     setActive(item: HTMLElement, value: boolean): void {
         const {classList} = item;
         if (value) {
-            if (!classList.contains("active")) {
-                classList.add("active");
-            }
+            classList.add("active");
         }
         else {
             classList.remove("active");
@@ -95,5 +78,9 @@ Widget({
     getActive(item: HTMLElement): boolean {
         const {classList} = item;
         return classList.contains("active");
+    }
+
+    #label(header: HTMLElement): HTMLElement {
+        return header.querySelector<HTMLElement>(":scope > .label")!;
     }
 }));

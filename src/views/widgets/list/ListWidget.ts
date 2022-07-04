@@ -68,14 +68,15 @@ Widget({
         return list;
     }
 
-    slot(root: HTMLElement) {
-        return root;
+    slot(list: HTMLElement) {
+        return list;
     }
 
-    slottedCallback(item: HTMLElement, slot: HTMLElement) {
-        Array.from(slot.childNodes).forEach((item_i, i) => {
-            if (item_i instanceof HTMLElement) {
-                listitemWidget.setPosInSet(item_i, i);
+    slottedCallback(list: HTMLElement, slot: HTMLElement) {
+        const {childNodes} = slot;
+        Array.from(childNodes).forEach((child_i, i) => {
+            if (child_i instanceof HTMLElement && child_i.classList.contains("listitem")) {
+                listitemWidget.setPosInSet(child_i, i);
             }
         });
     }
@@ -434,7 +435,7 @@ Widget({
             }
             case "Enter": {
                 if (activeItem) {
-                    this.#setSelection(activeItem);
+                    this.#setSelection(targetList, activeItem);
                     activeItem.click();
                 }
                 event.stopPropagation();
@@ -452,8 +453,8 @@ Widget({
 
     #handleMouseDownEvent(event: MouseEvent): void {
         const {currentTarget, target, ctrlKey, shiftKey, button} = event;
-        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".listitem");
         const targetList = <HTMLElement>currentTarget;
+        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".listitem");
         if (targetItem) {
             const selected = listitemWidget.getSelected(targetItem);
             switch (button) {
@@ -469,6 +470,7 @@ Widget({
                         else {
                             this.#addToSelection(targetList, targetItem);
                         }
+                        event.stopPropagation();
                     }
                     else if (shiftKey) {
                         const activeItem = this.#getActiveItem(targetList);

@@ -35,6 +35,16 @@
     background-color: var(--hovered-item-color);
 }
 
+.toolbaritem-menubutton > .menu {
+    z-index: 1;
+    position: absolute;
+}
+
+.toolbaritem-menubutton:not([aria-expanded]) > .menu {
+    opacity: 0;
+    pointer-events: none;
+}
+
 /*
 .toolbaritem:focus-within {
     background-color: var(--focused-item-color);

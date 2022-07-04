@@ -46,13 +46,15 @@
     background-color: var(--selected-item-color);
 }
 
+.treeitem > .content {
+    display: flex;
+    line-height: 22px;
+    padding-left: calc(var(--level) * var(--indent-width, 12px));
+}
+
 .treeitem:not(.treeitem-parent) > .treeitemgroup,
 .treeitem:not([aria-expanded]) > .treeitemgroup {
     display: none;
-}
-
-.treeitem:not(.treeitem-parent) > .content > .arrow::before {
-    visibility: hidden;
 }
 
 .treeitem > .content > .arrow {
@@ -62,7 +64,7 @@
     margin: 1px 4px 1px 1px;
 }
 
-.treeitem > .content > .arrow::before {
+.treeitem-parent > .content > .arrow::before {
     display: inline-block;
     width: 18px;
     height: 18px;

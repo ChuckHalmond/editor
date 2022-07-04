@@ -16,7 +16,7 @@ interface ToolBarItemWidgetFactory extends WidgetFactory {
         value?: string;
         disabled?: boolean;
     }): HTMLElement;
-    getMenu(item: HTMLElement): HTMLElement | null;
+    menu(item: HTMLElement): HTMLElement | null;
     getName(item: HTMLElement): string;
     setName(item: HTMLElement, value: string): void;
     getLabel(item: HTMLElement): string;
@@ -33,27 +33,27 @@ interface ToolBarItemWidgetFactory extends WidgetFactory {
     setType(item: HTMLElement, value: ToolBarItemType): void;
 }
 declare var toolbarItemWidget: {
-    "__#52@#template": HTMLElement;
-    "__#52@#types": ToolBarItemType[];
-    getMenu(item: HTMLElement): HTMLElement | null;
+    "__#25285@#template": HTMLElement;
+    "__#25285@#types": ToolBarItemType[];
     create(init?: {
-        type: ToolBarItemType;
-        pressed?: boolean;
-        label?: string;
-        name?: string;
-        keyshortcut?: string;
-        value?: string;
-        disabled?: boolean;
-    }): HTMLElement;
-    "__#52@#label"(item: HTMLElement): HTMLElement;
+        type?: ToolBarItemType | undefined;
+        pressed?: boolean | undefined;
+        label?: string | undefined;
+        name?: string | undefined;
+        keyshortcut?: string | undefined;
+        value?: string | undefined;
+        disabled?: boolean | undefined;
+    } | undefined): HTMLElement;
+    slot(item: HTMLElement): HTMLElement | null;
     slottedCallback(item: HTMLElement, slot: HTMLElement): void;
+    menu(item: HTMLElement): HTMLElement | null;
     setExpanded(item: HTMLElement, value: boolean): void;
     getExpanded(item: HTMLElement): boolean;
     getLabel(item: HTMLElement): string;
     setLabel(item: HTMLElement, value: string): void;
     getKeyShortcut(item: HTMLElement): string | null;
     setKeyShortcut(item: HTMLElement, value: string | null): void;
-    toggle(item: HTMLElement, force?: boolean): void;
+    toggle(item: HTMLElement, force?: boolean | undefined): void;
     expand(item: HTMLElement): void;
     collapse(item: HTMLElement): void;
     getType(item: HTMLElement): ToolBarItemType | null;
@@ -68,8 +68,9 @@ declare var toolbarItemWidget: {
     setDisabled(item: HTMLElement, value: boolean): void;
     setActive(item: HTMLElement, value: boolean): void;
     getActive(item: HTMLElement): boolean;
-    "__#52@#handleClickEvent"(event: MouseEvent): void;
-    "__#52@#positionMenu"(item: HTMLElement): void;
-    slot(root: HTMLElement, name: string | null): HTMLElement | null;
+    "__#25285@#handleFocusOutEvent"(event: FocusEvent): void;
+    "__#25285@#handleClickEvent"(event: MouseEvent): void;
+    "__#25285@#positionMenu"(item: HTMLElement): void;
+    "__#25285@#label"(item: HTMLElement): HTMLElement;
     readonly slots: string[];
 };

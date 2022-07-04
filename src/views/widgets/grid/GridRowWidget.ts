@@ -39,8 +39,7 @@ Widget({
             attributes: {
                 class: "gridrow",
                 role: "row",
-                tabindex: -1,
-                ariaSelected: "false"
+                tabindex: -1
             }
         });
     }
@@ -54,7 +53,12 @@ Widget({
             if (disabled !== void 0) {
                 this.setDisabled(row, disabled);
             }
+            this.setSelected(row, false);
         }
+        return row;
+    }
+
+    slot(row: HTMLElement): HTMLElement | null {
         return row;
     }
 
@@ -76,9 +80,7 @@ Widget({
     setActive(row: HTMLElement, value: boolean): void {
         const {classList} = row;
         if (value) {
-            if (!classList.contains("active")) {
-                classList.add("active");
-            }
+            classList.add("active");
         }
         else {
             classList.remove("active");

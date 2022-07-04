@@ -21,7 +21,7 @@ interface ToolBarItemWidgetFactory extends WidgetFactory {
         value?: string;
         disabled?: boolean;
     }): HTMLElement;
-    getMenu(item: HTMLElement): HTMLElement | null;
+    menu(item: HTMLElement): HTMLElement | null;
     getName(item: HTMLElement): string;
     setName(item: HTMLElement, value: string): void;
     getLabel(item: HTMLElement): string;
@@ -47,10 +47,6 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
     #template: HTMLElement;
     #types: ToolBarItemType[];
 
-    getMenu(item: HTMLElement): HTMLElement | null {
-        return item.querySelector<HTMLElement>(":scope > .menu");
-    }
-
     constructor() {
         super();
         this.#types = ["button", "checkbox", "radio", "menubutton"];
@@ -72,7 +68,7 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
     }
 
     create(init?: {
-        type: ToolBarItemType;
+        type?: ToolBarItemType;
         pressed?: boolean;
         label?: string;
         name?: string;
@@ -81,6 +77,7 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
         disabled?: boolean;
     }) {
         const item = <HTMLElement>this.#template.cloneNode(true);
+        item.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         item.addEventListener("click", this.#handleClickEvent.bind(this));
         if (init !== void 0) {
             const {keyshortcut, pressed, type, label, name, value, disabled} = init;
@@ -109,12 +106,8 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
         return item;
     }
 
-    #label(item: HTMLElement): HTMLElement {
-        const label = item.querySelector<HTMLElement>(":scope > .label");
-        if (!label) {
-            throw new Error(`No label found.`);
-        }
-        return label;
+    slot(item: HTMLElement): HTMLElement | null {
+        return item;
     }
 
     slottedCallback(item: HTMLElement, slot: HTMLElement): void {
@@ -122,6 +115,10 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
             childNode_i => childNode_i instanceof HTMLElement && childNode_i.classList.contains("menu")
         );
         item.setAttribute("aria-haspopup", hasChildMenu.toString());
+    }
+
+    menu(item: HTMLElement): HTMLElement | null {
+        return item.querySelector<HTMLElement>(":scope > .menu");
     }
 
     setExpanded(item: HTMLElement, value: boolean): void {
@@ -189,11 +186,13 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
 
     setType(item: HTMLElement, type: ToolBarItemType): void {
         const oldType = this.getType(item);
-        const {classList} = item;
-        if (oldType) {
-            classList.remove(`toolbaritem-${oldType}`);
+        if (type !== oldType) {
+            const {classList} = item;
+            if (oldType) {
+                classList.remove(`toolbaritem-${oldType}`);
+            }
+            classList.add(`toolbaritem-${type}`);
         }
-        classList.add(`toolbaritem-${type}`);
     }
 
     getValue(item: HTMLElement): string {
@@ -231,9 +230,7 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
     setActive(item: HTMLElement, value: boolean): void {
         const {classList} = item;
         if (value) {
-            if (!classList.contains("active")) {
-                classList.add("active");
-            }
+            classList.add("active");
         }
         else {
             classList.remove("active");
@@ -243,6 +240,15 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
     getActive(item: HTMLElement): boolean {
         const {classList} = item;
         return classList.contains("active");
+    }
+
+    #handleFocusOutEvent(event: FocusEvent): void {
+        const {currentTarget, relatedTarget} = event;
+        const targetItem = <HTMLElement>currentTarget;
+        const lostFocusWithin = !targetItem.contains(<Node>relatedTarget);
+        if (lostFocusWithin) {
+            this.collapse(targetItem);
+        }
     }
 
     #handleClickEvent(event: MouseEvent): void {
@@ -260,7 +266,14 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
                     break;
                 }
                 case "menubutton": {
-                    this.toggle(targetItem);
+                    const menu = this.menu(targetItem);
+                    if (menu && !menu.contains(<Node>target)) {
+                        this.toggle(targetItem);
+                        const expanded = this.getExpanded(targetItem);
+                        if (expanded) {
+                            menu?.focus({preventScroll: true});
+                        }
+                    }
                     break;
                 }
             }
@@ -270,7 +283,7 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
     #positionMenu(item: HTMLElement): void {
         const type = this.getType(item);
         if (type == "menubutton") {
-            const menu = this.getMenu(item);
+            const menu = this.menu(item);
             if (menu !== null) {
                 const {style: menuStyle} = menu;
                 const {top: itemTop, bottom: itemBottom, left: itemLeft, right: itemRight} = item.getBoundingClientRect();
@@ -291,5 +304,9 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
                 }px`);
             }
         }
+    }
+
+    #label(item: HTMLElement): HTMLElement {
+        return item.querySelector<HTMLElement>(":scope > .label")!;
     }
 }));

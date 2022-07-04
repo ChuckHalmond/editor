@@ -42,7 +42,6 @@ Widget({
             attributes: {
                 class: "gridcell",
                 role: "gridcell",
-                ariaSelected: "false",
                 tabindex: -1
             },
             children: [
@@ -75,16 +74,13 @@ Widget({
             if (disabled !== void 0) {
                 this.setDisabled(cell, disabled);
             }
+            this.setSelected(cell, false);
         }
         return cell;
     }
 
-    #label(item: HTMLElement): HTMLElement {
-        const label = item.querySelector<HTMLElement>(":scope > .content > .label");
-        if (!label) {
-            throw new Error(`No label found.`);
-        }
-        return label;
+    slot(cell: HTMLElement): HTMLElement | null {
+        return cell;
     }
 
     getHeaders(item: HTMLElement): string {
@@ -115,9 +111,7 @@ Widget({
     setActive(item: HTMLElement, value: boolean): void {
         const {classList} = item;
         if (value) {
-            if (!classList.contains("active")) {
-                classList.add("active");
-            }
+            classList.add("active");
         }
         else {
             classList.remove("active");
@@ -132,9 +126,7 @@ Widget({
     setDropTarget(item: HTMLElement, value: boolean): void {
         const {classList} = item;
         if (value) {
-            if (!classList.contains("droptarget")) {
-                classList.add("droptarget");
-            }
+            classList.add("droptarget");
         }
         else {
             classList.remove("droptarget");
@@ -161,5 +153,9 @@ Widget({
 
     getSelected(item: HTMLElement): boolean {
         return JSON.parse(item.getAttribute("aria-selected") ?? false.toString());
+    }
+
+    #label(item: HTMLElement): HTMLElement {
+        return item.querySelector<HTMLElement>(":scope > .content > .label")!;
     }
 }));

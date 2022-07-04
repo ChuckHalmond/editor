@@ -427,6 +427,26 @@ export async function main() {
                     label: "treeitem 1",
                     type: "leaf",
                     draggable: true
+                },
+                slotted: {
+                    content: [
+                        widget("toolbar", {
+                            slotted: [
+                                widget("toolbaritem",  {
+                                    properties: {
+                                        label: "First item",
+                                        type: "button"
+                                    }
+                                }),
+                                widget("toolbaritem",  {
+                                    properties: {
+                                        label: "Second item",
+                                        type: "checkbox"
+                                    }
+                                })
+                            ]
+                        })
+                    ]
                 }
             })
         ]
@@ -439,8 +459,28 @@ export async function main() {
                 widget("toolbaritem",  {
                     properties: {
                         label: "First item",
-                        type: "button"
-                    }
+                        type: "menubutton"
+                    },
+                    slotted: [
+                        widget("menu", {
+                            slotted: [
+                                widget("menuitem", {
+                                    properties: {
+                                        label: "MenuItem 1",
+                                        name: "MenuItem 1",
+                                        type: "checkbox"
+                                    }
+                                }),
+                                widget("menuitem", {
+                                    properties: {
+                                        label: "MenuItem 2",
+                                        name: "MenuItem 2",
+                                        type: "checkbox"
+                                    }
+                                })
+                            ]
+                        })
+                    ]
                 }),
                 widget("toolbaritem",  {
                     properties: {
@@ -480,7 +520,25 @@ export async function main() {
                 widget("listitem",  {
                     properties: {
                         label: "Second item"
-                    }
+                    },
+                    slotted: [
+                        widget("toolbar", {
+                            slotted: [
+                                widget("toolbaritem",  {
+                                    properties: {
+                                        label: "First item",
+                                        type: "button"
+                                    }
+                                }),
+                                widget("toolbaritem",  {
+                                    properties: {
+                                        label: "Second item",
+                                        type: "checkbox"
+                                    }
+                                })
+                            ]
+                        })
+                    ]
                 }),
                 widget("listitem",  {
                     properties: {

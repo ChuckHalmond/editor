@@ -21,7 +21,6 @@ var toolbarWidget = new (
 Widget({
     name: "toolbar"
 })(class ToolBarWidgetFactoryBase extends WidgetFactory {
-
     #template: HTMLElement;
     #walker: TreeWalker;
 
@@ -45,7 +44,7 @@ Widget({
         toolbar.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
         toolbar.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         toolbar.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
-        toolbar.addEventListener("click", this.#handleClickEvent.bind(this));
+        toolbar.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
         return toolbar;
     }
 
@@ -108,7 +107,7 @@ Widget({
     }
 
     #firstChildItem(item: HTMLElement): HTMLElement | null {
-        const menu = toolbarItemWidget.getMenu(item);
+        const menu = toolbarItemWidget.menu(item);
         if (menu) {
             const walker = this.#walker;
             walker.currentNode = menu;
@@ -227,15 +226,21 @@ Widget({
                 break;
             }
             case "Escape": {
-                this.#setActiveItem(targetToolbar, null);
-                targetToolbar.focus();
+                if (activeItem) {
+                    activeItem.focus({preventScroll: true});
+                }
+                else {
+                    targetToolbar.focus({preventScroll: true});
+                }
+                //this.#setActiveItem(targetToolbar, null);
+                //targetToolbar.focus();
                 event.stopPropagation();
                 break;
             }
         }
     }
 
-    #handleClickEvent(event: Event): void {
+    #handleMouseDownEvent(event: Event): void {
         const {currentTarget, target} = event;
         const toolbar = <HTMLElement>currentTarget;
         if (target instanceof HTMLElement && target.classList.contains("toolbaritem")) {

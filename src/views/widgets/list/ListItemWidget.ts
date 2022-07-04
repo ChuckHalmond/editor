@@ -45,15 +45,8 @@ Widget({
             children: [
                 element("span", {
                     attributes: {
-                        class: "content"
-                    },
-                    children: [
-                        element("span", {
-                            attributes: {
-                                class: "label"
-                            }
-                        })
-                    ]
+                        class: "label"
+                    }
                 })
             ]
         });
@@ -72,20 +65,17 @@ Widget({
             if (disabled !== void 0) {
                 this.setDisabled(item, disabled);
             }
+            this.setSelected(item, false);
         }
         return item;
     }
 
-    group(item: HTMLElement): HTMLElement | null {
-        return item.querySelector<HTMLElement>(":scope > .listitemgroup");
+    slot(root: HTMLElement): HTMLElement | null {
+        return root;
     }
 
-    #label(item: HTMLElement): HTMLElement {
-        const label = item.querySelector<HTMLElement>(":scope > .content > .label");
-        if (!label) {
-            throw new Error(`No label found.`);
-        }
-        return label;
+    group(item: HTMLElement): HTMLElement | null {
+        return item.querySelector<HTMLElement>(":scope > .listitemgroup");
     }
 
     getLabel(item: HTMLElement): string {
@@ -108,9 +98,7 @@ Widget({
     setActive(item: HTMLElement, value: boolean): void {
         const {classList} = item;
         if (value) {
-            if (!classList.contains("active")) {
-                classList.add("active");
-            }
+            classList.add("active");
         }
         else {
             classList.remove("active");
@@ -152,5 +140,9 @@ Widget({
 
     getSelected(row: HTMLElement): boolean {
         return JSON.parse(row.getAttribute("aria-selected") ?? false.toString());
+    }
+
+    #label(item: HTMLElement): Node {
+        return item.querySelector<HTMLElement>(":scope > .label")!;
     }
 }));

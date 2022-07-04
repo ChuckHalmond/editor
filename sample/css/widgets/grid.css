@@ -22,8 +22,12 @@
     background-color: var(--hovered-item-color);
 }
 
-.grid:is(:not([data-selectby]), [data-selectby="cell"]) .gridcell.active,
-.grid:is([data-selectby="row"]) .gridrow.active {
+.grid .gridheader:hover {
+    background-color: var(--hovered-item-color);
+}
+
+.grid:focus-within:is(:not([data-selectby]), [data-selectby="cell"]) .gridcell.active,
+.grid:focus-within:is([data-selectby="row"]) .gridrow.active {
     outline: 1px solid var(--focused-item-outline-color);
     outline-offset: -1px;
 }

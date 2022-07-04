@@ -24,13 +24,13 @@ declare global {
     }
 }
 declare var listitemWidget: {
-    "__#28411@#template": HTMLElement;
+    "__#20183@#template": HTMLElement;
     create(init?: {
-        label?: string;
-        disabled?: boolean;
-    }): HTMLElement;
+        label?: string | undefined;
+        disabled?: boolean | undefined;
+    } | undefined): HTMLElement;
+    slot(root: HTMLElement): HTMLElement | null;
     group(item: HTMLElement): HTMLElement | null;
-    "__#28411@#label"(item: HTMLElement): HTMLElement;
     getLabel(item: HTMLElement): string;
     setLabel(item: HTMLElement, value: string): void;
     setPosInSet(item: HTMLElement, value: number): void;
@@ -43,6 +43,6 @@ declare var listitemWidget: {
     getDisabled(item: HTMLElement): boolean;
     setSelected(row: HTMLElement, value: boolean): void;
     getSelected(row: HTMLElement): boolean;
-    slot(root: HTMLElement, name: string | null): HTMLElement | null;
+    "__#20183@#label"(item: HTMLElement): Node;
     readonly slots: string[];
 };

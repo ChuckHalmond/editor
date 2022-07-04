@@ -163,8 +163,8 @@ class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetF
         return item;
     }
 
-    slot(root: HTMLElement): HTMLElement | null {
-        return root;
+    slot(item: HTMLElement): HTMLElement | null {
+        return item;
     }
 
     slottedCallback(item: HTMLElement, slot: HTMLElement): void {

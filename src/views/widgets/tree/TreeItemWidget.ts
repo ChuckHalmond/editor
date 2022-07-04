@@ -12,7 +12,7 @@ interface TreeItemWidgetFactory extends WidgetFactory {
         disabled?: boolean;
         draggable?: boolean;
     }): HTMLElement;
-    getGroup(item: HTMLElement): HTMLElement | null;
+    group(item: HTMLElement): HTMLElement | null;
     setPosInSet(item: HTMLElement, value: number): void;
     getPosInSet(item: HTMLElement): number;
     getLabel(item: HTMLElement): string;
@@ -44,23 +44,11 @@ var treeitemWidget = new (
 Widget({
     name: "treeitem"
 })(class TreeItemWidgetFactoryBase extends WidgetFactory implements TreeItemWidgetFactory {
-    #arrowPartTemplate : HTMLElement;
     #template: HTMLElement;
     #types: TreeItemType[];
-    #typesFeatures: {
-        [key in TreeItemType]: {
-            role: string,
-            hasArrow: boolean
-        }
-    };
 
     constructor() {
         super();
-        this.#arrowPartTemplate = element("span", {
-            attributes: {
-                class: "arrow"
-            }
-        });
         this.#template = element("li", {
             attributes: {
                 class: "treeitem",
@@ -76,6 +64,11 @@ Widget({
                     children: [
                         element("span", {
                             attributes: {
+                                class: "arrow"
+                            }
+                        }),
+                        element("span", {
+                            attributes: {
                                 class: "label"
                             }
                         })
@@ -84,19 +77,9 @@ Widget({
             ]
         });
         this.#types = ["parent", "leaf"];
-        this.#typesFeatures = {
-            parent: {
-                role: "treeitem",
-                hasArrow: true
-            },
-            leaf: {
-                role: "treeitem",
-                hasArrow: false
-            }
-        };
     }
 
-    getGroup(item: HTMLElement): HTMLElement | null {
+    group(item: HTMLElement): HTMLElement | null {
         return item.querySelector<HTMLElement>(":scope > .treeitemgroup");
     }
 
@@ -122,16 +105,26 @@ Widget({
             if (draggable !== void 0) {
                 this.setDraggable(item, draggable);
             }
+            this.setSelected(item, false);
         }
         return item;
     }
 
-    #label(item: HTMLElement): HTMLElement {
-        const label = item.querySelector<HTMLElement>(":scope > .content > .label");
-        if (!label) {
-            throw new Error(`No label found.`);
+    slot(item: HTMLElement, name: string | null) {
+        switch (name) {
+            case "content":
+                return this.#content(item);;
+            default:
+                return item;
         }
-        return label;
+    }
+
+    #content(item: HTMLElement): HTMLElement {
+        return item.querySelector<HTMLElement>(":scope > .content")!;
+    }
+
+    #label(item: HTMLElement): HTMLElement {
+        return item.querySelector<HTMLElement>(":scope > .content > .label")!;
     }
 
     getLabel(item: HTMLElement): string {
@@ -163,28 +156,12 @@ Widget({
     }
 
     setType(item: HTMLElement, type: TreeItemType): void {
-        const typesFeatures = this.#typesFeatures;
-        const arrowPartTemplate = this.#arrowPartTemplate;
         const oldType = this.getType(item);
         const {classList} = item;
         if (oldType) {
             classList.remove(`treeitem-${oldType}`);
         }
         classList.add(`treeitem-${type}`);
-        const {role, hasArrow} = typesFeatures[type];
-        item.setAttribute("role", role);
-        const labelPart = this.#label(item);
-        const arrowPart = item.querySelector(":scope > .arrow");
-        if (hasArrow) {
-            if (!arrowPart && labelPart) {
-                labelPart.before(arrowPartTemplate.cloneNode(true));
-            }
-        }
-        else {
-            if (arrowPart) {
-                arrowPart.remove();
-            }
-        }
     }
 
     setExpanded(item: HTMLElement, value: boolean): void {

@@ -70,22 +70,22 @@ Widget({
         return tree;
     }
 
-    slot(root: HTMLElement) {
-        return root;
+    slot(tree: HTMLElement) {
+        return tree;
     }
 
-    slottedCallback(item: HTMLElement, slot: HTMLElement) {
+    slottedCallback(tree: HTMLElement, slot: HTMLElement) {
         const {childNodes} = slot;
-        Array.from(childNodes).forEach((item_i, i) => {
-            if (item_i instanceof HTMLElement) {
-                treeitemWidget.setPosInSet(item_i, i);
-                treeitemWidget.setLevel(item_i, 0);
+        Array.from(childNodes).forEach((child_i, i) => {
+            if (child_i instanceof HTMLElement && child_i.classList.contains("treeitem")) {
+                treeitemWidget.setPosInSet(child_i, i);
+                treeitemWidget.setLevel(child_i, 0);
             }
         });
     }
 
-    items(menu: HTMLElement): HTMLElement[] {
-        return Array.from(menu.querySelectorAll<HTMLElement>(
+    items(tree: HTMLElement): HTMLElement[] {
+        return Array.from(tree.querySelectorAll<HTMLElement>(
             ":is(:scope, :scope > .treeitemgroup) > .treeitem"
         ));
     }

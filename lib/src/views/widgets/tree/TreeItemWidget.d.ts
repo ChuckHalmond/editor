@@ -8,7 +8,7 @@ interface TreeItemWidgetFactory extends WidgetFactory {
         disabled?: boolean;
         draggable?: boolean;
     }): HTMLElement;
-    getGroup(item: HTMLElement): HTMLElement | null;
+    group(item: HTMLElement): HTMLElement | null;
     setPosInSet(item: HTMLElement, value: number): void;
     getPosInSet(item: HTMLElement): number;
     getLabel(item: HTMLElement): string;
@@ -35,27 +35,18 @@ declare global {
     }
 }
 declare var treeitemWidget: {
-    "__#28409@#arrowPartTemplate": HTMLElement;
-    "__#28409@#template": HTMLElement;
-    "__#28409@#types": TreeItemType[];
-    "__#28409@#typesFeatures": {
-        parent: {
-            role: string;
-            hasArrow: boolean;
-        };
-        leaf: {
-            role: string;
-            hasArrow: boolean;
-        };
-    };
-    getGroup(item: HTMLElement): HTMLElement | null;
+    "__#18927@#template": HTMLElement;
+    "__#18927@#types": TreeItemType[];
+    group(item: HTMLElement): HTMLElement | null;
     create(init?: {
         type: TreeItemType;
-        label?: string;
-        disabled?: boolean;
-        draggable?: boolean;
-    }): HTMLElement;
-    "__#28409@#label"(item: HTMLElement): HTMLElement;
+        label?: string | undefined;
+        disabled?: boolean | undefined;
+        draggable?: boolean | undefined;
+    } | undefined): HTMLElement;
+    slot(item: HTMLElement, name: string | null): HTMLElement;
+    "__#18927@#content"(item: HTMLElement): HTMLElement;
+    "__#18927@#label"(item: HTMLElement): HTMLElement;
     getLabel(item: HTMLElement): string;
     setLabel(item: HTMLElement, value: string): void;
     setPosInSet(item: HTMLElement, value: number): void;
@@ -76,8 +67,7 @@ declare var treeitemWidget: {
     getSelected(item: HTMLElement): boolean;
     setLevel(item: HTMLElement, value: number): void;
     getLevel(item: HTMLElement): number;
-    toggle(item: HTMLElement, force?: boolean): void;
-    "__#28409@#handleClickEvent"(event: MouseEvent): void;
-    slot(root: HTMLElement, name: string | null): HTMLElement | null;
+    toggle(item: HTMLElement, force?: boolean | undefined): void;
+    "__#18927@#handleClickEvent"(event: MouseEvent): void;
     readonly slots: string[];
 };
