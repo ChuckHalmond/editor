@@ -10,7 +10,7 @@ declare global {
 }
 
 interface SeparatorWidgetFactory extends WidgetFactory {
-
+    create(): HTMLElement;
 }
 
 var separatorWidget = new (
@@ -18,7 +18,7 @@ Widget({
     name: "separator"
 })(class SeparatorWidgetFactory extends WidgetFactory {
     #template: HTMLElement;
-
+    
     constructor() {
         super();
         this.#template = element("div", {

@@ -9,6 +9,7 @@ type GridSelectBy = "cell" | "row";
 
 interface GridRowWidgetFactory extends WidgetFactory {
     create(init?: {
+        multisectable?: boolean;
         selectby?: GridSelectBy
     }): HTMLElement;
     setSelectBy(item: HTMLElement, value: GridSelectBy): void;
@@ -70,17 +71,20 @@ Widget({
         this.#template = element("table", {
             attributes: {
                 class: "grid",
+                role: "grid",
                 tabindex: 0
             },
             children: [
                 element("thead", {
                     attributes: {
-                        class: "gridhead"
+                        class: "gridhead",
+                        role: "row"
                     }
                 }),
                 element("tbody", {
                     attributes: {
-                        class: "gridbody"
+                        class: "gridbody",
+                        role: "rowgroup"
                     }
                 }),
             ]
@@ -96,17 +100,21 @@ Widget({
     }
 
     create(init?: {
+        multisectable?: boolean;
         selectby?: GridSelectBy;
     }) {
         const grid = <HTMLElement>this.#template.cloneNode(true);
         if (init !== void 0) {
-            const {selectby} = init;
+            const {selectby, multisectable} = init;
             if (selectby !== void 0) {
                 this.setSelectBy(grid, selectby);
             }
+            if (multisectable !== void 0) {
+                this.setMultiSelectable(grid, multisectable);
+            }
         }
         grid.addEventListener("contextmenu", this.#handleContextMenuEvent.bind(this));
-        grid.addEventListener("click", this.#handleClickEvent.bind(this));
+        grid.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
         grid.addEventListener("focus", this.#handleFocusEvent.bind(this));
         grid.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
         grid.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
@@ -132,12 +140,20 @@ Widget({
         });
     }
 
-    setSelectBy(item: HTMLElement, value: GridSelectBy): void {
-        item.setAttribute("data-selectby", value);
+    setMultiSelectable(grid: HTMLElement, value: boolean): void {
+        grid.setAttribute("aria-multiselectable", value.toString());
     }
 
-    getSelectBy(item: HTMLElement): GridSelectBy {
-        return <GridSelectBy>item.getAttribute("data-selectby") ?? "cell";
+    getMultiSelectable(grid: HTMLElement): boolean {
+        return JSON.parse(grid.getAttribute("aria-multiselectable") ?? false.toString());
+    }
+
+    setSelectBy(grid: HTMLElement, value: GridSelectBy): void {
+        grid.setAttribute("data-selectby", value);
+    }
+
+    getSelectBy(grid: HTMLElement): GridSelectBy {
+        return <GridSelectBy>grid.getAttribute("data-selectby") ?? "cell";
     }
 
     beginSelection(grid: HTMLElement): void {
@@ -158,11 +174,11 @@ Widget({
     }
 
     selectedCells(grid: HTMLElement): HTMLElement[] {
-        return Array.from(grid.querySelectorAll(":scope > .gridbody > .gridrow > .gridcell[aria-selected]"));
+        return Array.from(grid.querySelectorAll(":scope > .gridbody > .gridrow > .gridcell[aria-selected=true]"));
     }
 
     selectedRows(grid: HTMLElement): HTMLElement[] {
-        return Array.from(grid.querySelectorAll(":scope > .gridbody > .gridrow[aria-selected]"));
+        return Array.from(grid.querySelectorAll(":scope > .gridbody > .gridrow[aria-selected=true]"));
     }
 
     #cellsWalkerNodeFilter(node: Node): number {
@@ -191,18 +207,30 @@ Widget({
         return NodeFilter.FILTER_REJECT;
     }
 
-    #getCellsRange(grid: HTMLElement, from: HTMLElement, to: HTMLElement): HTMLElement[] {
-        const cells = this.cells(grid);
-        const fromIndex = cells.indexOf(from);
-        const toIndex = cells.indexOf(to);
-        if (fromIndex > -1 && toIndex > -1) {
-            if (from == to) {
-                return [from];
+    #getCellsRange(from: HTMLElement, to: HTMLElement): HTMLElement[] {
+        if (from == to) {
+            return [from];
+        }
+        const position = from.compareDocumentPosition(to);
+        if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
+            const range = [from];
+            let nextCell = this.#nextCell(from);
+            while (nextCell && nextCell !== to) {
+                range.push(nextCell);
+                nextCell = this.#nextCell(nextCell);
             }
-            return cells.slice(
-                Math.min(fromIndex, toIndex),
-                Math.max(fromIndex, toIndex) + 1
-            );
+            range.push(to);
+            return range;
+        }
+        else if (position & Node.DOCUMENT_POSITION_PRECEDING) {
+            const range = [from];
+            let previousCell = this.#previousCell(from);
+            while (previousCell && previousCell !== to) {
+                range.push(previousCell);
+                previousCell = this.#previousRow(previousCell);
+            }
+            range.push(to);
+            return range;
         }
         return [];
     }
@@ -214,20 +242,20 @@ Widget({
         const position = from.compareDocumentPosition(to);
         if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
             const range = [from];
-            let nextVisibleRow = this.#nextRow(from);
-            while (nextVisibleRow && nextVisibleRow !== to) {
-                range.push(nextVisibleRow);
-                nextVisibleRow = this.#nextRow(nextVisibleRow);
+            let nextRow = this.#nextRow(from);
+            while (nextRow && nextRow !== to) {
+                range.push(nextRow);
+                nextRow = this.#nextRow(nextRow);
             }
             range.push(to);
             return range;
         }
         else if (position & Node.DOCUMENT_POSITION_PRECEDING) {
             const range = [from];
-            let previousVisibleRow = this.#previousRow(from);
-            while (previousVisibleRow && previousVisibleRow !== to) {
-                range.push(previousVisibleRow);
-                previousVisibleRow = this.#previousRow(previousVisibleRow);
+            let previousRow = this.#previousRow(from);
+            while (previousRow && previousRow !== to) {
+                range.push(previousRow);
+                previousRow = this.#previousRow(previousRow);
             }
             range.push(to);
             return range;
@@ -475,81 +503,89 @@ Widget({
         event.preventDefault();
     }
 
-    #handleClickEvent(event: MouseEvent): void {
-        const {currentTarget, target, ctrlKey, shiftKey} = event;
+    /*#handleDragEndEvent(event: DragEvent): void {
+        const {currentTarget} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        this.#setDropTargetItem(targetTree, null);
+    }
+
+    #handleDragEnterEvent(event: DragEvent): void {
+        const {currentTarget, target} = event;
+        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".treeitem");
+        const targetTree = <HTMLElement>currentTarget;
+        if (targetItem) {
+            const type = treeitemWidget.getType(targetItem);
+            if (type == "parent") {
+                treeitemWidget.toggle(targetItem, true);
+            }
+            this.#setDropTargetItem(targetTree, targetItem);
+        }
+        event.preventDefault();
+    }
+
+    #handleDragOverEvent(event: DragEvent): void {
+        event.preventDefault();
+    }
+
+    #handleDragLeaveEvent(event: DragEvent): void {
+        const {currentTarget, relatedTarget} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        if (relatedTarget) {
+            const relatedTargetRoot = (<Node>relatedTarget).getRootNode();
+            const relatedTargetHost =
+                relatedTargetRoot instanceof ShadowRoot ?
+                relatedTargetRoot.host :
+                relatedTarget;
+            if (!targetTree.contains(<Node>relatedTargetHost)) {
+                this.#setDropTargetItem(targetTree, null);
+            }
+        }
+    }
+
+    #handleDropEvent(event: DragEvent): void {
+        const {currentTarget} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        this.#setDropTargetItem(targetTree, null);
+    }*/
+
+    #handleFocusEvent(event: FocusEvent): void {
+        const {currentTarget, relatedTarget} = event;
+        const targetGrid = <HTMLElement>currentTarget;
+        const selectby = this.getSelectBy(targetGrid);
+        switch (selectby) {
+            case "cell": {
+                const activeCell = this.#getActiveCell(targetGrid);
+                if (activeCell && relatedTarget !== activeCell) {
+                    activeCell.focus();
+                }
+                break;
+            }
+            case "row": {
+                const activeRow = this.#getActiveRow(targetGrid);
+                if (activeRow && relatedTarget !== activeRow) {
+                    activeRow.focus();
+                }
+                break;
+            }
+        }
+    }
+
+    #handleFocusInEvent(event: FocusEvent): void {
+        const {currentTarget, target} = event;
         const targetGrid = <HTMLElement>currentTarget;
         const selectby = this.getSelectBy(targetGrid);
         switch (selectby) {
             case "cell": {
                 const targetCell = (<HTMLElement>target).closest<HTMLElement>(".gridcell");
-                console.log(targetCell);
-                console.log(target);
                 if (targetCell) {
-                    if (!shiftKey && !ctrlKey) {
-                        this.#setCellsSelection(targetGrid, targetCell);
-                    }
-                    else if (ctrlKey) {
-                        const selected = gridCellWidget.getSelected(targetCell);
-                        !selected ?
-                            this.#addCellsToSelection(targetGrid, targetCell) :
-                            this.#removeCellsFromSelection(targetGrid, targetCell);
-                        event.stopPropagation();
-                    }
-                    else if (shiftKey) {
-                        const selectedCells = this.selectedCells(targetGrid);
-                        const lastSelectedCell = selectedCells[selectedCells.length - 1];
-                        if (lastSelectedCell) {
-                            const range = this.#getCellsRange(
-                                targetGrid,
-                                lastSelectedCell,
-                                targetCell
-                            );
-                            if (range) {
-                                selectedCells.includes(targetCell) ?
-                                    this.#removeCellsFromSelection(targetGrid, ...range) :
-                                    this.#addCellsToSelection(targetGrid, ...range);
-                            }
-                        }
-                        else {
-                            this.#setCellsSelection(targetGrid, targetCell);
-                        }
-                        event.stopPropagation();
-                    }
+                    this.#setActiveCell(targetGrid, targetCell);
                 }
                 break;
             }
             case "row": {
                 const targetRow = (<HTMLElement>target).closest<HTMLElement>(".gridrow");
                 if (targetRow) {
-                    if (!shiftKey && !ctrlKey) {
-                        this.#setRowsSelection(targetGrid, targetRow);
-                    }
-                    else if (ctrlKey) {
-                        const selected = gridRowWidget.getSelected(targetRow);
-                        !selected ?
-                            this.#addRowsToSelection(targetGrid, targetRow) :
-                            this.#removeRowsFromSelection(targetGrid, targetRow);
-                        event.stopPropagation();
-                    }
-                    else if (shiftKey) {
-                        const selectedRows = this.selectedRows(targetGrid);
-                        const lastSelectedRow = selectedRows[selectedRows.length - 1];
-                        if (lastSelectedRow) {
-                            const range = this.#getRowsRange(
-                                lastSelectedRow,
-                                targetRow
-                            );
-                            if (range) {
-                                selectedRows.includes(targetRow) ?
-                                    this.#removeRowsFromSelection(targetGrid, ...range) :
-                                    this.#addRowsToSelection(targetGrid, ...range);
-                            }
-                        }
-                        else {
-                            this.#setRowsSelection(targetGrid, targetRow);
-                        }
-                        event.stopPropagation();
-                    }
+                    this.#setActiveRow(targetGrid, targetRow);
                 }
                 break;
             }
@@ -562,10 +598,11 @@ Widget({
         const activeCell = this.#getActiveCell(targetGrid);
         const activeRow = this.#getActiveRow(targetGrid);
         const selectby = this.getSelectBy(targetGrid);
+        const multiselectable = this.getMultiSelectable(targetGrid);
         switch (key) {
             case "a": {
                 const {ctrlKey} = event;
-                if (ctrlKey) {
+                if (ctrlKey && multiselectable) {
                     switch (selectby) {
                         case "cell": {
                             const firstRow = this.#firstRow(targetGrid);
@@ -573,7 +610,7 @@ Widget({
                             const lastRow = this.#lastRow(targetGrid);
                             const lastCell = lastRow ? this.#lastCell(lastRow) : null;
                             if (firstCell && lastCell) {
-                                const range = this.#getCellsRange(targetGrid, firstCell, lastCell);
+                                const range = this.#getCellsRange(firstCell, lastCell);
                                 if (range) {
                                     this.#setCellsSelection(targetGrid, ...range);
                                 }
@@ -603,7 +640,7 @@ Widget({
                         if (previousCell) {
                             previousCell.focus({preventScroll: true});
                             const {shiftKey} = event;
-                            if (shiftKey) {
+                            if (shiftKey && multiselectable) {
                                 const selected = gridCellWidget.getSelected(previousCell);
                                 selected ?
                                     this.#removeCellsFromSelection(targetGrid, previousCell) :
@@ -622,7 +659,7 @@ Widget({
                         if (nextCell) {
                             nextCell.focus({preventScroll: true});
                             const {shiftKey} = event;
-                            if (shiftKey) {
+                            if (shiftKey && multiselectable) {
                                 const selected = gridCellWidget.getSelected(nextCell);
                                 selected ?
                                     this.#removeCellsFromSelection(targetGrid, nextCell) :
@@ -646,7 +683,7 @@ Widget({
                         if (topCell) {
                             topCell.focus({preventScroll: true});
                             const {shiftKey} = event;
-                            if (shiftKey) {
+                            if (shiftKey && multiselectable) {
                                 const selected = gridCellWidget.getSelected(topCell);
                                 selected ?
                                     this.#removeCellsFromSelection(targetGrid, topCell) :
@@ -662,7 +699,7 @@ Widget({
                         if (previousRow) {
                             previousRow.focus({preventScroll: true});
                             const {shiftKey} = event;
-                            if (shiftKey) {
+                            if (shiftKey && multiselectable) {
                                 const selected = gridRowWidget.getSelected(previousRow);
                                 selected ?
                                     this.#removeRowsFromSelection(targetGrid, previousRow) :
@@ -687,7 +724,7 @@ Widget({
                             if (bottomCell) {
                                 bottomCell.focus({preventScroll: true});
                                 const {shiftKey} = event;
-                                if (shiftKey) {
+                                if (shiftKey && multiselectable) {
                                     const selected = gridCellWidget.getSelected(bottomCell);
                                     selected ?
                                         this.#removeCellsFromSelection(targetGrid, bottomCell) :
@@ -703,7 +740,7 @@ Widget({
                         if (nextRow) {
                             nextRow.focus({preventScroll: true});
                             const {shiftKey} = event;
-                            if (shiftKey) {
+                            if (shiftKey && multiselectable) {
                                 const selected = gridRowWidget.getSelected(nextRow);
                                 selected ?
                                     this.#removeRowsFromSelection(targetGrid, nextRow) :
@@ -800,44 +837,79 @@ Widget({
         }
     }
 
-    #handleFocusEvent(event: FocusEvent): void {
-        const {currentTarget, relatedTarget} = event;
+    #handleMouseDownEvent(event: MouseEvent): void {
+        const {currentTarget, target, ctrlKey, shiftKey} = event;
         const targetGrid = <HTMLElement>currentTarget;
         const selectby = this.getSelectBy(targetGrid);
-        switch (selectby) {
-            case "cell": {
-                const activeCell = this.#getActiveCell(targetGrid);
-                if (activeCell && relatedTarget !== activeCell) {
-                    activeCell.focus();
-                }
-                break;
-            }
-            case "row": {
-                const activeRow = this.#getActiveRow(targetGrid);
-                if (activeRow && relatedTarget !== activeRow) {
-                    activeRow.focus();
-                }
-                break;
-            }
-        }
-    }
-
-    #handleFocusInEvent(event: FocusEvent): void {
-        const {currentTarget, target} = event;
-        const targetGrid = <HTMLElement>currentTarget;
-        const selectby = this.getSelectBy(targetGrid);
+        const multiselectable = this.getMultiSelectable(targetGrid);
         switch (selectby) {
             case "cell": {
                 const targetCell = (<HTMLElement>target).closest<HTMLElement>(".gridcell");
                 if (targetCell) {
-                    this.#setActiveCell(targetGrid, targetCell);
+                    if (multiselectable) {
+                        if (!shiftKey && !ctrlKey) {
+                            this.#setCellsSelection(targetGrid, targetCell);
+                        }
+                        else if (ctrlKey) {
+                            const selected = gridCellWidget.getSelected(targetCell);
+                            !selected ?
+                                this.#addCellsToSelection(targetGrid, targetCell) :
+                                this.#removeCellsFromSelection(targetGrid, targetCell);
+                            event.stopPropagation();
+                        }
+                        else if (shiftKey) {
+                            const activeCell = this.#getActiveCell(targetGrid);
+                            if (activeCell) {
+                                const range = this.#getCellsRange(
+                                    activeCell,
+                                    targetCell
+                                );
+                                if (range) {
+                                    this.#setCellsSelection(targetGrid, ...range);
+                                }
+                            }
+                            event.stopPropagation();
+                        }
+                    }
+                    else {
+                        this.#setCellsSelection(targetGrid, targetCell);
+                    }
+                    event.stopPropagation();
                 }
                 break;
             }
             case "row": {
                 const targetRow = (<HTMLElement>target).closest<HTMLElement>(".gridrow");
                 if (targetRow) {
-                    this.#setActiveRow(targetGrid, targetRow);
+                    if (multiselectable) {
+                        if (!shiftKey && !ctrlKey) {
+                            this.#setRowsSelection(targetGrid, targetRow);
+                        }
+                        else if (ctrlKey) {
+                            const selected = gridRowWidget.getSelected(targetRow);
+                            !selected ?
+                                this.#addRowsToSelection(targetGrid, targetRow) :
+                                this.#removeRowsFromSelection(targetGrid, targetRow);
+                            event.stopPropagation();
+                        }
+                        else if (shiftKey) {
+                            const activeRow = this.#getActiveRow(targetGrid);
+                            if (activeRow) {
+                                const range = this.#getRowsRange(
+                                    activeRow,
+                                    targetRow
+                                );
+                                if (range) {
+                                    this.#setRowsSelection(targetGrid, ...range);
+                                }
+                            }
+                            event.stopPropagation();
+                        }
+                    }
+                    else {
+                        this.#setRowsSelection(targetGrid, targetRow);
+                    }
+                    event.stopPropagation();
                 }
                 break;
             }

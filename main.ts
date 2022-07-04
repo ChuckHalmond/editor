@@ -343,6 +343,7 @@ export async function main() {
                 properties: {
                     label: "treeitem 0",
                     type: "parent",
+                    draggable: true
                     //disabled: true
                 },
                 slotted: [
@@ -351,7 +352,8 @@ export async function main() {
                             widget("treeitem", {
                                 properties: {
                                     label: "treeitem 1",
-                                    type: "leaf"
+                                    type: "leaf",
+                                    draggable: true
                                 }
                             })
                         ]
@@ -403,6 +405,7 @@ export async function main() {
                 properties: {
                     label: "treeitem 0",
                     type: "parent",
+                    draggable: true,
                     disabled: true
                 },
                 slotted: [
@@ -411,7 +414,8 @@ export async function main() {
                             widget("treeitem", {
                                 properties: {
                                     label: "treeitem 1",
-                                    type: "leaf"
+                                    type: "leaf",
+                                    draggable: true
                                 }
                             })
                         ]
@@ -421,7 +425,8 @@ export async function main() {
             widget("treeitem", {
                 properties: {
                     label: "treeitem 1",
-                    type: "leaf"
+                    type: "leaf",
+                    draggable: true
                 }
             })
         ]
@@ -495,7 +500,8 @@ export async function main() {
     document.body.append(
         widget("grid", {
             properties: {
-                selectby: "row"
+                selectby: "row",
+                multisectable: true
             },
             slotted: {
                 headers: [
@@ -535,6 +541,34 @@ export async function main() {
                             widget("gridcell",  {
                                 properties: {
                                     label: "Fourth cell"
+                                }
+                            })
+                        ]
+                    }),
+                    widget("gridrow",  {
+                        slotted: [   
+                            widget("gridcell",  {
+                                properties: {
+                                    label: "Fifth cell"
+                                }
+                            }),
+                            widget("gridcell",  {
+                                properties: {
+                                    label: "Sixth cell"
+                                }
+                            })
+                        ]
+                    }),
+                    widget("gridrow",  {
+                        slotted: [   
+                            widget("gridcell",  {
+                                properties: {
+                                    label: "Heighth cell"
+                                }
+                            }),
+                            widget("gridcell",  {
+                                properties: {
+                                    label: "Nineth cell"
                                 }
                             })
                         ]

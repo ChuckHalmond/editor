@@ -30,6 +30,6 @@
     outline-offset: -1px;
 }
 
-.listitem[aria-selected] {
+.listitem[aria-selected="true"] {
     background-color: var(--selected-item-color);
 }

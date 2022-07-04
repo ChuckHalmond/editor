@@ -1,9 +1,15 @@
 .grid {
     display: table;
+    user-select: none;
 }
 
 .gridrow {
     display: table-row;
+}
+
+.gridbody,
+.gridhead {
+    display: table-row-group;
 }
 
 .gridcell,
@@ -22,7 +28,7 @@
     outline-offset: -1px;
 }
 
-.grid:is(:not([data-selectby]), [data-selectby="cell"]) .gridcell[aria-selected],
-.grid:is([data-selectby="row"]) .gridrow[aria-selected] {
+.grid:is(:not([data-selectby]), [data-selectby="cell"]) .gridcell[aria-selected="true"],
+.grid:is([data-selectby="row"]) .gridrow[aria-selected="true"] {
     background-color: var(--selected-item-color);
 }

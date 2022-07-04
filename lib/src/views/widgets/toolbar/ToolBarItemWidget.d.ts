@@ -38,13 +38,13 @@ declare var toolbarItemWidget: {
     getMenu(item: HTMLElement): HTMLElement | null;
     create(init?: {
         type: ToolBarItemType;
-        pressed?: boolean | undefined;
-        label?: string | undefined;
-        name?: string | undefined;
-        keyshortcut?: string | undefined;
-        value?: string | undefined;
-        disabled?: boolean | undefined;
-    } | undefined): HTMLElement;
+        pressed?: boolean;
+        label?: string;
+        name?: string;
+        keyshortcut?: string;
+        value?: string;
+        disabled?: boolean;
+    }): HTMLElement;
     "__#52@#label"(item: HTMLElement): HTMLElement;
     slottedCallback(item: HTMLElement, slot: HTMLElement): void;
     setExpanded(item: HTMLElement, value: boolean): void;
@@ -53,7 +53,7 @@ declare var toolbarItemWidget: {
     setLabel(item: HTMLElement, value: string): void;
     getKeyShortcut(item: HTMLElement): string | null;
     setKeyShortcut(item: HTMLElement, value: string | null): void;
-    toggle(item: HTMLElement, force?: boolean | undefined): void;
+    toggle(item: HTMLElement, force?: boolean): void;
     expand(item: HTMLElement): void;
     collapse(item: HTMLElement): void;
     getType(item: HTMLElement): ToolBarItemType | null;

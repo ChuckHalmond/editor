@@ -6,6 +6,7 @@ declare global {
     }
 }
 interface SeparatorWidgetFactory extends WidgetFactory {
+    create(): HTMLElement;
 }
 declare var separatorWidget: {
     "__#41@#template": HTMLElement;

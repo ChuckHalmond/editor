@@ -10,6 +10,7 @@ interface TreeItemWidgetFactory extends WidgetFactory {
         type: TreeItemType;
         label?: string;
         disabled?: boolean;
+        draggable?: boolean;
     }): HTMLElement;
     getGroup(item: HTMLElement): HTMLElement | null;
     setPosInSet(item: HTMLElement, value: number): void;
@@ -26,6 +27,8 @@ interface TreeItemWidgetFactory extends WidgetFactory {
     getDisabled(item: HTMLElement): boolean;
     setExpanded(item: HTMLElement, value: boolean): void;
     getExpanded(item: HTMLElement): boolean;
+    setDraggable(row: HTMLElement, value: boolean): void;
+    getDraggable(item: HTMLElement): boolean;
     getType(item: HTMLElement): TreeItemType | null;
     setType(item: HTMLElement, value: TreeItemType): void;
     toggle(item: HTMLElement, force?: boolean): void;
@@ -101,11 +104,12 @@ Widget({
         type: TreeItemType;
         label?: string;
         disabled?: boolean;
+        draggable?: boolean;
     }): HTMLElement {
         const item = <HTMLElement>this.#template.cloneNode(true);
         item.addEventListener("click", this.#handleClickEvent.bind(this));
         if (init !== void 0) {
-            const {type, label, disabled} = init;
+            const {type, label, disabled, draggable} = init;
             if (type !== void 0) {
                 this.setType(item, type);
             }
@@ -114,6 +118,9 @@ Widget({
             }
             if (disabled !== void 0) {
                 this.setDisabled(item, disabled);
+            }
+            if (draggable !== void 0) {
+                this.setDraggable(item, draggable);
             }
         }
         return item;
@@ -209,9 +216,7 @@ Widget({
     setDropTarget(item: HTMLElement, value: boolean): void {
         const {classList} = item;
         if (value) {
-            if (!classList.contains("droptarget")) {
-                classList.add("droptarget");
-            }
+            classList.add("droptarget");
         }
         else {
             classList.remove("droptarget");
@@ -231,13 +236,21 @@ Widget({
         return item.hasAttribute("aria-disabled");
     }
 
+    setDraggable(item: HTMLElement, value: boolean): void {
+        item.setAttribute("draggable", value.toString());
+    }
+
+    getDraggable(item: HTMLElement): boolean {
+        return JSON.parse(item.getAttribute("draggable") ?? false.toString());
+    }
+
     setSelected(item: HTMLElement, value: boolean): void {
-        item.toggleAttribute("aria-selected", value);
+        item.setAttribute("aria-selected", value.toString());
         item.dispatchEvent(new Event("select", {bubbles: true}));
     }
 
     getSelected(item: HTMLElement): boolean {
-        return item.hasAttribute("aria-selected");
+        return JSON.parse(item.getAttribute("aria-selected") ?? false.toString());
     }
 
     setLevel(item: HTMLElement, value: number): void {

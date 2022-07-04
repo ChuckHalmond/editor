@@ -125,9 +125,7 @@ Widget({
     setDropTarget(item: HTMLElement, value: boolean): void {
         const {classList} = item;
         if (value) {
-            if (!classList.contains("droptarget")) {
-                classList.add("droptarget");
-            }
+            classList.add("droptarget");
         }
         else {
             classList.remove("droptarget");
@@ -147,12 +145,12 @@ Widget({
         return item.hasAttribute("aria-disabled");
     }
 
-    setSelected(item: HTMLElement, value: boolean): void {
-        item.toggleAttribute("aria-selected", value);
-        item.dispatchEvent(new Event("select", {bubbles: true}));
+    setSelected(row: HTMLElement, value: boolean): void {
+        row.setAttribute("aria-selected", value.toString());
+        row.dispatchEvent(new Event("select", {bubbles: true}));
     }
 
-    getSelected(item: HTMLElement): boolean {
-        return item.hasAttribute("aria-selected");
+    getSelected(row: HTMLElement): boolean {
+        return JSON.parse(row.getAttribute("aria-selected") ?? false.toString());
     }
 }));

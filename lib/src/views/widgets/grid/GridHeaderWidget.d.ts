@@ -15,11 +15,11 @@ declare global {
     }
 }
 declare var gridcellWidget: {
-    "__#13564@#template": HTMLElement;
+    "__#58@#template": HTMLElement;
     create(init?: {
-        label?: string | undefined;
-    } | undefined): HTMLElement;
-    "__#13564@#label"(header: HTMLElement): HTMLElement;
+        label?: string;
+    }): HTMLElement;
+    "__#58@#label"(header: HTMLElement): HTMLElement;
     getLabel(header: HTMLElement): string;
     setLabel(header: HTMLElement, value: string): void;
     setActive(item: HTMLElement, value: boolean): void;

@@ -41,10 +41,16 @@ Widget({
         );
     }
 
-    create(): HTMLElement {
+    create(init?: {
+        multisectable?: boolean;
+    }): HTMLElement {
         const list = <HTMLElement>this.#template.cloneNode(true);
-        list.addEventListener("click", this.#handleClickEvent.bind(this));
-        list.addEventListener("contextmenu", this.#handleContextMenuEvent.bind(this), true);
+        if (init !== void 0) {
+            const {multisectable} = init;
+            if (multisectable !== void 0) {
+                this.setMultiSelectable(list, multisectable);
+            }
+        }
         list.addEventListener("dragend", this.#handleDragEndEvent.bind(this));
         list.addEventListener("dragenter", this.#handleDragEnterEvent.bind(this));
         list.addEventListener("dragleave", this.#handleDragLeaveEvent.bind(this));
@@ -55,6 +61,7 @@ Widget({
         list.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
         list.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         list.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
+        list.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
         list.addEventListener("select", this.#handleSelectEvent.bind(this));
         this.#onSelection.set(list, false);
         this.#hasSelectionChanged.set(list, false);
@@ -73,24 +80,20 @@ Widget({
         });
     }
 
+    setMultiSelectable(tree: HTMLElement, value: boolean): void {
+        tree.setAttribute("aria-multiselectable", value.toString());
+    }
+
+    getMultiSelectable(tree: HTMLElement): boolean {
+        return JSON.parse(tree.getAttribute("aria-multiselectable") ?? false.toString());
+    }
+
     #getActiveItem(tree: HTMLElement): HTMLElement | null {
         return tree.querySelector<HTMLElement>(".listitem.active");
     }
 
     #getDropTargetItem(tree: HTMLElement): HTMLElement | null {
         return tree.querySelector<HTMLElement>(".listitem.droptarget");
-    }
-
-    #setDropTarget(tree: HTMLElement, droptarget: boolean): void {
-        const {classList} = tree;
-        if (droptarget) {
-            if (!classList.contains("droptarget")) {
-                classList.add("droptarget");
-            }
-        }
-        else {
-            classList.remove("droptarget");
-        }
     }
 
     items(list: HTMLElement): HTMLElement[] {
@@ -140,20 +143,30 @@ Widget({
     }
 
 
-    #getItemsRange(list: HTMLElement, from: HTMLElement, to: HTMLElement): HTMLElement[] {
-        const items = this.items(list);
-        const fromIndex = items.indexOf(from);
-        const toIndex = items.indexOf(to);
-        if (fromIndex > -1 && toIndex > -1) {
-            if (from == to) {
-                return [from];
+    #getItemsRange(from: HTMLElement, to: HTMLElement): HTMLElement[] {
+        if (from == to) {
+            return [from];
+        }
+        const position = from.compareDocumentPosition(to);
+        if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
+            const range = [from];
+            let nextItem = this.#nextItem(from);
+            while (nextItem && nextItem !== to) {
+                range.push(nextItem);
+                nextItem = this.#nextItem(nextItem);
             }
-            return items.slice(
-                Math.min(fromIndex, toIndex),
-                Math.max(fromIndex, toIndex) + 1
-            ).filter(
-                item_i => !listitemWidget.getDisabled(item_i)
-            );
+            range.push(to);
+            return range;
+        }
+        else if (position & Node.DOCUMENT_POSITION_PRECEDING) {
+            const range = [from];
+            let previousItem = this.#previousItem(from);
+            while (previousItem && previousItem !== to) {
+                range.push(previousItem);
+                previousItem = this.#previousItem(previousItem);
+            }
+            range.push(to);
+            return range;
         }
         return [];
     }
@@ -218,16 +231,17 @@ Widget({
     }
     
     #setDropTargetItem(list: HTMLElement, item: HTMLElement | null): void {
+        const {classList} = list;
         const dropTargetItem = this.#getDropTargetItem(list);
         if (dropTargetItem !== null && dropTargetItem !== item) {
             listitemWidget.setDropTarget(dropTargetItem, false);
         }
         if (item !== null) {
-            this.#setDropTarget(list, true);
             listitemWidget.setDropTarget(item, false);
+            classList.add("droptarget");
         }
         else {
-            this.#setDropTarget(list, false);
+            classList.remove("droptarget");
         }
     }
 
@@ -255,63 +269,6 @@ Widget({
         walker.currentNode = item;
         const nextItem = <HTMLElement | null>walker.nextNode();
         return nextItem;
-    }
-
-    #handleClickEvent(event: MouseEvent): void {
-        const {currentTarget, target, ctrlKey, shiftKey} = event;
-        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".listitem");
-        const targetList = <HTMLElement>currentTarget;
-        if (targetItem) {
-            const selectedItems = this.selectedItems(targetList);
-            if (!shiftKey && !ctrlKey) {
-                this.#setSelection(targetList, targetItem);
-            }
-            else if (ctrlKey) {
-                const selected = listitemWidget.getSelected(targetItem);
-                if (selected) {
-                    targetItem.blur();
-                    this.#removeFromSelection(targetList, targetItem);
-                }
-                else {
-                    this.#addToSelection(targetList, targetItem);
-                }
-            }
-            else if (shiftKey) {
-                const lastSelectedItem = selectedItems[selectedItems.length - 1];
-                if (lastSelectedItem) {
-                    const range = this.#getItemsRange(
-                        targetList,
-                        lastSelectedItem,
-                        targetItem
-                    );
-                    if (range) {
-                        if (selectedItems.includes(targetItem)) {
-                            this.#removeFromSelection(targetList, ...range);
-                        }
-                        else {
-                            this.#addToSelection(targetList, ...range);
-                        }
-                    }
-                }
-                else {
-                    this.#setSelection(targetList, targetItem);
-                }
-                event.stopPropagation();
-            }
-        }
-    }
-
-    #handleContextMenuEvent(event: MouseEvent) {
-        const {currentTarget, target} = event;
-        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".treeitem");
-        const targetTree = <HTMLElement>currentTarget;
-        if (targetItem) {
-            const selectedItems = this.selectedItems(targetTree);
-            if (!selectedItems.includes(targetItem)) {
-                this.#setSelection(targetItem);
-            }
-            event.preventDefault();
-        }
     }
 
     #handleDragEndEvent(event: DragEvent): void {
@@ -366,6 +323,25 @@ Widget({
         this.#setDropTargetItem(targetTree, null);
     }
 
+    #handleFocusEvent(event: FocusEvent): void {
+        const {currentTarget, relatedTarget} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        const activeItem = this.#getActiveItem(targetTree);
+        if (activeItem && relatedTarget !== activeItem) {
+            activeItem.focus();
+        }
+    }
+
+    #handleFocusInEvent(event: FocusEvent): void {
+        const {currentTarget, target} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".listitem");
+        if (targetItem) {
+            this.#setActiveItem(targetTree, targetItem);
+            targetTree.tabIndex = -1;
+        }
+    }
+
     #handleKeyDownEvent(event: KeyboardEvent) {
         const {currentTarget, key} = event;
         const targetList = <HTMLElement>currentTarget;
@@ -384,11 +360,7 @@ Widget({
                             walker.currentNode = walker.parentNode() ?? targetList, walker.lastChild()
                         );
                         if (firstItem && lastItem) {
-                            const range = this.#getItemsRange(
-                                targetList,
-                                firstItem,
-                                lastItem
-                            );
+                            const range = this.#getItemsRange(firstItem, lastItem);
                             if (range) {
                                 this.#setSelection(targetList, ...range);
                             }
@@ -478,22 +450,48 @@ Widget({
         }
     }
 
-    #handleFocusEvent(event: FocusEvent): void {
-        const {currentTarget, relatedTarget} = event;
-        const targetTree = <HTMLElement>currentTarget;
-        const activeItem = this.#getActiveItem(targetTree);
-        if (activeItem && relatedTarget !== activeItem) {
-            activeItem.focus();
-        }
-    }
-
-    #handleFocusInEvent(event: FocusEvent): void {
-        const {currentTarget, target} = event;
-        const targetTree = <HTMLElement>currentTarget;
+    #handleMouseDownEvent(event: MouseEvent): void {
+        const {currentTarget, target, ctrlKey, shiftKey, button} = event;
         const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".listitem");
+        const targetList = <HTMLElement>currentTarget;
         if (targetItem) {
-            this.#setActiveItem(targetTree, targetItem);
-            targetTree.tabIndex = -1;
+            const selected = listitemWidget.getSelected(targetItem);
+            switch (button) {
+                case 0: {
+                    if (!shiftKey && !ctrlKey) {
+                        this.#setSelection(targetList, targetItem);
+                    }
+                    else if (ctrlKey) {
+                        if (selected) {
+                            targetItem.blur();
+                            this.#removeFromSelection(targetList, targetItem);
+                        }
+                        else {
+                            this.#addToSelection(targetList, targetItem);
+                        }
+                    }
+                    else if (shiftKey) {
+                        const activeItem = this.#getActiveItem(targetList);
+                        if (activeItem) {
+                            const range = this.#getItemsRange(
+                                activeItem,
+                                targetItem
+                            );
+                            if (range) {
+                                this.#setSelection(targetList, ...range);
+                            }
+                        }
+                        event.stopPropagation();
+                    }
+                    break;
+                }
+                case 2: {
+                    if (!selected) {
+                        this.#setSelection(targetList, targetItem);
+                    }
+                    break;
+                }
+            }
         }
     }
 

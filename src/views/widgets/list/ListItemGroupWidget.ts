@@ -39,7 +39,8 @@ Widget({
     }
 
     slottedCallback(item: HTMLElement, slot: HTMLElement) {
-        Array.from(slot.childNodes).forEach((item_i, i) => {
+        const {childNodes} = slot;
+        Array.from(childNodes).forEach((item_i, i) => {
             if (item_i instanceof HTMLElement) {
                 listitemWidget.setPosInSet(item_i, i);
             }

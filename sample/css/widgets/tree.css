@@ -42,7 +42,7 @@
     background-color: var(--hovered-item-color);
 }
 
-.treeitem[aria-selected] > .content {
+.treeitem[aria-selected="true"] > .content {
     background-color: var(--selected-item-color);
 }
 

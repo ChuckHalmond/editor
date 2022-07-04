@@ -213,11 +213,11 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
     }
 
     getPressed(item: HTMLElement): boolean {
-        return item.hasAttribute("aria-pressed");
+        return JSON.parse(item.getAttribute("aria-pressed") ?? false.toString());
     }
 
     setPressed(item: HTMLElement, value: boolean): void {
-        item.toggleAttribute("aria-pressed", value);
+        item.setAttribute("aria-pressed", value.toString());
     }
 
     getDisabled(item: HTMLElement): boolean {

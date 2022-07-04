@@ -31,6 +31,7 @@ Widget({
             attributes: {
                 class: "gridheader",
                 scope: "column",
+                role: "columnheader",
                 tabindex: -1
             },
             children: [

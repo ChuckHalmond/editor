@@ -78,13 +78,11 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
-        this.addEventListener("click", this.#handleClickEvent.bind(this));
-        this.addEventListener("contextmenu", this.#handleContextMenuEvent.bind(this), true);
+        this.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
         this.addEventListener("dragend", this.#handleDragEndEvent.bind(this));
         this.addEventListener("dragenter", this.#handleDragEnterEvent.bind(this));
         this.addEventListener("dragleave", this.#handleDragLeaveEvent.bind(this));
         this.addEventListener("dragover", this.#handleDragOverEvent.bind(this));
-        this.addEventListener("dragstart", this.#handleDragStartEvent.bind(this));
         this.addEventListener("drop", this.#handleDropEvent.bind(this));
         this.addEventListener("focus", this.#handleFocusEvent.bind(this));
         this.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
@@ -280,55 +278,46 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         return item;
     }
 
-    #handleClickEvent(event: MouseEvent): void {
-        const {target, ctrlKey, shiftKey} = event;
-        const selectedItems = this.selectedItems();
+    #handleMouseDownEvent(event: MouseEvent): void {
+        const {target, ctrlKey, shiftKey, button} = event;
         if (target instanceof HTMLETreeItemElement) {
-            if (!shiftKey && !ctrlKey) {
-                this.#setSelection(target);
-            }
-            else if (ctrlKey) {
-                const {selected} = target;
-                if (selected) {
-                    target.blur();
-                }
-                (!selected) ?
-                    this.#addToSelection(target) :
-                    this.#removeFromSelection(target);
-                event.stopPropagation();
-            }
-            else if (shiftKey) {
-                const lastSelectedItem = selectedItems[selectedItems.length - 1];
-                if (lastSelectedItem) {
-                    const range = this.#getItemsRange(
-                        lastSelectedItem,
-                        target
-                    );
-                    if (range) {
-                        if (selectedItems.includes(target)) {
-                            this.#removeFromSelection(...range);
+            const {selected} = target;
+            switch (button) {
+                case 0: {
+                    if (!shiftKey && !ctrlKey) {
+                        this.#setSelection(target);
+                    }
+                    else if (ctrlKey) {
+                        if (selected) {
+                            target.blur();
                         }
-                        else {
-                            this.#addToSelection(...range);
+                        (!selected) ?
+                            this.#addToSelection(target) :
+                            this.#removeFromSelection(target);
+                        event.stopPropagation();
+                    }
+                    else if (shiftKey) {
+                        const {activeItem} = this
+                        if (activeItem) {
+                            const range = this.#getItemsRange(
+                                activeItem,
+                                target
+                            );
+                            if (range) {
+                                this.#setSelection(...range);
+                            }
                         }
+                        event.stopPropagation();
                     }
                 }
-                else {
-                    this.#setSelection(target);
+                break;
+                case 2: {
+                    if (!selected) {
+                        this.#setSelection(target);
+                    }
+                    break;
                 }
-                event.stopPropagation();
             }
-        }
-    }
-
-    #handleContextMenuEvent(event: MouseEvent): void {
-        const {target} = event;
-        if (target instanceof HTMLETreeItemElement) {
-            const selectedItems = this.selectedItems();
-            if (!selectedItems.includes(target)) {
-                this.#setSelection(target);
-            }
-            event.preventDefault();
         }
     }
 
@@ -362,16 +351,6 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
                 relatedTarget;
             if (!this.contains(<Node>relatedTargetHost)) {
                 this.#setDropTargetItem(null);
-            }
-        }
-    }
-
-    #handleDragStartEvent(event: DragEvent): void {
-        const {target} = event;
-        if (target instanceof HTMLETreeItemElement) {
-            const selectedItems = this.selectedItems();
-            if (!selectedItems.includes(target)) {
-                this.#setSelection(target);
             }
         }
     }

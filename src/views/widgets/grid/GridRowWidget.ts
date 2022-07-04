@@ -38,7 +38,9 @@ Widget({
         this.#template = element("tr", {
             attributes: {
                 class: "gridrow",
-                tabindex: -1
+                role: "row",
+                tabindex: -1,
+                ariaSelected: "false"
             }
         });
     }
@@ -91,9 +93,7 @@ Widget({
     setDropTarget(row: HTMLElement, value: boolean): void {
         const {classList} = row;
         if (value) {
-            if (!classList.contains("droptarget")) {
-                classList.add("droptarget");
-            }
+            classList.add("droptarget");
         }
         else {
             classList.remove("droptarget");
@@ -114,16 +114,17 @@ Widget({
     }
 
     setSelected(row: HTMLElement, value: boolean): void {
-        row.toggleAttribute("aria-selected", value);
+        row.setAttribute("aria-selected", value.toString());
         row.dispatchEvent(new Event("select", {bubbles: true}));
     }
 
     getSelected(row: HTMLElement): boolean {
-        return row.hasAttribute("aria-selected");
+        return JSON.parse(row.getAttribute("aria-selected") ?? false.toString());
     }
 
     slottedCallback(item: HTMLElement, slot: HTMLElement) {
-        Array.from(slot.childNodes).forEach((item_i, i) => {
+        const {childNodes} = slot;
+        Array.from(childNodes).forEach((item_i, i) => {
             if (item_i instanceof HTMLElement) {
                 gridCellWidget.setPosInSet(item_i, i);
             }

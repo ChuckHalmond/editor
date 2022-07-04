@@ -26,12 +26,12 @@ declare global {
     }
 }
 declare var gridCellWidget: {
-    "__#17481@#template": HTMLElement;
+    "__#55@#template": HTMLElement;
     create(init?: {
-        label?: string | undefined;
-        disabled?: boolean | undefined;
-    } | undefined): HTMLElement;
-    "__#17481@#label"(item: HTMLElement): HTMLElement;
+        label?: string;
+        disabled?: boolean;
+    }): HTMLElement;
+    "__#55@#label"(item: HTMLElement): HTMLElement;
     getHeaders(item: HTMLElement): string;
     setHeaders(item: HTMLElement, value: string): void;
     getLabel(item: HTMLElement): string;

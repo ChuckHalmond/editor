@@ -17,6 +17,10 @@
     line-height: 22px;
 }
 
+.toolbaritem[aria-pressed="true"] {
+    background-color: var(--activated-item-color);
+}
+
 .toolbaritem[aria-disabled] {
     opacity: 0.38;
     pointer-events: none;

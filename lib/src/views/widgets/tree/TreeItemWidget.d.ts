@@ -6,6 +6,7 @@ interface TreeItemWidgetFactory extends WidgetFactory {
         type: TreeItemType;
         label?: string;
         disabled?: boolean;
+        draggable?: boolean;
     }): HTMLElement;
     getGroup(item: HTMLElement): HTMLElement | null;
     setPosInSet(item: HTMLElement, value: number): void;
@@ -22,6 +23,8 @@ interface TreeItemWidgetFactory extends WidgetFactory {
     getDisabled(item: HTMLElement): boolean;
     setExpanded(item: HTMLElement, value: boolean): void;
     getExpanded(item: HTMLElement): boolean;
+    setDraggable(row: HTMLElement, value: boolean): void;
+    getDraggable(item: HTMLElement): boolean;
     getType(item: HTMLElement): TreeItemType | null;
     setType(item: HTMLElement, value: TreeItemType): void;
     toggle(item: HTMLElement, force?: boolean): void;
@@ -32,10 +35,10 @@ declare global {
     }
 }
 declare var treeitemWidget: {
-    "__#46@#arrowPartTemplate": HTMLElement;
-    "__#46@#template": HTMLElement;
-    "__#46@#types": TreeItemType[];
-    "__#46@#typesFeatures": {
+    "__#28409@#arrowPartTemplate": HTMLElement;
+    "__#28409@#template": HTMLElement;
+    "__#28409@#types": TreeItemType[];
+    "__#28409@#typesFeatures": {
         parent: {
             role: string;
             hasArrow: boolean;
@@ -48,10 +51,11 @@ declare var treeitemWidget: {
     getGroup(item: HTMLElement): HTMLElement | null;
     create(init?: {
         type: TreeItemType;
-        label?: string | undefined;
-        disabled?: boolean | undefined;
-    } | undefined): HTMLElement;
-    "__#46@#label"(item: HTMLElement): HTMLElement;
+        label?: string;
+        disabled?: boolean;
+        draggable?: boolean;
+    }): HTMLElement;
+    "__#28409@#label"(item: HTMLElement): HTMLElement;
     getLabel(item: HTMLElement): string;
     setLabel(item: HTMLElement, value: string): void;
     setPosInSet(item: HTMLElement, value: number): void;
@@ -66,12 +70,14 @@ declare var treeitemWidget: {
     getDropTarget(item: HTMLElement): boolean;
     setDisabled(item: HTMLElement, value: boolean): void;
     getDisabled(item: HTMLElement): boolean;
+    setDraggable(item: HTMLElement, value: boolean): void;
+    getDraggable(item: HTMLElement): boolean;
     setSelected(item: HTMLElement, value: boolean): void;
     getSelected(item: HTMLElement): boolean;
     setLevel(item: HTMLElement, value: number): void;
     getLevel(item: HTMLElement): number;
-    toggle(item: HTMLElement, force?: boolean | undefined): void;
-    "__#46@#handleClickEvent"(event: MouseEvent): void;
+    toggle(item: HTMLElement, force?: boolean): void;
+    "__#28409@#handleClickEvent"(event: MouseEvent): void;
     slot(root: HTMLElement, name: string | null): HTMLElement | null;
     readonly slots: string[];
 };

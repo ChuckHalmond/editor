@@ -41,6 +41,8 @@ Widget({
         this.#template = element("td", {
             attributes: {
                 class: "gridcell",
+                role: "gridcell",
+                ariaSelected: "false",
                 tabindex: -1
             },
             children: [
@@ -153,11 +155,11 @@ Widget({
     }
 
     setSelected(item: HTMLElement, value: boolean): void {
-        item.toggleAttribute("aria-selected", value);
+        item.setAttribute("aria-selected", value.toString());
         item.dispatchEvent(new Event("select", {bubbles: true}));
     }
 
     getSelected(item: HTMLElement): boolean {
-        return item.hasAttribute("aria-selected");
+        return JSON.parse(item.getAttribute("aria-selected") ?? false.toString());
     }
 }));

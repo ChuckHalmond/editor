@@ -44,15 +44,21 @@ Widget({
         );
     }
 
-    create(): HTMLElement {
+    create(init?: {
+        multisectable?: boolean;
+    }): HTMLElement {
         const tree = <HTMLElement>this.#template.cloneNode(true);
-        tree.addEventListener("click", this.#handleClickEvent.bind(this));
-        tree.addEventListener("contextmenu", this.#handleContextMenuEvent.bind(this), true);
+        if (init !== void 0) {
+            const {multisectable} = init;
+            if (multisectable !== void 0) {
+                this.setMultiSelectable(tree, multisectable);
+            }
+        }
+        tree.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
         tree.addEventListener("dragend", this.#handleDragEndEvent.bind(this));
         tree.addEventListener("dragenter", this.#handleDragEnterEvent.bind(this));
         tree.addEventListener("dragleave", this.#handleDragLeaveEvent.bind(this));
         tree.addEventListener("dragover", this.#handleDragOverEvent.bind(this));
-        tree.addEventListener("dragstart", this.#handleDragStartEvent.bind(this));
         tree.addEventListener("drop", this.#handleDropEvent.bind(this));
         tree.addEventListener("focus", this.#handleFocusEvent.bind(this));
         tree.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
@@ -69,32 +75,13 @@ Widget({
     }
 
     slottedCallback(item: HTMLElement, slot: HTMLElement) {
-        Array.from(slot.childNodes).forEach((item_i, i) => {
+        const {childNodes} = slot;
+        Array.from(childNodes).forEach((item_i, i) => {
             if (item_i instanceof HTMLElement) {
                 treeitemWidget.setPosInSet(item_i, i);
                 treeitemWidget.setLevel(item_i, 0);
             }
         });
-    }
-
-    #getActiveItem(tree: HTMLElement): HTMLElement | null {
-        return tree.querySelector<HTMLElement>(".treeitem.active");
-    }
-
-    #getDropTargetItem(tree: HTMLElement): HTMLElement | null {
-        return tree.querySelector<HTMLElement>(".treeitem.droptarget");
-    }
-
-    #setDropTarget(tree: HTMLElement, droptarget: boolean): void {
-        const {classList} = tree;
-        if (droptarget) {
-            if (!classList.contains("droptarget")) {
-                classList.add("droptarget");
-            }
-        }
-        else {
-            classList.remove("droptarget");
-        }
     }
 
     items(menu: HTMLElement): HTMLElement[] {
@@ -130,6 +117,37 @@ Widget({
         }
     }
 
+    setMultiSelectable(tree: HTMLElement, value: boolean): void {
+        tree.setAttribute("aria-multiselectable", value.toString());
+    }
+
+    getMultiSelectable(tree: HTMLElement): boolean {
+        return JSON.parse(tree.getAttribute("aria-multiselectable") ?? false.toString());
+    }
+
+    #getActiveItem(tree: HTMLElement): HTMLElement | null {
+        return tree.querySelector<HTMLElement>(".treeitem.active");
+    }
+
+    #getDropTargetItem(tree: HTMLElement): HTMLElement | null {
+        return tree.querySelector<HTMLElement>(".treeitem.droptarget");
+    }
+
+    #setDropTargetItem(tree: HTMLElement, item: HTMLElement | null): void {
+        const {classList} = tree;
+        const dropTargetItem = this.#getDropTargetItem(tree);
+        if (dropTargetItem !== null && dropTargetItem !== item) {
+            treeitemWidget.setDropTarget(dropTargetItem, false);
+        }
+        if (item !== null) {
+            treeitemWidget.setDropTarget(item, true);
+            classList.add("droptarget");
+        }
+        else {
+            classList.remove("droptarget");
+        }
+    }
+
     #nodeFilter(node: Node): number {
         if (node instanceof HTMLElement) {
             const {classList} = node;
@@ -150,20 +168,20 @@ Widget({
         const position = from.compareDocumentPosition(to);
         if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
             const range = [from];
-            let nextVisibleItem = this.#nextItem(from);
-            while (nextVisibleItem && nextVisibleItem !== to) {
-                range.push(nextVisibleItem);
-                nextVisibleItem = this.#nextItem(nextVisibleItem);
+            let nextItem = this.#nextItem(from);
+            while (nextItem && nextItem !== to) {
+                range.push(nextItem);
+                nextItem = this.#nextItem(nextItem);
             }
             range.push(to);
             return range;
         }
         else if (position & Node.DOCUMENT_POSITION_PRECEDING) {
             const range = [from];
-            let previousVisibleItem = this.#previousItem(from);
-            while (previousVisibleItem && previousVisibleItem !== to) {
-                range.push(previousVisibleItem);
-                previousVisibleItem = this.#previousItem(previousVisibleItem);
+            let previousItem = this.#previousItem(from);
+            while (previousItem && previousItem !== to) {
+                range.push(previousItem);
+                previousItem = this.#previousItem(previousItem);
             }
             range.push(to);
             return range;
@@ -229,20 +247,6 @@ Widget({
             item.tabIndex = 0;
         }
     }
-    
-    #setDropTargetItem(tree: HTMLElement, item: HTMLElement | null): void {
-        const dropTargetItem = this.#getDropTargetItem(tree);
-        if (dropTargetItem !== null && dropTargetItem !== item) {
-            treeitemWidget.setDropTarget(dropTargetItem, false);
-        }
-        if (item !== null) {
-            this.#setDropTarget(tree, true);
-            treeitemWidget.setDropTarget(item, false);
-        }
-        else {
-            this.#setDropTarget(tree, false);
-        }
-    }
 
     #firstItem(tree: HTMLElement): HTMLElement | null {
         const walker = this.#walker;
@@ -292,60 +296,49 @@ Widget({
         return item;
     }
 
-    #handleClickEvent(event: MouseEvent): void {
-        const {currentTarget, target, ctrlKey, shiftKey} = event;
+    #handleMouseDownEvent(event: MouseEvent): void {
+        const {currentTarget, target, ctrlKey, shiftKey, button} = event;
         const targetTree = <HTMLElement>currentTarget;
         const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".treeitem");
         if (targetItem) {
-            const selectedItems = this.selectedItems(targetTree);
-            if (!shiftKey && !ctrlKey) {
-                this.#setSelection(targetTree, targetItem);
-            }
-            else if (ctrlKey) {
-                const selected = treeitemWidget.getSelected(targetItem);
-                if (selected) {
-                    targetItem.blur();
-                    this.#removeFromSelection(targetTree, targetItem);
-                }
-                else {
-                    this.#addToSelection(targetTree, targetItem);
-                }
-                event.stopPropagation();
-            }
-            else if (shiftKey) {
-                const lastSelectedItem = selectedItems[selectedItems.length - 1];
-                if (lastSelectedItem) {
-                    const range = this.#getItemsRange(
-                        lastSelectedItem,
-                        targetItem
-                    );
-                    if (range) {
-                        if (selectedItems.includes(targetItem)) {
-                            this.#removeFromSelection(targetTree, ...range);
+            const selected = treeitemWidget.getSelected(targetItem);
+            switch (button) {
+                case 0: {
+                    if (!shiftKey && !ctrlKey) {
+                        this.#setSelection(targetTree, targetItem);
+                    }
+                    else if (ctrlKey) {
+                        if (selected) {
+                            targetItem.blur();
+                            this.#removeFromSelection(targetTree, targetItem);
                         }
                         else {
-                            this.#addToSelection(targetTree, ...range);
+                            this.#addToSelection(targetTree, targetItem);
                         }
+                        event.stopPropagation();
                     }
+                    else if (shiftKey) {
+                        const activeItem = this.#getActiveItem(targetTree);
+                        if (activeItem) {
+                            const range = this.#getItemsRange(
+                                activeItem,
+                                targetItem
+                            );
+                            if (range) {
+                                this.#setSelection(targetTree, ...range);
+                            }
+                        }
+                        event.stopPropagation();
+                    }
+                    break;
                 }
-                else {
-                    this.#setSelection(targetTree, targetItem);
+                case 2: {
+                    if (!selected) {
+                        this.#setSelection(targetTree, targetItem);
+                    }
+                    break;
                 }
-                event.stopPropagation();
             }
-        }
-    }
-
-    #handleContextMenuEvent(event: MouseEvent): void {
-        const {currentTarget, target} = event;
-        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".treeitem");
-        const targetTree = <HTMLElement>currentTarget;
-        if (targetItem) {
-            const selectedItems = this.selectedItems(targetTree);
-            if (!selectedItems.includes(targetItem)) {
-                this.#setSelection(targetTree, targetItem);
-            }
-            event.preventDefault();
         }
     }
 
@@ -384,17 +377,6 @@ Widget({
                 relatedTarget;
             if (!targetTree.contains(<Node>relatedTargetHost)) {
                 this.#setDropTargetItem(targetTree, null);
-            }
-        }
-    }
-
-    #handleDragStartEvent(event: DragEvent): void {
-        const {currentTarget, target} = event;
-        const targetTree = <HTMLElement>currentTarget;
-        if (target instanceof HTMLElement && target.classList.contains("treeitem")) {
-            const selectedItems = this.selectedItems(targetTree);
-            if (!selectedItems.includes(target)) {
-                this.#setSelection(targetTree, target);
             }
         }
     }
