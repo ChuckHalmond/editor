@@ -33,9 +33,9 @@ declare var gridWidget: {
     "__#57@#onSelection": WeakMap<HTMLElement, boolean>;
     "__#57@#hasSelectionChanged": WeakMap<HTMLElement, boolean>;
     create(init?: {
-        multisectable?: boolean | undefined;
-        selectby?: GridSelectBy | undefined;
-    } | undefined): HTMLElement;
+        multisectable?: boolean;
+        selectby?: GridSelectBy;
+    }): HTMLElement;
     slot(grid: HTMLElement, name: string | null): HTMLElement | null;
     slottedCallback(grid: HTMLElement, slot: HTMLElement): void;
     setMultiSelectable(grid: HTMLElement, value: boolean): void;

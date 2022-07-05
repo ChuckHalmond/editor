@@ -35,23 +35,24 @@ declare global {
     }
 }
 declare var treeitemWidget: {
-    "__#18927@#template": HTMLElement;
-    "__#18927@#types": TreeItemType[];
+    "__#15307@#template": HTMLElement;
+    "__#15307@#types": TreeItemType[];
     group(item: HTMLElement): HTMLElement | null;
     create(init?: {
-        type: TreeItemType;
-        label?: string | undefined;
-        disabled?: boolean | undefined;
-        draggable?: boolean | undefined;
-    } | undefined): HTMLElement;
-    slot(item: HTMLElement, name: string | null): HTMLElement;
-    "__#18927@#content"(item: HTMLElement): HTMLElement;
-    "__#18927@#label"(item: HTMLElement): HTMLElement;
+        type?: TreeItemType;
+        label?: string;
+        disabled?: boolean;
+        draggable?: boolean;
+    }): HTMLElement;
+    readonly slots: string[];
+    slot(item: HTMLElement, name: string | null): HTMLElement | null;
+    "__#15307@#content"(item: HTMLElement): HTMLElement;
+    "__#15307@#label"(item: HTMLElement): HTMLElement;
     getLabel(item: HTMLElement): string;
     setLabel(item: HTMLElement, value: string): void;
     setPosInSet(item: HTMLElement, value: number): void;
     getPosInSet(item: HTMLElement): number;
-    getType(item: HTMLElement): TreeItemType | null;
+    getType(item: HTMLElement): TreeItemType;
     setType(item: HTMLElement, type: TreeItemType): void;
     setExpanded(item: HTMLElement, value: boolean): void;
     getExpanded(item: HTMLElement): boolean;
@@ -67,7 +68,6 @@ declare var treeitemWidget: {
     getSelected(item: HTMLElement): boolean;
     setLevel(item: HTMLElement, value: number): void;
     getLevel(item: HTMLElement): number;
-    toggle(item: HTMLElement, force?: boolean | undefined): void;
-    "__#18927@#handleClickEvent"(event: MouseEvent): void;
-    readonly slots: string[];
+    toggle(item: HTMLElement, force?: boolean): void;
+    "__#15307@#handleClickEvent"(event: MouseEvent): void;
 };

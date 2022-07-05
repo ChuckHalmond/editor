@@ -346,19 +346,21 @@ export async function main() {
                     draggable: true
                     //disabled: true
                 },
-                slotted: [
-                    widget("treeitemgroup", {
-                        slotted: [
-                            widget("treeitem", {
-                                properties: {
-                                    label: "treeitem 1",
-                                    type: "leaf",
-                                    draggable: true
-                                }
-                            })
-                        ]
-                    })
-                ],
+                slotted: {
+                    group: [
+                        widget("treeitemgroup", {
+                            slotted: [
+                                widget("treeitem", {
+                                    properties: {
+                                        label: "treeitem 1",
+                                        type: "leaf",
+                                        draggable: true
+                                    }
+                                })
+                            ]
+                        })
+                    ]
+                },
                 listeners: {
                     contextmenu: <EventListener>((event: MouseEvent) => {
                         const {target, clientX, clientY} = event;
@@ -408,19 +410,21 @@ export async function main() {
                     draggable: true,
                     disabled: true
                 },
-                slotted: [
-                    widget("treeitemgroup", {
-                        slotted: [
-                            widget("treeitem", {
-                                properties: {
-                                    label: "treeitem 1",
-                                    type: "leaf",
-                                    draggable: true
-                                }
-                            })
-                        ]
-                    })
-                ]
+                slotted: {
+                    group: [
+                        widget("treeitemgroup", {
+                            slotted: [
+                                widget("treeitem", {
+                                    properties: {
+                                        label: "treeitem 1",
+                                        type: "leaf",
+                                        draggable: true
+                                    }
+                                })
+                            ]
+                        })
+                    ]
+                }
             }),
             widget("treeitem", {
                 properties: {

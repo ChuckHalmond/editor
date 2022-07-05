@@ -49,11 +49,11 @@ Widget({
 
     constructor() {
         super();
+        this.#types = ["parent", "leaf"];
         this.#template = element("li", {
             attributes: {
                 class: "treeitem",
                 role: "treeitem",
-                type: "treeitem-leaf",
                 tabindex: -1
             },
             children: [
@@ -76,7 +76,6 @@ Widget({
                 })
             ]
         });
-        this.#types = ["parent", "leaf"];
     }
 
     group(item: HTMLElement): HTMLElement | null {
@@ -84,18 +83,17 @@ Widget({
     }
 
     create(init?: {
-        type: TreeItemType;
+        type?: TreeItemType;
         label?: string;
         disabled?: boolean;
         draggable?: boolean;
     }): HTMLElement {
         const item = <HTMLElement>this.#template.cloneNode(true);
         item.addEventListener("click", this.#handleClickEvent.bind(this));
+        const type = init?.type ?? "leaf";
+        this.setType(item, type);
         if (init !== void 0) {
-            const {type, label, disabled, draggable} = init;
-            if (type !== void 0) {
-                this.setType(item, type);
-            }
+            const {label, disabled, draggable} = init;
             if (label !== void 0) {
                 this.setLabel(item, label);
             }
@@ -110,21 +108,30 @@ Widget({
         return item;
     }
 
+    get slots() {
+        return ["content", "group"];
+    }
+
     slot(item: HTMLElement, name: string | null) {
         switch (name) {
             case "content":
                 return this.#content(item);;
-            default:
+            case "group":
                 return item;
         }
+        return null;
     }
 
     #content(item: HTMLElement): HTMLElement {
-        return item.querySelector<HTMLElement>(":scope > .content")!;
+        const content = item.querySelector<HTMLElement>(":scope > .content")!;
+        if (!content) throw new Error("Missing content.");
+        return content;
     }
 
     #label(item: HTMLElement): HTMLElement {
-        return item.querySelector<HTMLElement>(":scope > .content > .label")!;
+        const label = item.querySelector<HTMLElement>(":scope > .content > .label");
+        if (!label) throw new Error("Missing label.");
+        return label;
     }
 
     getLabel(item: HTMLElement): string {
@@ -144,7 +151,7 @@ Widget({
         return posInSet ? parseInt(posInSet) : -1;
     }
 
-    getType(item: HTMLElement): TreeItemType | null {
+    getType(item: HTMLElement): TreeItemType {
         const types = this.#types;
         const {classList} = item;
         for (let type_i of types) {
@@ -152,15 +159,16 @@ Widget({
                 return type_i;
             }
         }
-        return null;
+        throw new Error("Missing type.");
     }
 
     setType(item: HTMLElement, type: TreeItemType): void {
-        const oldType = this.getType(item);
         const {classList} = item;
-        if (oldType) {
+        try {
+            const oldType = this.getType(item);
             classList.remove(`treeitem-${oldType}`);
         }
+        catch (e) {};
         classList.add(`treeitem-${type}`);
     }
 
