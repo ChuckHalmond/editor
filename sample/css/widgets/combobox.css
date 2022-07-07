@@ -1,0 +1,112 @@
+.combobox {
+    display: inline-block;
+    user-select: none;
+    line-height: 22px;
+}
+
+.combobox:focus-within {
+    background-color: var(--focused-item-color);
+}
+
+.combobox:hover:not(:focus-within) {
+    background-color: var(--hovered-item-color);
+}
+
+.combobox[aria-disabled] {
+    opacity: 0.38;
+    pointer-events: none;
+}
+
+.combobox > .content {
+    flex: 1;
+    overflow: hidden;
+    padding: 0 4px;
+    pointer-events: none;
+}
+
+.combobox > .content > .label {
+    flex: auto;
+    margin-right: 16px;
+}
+
+.combobox > .content > .value {
+    flex: auto;
+    text-align: right;
+}
+
+.combobox > .box {
+    z-index: 1;
+    position: absolute;
+
+    display: flex;
+    flex-direction: column;
+    
+    padding: 6px 0;
+
+    background-color: white;
+
+    -webkit-box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
+    -moz-box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
+}
+
+.combobox[aria-expanded="false"] > .box {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.combobox > .content::after {
+    display: inline-block;
+    text-align: center;
+    width: 18px;
+    height: 18px;
+    margin-left: 6px;
+    content: "▾";
+}
+
+.option {
+    display: flex;
+    user-select: none;
+    white-space: nowrap;
+    line-height: 22px;
+    padding: 0 12px;
+}
+
+.option:hover {
+    background-color: var(--hovered-item-color);
+}
+
+.option:focus-within {
+    outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;
+}
+
+.option[aria-selected="true"] {
+    background-color: var(--selected-item-color);
+}
+
+.option[aria-disabled] {
+    opacity: 0.38;
+    pointer-events: none;
+}
+
+.option::before {
+    display: flex;
+    content: "";
+    width: 18px;
+    height: 18px;
+    margin-right: 6px;
+
+    mask-size: 18px 18px;
+    -webkit-mask-size: 18px 18px;
+    background-color: var(--icon-color, none);
+    -webkit-mask-image: var(--icon-image, none);
+    mask-image: var(--icon-image, none);
+}
+
+.option[data-default]::after {
+    display: inline-block;
+    content: "(default)";
+    margin-left: 24px;
+    text-align: right;
+}

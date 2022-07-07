@@ -39,12 +39,12 @@ interface MenuItemWidgetFactory extends WidgetFactory {
     collapse(item: HTMLElement): void;
 }
 declare var menuItemWidget: {
-    "__#42@#iconPartTemplate": HTMLElement;
-    "__#42@#arrowPartTemplate": HTMLElement;
-    "__#42@#keyshortcutsPartTemplate": HTMLElement;
-    "__#42@#template": HTMLElement;
-    "__#42@#types": MenuItemType[];
-    "__#42@#typesFeatures": {
+    "__#18284@#iconPartTemplate": HTMLElement;
+    "__#18284@#arrowPartTemplate": HTMLElement;
+    "__#18284@#keyshortcutsPartTemplate": HTMLElement;
+    "__#18284@#template": HTMLElement;
+    "__#18284@#types": MenuItemType[];
+    "__#18284@#typesFeatures": {
         button: {
             role: string;
             hasIcon: boolean;
@@ -82,7 +82,7 @@ declare var menuItemWidget: {
     }): HTMLElement;
     slot(item: HTMLElement): HTMLElement | null;
     slottedCallback(item: HTMLElement, slot: HTMLElement): void;
-    "__#42@#label"(item: HTMLElement): HTMLElement;
+    "__#18284@#label"(item: HTMLElement): HTMLElement;
     getMenu(item: HTMLElement): HTMLElement | null;
     getKeyShortcut(item: HTMLElement): string | null;
     setKeyShortcut(item: HTMLElement, value: string | null): void;
@@ -103,7 +103,7 @@ declare var menuItemWidget: {
     toggle(item: HTMLElement, force?: boolean): void;
     expand(item: HTMLElement): void;
     collapse(item: HTMLElement): void;
-    "__#42@#handleClickEvent"(event: MouseEvent): void;
-    "__#42@#positionMenu"(item: HTMLElement): void;
+    "__#18284@#handleClickEvent"(event: MouseEvent): void;
+    "__#18284@#positionMenu"(item: HTMLElement): void;
     readonly slots: string[];
 };

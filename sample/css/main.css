@@ -29,3 +29,4 @@
 @import "widgets/list.css" layer(base);
 @import "widgets/toolbar.css" layer(base);
 @import "widgets/grid.css" layer(base);
+@import "widgets/combobox.css" layer(base);

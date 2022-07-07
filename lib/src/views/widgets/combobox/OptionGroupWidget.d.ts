@@ -1,15 +1,15 @@
 import { WidgetFactory } from "../Widget";
-export { listItemGroupWidget };
+export { optionGroupWidget };
 declare global {
     interface WidgetNameMap {
-        "listitemgroup": ListItemGroupWidgetFactory;
+        "optiongroup": OptionGroupWidgetFactory;
     }
 }
-interface ListItemGroupWidgetFactory extends WidgetFactory {
+interface OptionGroupWidgetFactory extends WidgetFactory {
     create(): HTMLElement;
 }
-declare var listItemGroupWidget: {
-    "__#18286@#template": HTMLElement;
+declare var optionGroupWidget: {
+    "__#18288@#template": HTMLElement;
     create(): HTMLElement;
     slot(group: HTMLElement): HTMLElement;
     slottedCallback(group: HTMLElement, slot: HTMLElement): void;

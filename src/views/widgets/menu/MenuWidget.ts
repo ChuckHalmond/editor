@@ -193,23 +193,23 @@ Widget({
 
     #handleClickEvent(event: MouseEvent): void {
         const {target, currentTarget} = event;
-        const menu = <HTMLElement>currentTarget;
+        const targetMenu = <HTMLElement>currentTarget;
         if (target instanceof HTMLElement && target.classList.contains("menuitem")) {
-            const contextual = this.getContextual(menu);
+            const contextual = this.getContextual(targetMenu);
             if (contextual) {
                 try {
-                    menu.remove();
+                    targetMenu.remove();
                 }
                 catch (error) {};
             }
             else {
-                const isClosestMenu = this.#isClosestMenu(menu, target);
+                const isClosestMenu = this.#isClosestMenu(targetMenu, target);
                 if (isClosestMenu) {
                     const type = menuItemWidget.getType(target);
                     const name = menuItemWidget.getName(target);
                     const value = menuItemWidget.getValue(target);
                     if (type == "radio") {
-                        menu.querySelectorAll<HTMLElement>(
+                        targetMenu.querySelectorAll<HTMLElement>(
                             `:is(:scope, :scope > .menuitemgroup) > .menuitem-radio[name=${name}]`
                         )
                         .forEach((radio_i) => {
@@ -223,19 +223,19 @@ Widget({
 
     #handleFocusOutEvent(event: FocusEvent): void {
         const {target, currentTarget, relatedTarget} = event;
-        const menu = <HTMLElement>currentTarget;
-        const lostFocusWithin = !menu.contains(<Node>relatedTarget);
+        const targetMenu = <HTMLElement>currentTarget;
+        const lostFocusWithin = !targetMenu.contains(<Node>relatedTarget);
         if (lostFocusWithin) {
-            const contextual = this.getContextual(menu);
+            const contextual = this.getContextual(targetMenu);
             if (contextual) {
                 try {
-                    menu.remove();
+                    targetMenu.remove();
                 } catch (error) {
                     void 0;
                 }
             }
             else {
-                const nearestItem = this.#nearestItem(menu, <HTMLElement>target);
+                const nearestItem = this.#nearestItem(targetMenu, <HTMLElement>target);
                 if (nearestItem) {
                     menuItemWidget.collapse(nearestItem);
                 }
@@ -245,33 +245,33 @@ Widget({
 
     #handleKeyDownEvent(event: KeyboardEvent): void {
         const {currentTarget, key} = event;
-        const menu = <HTMLElement>currentTarget;
-        const activeItem = this.#getActiveItem(menu);
+        const targetMenu = <HTMLElement>currentTarget;
+        const activeItem = this.#getActiveItem(targetMenu);
         switch (key) {
             case "ArrowUp": {
                 const previousItem = activeItem ?
-                    this.#previousItem(activeItem) ?? this.#lastItem(menu) :
-                    this.#firstItem(menu);
+                    this.#previousItem(activeItem) ?? this.#lastItem(targetMenu) :
+                    this.#firstItem(targetMenu);
                 previousItem?.focus({preventScroll: true});
                 event.stopPropagation();
                 break;
             }
             case "ArrowDown": {
                 const nextItem = activeItem ?
-                    this.#nextItem(activeItem) ?? this.#firstItem(menu) :
-                    this.#firstItem(menu);
+                    this.#nextItem(activeItem) ?? this.#firstItem(targetMenu) :
+                    this.#firstItem(targetMenu);
                 nextItem?.focus({preventScroll: true});
                 event.stopPropagation();
                 break;
             }
             case "Home": {
-                const firstItem = this.#firstItem(menu);
+                const firstItem = this.#firstItem(targetMenu);
                 firstItem?.focus({preventScroll: true});
                 event.stopPropagation();
                 break;
             }
             case "End": {
-                const lastItem = this.#lastItem(menu);
+                const lastItem = this.#lastItem(targetMenu);
                 lastItem?.focus({preventScroll: true});
                 event.stopPropagation();
                 break;
@@ -295,10 +295,10 @@ Widget({
             }
             case "Escape": {
                 if (activeItem) {
-                    const isClosestTargetMenu = event.composedPath().find(
+                    const isTargetClosestMenu = event.composedPath().find(
                         target_i => target_i instanceof HTMLElement && target_i.classList.contains("menu")
-                    ) == menu;
-                    if (!isClosestTargetMenu) {
+                    ) == targetMenu;
+                    if (!isTargetClosestMenu) {
                         menuItemWidget.collapse(activeItem);
                         activeItem.focus({preventScroll: true});
                         event.stopPropagation();
@@ -308,10 +308,10 @@ Widget({
             }
             case "ArrowLeft": {
                 if (activeItem) {
-                    const isClosestTargetMenu = event.composedPath().find(
+                    const isTargetClosestMenu = event.composedPath().find(
                         target_i => target_i instanceof HTMLElement && target_i.classList.contains("menu")
-                    ) == menu;
-                    if (!isClosestTargetMenu) {
+                    ) == targetMenu;
+                    if (!isTargetClosestMenu) {
                         menuItemWidget.collapse(activeItem);
                         activeItem.focus({preventScroll: true});
                         event.stopPropagation();
@@ -342,9 +342,9 @@ Widget({
 
     #handleMouseOutEvent(event: MouseEvent): void {
         const {target, currentTarget, relatedTarget} = event;
-        const menu = <HTMLElement>currentTarget;
+        const targetMenu = <HTMLElement>currentTarget;
         if (target instanceof HTMLElement && target.classList.contains("menuitem")) {
-            const nearestItem = this.#nearestItem(menu, target);
+            const nearestItem = this.#nearestItem(targetMenu, target);
             if (nearestItem !== null) {
                 if (menuItemWidget.getType(nearestItem) == "submenu" &&
                     !menuItemWidget.getExpanded(nearestItem)) {
@@ -352,9 +352,9 @@ Widget({
                 }
                 const isTargetClosestMenu = event.composedPath().find(
                     target_i => target_i instanceof HTMLElement && target_i.classList.contains("menu")
-                ) == menu;
+                ) == targetMenu;
                 if (isTargetClosestMenu) {
-                    const activeItem = this.#getActiveItem(menu);
+                    const activeItem = this.#getActiveItem(targetMenu);
                     if (activeItem !== null &&
                         menuItemWidget.getType(activeItem) == "submenu" &&
                         menuItemWidget.getExpanded(activeItem)) {
@@ -366,21 +366,21 @@ Widget({
                             .catch(() => void 0);
                     }
                     const {clientX, clientY} = event;
-                    const {left, right, top, bottom} = menu.getBoundingClientRect();
+                    const {left, right, top, bottom} = targetMenu.getBoundingClientRect();
                     const intersectsWithMouse = !(
                         left > clientX || right < clientX || top > clientY || bottom < clientY
                     );
-                    const containsRelatedTarget = menu.contains(<Node>relatedTarget);
+                    const containsRelatedTarget = targetMenu.contains(<Node>relatedTarget);
                     if (intersectsWithMouse && containsRelatedTarget) {
-                        if (relatedTarget instanceof HTMLElement && relatedTarget.classList.contains("menu") && relatedTarget !== menu) {
+                        if (relatedTarget instanceof HTMLElement && relatedTarget.classList.contains("menu") && relatedTarget !== targetMenu) {
                             relatedTarget.focus({preventScroll: true});
                         }
                         else {
-                            menu.focus({preventScroll: true});
+                            targetMenu.focus({preventScroll: true});
                         }
                     }
                     if (!intersectsWithMouse) {
-                        menu.focus({preventScroll: true});
+                        targetMenu.focus({preventScroll: true});
                     }
                 }
             }
@@ -389,9 +389,9 @@ Widget({
 
     #handleMouseOverEvent(event: MouseEvent): void {
         const {target, currentTarget} = event;
-        const menu = <HTMLElement>currentTarget;
+        const targetMenu = <HTMLElement>currentTarget;
         if (target instanceof HTMLElement && target.classList.contains("menuitem")) {
-            const nearestItem = this.#nearestItem(menu, target); 
+            const nearestItem = this.#nearestItem(targetMenu, target); 
             if (nearestItem !== null) {
                 if (menuItemWidget.getType(nearestItem) == "submenu" &&
                     menuItemWidget.getExpanded(nearestItem)) {
@@ -399,9 +399,9 @@ Widget({
                 }
                 const isTargetClosestMenu = event.composedPath().find(
                     target_i => target_i instanceof HTMLElement && target_i.classList.contains("menu")
-                ) == menu;
+                ) == targetMenu;
                 if (isTargetClosestMenu) {
-                    const activeItem = this.#getActiveItem(menu);
+                    const activeItem = this.#getActiveItem(targetMenu);
                     if (activeItem !== null) {
                         if (menuItemWidget.getType(activeItem) == "submenu" &&
                             menuItemWidget.getExpanded(activeItem) && 
@@ -420,8 +420,8 @@ Widget({
                             this.#clearItemTimeout(nearestItem);
                             this.#setItemTimeout(nearestItem, mouseOverExpandDelay)
                                 .then(() => {
-                                    const activeItem = this.#getActiveItem(menu);
-                                    this.#collapseSubmenus(menu);
+                                    const activeItem = this.#getActiveItem(targetMenu);
+                                    this.#collapseSubmenus(targetMenu);
                                     if (activeItem) {
                                         this.#clearItemTimeout(activeItem);
                                         menuItemWidget.expand(activeItem);

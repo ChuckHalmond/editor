@@ -69,6 +69,7 @@ e-treeitem:not(:hover):not([active]):not([selected]) > e-toolbar {
 
 e-option[selected],
 e-menuitem:is([type="checkbox"], [type="radio"])[checked],
+
 .menuitem:is(.menuitem-checkbox, .menuitem-radio)[aria-checked="true"] {
     --icon-color: black;
     --icon-image: url("/sample/assets/done_FILL0_wght400_GRAD0_opsz48.svg");

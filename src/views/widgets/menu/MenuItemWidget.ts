@@ -145,6 +145,9 @@ class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetF
                 this.setChecked(item, checked);
             }
             if (type !== void 0) {
+                if (type == "menu" || type == "submenu") {
+                    this.setExpanded(item, false);
+                }
                 this.setType(item, type);
             }
             if (label !== void 0) {
@@ -175,11 +178,7 @@ class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetF
     }
 
     #label(item: HTMLElement): HTMLElement {
-        const label = item.querySelector<HTMLElement>(":scope > .label");
-        if (!label) {
-            throw new Error(`No label found.`);
-        }
-        return label;
+        return item.querySelector<HTMLElement>(":scope > .label")!;
     }
 
     getMenu(item: HTMLElement): HTMLElement | null {
@@ -299,11 +298,11 @@ class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetF
     }
 
     setExpanded(item: HTMLElement, value: boolean): void {
-        item.toggleAttribute("aria-expanded", value);
+        item.setAttribute("aria-expanded", value.toString());
     }
 
     getExpanded(item: HTMLElement): boolean {
-        return item.hasAttribute("aria-expanded");
+        return JSON.parse(item.getAttribute("aria-expanded") ?? false.toString());
     }
 
     toggle(item: HTMLElement, force?: boolean): void {

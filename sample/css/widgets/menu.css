@@ -47,7 +47,7 @@
     position: absolute;
 }
 
-.menuitem:not([aria-expanded]) > .menu {
+.menuitem[aria-expanded="false"] > .menu {
     opacity: 0;
     pointer-events: none;
 }

@@ -173,12 +173,11 @@ Widget({
     }
 
     setExpanded(item: HTMLElement, value: boolean): void {
-        item.toggleAttribute("aria-expanded", value);
-        item.dispatchEvent(new Event("toggle", {bubbles: true}));
+        item.setAttribute("aria-expanded", value.toString());
     }
 
     getExpanded(item: HTMLElement): boolean {
-        return item.hasAttribute("aria-expanded");
+        return JSON.parse(item.getAttribute("aria-expanded") ?? false.toString());
     }
 
     setActive(item: HTMLElement, value: boolean): void {

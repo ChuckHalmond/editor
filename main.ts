@@ -639,6 +639,32 @@ export async function main() {
             }
         })
     );
+
+    document.body.append(
+        widget("combobox", {
+            properties: {
+                label: "Combobox"
+            },
+            slotted: [
+                widget("option",  {
+                    properties: {
+                        label: "First option"
+                    }
+                }),
+                widget("option",  {
+                    properties: {
+                        label: "Second option"
+                    }
+                }),
+                widget("option",  {
+                    properties: {
+                        label: "Third option",
+                        selected: true
+                    }
+                })
+            ]
+        })
+    );
     
     const editor = new Editor();
     editor.setup();

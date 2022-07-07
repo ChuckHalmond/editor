@@ -40,12 +40,12 @@ Widget({
 
     slottedCallback(item: HTMLElement, slot: HTMLElement) {
         const {childNodes} = slot;
-        Array.from(childNodes).forEach((item_i, i) => {
-            if (item_i instanceof HTMLElement) {
-                treeitemWidget.setPosInSet(item_i, i);
-                treeitemWidget.setLevel(item_i, (() => {
+        Array.from(childNodes).forEach((child_i, i) => {
+            if (child_i instanceof HTMLElement && child_i.classList.contains("treeitem")) {
+                treeitemWidget.setPosInSet(child_i, i);
+                treeitemWidget.setLevel(child_i, (() => {
                     let level = -1;
-                    let closestItem: HTMLElement | null = item_i;
+                    let closestItem: HTMLElement | null = child_i;
                     while (closestItem !== null && closestItem.matches(".tree :scope")) {
                         closestItem = closestItem.parentElement?.closest(".treeitem") ?? null;
                         level++;

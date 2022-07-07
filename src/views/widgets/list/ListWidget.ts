@@ -1,6 +1,8 @@
 import { element, Widget } from "../../../elements/Element";
 import { WidgetFactory } from "../Widget";
-import { listitemWidget } from "./ListItemWidget";
+import { listItemWidget } from "./ListItemWidget";
+
+export  { listWidget };
 
 interface ListWidgetFactory extends WidgetFactory {
     create(): HTMLElement;
@@ -76,7 +78,7 @@ Widget({
         const {childNodes} = slot;
         Array.from(childNodes).forEach((child_i, i) => {
             if (child_i instanceof HTMLElement && child_i.classList.contains("listitem")) {
-                listitemWidget.setPosInSet(child_i, i);
+                listItemWidget.setPosInSet(child_i, i);
             }
         });
     }
@@ -109,7 +111,7 @@ Widget({
         walker.currentNode = list;
         let item = this.#firstItem(list);
         while (item !== null) {
-            const selected = listitemWidget.getSelected(item);
+            const selected = listItemWidget.getSelected(item);
             if (selected) {
                 selectedItems.push(item);
             }
@@ -133,7 +135,7 @@ Widget({
     #nodeFilter(node: Node): number {
         if (node instanceof HTMLElement) {
             const {classList} = node;
-            if (classList.contains("listitem") && !listitemWidget.getDisabled(node) && !node.hidden) {
+            if (classList.contains("listitem") && !listItemWidget.getDisabled(node) && !node.hidden) {
                 return NodeFilter.FILTER_ACCEPT;
             }
             else if (classList.contains("listitemgroup")) {
@@ -142,7 +144,6 @@ Widget({
         }
         return NodeFilter.FILTER_REJECT;
     }
-
 
     #getItemsRange(from: HTMLElement, to: HTMLElement): HTMLElement[] {
         if (from == to) {
@@ -177,13 +178,13 @@ Widget({
         this.beginSelection(list);
         selectedItems.forEach((item_i) => {
             if (!items.includes(item_i)) {
-                listitemWidget.setSelected(item_i, false);
+                listItemWidget.setSelected(item_i, false);
             }
         });
         items.forEach((item_i) => {
-            const selected = listitemWidget.getSelected(item_i);
+            const selected = listItemWidget.getSelected(item_i);
             if (list.contains(item_i) && !selected) {
-                listitemWidget.setSelected(item_i, true);
+                listItemWidget.setSelected(item_i, true);
             }
         });
         this.endSelection(list);
@@ -192,8 +193,8 @@ Widget({
     #addToSelection(list: HTMLElement, ...items: HTMLElement[]): void {
         this.beginSelection(list);
         items.forEach((item_i) => {
-            if (!listitemWidget.getSelected(item_i)) {
-                listitemWidget.setSelected(item_i, true);
+            if (!listItemWidget.getSelected(item_i)) {
+                listItemWidget.setSelected(item_i, true);
             }
         });
         this.endSelection(list);
@@ -204,7 +205,7 @@ Widget({
         this.beginSelection(list);
         items.forEach((item_i) => {
             if (selectedItems.includes(item_i)) {
-                listitemWidget.setSelected(item_i, false);
+                listItemWidget.setSelected(item_i, false);
             }
         });
         this.endSelection(list);
@@ -214,7 +215,7 @@ Widget({
         const selectedItems = this.selectedItems(list);
         this.beginSelection(list);
         selectedItems.forEach((item_i) => {
-            listitemWidget.setSelected(item_i, false);
+            listItemWidget.setSelected(item_i, false);
         });
         this.endSelection(list);
     }
@@ -222,11 +223,11 @@ Widget({
     #setActiveItem(list: HTMLElement, item: HTMLElement | null): void {
         const activeItem = this.#getActiveItem(list);
         if (activeItem !== null && activeItem !== item) {
-            listitemWidget.setActive(activeItem, false);
+            listItemWidget.setActive(activeItem, false);
             activeItem.tabIndex = -1;
         }
         if (item !== null) {
-            listitemWidget.setActive(item, true);
+            listItemWidget.setActive(item, true);
             item.tabIndex = 0;
         }
     }
@@ -235,10 +236,10 @@ Widget({
         const {classList} = list;
         const dropTargetItem = this.#getDropTargetItem(list);
         if (dropTargetItem !== null && dropTargetItem !== item) {
-            listitemWidget.setDropTarget(dropTargetItem, false);
+            listItemWidget.setDropTarget(dropTargetItem, false);
         }
         if (item !== null) {
-            listitemWidget.setDropTarget(item, false);
+            listItemWidget.setDropTarget(item, false);
             classList.add("droptarget");
         }
         else {
@@ -378,7 +379,7 @@ Widget({
                         previousItem.focus({preventScroll: true});
                         const {shiftKey} = event;
                         if (shiftKey) {
-                            const selected = listitemWidget.getSelected(previousItem);
+                            const selected = listItemWidget.getSelected(previousItem);
                             selected ?
                                 this.#removeFromSelection(targetList, previousItem) :
                                 this.#addToSelection(targetList, previousItem);
@@ -401,7 +402,7 @@ Widget({
                         nextItem.focus({preventScroll: true});
                         const {shiftKey} = event;
                         if (shiftKey) {
-                            const selected = listitemWidget.getSelected(nextItem);
+                            const selected = listItemWidget.getSelected(nextItem);
                             selected ?
                                 this.#removeFromSelection(targetList, nextItem) :
                                 this.#addToSelection(targetList, nextItem);
@@ -456,7 +457,7 @@ Widget({
         const targetList = <HTMLElement>currentTarget;
         const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".listitem");
         if (targetItem) {
-            const selected = listitemWidget.getSelected(targetItem);
+            const selected = listItemWidget.getSelected(targetItem);
             switch (button) {
                 case 0: {
                     if (!shiftKey && !ctrlKey) {

@@ -117,6 +117,7 @@ Widget({
         grid.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
         grid.addEventListener("focus", this.#handleFocusEvent.bind(this));
         grid.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
+        grid.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         grid.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         grid.addEventListener("select", this.#handleSelectEvent.bind(this));
         return grid;
@@ -133,9 +134,10 @@ Widget({
     }
 
     slottedCallback(grid: HTMLElement, slot: HTMLElement) {
-        Array.from(slot.childNodes).forEach((item_i, i) => {
-            if (item_i instanceof HTMLElement) {
-                gridRowWidget.setPosInSet(item_i, i);
+        const {childNodes} = slot;
+        Array.from(childNodes).forEach((child_i, i) => {
+            if (child_i instanceof HTMLElement) {
+                gridRowWidget.setPosInSet(child_i, i);
             }
         });
     }
@@ -589,6 +591,15 @@ Widget({
                 }
                 break;
             }
+        }
+    }
+
+    #handleFocusOutEvent(event: FocusEvent): void {
+        const {currentTarget, relatedTarget} = event;
+        const targetGrid = <HTMLElement>currentTarget;
+        const lostFocusWithin = !targetGrid.contains(<Node>relatedTarget);
+        if (lostFocusWithin) {
+            targetGrid.tabIndex = 0;
         }
     }
 

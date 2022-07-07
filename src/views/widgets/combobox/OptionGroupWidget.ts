@@ -1,30 +1,30 @@
 import { Widget, element } from "../../../elements/Element";
 import { WidgetFactory } from "../Widget";
-import { listItemWidget } from "./ListItemWidget";
+import { optionWidget } from "./OptionWidget";
 
-export { listItemGroupWidget };
+export { optionGroupWidget };
 
 declare global {
     interface WidgetNameMap {
-        "listitemgroup": ListItemGroupWidgetFactory
+        "optiongroup": OptionGroupWidgetFactory
     }
 }
 
-interface ListItemGroupWidgetFactory extends WidgetFactory {
+interface OptionGroupWidgetFactory extends WidgetFactory {
     create(): HTMLElement;
 }
 
-var listItemGroupWidget = new (
+var optionGroupWidget = new (
 Widget({
-    name: "listitemgroup"
-})(class ListItemGroupWidgetFactoryBase extends WidgetFactory implements ListItemGroupWidgetFactory {
+    name: "optiongroup"
+})(class OptionGroupWidgetFactoryBase extends WidgetFactory implements OptionGroupWidgetFactory {
     #template: HTMLElement;
 
     constructor() {
         super();
         this.#template = element("ul", {
             attributes: {
-                class: "listitemgroup",
+                class: "optiongroup",
                 role: "group"
             }
         });
@@ -41,8 +41,8 @@ Widget({
     slottedCallback(group: HTMLElement, slot: HTMLElement) {
         const {childNodes} = slot;
         Array.from(childNodes).forEach((child_i, i) => {
-            if (child_i instanceof HTMLElement && child_i.classList.contains("listitem")) {
-                listItemWidget.setPosInSet(child_i, i);
+            if (child_i instanceof HTMLElement && child_i.classList.contains("option")) {
+                //optionWidget.setPosInSet(item_i, i);
             }
         });
     }

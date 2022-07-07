@@ -1,7 +1,7 @@
 import { element, Widget } from "../../../elements/Element";
 import { WidgetFactory } from "../Widget";
 
-export { listitemWidget };
+export { listItemWidget };
 
 interface ListItemWidgetFactory extends WidgetFactory {
     create(init?: {
@@ -28,7 +28,7 @@ declare global {
     }
 }
 
-var listitemWidget = new (
+var listItemWidget = new (
 Widget({
     name: "listitem"
 })(class ListItemWidgetFactoryBase extends WidgetFactory implements ListItemWidgetFactory {

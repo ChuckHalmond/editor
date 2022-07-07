@@ -1,5 +1,5 @@
 import { WidgetFactory } from "../Widget";
-export { listitemWidget };
+export { listItemWidget };
 interface ListItemWidgetFactory extends WidgetFactory {
     create(init?: {
         label?: string;
@@ -23,7 +23,7 @@ declare global {
         "listitem": ListItemWidgetFactory;
     }
 }
-declare var listitemWidget: {
+declare var listItemWidget: {
     "__#49@#template": HTMLElement;
     create(init?: {
         label?: string;

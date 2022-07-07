@@ -5,8 +5,9 @@ body {
 }
 
 *:focus-visible {
-    outline: 1px solid var(--focused-item-outline-color);
-    outline-offset: -1px;
+    /*outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;*/
+    outline: none;
 }
 
 button {
