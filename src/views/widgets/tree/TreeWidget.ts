@@ -48,12 +48,6 @@ Widget({
         multisectable?: boolean;
     }): HTMLElement {
         const tree = <HTMLElement>this.#template.cloneNode(true);
-        if (init !== void 0) {
-            const {multisectable} = init;
-            if (multisectable !== void 0) {
-                this.setMultiSelectable(tree, multisectable);
-            }
-        }
         tree.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
         tree.addEventListener("dragend", this.#handleDragEndEvent.bind(this));
         tree.addEventListener("dragenter", this.#handleDragEnterEvent.bind(this));
@@ -67,6 +61,12 @@ Widget({
         tree.addEventListener("select", this.#handleSelectEvent.bind(this));
         this.#onSelection.set(tree, false);
         this.#hasSelectionChanged.set(tree, false);
+        if (init !== void 0) {
+            const {multisectable} = init;
+            if (multisectable !== void 0) {
+                this.setMultiSelectable(tree, multisectable);
+            }
+        }
         return tree;
     }
 

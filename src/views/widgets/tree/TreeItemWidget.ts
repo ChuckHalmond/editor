@@ -90,10 +90,14 @@ Widget({
     }): HTMLElement {
         const item = <HTMLElement>this.#template.cloneNode(true);
         item.addEventListener("click", this.#handleClickEvent.bind(this));
-        const type = init?.type ?? "leaf";
-        this.setType(item, type);
         if (init !== void 0) {
             const {label, disabled, draggable} = init;
+            let {type} = init;
+            type = type ?? "leaf";
+            this.setType(item, type);
+            if (type === "parent") {
+                this.setExpanded(item, false);
+            }
             if (label !== void 0) {
                 this.setLabel(item, label);
             }

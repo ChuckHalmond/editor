@@ -8,15 +8,12 @@ interface ComboboxWidgetFactory extends WidgetFactory {
     create(properties?: {
         label?: string;
         name?: string;
-        value?: string;
         disabled?: boolean;
         multiselectable?: boolean;
     }): HTMLElement;
     options(combobox: HTMLElement): HTMLElement[];
     getLabel(combobox: HTMLElement): string;
     setLabel(combobox: HTMLElement, value: string): void;
-    getValue(combobox: HTMLElement): string;
-    setValue(combobox: HTMLElement, value: string): void;
     getName(combobox: HTMLElement): string;
     setName(combobox: HTMLElement, value: string): void;
     getExpanded(combobox: HTMLElement): boolean;
@@ -41,38 +38,15 @@ Widget({
 class ComboboxWidgetFactoryBase extends WidgetFactory implements ComboboxWidgetFactory {
     #template: HTMLElement;
     #walker: TreeWalker;
-    #optionsObserver = new MutationObserver(
-        (mutationsList: MutationRecord[]) => {
-            mutationsList.forEach((mutation: MutationRecord) => {
-                const {target, type} = mutation;
-                const targetCombobox = (<HTMLElement>target).closest<HTMLElement>(".combobox")!;
-                if (targetCombobox instanceof HTMLElement) {
-                    switch (type) {
-                        case "childList": {
-                            const {addedNodes} = mutation;
-                            const selector = ".option[aria-selected=true]";
-                            for (let node of addedNodes) {
-                                if (node instanceof HTMLElement) {
-                                    const selectedOption = node.matches(selector) ? node :
-                                        node.querySelector<HTMLElement>(selector);
-                                    if (selectedOption) {
-                                        this.#setSelectedOption(targetCombobox, selectedOption);
-                                        break;
-                                    }
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-            });
-        }
-    );
+    #optionsObserver: MutationObserver;
 
     constructor() {
         super();
         this.#walker = document.createTreeWalker(
             document, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
+        );
+        this.#optionsObserver = new MutationObserver(
+            this.#optionsMutationCallback.bind(this)
         );
         this.#template = element("div", {
             attributes: {
@@ -110,7 +84,6 @@ class ComboboxWidgetFactoryBase extends WidgetFactory implements ComboboxWidgetF
     create(init?: {
         label?: string;
         name?: string;
-        value?: string;
         disabled?: boolean;
         multiselectable?: boolean;
     }): HTMLElement {
@@ -126,15 +99,12 @@ class ComboboxWidgetFactoryBase extends WidgetFactory implements ComboboxWidgetF
         combobox.addEventListener("select", this.#handleSelectEvent.bind(this));
         this.setExpanded(combobox, false);
         if (init !== void 0) {
-            const {label, name, value, disabled, multiselectable} = init;
+            const {label, name, disabled, multiselectable} = init;
             if (label !== void 0) {
                 this.setLabel(combobox, label);
             }
             if (name !== void 0) {
                 this.setName(combobox, name);
-            }
-            if (value !== void 0) {
-                this.setValue(combobox, value);
             }
             if (disabled !== void 0) {
                 this.setDisabled(combobox, disabled);
@@ -196,14 +166,6 @@ class ComboboxWidgetFactoryBase extends WidgetFactory implements ComboboxWidgetF
     setLabel(combobox: HTMLElement, value: string): void {
         this.#label(combobox).textContent = value;
     }
-
-    getValue(combobox: HTMLElement): string {
-        return combobox.getAttribute("value") ?? "";
-    }
-
-    setValue(combobox: HTMLElement, value: string): void {
-        combobox.setAttribute("value", value);
-    }
     
     getName(combobox: HTMLElement): string {
         return combobox.getAttribute("name") ?? "";
@@ -263,6 +225,32 @@ class ComboboxWidgetFactoryBase extends WidgetFactory implements ComboboxWidgetF
         expand ? this.expand(combobox) : this.collapse(combobox);
     }
 
+    #optionsMutationCallback(mutationsList: MutationRecord[]) {
+        mutationsList.forEach((mutation: MutationRecord) => {
+            const {target, type} = mutation;
+            const targetCombobox = (<HTMLElement>target).closest<HTMLElement>(".combobox")!;
+            if (targetCombobox instanceof HTMLElement) {
+                switch (type) {
+                    case "childList": {
+                        const {addedNodes} = mutation;
+                        const selector = ".option[aria-selected=true]";
+                        for (let node of addedNodes) {
+                            if (node instanceof HTMLElement) {
+                                const selectedOption = node.matches(selector) ? node :
+                                    node.querySelector<HTMLElement>(selector);
+                                if (selectedOption) {
+                                    this.#setSelectedOption(targetCombobox, selectedOption);
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
     #walkerNodeFilter(node: Node): number {
         if (node instanceof HTMLElement) {
             const {classList} = node;
@@ -311,7 +299,6 @@ class ComboboxWidgetFactoryBase extends WidgetFactory implements ComboboxWidgetF
     }
     
     #setSelectedOption(combobox: HTMLElement, option: HTMLElement) {
-        this.setValue(combobox, optionWidget.getValue(option));
         this.#value(combobox).textContent = optionWidget.getLabel(option);
     }
 

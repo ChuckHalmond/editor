@@ -2,6 +2,7 @@
     --collapsed-symbol: "►";
     --expanded-symbol: "▼";
     --default-icon-mask-image: url("assets/blank.png");
+    accent-color: var(--accent-color);
 }
 
 @font-face {
@@ -12,6 +13,7 @@
 body {
     font-family: "Open Sans";
     font-size: 13px;
+    /*accent-color: var(--accent-color);*/
 }
 
 e-toolbaritem[name="visibility"][checked] {

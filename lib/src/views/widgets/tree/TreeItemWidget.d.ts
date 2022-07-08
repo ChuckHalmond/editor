@@ -35,8 +35,8 @@ declare global {
     }
 }
 declare var treeitemWidget: {
-    "__#18285@#template": HTMLElement;
-    "__#18285@#types": TreeItemType[];
+    "__#15158@#template": HTMLElement;
+    "__#15158@#types": TreeItemType[];
     group(item: HTMLElement): HTMLElement | null;
     create(init?: {
         type?: TreeItemType;
@@ -46,8 +46,8 @@ declare var treeitemWidget: {
     }): HTMLElement;
     readonly slots: string[];
     slot(item: HTMLElement, name: string | null): HTMLElement | null;
-    "__#18285@#content"(item: HTMLElement): HTMLElement;
-    "__#18285@#label"(item: HTMLElement): HTMLElement;
+    "__#15158@#content"(item: HTMLElement): HTMLElement;
+    "__#15158@#label"(item: HTMLElement): HTMLElement;
     getLabel(item: HTMLElement): string;
     setLabel(item: HTMLElement, value: string): void;
     setPosInSet(item: HTMLElement, value: number): void;
@@ -69,5 +69,5 @@ declare var treeitemWidget: {
     setLevel(item: HTMLElement, value: number): void;
     getLevel(item: HTMLElement): number;
     toggle(item: HTMLElement, force?: boolean): void;
-    "__#18285@#handleClickEvent"(event: MouseEvent): void;
+    "__#15158@#handleClickEvent"(event: MouseEvent): void;
 };

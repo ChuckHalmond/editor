@@ -1,7 +1,44 @@
-input, select, button,
-body {
-    border: 1px solid grey;
+* {
+    box-sizing: content-box;
+}
+
+html {
+    scrollbar-color: var(--accent-color) Canvas;
+}
+  
+:root { accent-color: var(--accent-color); }
+
+:focus-visible {
+    outline-color: var(--accent-color);
+}
+
+::selection {
+    background-color: var(--selected-item-color);
+}
+
+::marker {
+    color: var(--accent-color);
+}
+  
+input,
+output,
+button,
+select,
+textarea {
     font-family: inherit;
+}
+
+select {
+    height: var(--padded-line-height);
+}
+
+input,
+progress {
+    height: var(--line-height);
+}
+
+input:is([type="radio"], [type="checkbox"]) {
+    width: var(--line-height); 
 }
 
 *:focus-visible {
@@ -10,61 +47,38 @@ body {
     outline: none;
 }
 
+input[type="color" i] {
+    border: none;
+    padding: initial;
+}
+
+::-webkit-color-swatch {
+    border: initial;
+}
+
+::-webkit-color-swatch-wrapper {
+    padding: initial;
+}
+
+::-webkit-search-cancel-button {
+    appearance: none;
+}
+
 button {
     appearance: none;
-    background: none;
-    border: none;
-    padding: 0;
-}
-
-menu {
-    padding: 0;
-    margin: 0;
-}
-
-li, ul {
-    margin: 0;
-    padding: 0;
+    background: initial;
+    border: initial;
+    padding: initial;
+    height: var(--padded-line-height);
 }
 
 table {
-    border-spacing: 0;
-}
-
-td {
-    border: none;
-}
-
-summary {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-}
-
-summary {
-    padding-left: var(--indent-width);
-}
-
-summary::before {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    color: black;
-    text-align: center;
-    margin-right: 12px;
-}
-
-details:not([open]) summary::before {
-    content: var(--collapsed-symbol);
-}
-            
-details[open] summary::before {
-    content: var(--expanded-symbol);
+    border-spacing: initial;
 }
 
 html,
 body {
     height: 100%;
-    margin: 0;
+    margin: initial;
     overflow: hidden;
 }

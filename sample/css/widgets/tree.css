@@ -2,6 +2,18 @@
     display: block;
 }
 
+ul.tree {
+    padding: initial;
+}
+
+.treeitemgroup {
+    display: block;
+}
+
+ul.treeitemgroup {
+    padding: initial;
+}
+
 .treeitem {
     display: block;
     user-select: none;
@@ -53,7 +65,7 @@
 }
 
 .treeitem:not(.treeitem-parent) > .treeitemgroup,
-.treeitem:not([aria-expanded]) > .treeitemgroup {
+.treeitem[aria-expanded="false"] > .treeitemgroup {
     display: none;
 }
 
@@ -76,12 +88,12 @@
     filter: var(--arrow-filter, none);
 }
 
-.treeitem:not([aria-expanded]) > .content > .arrow::before {
+.treeitem[aria-expanded="false"] > .content > .arrow::before {
     -webkit-mask-image: var(--arrow-icon-collapsed, none);
     mask-image: var(--arrow-icon-collapsed, none);
 }
 
-.treeitem[aria-expanded] > .content > .arrow::before {
+.treeitem[aria-expanded="true"] > .content > .arrow::before {
     -webkit-mask-image: var(--arrow-icon-expanded, none);
     mask-image: var(--arrow-icon-expanded, none);
 }
