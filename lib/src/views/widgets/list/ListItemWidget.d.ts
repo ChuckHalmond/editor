@@ -24,11 +24,11 @@ declare global {
     }
 }
 declare var listItemWidget: {
-    "__#49@#template": HTMLElement;
+    "__#13308@#template": HTMLElement;
     create(init?: {
-        label?: string;
-        disabled?: boolean;
-    }): HTMLElement;
+        label?: string | undefined;
+        disabled?: boolean | undefined;
+    } | undefined): HTMLElement;
     slot(root: HTMLElement): HTMLElement | null;
     group(item: HTMLElement): HTMLElement | null;
     getLabel(item: HTMLElement): string;
@@ -43,6 +43,5 @@ declare var listItemWidget: {
     getDisabled(item: HTMLElement): boolean;
     setSelected(row: HTMLElement, value: boolean): void;
     getSelected(row: HTMLElement): boolean;
-    "__#49@#label"(item: HTMLElement): Node;
-    readonly slots: string[];
+    "__#13308@#label"(item: HTMLElement): Node;
 };

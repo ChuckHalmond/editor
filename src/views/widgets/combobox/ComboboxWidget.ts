@@ -1,19 +1,16 @@
-import { element, widget, Widget } from "../../../elements/Element";
+import { element, Widget } from "../../../elements/Element";
 import { WidgetFactory } from "../Widget";
 import { optionWidget } from "./OptionWidget";
 
-export { comboboxWidget };
+export { comboBoxWidget };
 
-interface ComboboxWidgetFactory extends WidgetFactory {
+interface ComboBoxWidgetFactory extends WidgetFactory {
     create(properties?: {
-        label?: string;
         name?: string;
         disabled?: boolean;
         multiselectable?: boolean;
     }): HTMLElement;
     options(combobox: HTMLElement): HTMLElement[];
-    getLabel(combobox: HTMLElement): string;
-    setLabel(combobox: HTMLElement, value: string): void;
     getName(combobox: HTMLElement): string;
     setName(combobox: HTMLElement, value: string): void;
     getExpanded(combobox: HTMLElement): boolean;
@@ -27,15 +24,15 @@ interface ComboboxWidgetFactory extends WidgetFactory {
 
 declare global {
     interface WidgetNameMap {
-        "combobox": ComboboxWidgetFactory
+        "combobox": ComboBoxWidgetFactory
     }
 }
 
-var comboboxWidget = new(
+var comboBoxWidget = new(
 Widget({
     name: "combobox"
 })(
-class ComboboxWidgetFactoryBase extends WidgetFactory implements ComboboxWidgetFactory {
+class ComboBoxWidgetFactoryBase extends WidgetFactory implements ComboBoxWidgetFactory {
     #template: HTMLElement;
     #walker: TreeWalker;
     #optionsObserver: MutationObserver;
@@ -60,11 +57,6 @@ class ComboboxWidgetFactoryBase extends WidgetFactory implements ComboboxWidgetF
                         class: "content"
                     },
                     children: [
-                        element("label", {
-                            attributes: {
-                                class: "label"
-                            }
-                        }),
                         element("span", {
                             attributes: {
                                 class: "value"
@@ -82,7 +74,6 @@ class ComboboxWidgetFactoryBase extends WidgetFactory implements ComboboxWidgetF
     }
 
     create(init?: {
-        label?: string;
         name?: string;
         disabled?: boolean;
         multiselectable?: boolean;
@@ -96,13 +87,9 @@ class ComboboxWidgetFactoryBase extends WidgetFactory implements ComboboxWidgetF
         combobox.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         combobox.addEventListener("click", this.#handleClickEvent.bind(this));
         combobox.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
-        combobox.addEventListener("select", this.#handleSelectEvent.bind(this));
         this.setExpanded(combobox, false);
         if (init !== void 0) {
-            const {label, name, disabled, multiselectable} = init;
-            if (label !== void 0) {
-                this.setLabel(combobox, label);
-            }
+            const {name, disabled, multiselectable} = init;
             if (name !== void 0) {
                 this.setName(combobox, name);
             }
@@ -116,11 +103,11 @@ class ComboboxWidgetFactoryBase extends WidgetFactory implements ComboboxWidgetF
         return combobox;
     }
 
-    slot(combobox: HTMLElement, name: string | null) {
+    slot(combobox: HTMLElement) {
         return this.#box(combobox);
     }
 
-    slottedCallback(combobox: HTMLElement, slot: HTMLElement) {
+    slottedCallback(combobox: HTMLElement, slot: HTMLElement, name: string | null) {
         const {childNodes} = slot;
         Array.from(childNodes).forEach((child_i, i) => {
             if (child_i instanceof HTMLElement) {
@@ -153,18 +140,6 @@ class ComboboxWidgetFactoryBase extends WidgetFactory implements ComboboxWidgetF
 
     #value(combobox: HTMLElement): HTMLElement {
         return combobox.querySelector<HTMLElement>(":scope > .content > .value")!;
-    }
-
-    #label(combobox: HTMLElement): HTMLElement {
-        return combobox.querySelector<HTMLElement>(":scope > .content > .label")!;
-    }
-
-    getLabel(combobox: HTMLElement): string {
-        return this.#label(combobox).textContent ?? "";
-    }
-
-    setLabel(combobox: HTMLElement, value: string): void {
-        this.#label(combobox).textContent = value;
     }
     
     getName(combobox: HTMLElement): string {
@@ -290,11 +265,13 @@ class ComboboxWidgetFactoryBase extends WidgetFactory implements ComboboxWidgetF
 
     #selectOption(combobox: HTMLElement, option: HTMLElement) {
         const selectedOption = this.selectedOption(combobox);
-        if (selectedOption && option !== selectedOption) {
+        if (selectedOption) {
             optionWidget.setSelected(selectedOption, false);
         }
-        if (option && option !== selectedOption) {
+        if (option !== selectedOption) {
             optionWidget.setSelected(option, true);
+            this.#setSelectedOption(combobox, option);
+            combobox.dispatchEvent(new Event("change", {bubbles: true}));
         }
     }
     
@@ -305,10 +282,10 @@ class ComboboxWidgetFactoryBase extends WidgetFactory implements ComboboxWidgetF
     #positionBox(combobox: HTMLElement): void {
         const box = combobox.querySelector<HTMLElement>(":scope > .box")!;
         const {style: optionsStyle} = box;  
-        const {bottom: selectBottom, left: selectLeft} = combobox.getBoundingClientRect();
+        const {bottom, left} = combobox.getBoundingClientRect();
         const {scrollX, scrollY} = window;
-        optionsStyle.setProperty("top", `${selectBottom + scrollY}px`);
-        optionsStyle.setProperty("left", `${selectLeft + scrollX}px`);
+        optionsStyle.setProperty("top", `${bottom + scrollY}px`);
+        optionsStyle.setProperty("left", `${left + scrollX}px`);
     }
 
     #handleClickEvent(event: MouseEvent): void {
@@ -345,45 +322,67 @@ class ComboboxWidgetFactoryBase extends WidgetFactory implements ComboboxWidgetF
         const selectedOption = this.selectedOption(targetCombobox);
         switch (key) {
             case "ArrowUp": {
-                if (expanded && activeOption !== null) {
-                    const previousOption = this.#previousOption(activeOption) ?? this.#firstOption(targetCombobox);
+                if (expanded) {
+                    const previousOption = activeOption ?
+                        this.#previousOption(activeOption) :
+                        this.#firstOption(targetCombobox);
                     if (previousOption) {
                         previousOption.focus({preventScroll: true});
                     }
                 }
                 else {
-                    this.expand(targetCombobox);
-                    selectedOption?.focus({preventScroll: true});
+                    const previousOption = selectedOption ?
+                        this.#previousOption(selectedOption) :
+                        this.#firstOption(targetCombobox);
+                    if (previousOption) {
+                        this.#selectOption(targetCombobox, previousOption);
+                    }
                 }
                 event.stopPropagation();
                 break;
             }
             case "ArrowDown": {
-                if (expanded && activeOption !== null) {
-                    const nextOption = this.#nextOption(activeOption) ?? this.#lastOption(targetCombobox);
+                if (expanded) {
+                    const nextOption = activeOption ?
+                        this.#nextOption(activeOption) :
+                        this.#lastOption(targetCombobox);
                     if (nextOption) {
                         nextOption.focus({preventScroll: true});
                     }
                 }
                 else {
-                    this.expand(targetCombobox);
-                    selectedOption?.focus({preventScroll: true});
+                    const nextOption = selectedOption ?
+                        this.#nextOption(selectedOption) :
+                        this.#lastOption(targetCombobox);
+                    if (nextOption) {
+                        this.#selectOption(targetCombobox, nextOption);
+                    }
                 }
                 event.stopPropagation();
                 break;
             }
             case "Home": {
                 const firstOption = this.#firstOption(targetCombobox);
-                if (firstOption && expanded) {
-                    firstOption.focus({preventScroll: true});
+                if (firstOption) {
+                    if (expanded) {
+                        firstOption.focus({preventScroll: true});
+                    }
+                    else {
+                        this.#selectOption(targetCombobox, firstOption);
+                    }
                 }
                 event.stopPropagation();
                 break;
             }
             case "End": {
                 const lastOption = this.#lastOption(targetCombobox);
-                if (lastOption && expanded) {
-                    lastOption.focus({preventScroll: true});
+                if (lastOption) {
+                    if (expanded) {
+                        lastOption.focus({preventScroll: true});
+                    }
+                    else {
+                        this.#selectOption(targetCombobox, lastOption);
+                    }
                 }
                 event.stopPropagation();
                 break;
@@ -435,14 +434,6 @@ class ComboboxWidgetFactoryBase extends WidgetFactory implements ComboboxWidgetF
         const targetItem = (<Element>target).closest<HTMLElement>(".option");
         if (targetItem) {
             targetItem.focus({preventScroll: true});
-        }
-    }
-
-    #handleSelectEvent(event: Event): void {
-        const {currentTarget, target} = event;
-        const targetCombobox = <HTMLElement>currentTarget;
-        if (target instanceof HTMLElement && target.classList.contains("option")) {
-            this.#setSelectedOption(targetCombobox, target);
         }
     }
 }));

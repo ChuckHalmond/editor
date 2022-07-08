@@ -25,15 +25,17 @@ declare global {
     }
 }
 declare var optionWidget: {
-    "__#59@#template": HTMLElement;
+    "__#27671@#template": HTMLElement;
     create(init?: {
-        selected?: boolean;
-        label?: string;
-        name?: string;
-        value?: string;
-        disabled?: boolean;
-    }): HTMLElement;
-    "__#59@#label"(option: HTMLElement): HTMLElement;
+        selected?: boolean | undefined;
+        label?: string | undefined;
+        name?: string | undefined;
+        value?: string | undefined;
+        disabled?: boolean | undefined;
+    } | undefined): HTMLElement;
+    readonly observedAttributes: string[];
+    attributeChangedCallback(option: HTMLElement, name: string, oldValue: string, newValue: string): void;
+    "__#27671@#label"(option: HTMLElement): HTMLElement;
     getLabel(option: HTMLElement): string;
     setLabel(option: HTMLElement, value: string): void;
     getValue(option: HTMLElement): string;
@@ -45,5 +47,4 @@ declare var optionWidget: {
     getDisabled(option: HTMLElement): boolean;
     setDisabled(option: HTMLElement, value: boolean): void;
     slot(root: HTMLElement, name: string | null): HTMLElement | null;
-    readonly slots: string[];
 };

@@ -2,16 +2,8 @@
     display: block;
 }
 
-ul.list {
-    padding: initial;
-}
-
 .listitemgroup {
     display: block;
-}
-
-ul.listitemgroup {
-    padding: initial;
 }
 
 .listitem {

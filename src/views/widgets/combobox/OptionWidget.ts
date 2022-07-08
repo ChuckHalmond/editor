@@ -85,6 +85,20 @@ class OptionWidgetFactoryBase extends WidgetFactory implements OptionWidgetFacto
         return option;
     }
 
+    get observedAttributes() {
+        return ["aria-selected"];
+    }
+
+    attributeChangedCallback(option: HTMLElement, name: string, oldValue: string, newValue: string) {
+        switch (name) {
+            case "aria-selected": {
+                if (JSON.parse(newValue) === true) {
+                    option.dispatchEvent(new Event("select", {bubbles: true}));
+                }
+            }
+        }
+    }
+
     #label(option: HTMLElement): HTMLElement {
         return option.querySelector<HTMLElement>(":scope > .label")!;
     }
@@ -119,7 +133,6 @@ class OptionWidgetFactoryBase extends WidgetFactory implements OptionWidgetFacto
 
     setSelected(option: HTMLElement, value: boolean): void {
         option.setAttribute("aria-selected", value.toString());
-        option.dispatchEvent(new Event("select", {bubbles: true}));
     }
 
     getDisabled(option: HTMLElement): boolean {

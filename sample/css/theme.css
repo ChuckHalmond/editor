@@ -20,7 +20,7 @@
     --background-lighter-color: white;
     
     --accent-color: hsl(212, 100%, 50%);
-    --hovered-item-color: hsl(203, 92%, 75%, 50%);
+    --hovered-item-color: hsl(203, 92%, 80%, 50%);
     --focused-item-color: hsl(203, 92%, 50%, 50%);
     --focused-item-outline-color: hsl(203, 92%, 50%);
     --selected-item-color: hsl(203, 92%, 75%, 75%);

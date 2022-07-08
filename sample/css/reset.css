@@ -49,15 +49,15 @@ input:is([type="radio"], [type="checkbox"]) {
 
 input[type="color" i] {
     border: none;
-    padding: initial;
+    padding: 0;
 }
 
 ::-webkit-color-swatch {
-    border: initial;
+    border: none;
 }
 
 ::-webkit-color-swatch-wrapper {
-    padding: initial;
+    padding: 0;
 }
 
 ::-webkit-search-cancel-button {
@@ -66,19 +66,25 @@ input[type="color" i] {
 
 button {
     appearance: none;
-    background: initial;
-    border: initial;
-    padding: initial;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
     height: var(--padded-line-height);
 }
 
 table {
-    border-spacing: initial;
+    border-spacing: 0;
+}
+
+ul {
+    padding: 0;
+    margin: 0;
 }
 
 html,
 body {
     height: 100%;
-    margin: initial;
+    margin: 0;
     overflow: hidden;
 }

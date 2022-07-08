@@ -59,7 +59,7 @@ export * from "./src/views/widgets/grid/GridWidget";
 export * from "./src/views/widgets/grid/GridHeaderWidget";
 export * from "./src/views/widgets/grid/GridCellWidget";
 export * from "./src/views/widgets/grid/GridRowWidget";
-export * from "./src/views/widgets/combobox/ComboboxWidget";
+export * from "./src/views/widgets/combobox/ComboBoxWidget";
 export * from "./src/views/widgets/combobox/OptionWidget";
 export * from "./src/views/widgets/combobox/OptionGroupWidget";
 export * from "./index";

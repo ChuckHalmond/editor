@@ -9,8 +9,14 @@
     background-color: var(--hovered-item-color);
 }
 
+.menuitemgroup {
+    display: flex;
+    flex-direction: column;
+}
+
 .menuitem {
     display: flex;
+    gap: 0;
     user-select: none;
     white-space: nowrap;
 }
@@ -30,6 +36,11 @@
 
     -webkit-box-shadow: var(--menu-box-shadow);
     box-shadow: var(--menu-box-shadow);
+}
+
+.menu-contextual {
+    z-index: 1;
+    position: absolute;
 }
 
 .menu > .separator {

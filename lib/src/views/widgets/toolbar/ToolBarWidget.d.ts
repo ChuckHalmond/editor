@@ -31,5 +31,4 @@ declare var toolbarWidget: {
     "__#53@#handleKeyDownEvent"(event: KeyboardEvent): void;
     "__#53@#handleMouseDownEvent"(event: Event): void;
     slot(root: HTMLElement, name: string | null): HTMLElement | null;
-    readonly slots: string[];
 };

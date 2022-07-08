@@ -9,9 +9,8 @@ interface ListItemGroupWidgetFactory extends WidgetFactory {
     create(): HTMLElement;
 }
 declare var listItemGroupWidget: {
-    "__#51@#template": HTMLElement;
+    "__#13310@#template": HTMLElement;
     create(): HTMLElement;
     slot(group: HTMLElement): HTMLElement;
     slottedCallback(group: HTMLElement, slot: HTMLElement): void;
-    readonly slots: string[];
 };

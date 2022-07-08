@@ -7,7 +7,7 @@ import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/
 import { element, fragment, widget } from "./src/elements/Element";
 import { treeitemWidget } from "./src/views/widgets/tree/TreeItemWidget";
 import { Editor } from "./src/Editor";
-import { menuWidget } from "./index";
+import { comboBoxWidget, menuWidget, optionWidget } from "./index";
 
 export async function main() {
     
@@ -642,9 +642,6 @@ export async function main() {
 
     document.body.append(
         widget("combobox", {
-            properties: {
-                label: "Combobox"
-            },
             slotted: [
                 widget("option",  {
                     properties: {
@@ -662,7 +659,14 @@ export async function main() {
                         selected: true
                     }
                 })
-            ]
+            ],
+            listeners: {
+                change: (event) => {
+                    const {currentTarget} = event;
+                    const comboBoxTarget = <HTMLElement>currentTarget;
+                    console.log(optionWidget.getLabel(comboBoxWidget.selectedOption(comboBoxTarget)!));
+                }
+            }
         })
     );
     

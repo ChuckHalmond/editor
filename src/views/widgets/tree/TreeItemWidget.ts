@@ -112,14 +112,14 @@ Widget({
         return item;
     }
 
-    get slots() {
+    get observedSlots() {
         return ["content", "group"];
     }
 
     slot(item: HTMLElement, name: string | null) {
         switch (name) {
             case "content":
-                return this.#content(item);;
+                return this.#content(item);
             case "group":
                 return item;
         }

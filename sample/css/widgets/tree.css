@@ -2,16 +2,8 @@
     display: block;
 }
 
-ul.tree {
-    padding: initial;
-}
-
 .treeitemgroup {
     display: block;
-}
-
-ul.treeitemgroup {
-    padding: initial;
 }
 
 .treeitem {
