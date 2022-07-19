@@ -65,6 +65,10 @@ Widget({
         return menu;
     }
 
+    slot(menu: HTMLElement): HTMLElement | null {
+        return menu;
+    }
+
     positionContextual(menu: HTMLElement, x: number, y: number): void {
         const {style} = menu;
         const {width: menuWidth, height: menuHeight} = menu.getBoundingClientRect();

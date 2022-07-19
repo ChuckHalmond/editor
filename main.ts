@@ -1,11 +1,11 @@
 //import { MenuItemGroupWidget, MenuItemWidget, MenuWidget, MenuBarWidget } from "./src/views/MenuBarWidget";
-import { TreeItemModel, TreeModel, TreeView } from "./src/views/TreeView";
+import { TreeItemModel, TreeModel, TreeView } from "./src/views/TreeeView";
 
 import "./index";
 import { ListItemModel, ListModel, ListView } from "./src/views/ListView";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
 import { element, fragment, widget } from "./src/elements/Element";
-import { treeitemWidget } from "./src/views/widgets/tree/TreeItemWidget";
+import { treeItemWidget } from "./src/views/widgets/tree/TreeItemWidget";
 import { Editor } from "./src/Editor";
 import { comboBoxWidget, menuWidget, optionWidget } from "./index";
 
@@ -378,7 +378,7 @@ export async function main() {
                                             },
                                             listeners: {
                                                 click: () => {
-                                                    console.log(treeitemWidget.getLabel(targetItem));
+                                                    console.log(treeItemWidget.getLabel(targetItem));
                                                 }
                                             }
                                         }),

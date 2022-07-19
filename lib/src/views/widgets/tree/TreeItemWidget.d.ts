@@ -1,5 +1,5 @@
 import { WidgetFactory } from "../Widget";
-export { treeitemWidget };
+export { treeItemWidget };
 declare type TreeItemType = "parent" | "leaf";
 interface TreeItemWidgetFactory extends WidgetFactory {
     create(init?: {
@@ -34,20 +34,20 @@ declare global {
         "treeitem": TreeItemWidgetFactory;
     }
 }
-declare var treeitemWidget: {
-    "__#30681@#template": HTMLElement;
-    "__#30681@#types": TreeItemType[];
+declare var treeItemWidget: {
+    "__#46@#template": HTMLElement;
+    "__#46@#types": TreeItemType[];
     group(item: HTMLElement): HTMLElement | null;
     create(init?: {
-        type?: TreeItemType | undefined;
-        label?: string | undefined;
-        disabled?: boolean | undefined;
-        draggable?: boolean | undefined;
-    } | undefined): HTMLElement;
+        type?: TreeItemType;
+        label?: string;
+        disabled?: boolean;
+        draggable?: boolean;
+    }): HTMLElement;
     readonly observedSlots: string[];
     slot(item: HTMLElement, name: string | null): HTMLElement | null;
-    "__#30681@#content"(item: HTMLElement): HTMLElement;
-    "__#30681@#label"(item: HTMLElement): HTMLElement;
+    "__#46@#content"(item: HTMLElement): HTMLElement;
+    "__#46@#label"(item: HTMLElement): HTMLElement;
     getLabel(item: HTMLElement): string;
     setLabel(item: HTMLElement, value: string): void;
     setPosInSet(item: HTMLElement, value: number): void;
@@ -68,6 +68,6 @@ declare var treeitemWidget: {
     getSelected(item: HTMLElement): boolean;
     setLevel(item: HTMLElement, value: number): void;
     getLevel(item: HTMLElement): number;
-    toggle(item: HTMLElement, force?: boolean | undefined): void;
-    "__#30681@#handleClickEvent"(event: MouseEvent): void;
+    toggle(item: HTMLElement, force?: boolean): void;
+    "__#46@#handleClickEvent"(event: MouseEvent): void;
 };

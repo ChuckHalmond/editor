@@ -203,6 +203,14 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
         item.setAttribute("value", value);
     }
 
+    getTitle(item: HTMLElement): string {
+        return item.getAttribute("title") ?? "";
+    }
+
+    setTitle(item: HTMLElement, value: string): void {
+        item.setAttribute("title", value);
+    }
+
     getName(item: HTMLElement): string {
         return item.getAttribute("name") ?? "";
     }

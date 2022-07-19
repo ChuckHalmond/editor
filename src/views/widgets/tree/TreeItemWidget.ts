@@ -1,7 +1,7 @@
 import { element, Widget } from "../../../elements/Element";
 import { WidgetFactory } from "../Widget";
 
-export { treeitemWidget };
+export { treeItemWidget };
 
 type TreeItemType = "parent" | "leaf";
 
@@ -40,7 +40,7 @@ declare global {
     }
 }
 
-var treeitemWidget = new (
+var treeItemWidget = new (
 Widget({
     name: "treeitem"
 })(class TreeItemWidgetFactoryBase extends WidgetFactory implements TreeItemWidgetFactory {

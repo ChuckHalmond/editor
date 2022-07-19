@@ -1,6 +1,6 @@
 import { element, Widget } from "../../../elements/Element";
 import { WidgetFactory } from "../Widget";
-import { treeitemWidget } from "./TreeItemWidget";
+import { treeItemWidget } from "./TreeItemWidget";
 
 export { treeWidget };
 
@@ -78,8 +78,8 @@ Widget({
         const {childNodes} = slot;
         Array.from(childNodes).forEach((child_i, i) => {
             if (child_i instanceof HTMLElement && child_i.classList.contains("treeitem")) {
-                treeitemWidget.setPosInSet(child_i, i);
-                treeitemWidget.setLevel(child_i, 0);
+                treeItemWidget.setPosInSet(child_i, i);
+                treeItemWidget.setLevel(child_i, 0);
             }
         });
     }
@@ -96,7 +96,7 @@ Widget({
         walker.currentNode = tree;
         let item = this.#firstItem(tree);
         while (item !== null) {
-            const selected = treeitemWidget.getSelected(item);
+            const selected = treeItemWidget.getSelected(item);
             if (selected) {
                 selectedItems.push(item);
             }
@@ -137,10 +137,10 @@ Widget({
         const {classList} = tree;
         const dropTargetItem = this.#getDropTargetItem(tree);
         if (dropTargetItem !== null && dropTargetItem !== item) {
-            treeitemWidget.setDropTarget(dropTargetItem, false);
+            treeItemWidget.setDropTarget(dropTargetItem, false);
         }
         if (item !== null) {
-            treeitemWidget.setDropTarget(item, true);
+            treeItemWidget.setDropTarget(item, true);
             classList.add("droptarget");
         }
         else {
@@ -151,7 +151,7 @@ Widget({
     #nodeFilter(node: Node): number {
         if (node instanceof HTMLElement) {
             const {classList} = node;
-            if (classList.contains("treeitem") && !treeitemWidget.getDisabled(node)) {
+            if (classList.contains("treeitem") && !treeItemWidget.getDisabled(node)) {
                 return NodeFilter.FILTER_ACCEPT;
             }
             else if (classList.contains("treeitemgroup")) {
@@ -194,13 +194,13 @@ Widget({
         this.beginSelection(tree);
         selectedItems.forEach((item_i) => {
             if (!items.includes(item_i)) {
-                treeitemWidget.setSelected(item_i, false);
+                treeItemWidget.setSelected(item_i, false);
             }
         });
         items.forEach((item_i) => {
-            const selected = treeitemWidget.getSelected(item_i);
+            const selected = treeItemWidget.getSelected(item_i);
             if (tree.contains(item_i) && !selected) {
-                treeitemWidget.setSelected(item_i, true);
+                treeItemWidget.setSelected(item_i, true);
             }
         });
         this.endSelection(tree);
@@ -209,8 +209,8 @@ Widget({
     #addToSelection(tree: HTMLElement, ...items: HTMLElement[]): void {
         this.beginSelection(tree);
         items.forEach((item_i) => {
-            if (!treeitemWidget.getSelected(item_i)) {
-                treeitemWidget.setSelected(item_i, true);
+            if (!treeItemWidget.getSelected(item_i)) {
+                treeItemWidget.setSelected(item_i, true);
             }
         });
         this.endSelection(tree);
@@ -221,7 +221,7 @@ Widget({
         this.beginSelection(tree);
         items.forEach((item_i) => {
             if (selectedItems.includes(item_i)) {
-                treeitemWidget.setSelected(item_i, false);
+                treeItemWidget.setSelected(item_i, false);
             }
         });
         this.endSelection(tree);
@@ -231,7 +231,7 @@ Widget({
         const selectedItems = this.selectedItems(tree);
         this.beginSelection(tree);
         selectedItems.forEach((item_i) => {
-            treeitemWidget.setSelected(item_i, false);
+            treeItemWidget.setSelected(item_i, false);
         });
         this.endSelection(tree);
     }
@@ -239,11 +239,11 @@ Widget({
     #setActiveItem(tree: HTMLElement, item: HTMLElement | null): void {
         const activeItem = this.#getActiveItem(tree);
         if (activeItem !== null && activeItem !== item) {
-            treeitemWidget.setActive(activeItem, false);
+            treeItemWidget.setActive(activeItem, false);
             activeItem.tabIndex = -1;
         }
         if (item !== null) {
-            treeitemWidget.setActive(item, true);
+            treeItemWidget.setActive(item, true);
             item.tabIndex = 0;
         }
     }
@@ -272,8 +272,8 @@ Widget({
     #nextItem(item: HTMLElement): HTMLElement | null {
         const walker = this.#walker;
         walker.currentNode = item;
-        const type = treeitemWidget.getType(item);
-        const expanded = treeitemWidget.getExpanded(item);
+        const type = treeItemWidget.getType(item);
+        const expanded = treeItemWidget.getExpanded(item);
         return <HTMLElement | null>(
             type === "leaf" ?
                 walker.nextNode() :
@@ -285,7 +285,7 @@ Widget({
     }
 
     #deepestItem(item: HTMLElement): HTMLElement {
-        const expanded = treeitemWidget.getExpanded(item);
+        const expanded = treeItemWidget.getExpanded(item);
         if (expanded) {
             const walker = this.#walker;
             const lastItem = <HTMLElement>walker.lastChild();
@@ -301,7 +301,7 @@ Widget({
         const targetTree = <HTMLElement>currentTarget;
         const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".treeitem");
         if (targetItem) {
-            const selected = treeitemWidget.getSelected(targetItem);
+            const selected = treeItemWidget.getSelected(targetItem);
             switch (button) {
                 case 0: {
                     if (!shiftKey && !ctrlKey) {
@@ -353,9 +353,9 @@ Widget({
         const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".treeitem");
         const targetTree = <HTMLElement>currentTarget;
         if (targetItem) {
-            const type = treeitemWidget.getType(targetItem);
+            const type = treeItemWidget.getType(targetItem);
             if (type == "parent") {
-                treeitemWidget.toggle(targetItem, true);
+                treeItemWidget.toggle(targetItem, true);
             }
             this.#setDropTargetItem(targetTree, targetItem);
         }
@@ -420,9 +420,9 @@ Widget({
             }
             case "ArrowLeft": {
                 if (activeItem) {
-                    const expanded = treeitemWidget.getExpanded(activeItem);
+                    const expanded = treeItemWidget.getExpanded(activeItem);
                     if (expanded) {
-                        treeitemWidget.toggle(activeItem);
+                        treeItemWidget.toggle(activeItem);
                     }
                     else {
                         const walker = this.#walker;
@@ -437,9 +437,9 @@ Widget({
             }
             case "ArrowRight": {
                 if (activeItem) {
-                    const expanded = treeitemWidget.getExpanded(activeItem);
+                    const expanded = treeItemWidget.getExpanded(activeItem);
                     if (!expanded) {
-                        treeitemWidget.toggle(activeItem);
+                        treeItemWidget.toggle(activeItem);
                     }
                 }
                 event.stopPropagation();
@@ -452,7 +452,7 @@ Widget({
                         previousItem.focus({preventScroll: true});
                         const {shiftKey} = event;
                         if (shiftKey) {
-                            const selected = treeitemWidget.getSelected(previousItem);
+                            const selected = treeItemWidget.getSelected(previousItem);
                             selected ?
                                 this.#removeFromSelection(targetTree, previousItem) :
                                 this.#addToSelection(targetTree, previousItem);
@@ -475,7 +475,7 @@ Widget({
                         nextItem.focus({preventScroll: true});
                         const {shiftKey} = event;
                         if (shiftKey) {
-                            const selected = treeitemWidget.getSelected(nextItem);
+                            const selected = treeItemWidget.getSelected(nextItem);
                             selected ?
                                 this.#removeFromSelection(targetTree, nextItem) :
                                 this.#addToSelection(targetTree, nextItem);

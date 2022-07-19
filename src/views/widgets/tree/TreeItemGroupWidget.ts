@@ -1,6 +1,6 @@
 import { Widget, element } from "../../../elements/Element";
 import { WidgetFactory } from "../Widget";
-import { treeitemWidget } from "./TreeItemWidget";
+import { treeItemWidget } from "./TreeItemWidget";
 
 export { treeItemGroupWidget };
 
@@ -42,8 +42,8 @@ Widget({
         const {childNodes} = slot;
         Array.from(childNodes).forEach((child_i, i) => {
             if (child_i instanceof HTMLElement && child_i.classList.contains("treeitem")) {
-                treeitemWidget.setPosInSet(child_i, i);
-                treeitemWidget.setLevel(child_i, (() => {
+                treeItemWidget.setPosInSet(child_i, i);
+                treeItemWidget.setLevel(child_i, (() => {
                     let level = -1;
                     let closestItem: HTMLElement | null = child_i;
                     while (closestItem !== null && closestItem.matches(".tree :scope")) {
