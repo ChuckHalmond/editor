@@ -345,6 +345,9 @@ class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetF
                 case "menu":
                 case "submenu": {
                     this.toggle(targetItem);
+                    if (this.getExpanded(targetItem)) {
+                        this.getMenu(targetItem)?.focus({preventScroll: true});
+                    }
                     break;
                 }
             }

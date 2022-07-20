@@ -32,3 +32,5 @@
 @import "widgets/toolbar.css" layer(base);
 @import "widgets/grid.css" layer(base);
 @import "widgets/combobox.css" layer(base);
+
+@import "views/treeview.css" layer(view);

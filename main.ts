@@ -1,5 +1,5 @@
 //import { MenuItemGroupWidget, MenuItemWidget, MenuWidget, MenuBarWidget } from "./src/views/MenuBarWidget";
-import { TreeItemModel, TreeModel, TreeView } from "./src/views/TreeeView";
+import { tree, TreeItemModel, TreeModel, TreeView } from "./src/views/TreeeView";
 
 import "./index";
 import { ListItemModel, ListModel, ListView } from "./src/views/ListView";
@@ -84,7 +84,7 @@ export async function main() {
         })
     ]);*/
 
-    const treeView = new TreeView();
+    
     const treeModel = new TreeModel({
         items: [
             new TreeItemModel({
@@ -142,8 +142,8 @@ export async function main() {
             return bLabel.localeCompare(aLabel);
         }
     });
-    treeView.setModel(treeModel);
-    document.body.append(treeView);
+    const treeElement = tree.create(treeModel);
+    document.body.append(treeElement);
     
     treeModel.childItems.append(
         new TreeItemModel({
@@ -357,7 +357,7 @@ export async function main() {
     document.body.append(menuView);
 
 
-    const tree = widget("tree", {
+    /*const tree = widget("tree", {
         slotted: [
             widget("treeitem", {
                 properties: {
@@ -475,7 +475,7 @@ export async function main() {
             })
         ]
     })
-    document.body.append(tree);
+    document.body.append(tree);*/
 
     document.body.append(
         widget("toolbar", {

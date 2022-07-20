@@ -55,3 +55,19 @@ declare global {
     }
 }
 declare var TreeView: TreeViewConstructor;
+export declare var tree: {
+    "__#22377@#models": WeakMap<HTMLElement, TreeModel>;
+    "__#22377@#dragImagesElementsMap": WeakMap<TreeItemModel, WeakRef<Element>>;
+    create(model: TreeModel): HTMLElement;
+    getModel(tree: HTMLElement): TreeModel | null;
+    getDragImageElement(model: TreeItemModel): Element | null;
+    selectedItems(tree: HTMLElement): TreeItemModel[];
+    "__#22377@#renderTreeItem"(item: TreeItemModel): Element;
+    "__#22377@#renderTreeItemDragImage"(item: TreeItemModel): Element;
+    "__#22377@#handleDragStartEvent"(event: DragEvent): void;
+    "__#22377@#handleDropEvent"(event: DragEvent): void;
+    "__#22377@#handleContextMenuEvent"(event: MouseEvent): void;
+    "__#22377@#handleFocusInEvent"(event: FocusEvent): void;
+    "__#22377@#handleFocusOutEvent"(event: FocusEvent): void;
+    "__#22377@#handleKeyDownEvent"(event: KeyboardEvent): void;
+};

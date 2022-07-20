@@ -486,11 +486,11 @@ class TreeViewBase extends View implements TreeView {
                         item_i => item_i !== null
                     );
                     const {type: targetType, parentItem: targetParentItem} = targetItemModel;
-                    const targetList = targetType == "parent" ?
-                        targetItemModel.childItems :
+                    const {childItems: targetList} = targetType == "parent" ?
+                        targetItemModel :
                         targetParentItem ?
-                        targetParentItem.childItems :
-                        model.childItems;
+                        targetParentItem :
+                        model;
                     const targetItems = Array.from(targetList.values());
                     targetItems.forEach((item_i) => {
                         const sameLabelIndex = transferedItems.findIndex(item_j => item_j.label == item_i.label);
@@ -548,9 +548,8 @@ class TreeViewBase extends View implements TreeView {
                                 },
                                 listeners: {
                                     click: () => {
-                                        TreeItemList.from(
-                                            this.selectedItems()
-                                        ).display();
+                                        const selectedItems = TreeItemList.from(this.selectedItems());
+                                        selectedItems.display();
                                     }
                                 }
                             }),
@@ -560,11 +559,11 @@ class TreeViewBase extends View implements TreeView {
                                 },
                                 listeners: {
                                     click: () => {
-                                        const itemsList = TreeItemList.from(this.selectedItems());
-                                        const {count} = itemsList;
+                                        const selectedItems = TreeItemList.from(this.selectedItems());
+                                        const {count} = selectedItems;
                                         const doRemove = confirm(`Remove ${count} items?`);
                                         if (doRemove) {
-                                            itemsList.remove();
+                                            selectedItems.remove();
                                         }
                                         targetTree.focus();
                                     }
@@ -650,3 +649,387 @@ class TreeViewBase extends View implements TreeView {
 }
 
 var TreeView: TreeViewConstructor = TreeViewBase;
+
+export var tree = new class Tree {
+    #models: WeakMap<HTMLElement, TreeModel>;
+    #dragImagesElementsMap: WeakMap<TreeItemModel, WeakRef<Element>>;
+    
+    constructor() {
+        this.#models = new WeakMap();
+        this.#dragImagesElementsMap = new WeakMap();
+    }
+
+    create(model: TreeModel): HTMLElement {
+        const treeElement = widget("tree", {
+            properties: {
+                tabIndex: 0,
+            },
+            slotted: reactiveChildElements(
+                model.childItems, item => this.#renderTreeItem(item)
+            ),
+            listeners: {
+                dragstart: <EventListener>this.#handleDragStartEvent.bind(this),
+                drop: <EventListener>this.#handleDropEvent.bind(this),
+                contextmenu: <EventListener>this.#handleContextMenuEvent.bind(this),
+                keydown: <EventListener>this.#handleKeyDownEvent.bind(this),
+                focusin: <EventListener>this.#handleFocusInEvent.bind(this),
+                focusout: <EventListener>this.#handleFocusOutEvent.bind(this),
+            }
+        });
+        document.body.append(
+            element("div", {
+                attributes: {
+                    class: "offscreen",
+                    hidden: true
+                },
+                children: reactiveChildElements(model.items,
+                    item => this.#renderTreeItemDragImage(item)
+                )
+            })
+        );
+        this.#models.set(treeElement, model);
+        return treeElement;
+    }
+    
+    getModel(tree: HTMLElement): TreeModel  | null {
+        return this.#models.get(tree) ?? null;
+    }
+
+    getDragImageElement(model: TreeItemModel): Element | null {
+        return this.#dragImagesElementsMap.get(model)?.deref() ?? null;
+    }
+
+    selectedItems(tree: HTMLElement): TreeItemModel[] {
+        const model = this.getModel(tree)!;
+        const selectedElements = treeWidget.selectedItems(tree);
+        return selectedElements.map(
+            item_i => <TreeItemModel>model.getItemByUri(item_i.dataset.uri!)
+        );
+    }
+
+    #renderTreeItem(item: TreeItemModel): Element {
+        const treeItemElement = reactiveElement(
+            item,
+            widget("treeitem", {
+                properties: {
+                    type: item.type,
+                    draggable: true,
+                    label: item.label
+                },
+                dataset: {
+                    uri: item.uri
+                },
+                slotted: {
+                    group:
+                        <Node[]>((item.type == "parent") ? [
+                        widget("treeitemgroup", {
+                            slotted: reactiveChildElements(item.childItems,
+                                item => this.#renderTreeItem(item)
+                            )
+                        })
+                    ] : []),
+                    content: <Node[]>
+                        ([
+                            element("span", {
+                                attributes: {
+                                    class: "label"
+                                }
+                            })
+                        ]).concat((item.type == "parent") ? [
+                            element("span", {
+                                attributes: {
+                                    class: "badge"
+                                }
+                            })
+                        ] : []).concat([
+                            widget("toolbar", {
+                                properties: {
+                                    tabIndex: -1
+                                },
+                                slotted: [
+                                    widget("toolbaritem", {
+                                        properties: {
+                                            name: "visibility",
+                                            type: "checkbox",
+                                            label: "Visibility"
+                                        },
+                                        listeners: {
+                                            click: () => {
+                                                item.visibility ?
+                                                    item.hide() :
+                                                    item.show();
+                                            }
+                                        }
+                                    })
+                                ]
+                            })
+                        ])
+                }
+            }),
+            ["label", "childCount", "visibility"],
+            (treeitem, property, oldValue, newValue) => {
+                switch (property) {
+                    case "label": {
+                        treeItemWidget.setLabel(treeitem, newValue);
+                        break;
+                    }
+                    case "childCount": {
+                        const badge = treeitem.querySelector<HTMLElement>(":scope > .content > .badge");
+                        if (badge) {
+                            badge.textContent = `(${newValue})`;
+                        }
+                        break;
+                    }
+                    case "visibility": {
+                        const toolbar = treeitem.querySelector<HTMLElement>(":scope > .content > .toolbar");
+                        if (toolbar) {
+                            const visibilityItem = toolbarWidget.slot(toolbar)
+                                ?.querySelector<HTMLElement>(".toolbaritem[name=visibility]");
+                            if (visibilityItem) {
+                                const label = newValue ? "Hide" : "Show";
+                                toolbarItemWidget.setLabel(visibilityItem, label);
+                                toolbarItemWidget.setTitle(visibilityItem, label);
+                                toolbarItemWidget.setPressed(visibilityItem, newValue);
+                            }
+                        }
+                    }
+                }
+            }
+        );
+        return treeItemElement;
+    }
+
+    #renderTreeItemDragImage(item: TreeItemModel): Element {
+        const dragImageElement = reactiveElement(
+            item,
+            element("span", {
+                attributes: {
+                    class: "dragimage"
+                }
+            }),
+            ["label"],
+            (span, property, oldValue, newValue) => {
+                span.textContent = newValue;
+            }
+        );
+        this.#dragImagesElementsMap.set(item, new WeakRef(dragImageElement));
+        return dragImageElement;
+    }
+
+    #handleDragStartEvent(event: DragEvent): void {
+        const {currentTarget, target} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        const targetItem = <HTMLElement>(<HTMLElement>target).closest(".treeitem");
+        const model = this.getModel(targetTree)!;
+        if (targetItem) {
+            const {dataTransfer} = event;
+            const selectedElements = treeWidget.selectedItems(targetTree);
+            const {length: selectedCount} = selectedElements;
+            if (selectedCount > 0) {
+                const selectedUris = 
+                    selectedElements
+                    .map((element_i) =>
+                        element_i.dataset.uri!
+                    )
+                    .filter(
+                        (uri_i, _, uris) => !uris.some(
+                            uri_j => uri_i.startsWith(`${uri_j}/`)
+                        )
+                    );
+                const selectedUrisString = selectedUris.join("\n");
+                const lastUri = selectedUris[selectedUris.length - 1];
+                const lastItem = model.getItemByUri(lastUri);
+                if (lastItem && dataTransfer) {
+                    dataTransfer.dropEffect = "move";
+                    dataTransfer.setData("text/plain", selectedUrisString);
+                    const dragImage = this.getDragImageElement(lastItem);
+                    if (dragImage) {
+                        dataTransfer.setDragImage(dragImage, -16, 0);
+                    }
+                }
+            }
+        }
+    }
+
+    #handleDropEvent(event: DragEvent): void {
+        const {currentTarget, target} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        const targetItem = <HTMLElement>(<HTMLElement>target).closest(".treeitem");
+        const model = this.getModel(targetTree)!;
+        const {sortFunction} = model;
+        if (targetItem) {
+            const {dataTransfer} = event;
+            if (dataTransfer) {
+                const targetUri = targetItem.dataset.uri!;
+                const targetItemModel = model.getItemByUri(targetUri)!;
+                const transferedUris = dataTransfer.getData("text/plain").split("\n");
+                const targetIsWithin = transferedUris.some(uri_i => targetUri.startsWith(`${uri_i}/`) || uri_i == targetUri);
+                if (!targetIsWithin) {
+                    const transferedItems = <TreeItemModel[]>transferedUris.map(
+                        uri_i => model.getItemByUri(uri_i)
+                    ).filter(
+                        item_i => item_i !== null
+                    );
+                    const {type: targetType, parentItem: targetParentItem} = targetItemModel;
+                    const {childItems: targetList} = targetType == "parent" ?
+                        targetItemModel :
+                        targetParentItem ?
+                        targetParentItem :
+                        model;
+                    const targetItems = Array.from(targetList.values());
+                    targetItems.forEach((item_i) => {
+                        const sameLabelIndex = transferedItems.findIndex(item_j => item_j.label == item_i.label);
+                        if (sameLabelIndex > -1) {
+                            const doReplace = confirm(`Replace ${item_i.label}?`);
+                            if (doReplace) {
+                                targetList.remove(item_i);
+                            }
+                            else {
+                                transferedItems.copyWithin(sameLabelIndex, sameLabelIndex + 1);
+                                transferedItems.length--;
+                            }
+                        }
+                    });
+                    TreeItemList.from(transferedItems).remove();
+                    if (sortFunction) {
+                        targetList.beginChanges();
+                        targetList.append(...transferedItems);
+                        targetList.sort(sortFunction);
+                        targetList.endChanges();
+                    }
+                    else {
+                        targetList.insert(treeItemWidget.getPosInSet(targetItem), ...transferedItems);
+                    }
+                    
+                    const newElements = targetTree.querySelectorAll<HTMLElement>(`.treeitem:is(${
+                        transferedItems.map(item_i => `[data-uri="${item_i.uri}"]`).join(",")
+                    })`);
+                    treeWidget.beginSelection(targetTree);
+                    newElements.forEach((element_i) => {
+                        treeItemWidget.setSelected(element_i, true);
+                    });
+                    treeWidget.endSelection(targetTree);
+                }
+            }
+        }
+    }
+
+    #handleContextMenuEvent(event: MouseEvent): void {
+        const {clientX, clientY, currentTarget, target} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        const targetItem = <HTMLElement>(<HTMLElement>target).closest(".treeitem");
+        const model = this.getModel(targetTree)!;
+        if (targetItem) {
+            const activeItem = model.getItemByUri(targetItem.dataset.uri!)!;
+            const menu = widget("menu", {
+                properties: {
+                    contextual: true
+                },
+                slotted: [
+                    widget("menuitemgroup", {
+                        slotted: [
+                            widget("menuitem", {
+                                properties: {
+                                    label: "Display"
+                                },
+                                listeners: {
+                                    click: () => {
+                                        const selectedItems = TreeItemList.from(this.selectedItems(targetTree));
+                                        selectedItems.display();
+                                    }
+                                }
+                            }),
+                            widget("menuitem", {
+                                properties: {
+                                    label: "Delete"
+                                },
+                                listeners: {
+                                    click: () => {
+                                        const selectedItems = TreeItemList.from(this.selectedItems(targetTree));
+                                        const {count} = selectedItems;
+                                        const doRemove = confirm(`Remove ${count} items?`);
+                                        if (doRemove) {
+                                            selectedItems.remove();
+                                        }
+                                        targetTree.focus();
+                                    }
+                                }
+                            })
+                        ]
+                    }),
+                    widget("menuitemgroup", {
+                        slotted: [
+                            widget("menuitem", {
+                                properties: {
+                                    type: "checkbox",
+                                    label: activeItem.visibility ? "Hide" : "Show"
+                                },
+                                listeners: {
+                                    click: () => {
+                                        const selectedItems = TreeItemList.from(
+                                            this.selectedItems(targetTree)
+                                        );
+                                        activeItem.visibility ?
+                                            selectedItems.hide() :
+                                            selectedItems.show();
+                                    }
+                                }
+                            })
+                        ]
+                    })
+                ],
+                listeners: {
+                    close: () => {
+                        targetItem.focus({preventScroll: true});
+                    }
+                }
+            });
+            targetTree.append(menu);
+            menuWidget.positionContextual(menu, clientX, clientY);
+            menu.focus({preventScroll: true});
+            event.preventDefault();
+        }
+    }
+
+    #handleFocusInEvent(event: FocusEvent): void {
+        const {target} = event;
+        const targetElement = <HTMLElement>target;
+        if (targetElement.matches(".treeitem")) {
+            const targetItem = targetElement;
+            const toolbar = targetItem.querySelector<HTMLElement>(".toolbar");
+            if (toolbar) {
+                toolbar.tabIndex = 0;
+            }
+        }
+    }
+
+    #handleFocusOutEvent(event: FocusEvent): void {
+        const {target} = event;
+        const targetElement = <HTMLElement>target;
+        if (targetElement.matches(".treeitem")) {
+            const targetItem = targetElement;
+            const toolbar = targetItem.querySelector<HTMLElement>(".toolbar");
+            if (toolbar) {
+                toolbar.tabIndex = -1;
+            }
+        }
+    }
+
+    #handleKeyDownEvent(event: KeyboardEvent) {
+        const {currentTarget, key} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        switch (key) {
+            case "Delete": {
+                const itemsList = TreeItemList.from(this.selectedItems(targetTree));
+                const {count} = itemsList;
+                const doRemove = confirm(`Remove ${count} items?`);
+                if (doRemove) {
+                    itemsList.remove();
+                }
+                targetTree.focus();
+                event.preventDefault();
+                break;
+            }
+        }
+    }
+}
