@@ -90,7 +90,7 @@ Widget({
     }): HTMLElement {
         const item = <HTMLElement>this.#template.cloneNode(true);
         item.addEventListener("click", this.#handleClickEvent.bind(this));
-        if (init !== void 0) {
+        if (init !== undefined) {
             const {label, disabled, draggable} = init;
             let {type} = init;
             type = type ?? "leaf";
@@ -98,13 +98,13 @@ Widget({
             if (type === "parent") {
                 this.setExpanded(item, false);
             }
-            if (label !== void 0) {
+            if (label !== undefined) {
                 this.setLabel(item, label);
             }
-            if (disabled !== void 0) {
+            if (disabled !== undefined) {
                 this.setDisabled(item, disabled);
             }
-            if (draggable !== void 0) {
+            if (draggable !== undefined) {
                 this.setDraggable(item, draggable);
             }
             this.setSelected(item, false);
@@ -147,12 +147,12 @@ Widget({
     }
 
     setPosInSet(item: HTMLElement, value: number): void {
-        item.setAttribute("aria-posinset", value.toString());
+        item.setAttribute("aria-posinset", String(value));
     }
 
     getPosInSet(item: HTMLElement): number {
         const posInSet = item.getAttribute("aria-posinset");
-        return posInSet ? parseInt(posInSet) : -1;
+        return posInSet ? Number(posInSet) : -1;
     }
 
     getType(item: HTMLElement): TreeItemType {
@@ -177,11 +177,11 @@ Widget({
     }
 
     setExpanded(item: HTMLElement, value: boolean): void {
-        item.setAttribute("aria-expanded", value.toString());
+        item.setAttribute("aria-expanded", String(value));
     }
 
     getExpanded(item: HTMLElement): boolean {
-        return JSON.parse(item.getAttribute("aria-expanded") ?? false.toString());
+        return JSON.parse(item.getAttribute("aria-expanded") ?? String(false));
     }
 
     setActive(item: HTMLElement, value: boolean): void {
@@ -225,24 +225,24 @@ Widget({
     }
 
     setDraggable(item: HTMLElement, value: boolean): void {
-        item.setAttribute("draggable", value.toString());
+        item.setAttribute("draggable", String(value));
     }
 
     getDraggable(item: HTMLElement): boolean {
-        return JSON.parse(item.getAttribute("draggable") ?? false.toString());
+        return JSON.parse(item.getAttribute("draggable") ?? String(false));
     }
 
     setSelected(item: HTMLElement, value: boolean): void {
-        item.setAttribute("aria-selected", value.toString());
+        item.setAttribute("aria-selected", String(value));
         item.dispatchEvent(new Event("select", {bubbles: true}));
     }
 
     getSelected(item: HTMLElement): boolean {
-        return JSON.parse(item.getAttribute("aria-selected") ?? false.toString());
+        return JSON.parse(item.getAttribute("aria-selected") ?? String(false));
     }
 
     setLevel(item: HTMLElement, value: number): void {
-        item.style.setProperty("--level", value.toString());
+        item.style.setProperty("--level", String(value));
     }
 
     getLevel(item: HTMLElement): number {

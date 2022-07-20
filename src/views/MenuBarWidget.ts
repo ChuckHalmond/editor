@@ -25,7 +25,7 @@ class MenuItemWidget extends Widget<HTMLEMenuItemElement> {
                 type: type,
                 tabindex: -1
             },
-            children: menu ? [menu.element] : void 0
+            children: menu ? [menu.element] : undefined
         });
         super(itemElement);
     }

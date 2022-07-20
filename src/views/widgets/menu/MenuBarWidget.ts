@@ -2,7 +2,7 @@ import { element, Widget } from "../../../elements/Element";
 import { menuItemWidget } from "./MenuItemWidget";
 import { WidgetFactory } from "../Widget";
 
-export { menubarWidget };
+export { menuBarWidget };
 
 declare global {
     interface WidgetNameMap {
@@ -15,7 +15,7 @@ interface MenuBarWidgetFactory extends WidgetFactory {
     getExpanded(menubar: HTMLElement): boolean;
 }
 
-var menubarWidget = new (
+var menuBarWidget = new (
 Widget({
     name: "menubar"
 })(class MenubarWidgetFactoryBase extends WidgetFactory {
@@ -43,6 +43,10 @@ Widget({
         menubar.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         menubar.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
         menubar.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
+        return menubar;
+    }
+
+    slot(menubar: HTMLElement) {
         return menubar;
     }
 
@@ -117,6 +121,30 @@ Widget({
         )).find(item_i => item_i.contains(target)) ?? null;
     }
 
+    #handleClickEvent(event: MouseEvent): void {
+        const {target, currentTarget} = event;
+        const menubar = <HTMLElement>currentTarget;
+        const targetItem = <HTMLElement>(<HTMLElement>target).closest(".menuitem");
+        if (targetItem) {
+            const expanded = this.getExpanded(menubar);
+            const isClosestMenu = this.#isClosestMenu(menubar, targetItem);
+            if (isClosestMenu) {
+                const isExpanded = !expanded;
+                this.setExpanded(menubar, isExpanded);
+                if (isExpanded) {
+                    if (targetItem !== null && !menuItemWidget.getExpanded(targetItem)) {
+                        menuItemWidget.expand(targetItem);
+                    }
+                    const menu = menuItemWidget.getMenu(targetItem);
+                    menu?.focus({preventScroll: true});
+                }
+                else {
+                    menubar.focus({preventScroll: true})
+                }
+            }
+        }
+    }
+
     #handleFocusInEvent(event: FocusEvent): void {
         const {target, currentTarget} = event;
         const menubar = <HTMLElement>currentTarget;
@@ -157,30 +185,6 @@ Widget({
                 }
                 else {
                     target.focus({preventScroll: true});
-                }
-            }
-        }
-    }
-
-    #handleClickEvent(event: MouseEvent): void {
-        const {target, currentTarget} = event;
-        const menubar = <HTMLElement>currentTarget;
-        const activeItem = this.#getActiveItem(menubar);
-        const expanded = this.getExpanded(menubar);
-        if (target instanceof HTMLElement && target.classList.contains("menuitem")) {
-            const isClosestMenu = this.#isClosestMenu(menubar, target);
-            if (isClosestMenu) {
-                const isExpanded = !expanded;
-                this.setExpanded(menubar, isExpanded);
-                if (isExpanded) {
-                    if (activeItem !== null && !menuItemWidget.getExpanded(activeItem)) {
-                        menuItemWidget.expand(activeItem);
-                    }
-                    const menu = menuItemWidget.getMenu(target);
-                    menu?.focus({preventScroll: true});
-                }
-                else {
-                    menubar.focus({preventScroll: true})
                 }
             }
         }

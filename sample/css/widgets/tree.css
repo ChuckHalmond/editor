@@ -2,6 +2,11 @@
     display: block;
 }
 
+.tree:focus {
+    outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;
+}
+
 .treeitemgroup {
     display: block;
 }
@@ -31,7 +36,7 @@
     padding-left: calc(var(--level) * var(--indent-width, 12px));
 }
 
-.tree:focus-within .treeitem.active > .content {
+.tree:focus-within .treeitem.active:not(:focus-within:not(:focus)) > .content {
     outline: 1px solid var(--focused-item-outline-color);
     outline-offset: -1px;
 }

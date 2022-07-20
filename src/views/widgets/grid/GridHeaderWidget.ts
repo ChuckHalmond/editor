@@ -48,9 +48,9 @@ Widget({
         label?: string;
     }): HTMLElement {
         const header = <HTMLElement>this.#template.cloneNode(true);
-        if (init !== void 0) {
+        if (init !== undefined) {
             const {label} = init;
-            if (label !== void 0) {
+            if (label !== undefined) {
                 this.setLabel(header, label);
             }
         }

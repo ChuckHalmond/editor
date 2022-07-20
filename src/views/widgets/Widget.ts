@@ -129,7 +129,7 @@ class WidgetFactoryBase implements WidgetFactory {
     }
 
     get observedSlots(): string[] {
-        return ["_"];
+        return [""];
     }
 }
 

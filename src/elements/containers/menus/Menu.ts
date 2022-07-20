@@ -169,7 +169,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     async #setItemTimeout(item: HTMLEMenuItemElement, delay?: number): Promise<void> {
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
-                resolve(void 0);
+                resolve(undefined);
             }, delay ?? 0);
             toggleTimeouts.set(item, {
                 clear: () => {
@@ -365,7 +365,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                             .then(() => {
                                 activeItem.collapse();
                             })
-                            .catch(() => void 0);
+                            .catch(() => undefined);
                     }
                     const {clientX, clientY} = event;
                     const {left, right, top, bottom} = this.getBoundingClientRect();
@@ -412,7 +412,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                             .then(() => {
                                 activeItem.collapse();
                             })
-                            .catch(() => void 0);
+                            .catch(() => undefined);
                     }
                     this.#setActiveItem(nearestItem);
                     nearestItem.focus({preventScroll: true});
@@ -429,7 +429,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                                         activeItem.menu?.focus({preventScroll: true});
                                     }
                                 })
-                                .catch(() => void 0);
+                                .catch(() => undefined);
                         }
                         else {
                             nearestItem.menu?.focus({preventScroll: true});

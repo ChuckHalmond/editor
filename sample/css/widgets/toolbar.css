@@ -3,6 +3,11 @@
     flex-direction: row;
 }
 
+.toolbar:focus {
+    outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;
+}
+
 .toolbaritemgroup {
     display: flex;
     width: max-content;
@@ -17,22 +22,22 @@
     line-height: 22px;
 }
 
-.toolbaritem[aria-pressed="true"] {
-    background-color: var(--activated-item-color);
-}
-
 .toolbaritem[aria-disabled] {
     opacity: 0.38;
     pointer-events: none;
 }
 
+.toolbaritem:hover {
+    background-color: var(--hovered-item-color);
+}
+
+.toolbaritem[aria-pressed="true"] {
+    background-color: var(--activated-item-color);
+}
+
 .toolbar:focus-within .toolbaritem.active {
     outline: 1px solid var(--focused-item-outline-color);
     outline-offset: -1px;
-}
-
-.toolbaritem:hover {
-    background-color: var(--hovered-item-color);
 }
 
 .toolbaritem-menubutton > .menu {

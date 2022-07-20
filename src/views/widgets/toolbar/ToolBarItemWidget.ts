@@ -43,7 +43,6 @@ Widget({
     name: "toolbaritem"
 })(
 class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemWidgetFactory {
-    
     #template: HTMLElement;
     #types: ToolBarItemType[];
 

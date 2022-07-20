@@ -23,7 +23,7 @@ function getPropertyFromPath(src: object, path: string): any {
       obj = obj[prop];
     }
     else {
-      obj = void 0;
+      obj = undefined;
     }
   });
   return obj;

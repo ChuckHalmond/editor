@@ -172,7 +172,7 @@ export async function main() {
         })
     );
 
-    document.body.append(listView);
+    //document.body.append(listView);
 
     // Menu actions
     // Toolbar actions
@@ -237,7 +237,7 @@ export async function main() {
         })
     );
 
-    document.body.append(gridView);
+    //document.body.append(gridView);
     
     const menuView = widget("menubar", {
         slotted: [
@@ -247,6 +247,26 @@ export async function main() {
                     name: "MenuItem 0",
                     type: "menu",
                     disabled: true
+                },
+                slotted: [
+                    widget("menu", {
+                        slotted: [
+                            widget("menuitem", {
+                                properties: {
+                                    label: "MenuItem 1",
+                                    name: "MenuItem 1",
+                                    type: "checkbox"
+                                }
+                            })
+                        ]
+                    })
+                ]
+            }),
+            widget("menuitem", {
+                properties: {
+                    label: "MenuItem 0",
+                    name: "MenuItem 0",
+                    type: "menu"
                 },
                 slotted: [
                     widget("menu", {

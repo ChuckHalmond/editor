@@ -48,9 +48,9 @@ Widget({
         disabled?: boolean;
     }): HTMLElement {
         const row = <HTMLElement>this.#template.cloneNode(true);
-        if (init !== void 0) {
+        if (init !== undefined) {
             const {disabled} = init;
-            if (disabled !== void 0) {
+            if (disabled !== undefined) {
                 this.setDisabled(row, disabled);
             }
             this.setSelected(row, false);

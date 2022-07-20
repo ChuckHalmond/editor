@@ -3,6 +3,7 @@ import { ModelEvent, ModelList, ModelObject, ModelProperty } from "../models/Mod
 import { View } from "./View";
 import { menuWidget } from "./widgets/menu/MenuWidget";
 import { toolbarItemWidget } from "./widgets/toolbar/ToolBarItemWidget";
+import { toolbarWidget } from "./widgets/toolbar/ToolBarWidget";
 import { treeItemWidget } from "./widgets/tree/TreeItemWidget";
 import { treeWidget } from "./widgets/tree/TreeWidget";
 
@@ -278,8 +279,8 @@ class TreeViewBase extends View implements TreeView {
     renderShadow(): Node {
         const {model} = this;
         const treeElement = widget("tree", {
-            attributes: {
-                tabindex: 0,
+            properties: {
+                tabIndex: 0,
             },
             slotted: reactiveChildElements(
                 model.childItems, item => this.#renderTreeItem(item)
@@ -288,7 +289,9 @@ class TreeViewBase extends View implements TreeView {
                 dragstart: <EventListener>this.#handleDragStartEvent.bind(this),
                 drop: <EventListener>this.#handleDropEvent.bind(this),
                 contextmenu: <EventListener>this.#handleContextMenuEvent.bind(this),
-                keydown: <EventListener>this.#handleKeyDownEvent.bind(this)
+                keydown: <EventListener>this.#handleKeyDownEvent.bind(this),
+                focusin: <EventListener>this.#handleFocusInEvent.bind(this),
+                focusout: <EventListener>this.#handleFocusOutEvent.bind(this),
             }
         });
         this.#treeElement = new WeakRef(treeElement);
@@ -354,11 +357,15 @@ class TreeViewBase extends View implements TreeView {
                             })
                         ] : []).concat([
                             widget("toolbar", {
+                                properties: {
+                                    tabIndex: -1
+                                },
                                 slotted: [
                                     widget("toolbaritem", {
                                         properties: {
                                             name: "visibility",
                                             type: "checkbox",
+                                            label: "Visibility"
                                         },
                                         listeners: {
                                             click: () => {
@@ -376,24 +383,26 @@ class TreeViewBase extends View implements TreeView {
             ["label", "childCount", "visibility"],
             (treeitem, property, oldValue, newValue) => {
                 switch (property) {
-                    case "label":
-                        const label = treeitem.querySelector(":scope > .label");
-                        if (label) {
-                            label.textContent = newValue;
-                        }
+                    case "label": {
+                        treeItemWidget.setLabel(treeitem, newValue);
                         break;
-                    case "childCount":
-                        const badge = treeitem.querySelector(":scope > .badge");
+                    }
+                    case "childCount": {
+                        const badge = treeitem.querySelector<HTMLElement>(":scope > .content > .badge");
                         if (badge) {
                             badge.textContent = `(${newValue})`;
                         }
                         break;
+                    }
                     case "visibility": {
-                        const toolbar = treeitem.querySelector<HTMLElement>(":scope > .toolbar");
+                        const toolbar = treeitem.querySelector<HTMLElement>(":scope > .content > .toolbar");
                         if (toolbar) {
-                            const visibilityItem = toolbar.querySelector<HTMLElement>(".toolbaritem[name=visibility]");
+                            const visibilityItem = toolbarWidget.slot(toolbar)
+                                ?.querySelector<HTMLElement>(".toolbaritem[name=visibility]");
                             if (visibilityItem) {
-                                toolbarItemWidget.setTitle(visibilityItem, newValue ? "Hide" : "Show");
+                                const label = newValue ? "Hide" : "Show";
+                                toolbarItemWidget.setLabel(visibilityItem, label);
+                                toolbarItemWidget.setTitle(visibilityItem, label);
                                 toolbarItemWidget.setPressed(visibilityItem, newValue);
                             }
                         }
@@ -594,6 +603,30 @@ class TreeViewBase extends View implements TreeView {
             menuWidget.positionContextual(menu, clientX, clientY);
             menu.focus({preventScroll: true});
             event.preventDefault();
+        }
+    }
+
+    #handleFocusInEvent(event: FocusEvent): void {
+        const {target} = event;
+        const targetElement = <HTMLElement>target;
+        if (targetElement.matches(".treeitem")) {
+            const targetItem = targetElement;
+            const toolbar = targetItem.querySelector<HTMLElement>(".toolbar");
+            if (toolbar) {
+                toolbar.tabIndex = 0;
+            }
+        }
+    }
+
+    #handleFocusOutEvent(event: FocusEvent): void {
+        const {target} = event;
+        const targetElement = <HTMLElement>target;
+        if (targetElement.matches(".treeitem")) {
+            const targetItem = targetElement;
+            const toolbar = targetItem.querySelector<HTMLElement>(".toolbar");
+            if (toolbar) {
+                toolbar.tabIndex = -1;
+            }
         }
     }
 

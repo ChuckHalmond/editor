@@ -66,12 +66,12 @@ Widget({
         disabled?: boolean;
     }): HTMLElement {
         const cell = <HTMLElement>this.#template.cloneNode(true);
-        if (init !== void 0) {
+        if (init !== undefined) {
             const {label, disabled} = init;
-            if (label !== void 0) {
+            if (label !== undefined) {
                 this.setLabel(cell, label);
             }
-            if (disabled !== void 0) {
+            if (disabled !== undefined) {
                 this.setDisabled(cell, disabled);
             }
             this.setSelected(cell, false);

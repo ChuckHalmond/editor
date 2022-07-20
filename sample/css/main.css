@@ -24,6 +24,8 @@
 @import "elements/grid/gridcell.css" layer(base);
 @import "elements/grid/gridrow.css" layer(base);
 
+@import "builtins.css" layer(base);
+
 @import "widgets/menu.css" layer(base);
 @import "widgets/tree.css" layer(base);
 @import "widgets/list.css" layer(base);

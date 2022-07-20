@@ -200,7 +200,7 @@ class GridWidget {
             attributes: {
                 tabindex: -1,
                 name: column.name,
-                id: this.resizable ? this.#columnID(column.name) : void 0,
+                id: this.resizable ? this.#columnID(column.name) : undefined,
                 type: "columnheader"
             },
             children: [
@@ -245,7 +245,7 @@ class GridWidget {
                     "width:" +
                     `var(${this.#columnWidthVariableName(column.name)}, ` +
                     `var(${this.#columnDefaultWidthVariableName()}))`
-                 : void 0,*/
+                 : undefined,*/
             },
             children: [
                 this.#cellDelegate(row, column)

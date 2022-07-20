@@ -301,7 +301,7 @@ class EditorBase implements Editor {
         if (value ?? false) {
             action.value = value;
         }
-        if (key !== void 0 && value !== void 0) {
+        if (key !== undefined && value !== undefined) {
             localStorage.setItem(key, value);
         }
         if (checked ?? false) {

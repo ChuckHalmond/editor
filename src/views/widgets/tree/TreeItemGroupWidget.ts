@@ -34,11 +34,11 @@ Widget({
         return <HTMLElement>this.#template.cloneNode(true);
     }
 
-    slot(root: HTMLElement) {
-        return root;
+    slot(group: HTMLElement) {
+        return group;
     }
 
-    slottedCallback(item: HTMLElement, slot: HTMLElement) {
+    slottedCallback(group: HTMLElement, slot: HTMLElement) {
         const {childNodes} = slot;
         Array.from(childNodes).forEach((child_i, i) => {
             if (child_i instanceof HTMLElement && child_i.classList.contains("treeitem")) {

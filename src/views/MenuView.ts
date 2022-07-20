@@ -100,7 +100,7 @@ class MenuViewBase extends View {
                 properties: {
                     type: type
                 },
-                slotted: menu !== void 0 ? [
+                slotted: menu !== undefined ? [
                     this.#renderMenu(menu)
                 ] : []
             }),

@@ -104,12 +104,12 @@ Widget({
         selectby?: GridSelectBy;
     }) {
         const grid = <HTMLElement>this.#template.cloneNode(true);
-        if (init !== void 0) {
+        if (init !== undefined) {
             const {selectby, multisectable} = init;
-            if (selectby !== void 0) {
+            if (selectby !== undefined) {
                 this.setSelectBy(grid, selectby);
             }
-            if (multisectable !== void 0) {
+            if (multisectable !== undefined) {
                 this.setMultiSelectable(grid, multisectable);
             }
         }

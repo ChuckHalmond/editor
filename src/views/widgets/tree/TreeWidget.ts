@@ -5,7 +5,12 @@ import { treeItemWidget } from "./TreeItemWidget";
 export { treeWidget };
 
 interface TreeWidgetFactory extends WidgetFactory {
-    create(): HTMLElement;
+    create(init: {
+        multisectable?: boolean;
+        tabIndex?: number;
+    }): HTMLElement;
+    setTabIndex(tree: HTMLElement, value: number): void;
+    getTabIndex(tree: HTMLElement): number;
     items(tree: HTMLElement): HTMLElement[];
     selectedItems(tree: HTMLElement): HTMLElement[];
     beginSelection(tree: HTMLElement): void;
@@ -46,6 +51,7 @@ Widget({
 
     create(init?: {
         multisectable?: boolean;
+        tabIndex?: number;
     }): HTMLElement {
         const tree = <HTMLElement>this.#template.cloneNode(true);
         tree.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
@@ -61,10 +67,13 @@ Widget({
         tree.addEventListener("select", this.#handleSelectEvent.bind(this));
         this.#onSelection.set(tree, false);
         this.#hasSelectionChanged.set(tree, false);
-        if (init !== void 0) {
-            const {multisectable} = init;
-            if (multisectable !== void 0) {
+        if (init !== undefined) {
+            const {multisectable, tabIndex} = init;
+            if (multisectable !== undefined) {
                 this.setMultiSelectable(tree, multisectable);
+            }
+            if (tabIndex !== undefined) {
+                this.setTabIndex(tree, tabIndex);
             }
         }
         return tree;
@@ -123,6 +132,14 @@ Widget({
 
     getMultiSelectable(tree: HTMLElement): boolean {
         return JSON.parse(tree.getAttribute("aria-multiselectable") ?? false.toString());
+    }
+
+    setTabIndex(tree: HTMLElement, value: number): void {
+        tree.tabIndex = value;
+    }
+
+    getTabIndex(tree: HTMLElement): number {
+        return tree.tabIndex;
     }
 
     #getActiveItem(tree: HTMLElement): HTMLElement | null {
@@ -369,15 +386,8 @@ Widget({
     #handleDragLeaveEvent(event: DragEvent): void {
         const {currentTarget, relatedTarget} = event;
         const targetTree = <HTMLElement>currentTarget;
-        if (relatedTarget) {
-            const relatedTargetRoot = (<Node>relatedTarget).getRootNode();
-            const relatedTargetHost =
-                relatedTargetRoot instanceof ShadowRoot ?
-                relatedTargetRoot.host :
-                relatedTarget;
-            if (!targetTree.contains(<Node>relatedTargetHost)) {
-                this.#setDropTargetItem(targetTree, null);
-            }
+        if (!targetTree.contains(<Node>relatedTarget)) {
+            this.#setDropTargetItem(targetTree, null);
         }
     }
 
@@ -385,6 +395,37 @@ Widget({
         const {currentTarget} = event;
         const targetTree = <HTMLElement>currentTarget;
         this.#setDropTargetItem(targetTree, null);
+    }
+
+    #handleFocusEvent(event: FocusEvent): void {
+        const {currentTarget, relatedTarget} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        const focusWithin = targetTree.contains(<Node>relatedTarget);
+        if (!focusWithin) {   
+            const activeItem = this.#getActiveItem(targetTree);
+            if (activeItem) {
+                activeItem.focus();
+            }
+        }
+    }
+
+    #handleFocusInEvent(event: FocusEvent): void {
+        const {currentTarget, target} = event;
+        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".treeitem");
+        const targetTree = <HTMLElement>currentTarget;
+        if (targetItem) {
+            this.#setActiveItem(targetTree, targetItem);
+            targetTree.tabIndex = -1;
+        }
+    }
+
+    #handleFocusOutEvent(event: FocusEvent): void {
+        const {currentTarget, relatedTarget} = event;
+        const targetTree = <HTMLElement>currentTarget;
+        const lostFocusWithin = !targetTree.contains(<Node>relatedTarget);
+        if (lostFocusWithin) {
+            targetTree.tabIndex = 0;
+        }
     }
 
     #handleKeyDownEvent(event: KeyboardEvent): void {
@@ -522,34 +563,6 @@ Widget({
                 event.stopPropagation();
                 break;
             }
-        }
-    }
-
-    #handleFocusEvent(event: FocusEvent): void {
-        const {currentTarget, relatedTarget} = event;
-        const targetTree = <HTMLElement>currentTarget;
-        const activeItem = this.#getActiveItem(targetTree);
-        if (activeItem && relatedTarget !== activeItem) {
-            activeItem.focus();
-        }
-    }
-
-    #handleFocusInEvent(event: FocusEvent): void {
-        const {currentTarget, target} = event;
-        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".treeitem");
-        const targetTree = <HTMLElement>currentTarget;
-        if (targetItem) {
-            this.#setActiveItem(targetTree, targetItem);
-            targetTree.tabIndex = -1;
-        }
-    }
-
-    #handleFocusOutEvent(event: FocusEvent): void {
-        const {currentTarget, relatedTarget} = event;
-        const targetTree = <HTMLElement>currentTarget;
-        const lostFocusWithin = !targetTree.contains(<Node>relatedTarget);
-        if (lostFocusWithin) {
-            targetTree.tabIndex = 0;
         }
     }
 

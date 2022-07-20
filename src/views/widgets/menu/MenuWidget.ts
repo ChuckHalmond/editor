@@ -56,9 +56,9 @@ Widget({
         menu.addEventListener("mouseout", this.#handleMouseOutEvent.bind(this));
         menu.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         menu.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
-        if (init !== void 0) {
+        if (init !== undefined) {
             const {contextual} = init;
-            if (contextual !== void 0) {
+            if (contextual !== undefined) {
                 this.setContextual(menu, contextual);
             }
         }
@@ -174,7 +174,7 @@ Widget({
     async #setItemTimeout(item: HTMLElement, delay?: number): Promise<void> {
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
-                resolve(void 0);
+                resolve(undefined);
             }, delay ?? 0);
             this.#toggleTimeouts.set(item, {
                 clear: () => {
@@ -198,7 +198,8 @@ Widget({
     #handleClickEvent(event: MouseEvent): void {
         const {target, currentTarget} = event;
         const targetMenu = <HTMLElement>currentTarget;
-        if (target instanceof HTMLElement && target.classList.contains("menuitem")) {
+        const targetItem = <HTMLElement>(<HTMLElement>target).closest(".menuitem");
+        if (targetItem) {
             const contextual = this.getContextual(targetMenu);
             if (contextual) {
                 try {
@@ -207,11 +208,11 @@ Widget({
                 catch (error) {};
             }
             else {
-                const isClosestMenu = this.#isClosestMenu(targetMenu, target);
+                const isClosestMenu = this.#isClosestMenu(targetMenu, targetItem);
                 if (isClosestMenu) {
-                    const type = menuItemWidget.getType(target);
-                    const name = menuItemWidget.getName(target);
-                    const value = menuItemWidget.getValue(target);
+                    const type = menuItemWidget.getType(targetItem);
+                    const name = menuItemWidget.getName(targetItem);
+                    const value = menuItemWidget.getValue(targetItem);
                     if (type == "radio") {
                         targetMenu.querySelectorAll<HTMLElement>(
                             `:is(:scope, :scope > .menuitemgroup) > .menuitem-radio[name=${name}]`
@@ -222,6 +223,7 @@ Widget({
                     }
                 }
             }
+            event.stopPropagation();
         }
     }
 
@@ -235,7 +237,7 @@ Widget({
                 try {
                     targetMenu.remove();
                 } catch (error) {
-                    void 0;
+                    undefined;
                 }
             }
             else {
@@ -367,7 +369,7 @@ Widget({
                             .then(() => {
                                 menuItemWidget.collapse(activeItem);
                             })
-                            .catch(() => void 0);
+                            .catch(() => undefined);
                     }
                     const {clientX, clientY} = event;
                     const {left, right, top, bottom} = targetMenu.getBoundingClientRect();
@@ -415,7 +417,7 @@ Widget({
                                 .then(() => {
                                     menuItemWidget.collapse(activeItem);
                                 })
-                                .catch(() => void 0);
+                                .catch(() => undefined);
                         }
                     }
                     nearestItem.focus({preventScroll: true});
@@ -432,7 +434,7 @@ Widget({
                                         menuItemWidget.getMenu(activeItem)?.focus({preventScroll: true});
                                     }
                                 })
-                                .catch(() => void 0);
+                                .catch(() => undefined);
                         }
                         else {
                             menuItemWidget.getMenu(nearestItem)?.focus({preventScroll: true});

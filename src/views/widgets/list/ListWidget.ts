@@ -47,9 +47,9 @@ Widget({
         multisectable?: boolean;
     }): HTMLElement {
         const list = <HTMLElement>this.#template.cloneNode(true);
-        if (init !== void 0) {
+        if (init !== undefined) {
             const {multisectable} = init;
-            if (multisectable !== void 0) {
+            if (multisectable !== undefined) {
                 this.setMultiSelectable(list, multisectable);
             }
         }
@@ -281,7 +281,7 @@ Widget({
 
     #handleDragEnterEvent(event: DragEvent): void {
         const {currentTarget, target} = event;
-        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".treeitem");
+        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".listitem");
         const targetList = <HTMLElement>currentTarget;
         if (targetItem) {
             this.#setDropTargetItem(targetList, targetItem);
@@ -311,10 +311,11 @@ Widget({
     #handleDragStartEvent(event: DragEvent): void {
         const {currentTarget, target} = event;
         const targetTree = <HTMLElement>currentTarget;
-        if (target instanceof HTMLElement && target.classList.contains("treeitem")) {
+        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".listitem");
+        if (targetItem) {
             const selectedItems = this.selectedItems(targetTree);
-            if (!selectedItems.includes(target)) {
-                this.#setSelection(targetTree, target);
+            if (!selectedItems.includes(targetItem)) {
+                this.#setSelection(targetTree, targetItem);
             }
         }
     }

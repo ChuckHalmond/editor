@@ -75,8 +75,8 @@ class ModelChangeRecordBase implements ModelChangeRecord {
         this.target = init.target;
         this.changeType = init.changeType;
         this.propertyName = init.propertyName ?? null;
-        this.oldValue = init.oldValue ?? void 0;
-        this.newValue = init.newValue ?? void 0;
+        this.oldValue = init.oldValue ?? undefined;
+        this.newValue = init.newValue ?? undefined;
         this.removedIndex = init.removedIndex ?? 0;
         this.removedItems = new ModelNodesList(init.removedItems ?? []);
         this.insertedIndex = init.insertedIndex ?? 0;

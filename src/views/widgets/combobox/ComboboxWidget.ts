@@ -88,15 +88,15 @@ class ComboBoxWidgetFactoryBase extends WidgetFactory implements ComboBoxWidgetF
         combobox.addEventListener("click", this.#handleClickEvent.bind(this));
         combobox.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
         this.setExpanded(combobox, false);
-        if (init !== void 0) {
+        if (init !== undefined) {
             const {name, disabled, multiselectable} = init;
-            if (name !== void 0) {
+            if (name !== undefined) {
                 this.setName(combobox, name);
             }
-            if (disabled !== void 0) {
+            if (disabled !== undefined) {
                 this.setDisabled(combobox, disabled);
             }
-            if (multiselectable !== void 0) {
+            if (multiselectable !== undefined) {
                 this.setMultiSelectable(combobox, multiselectable);
             }
         }

@@ -11,6 +11,11 @@ declare global {
 }
 
 interface ToolBarWidgetFactory extends WidgetFactory {
+    create(init?: {
+        tabIndex?: number;
+    }): HTMLElement;
+    setTabIndex(toolbar: HTMLElement, value: number): void;
+    getTabIndex(toolbar: HTMLElement): number;
     setOrientation(toolbar: HTMLElement, value: ToolBarOrientation): void;
     getOrientation(toolbar: HTMLElement): ToolBarOrientation;
 }
@@ -30,7 +35,7 @@ Widget({
             attributes: {
                 class: "toolbar",
                 role: "toolbar",
-                tabindex: 0
+                tabindex: -1
             }
         });
         this.#walker = document.createTreeWalker(
@@ -38,13 +43,25 @@ Widget({
         )
     }
 
-    create() {
+    create(init?: {
+        tabIndex?: number;
+    }) {
         const toolbar = <HTMLElement>this.#template.cloneNode(true);
         toolbar.addEventListener("focus", this.#handleFocusEvent.bind(this));
         toolbar.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
         toolbar.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         toolbar.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
-        toolbar.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
+        toolbar.addEventListener("click", this.#handleClickEvent.bind(this));
+        if (init !== undefined) {
+            const {tabIndex} = init;
+            if (tabIndex !== undefined) {
+                this.setTabIndex(toolbar, tabIndex);
+            }
+        }
+        return toolbar;
+    }
+
+    slot(toolbar: HTMLElement) {
         return toolbar;
     }
 
@@ -58,6 +75,14 @@ Widget({
         return Array.from(toolbar.querySelectorAll<HTMLElement>(
             ":is(:scope, :scope > .toolbaritemgroup) > .toolbaritem"
         ));
+    }
+
+    setTabIndex(toolbar: HTMLElement, value: number): void {
+        toolbar.tabIndex = value;
+    }
+
+    getTabIndex(toolbar: HTMLElement): number {
+        return toolbar.tabIndex;
     }
 
     setOrientation(toolbar: HTMLElement, value: ToolBarOrientation): void {
@@ -128,20 +153,47 @@ Widget({
         }
     }
 
+    #handleClickEvent(event: Event): void {
+        const {currentTarget, target} = event;
+        const toolbar = <HTMLElement>currentTarget;
+        const targetItem = <HTMLElement>(<HTMLElement>target).closest(".toolbaritem");
+        if (targetItem) {
+            const type = toolbarItemWidget.getType(targetItem);
+            const name = toolbarItemWidget.getName(targetItem);
+            const value = toolbarItemWidget.getType(targetItem);
+            if (type == "radio") {
+                toolbar.querySelectorAll<HTMLElement>(
+                    `:is(:scope, :scope > .toolbaritemgroup) > .toolbaritem[type=radio][name=${name}]`
+                ).forEach((radio_i) => {
+                    toolbarItemWidget.setPressed(radio_i, toolbarItemWidget.getValue(radio_i) == value);
+                });
+            }
+            event.stopPropagation();
+        }
+    }
+
     #handleFocusEvent(event: FocusEvent): void {
         const {currentTarget, relatedTarget} = event;
         const targetToolbar = <HTMLElement>currentTarget;
-        const activeItem = this.#getActiveItem(targetToolbar);
-        if (activeItem && relatedTarget !== activeItem) {
-            activeItem.focus();
+        const focusWithin = targetToolbar.contains(<Node>relatedTarget);
+        if (!focusWithin) {
+            const activeItem = this.#getActiveItem(targetToolbar);
+            if (activeItem) {
+                activeItem.focus();
+            }
+            else {
+                const firstItem = this.#firstItem(targetToolbar);
+                firstItem?.focus();
+            }
         }
     }
 
     #handleFocusInEvent(event: FocusEvent): void {
         const {currentTarget, target} = event;
         const targetToolbar = <HTMLElement>currentTarget;
-        if (target instanceof HTMLElement && target.classList.contains("toolbaritem")) {
-            this.#setActiveItem(targetToolbar, target);
+        const targetItem = <HTMLElement | null>(<HTMLElement>target).closest(".toolbaritem");
+        if (targetItem) {
+            this.#setActiveItem(targetToolbar, targetItem);
             targetToolbar.tabIndex = -1;
         }
     }
@@ -151,6 +203,7 @@ Widget({
         const targetToolbar = <HTMLElement>currentTarget;
         const lostFocusWithin = !targetToolbar.contains(<Node>relatedTarget);
         if (lostFocusWithin) {
+            this.#setActiveItem(targetToolbar, null);
             targetToolbar.tabIndex = 0;
         }
     }
@@ -236,23 +289,6 @@ Widget({
                 //targetToolbar.focus();
                 event.stopPropagation();
                 break;
-            }
-        }
-    }
-
-    #handleMouseDownEvent(event: Event): void {
-        const {currentTarget, target} = event;
-        const toolbar = <HTMLElement>currentTarget;
-        if (target instanceof HTMLElement && target.classList.contains("toolbaritem")) {
-            const type = toolbarItemWidget.getType(target);
-            const name = toolbarItemWidget.getName(target);
-            const value = toolbarItemWidget.getType(target);
-            if (type == "radio") {
-                toolbar.querySelectorAll<HTMLElement>(
-                    `:is(:scope, :scope > .toolbaritemgroup) > .toolbaritem[type=radio][name=${name}]`
-                ).forEach((radio_i) => {
-                    toolbarItemWidget.setPressed(radio_i, toolbarItemWidget.getValue(radio_i) == value);
-                });
             }
         }
     }

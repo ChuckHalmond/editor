@@ -37,13 +37,4 @@ Widget({
     slot(group: HTMLElement) {
         return group;
     }
-
-    slottedCallback(group: HTMLElement, slot: HTMLElement) {
-        const {childNodes} = slot;
-        Array.from(childNodes).forEach((child_i, i) => {
-            if (child_i instanceof HTMLElement && child_i.classList.contains("option")) {
-                //optionWidget.setPosInSet(item_i, i);
-            }
-        });
-    }
 }));

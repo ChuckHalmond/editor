@@ -35,7 +35,7 @@ class GridModel extends ModelObject {
 
     sortByColumn(column: GridColumnModel, sortOrder: number) {
         Array.from(this.columns.values()).forEach((column_i) => {
-            column_i.sortorder = column_i == column ? sortOrder : void 0;
+            column_i.sortorder = column_i == column ? sortOrder : undefined;
         });
         this.rows.sort(
             (row_1, row_2) => {
@@ -316,7 +316,7 @@ class GridViewBase extends View implements GridView {
                 attributes: {
                     tabindex: -1,
                     name: column.name,
-                    id: this.resizable ? `${column.name}-columnheader` : void 0,
+                    id: this.resizable ? `${column.name}-columnheader` : undefined,
                     type: "columnheader"
                 },
                 children: [

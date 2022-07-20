@@ -346,7 +346,7 @@ function element<K extends keyof HTMLElementTagNameMap>(
         if (attributes) {
             Object.keys(attributes).forEach((attributeName) => {
                 const attributeValue = attributes[attributeName];
-                if (attributeValue !== void 0) {
+                if (attributeValue !== undefined) {
                     if (typeof attributeValue == "boolean") {
                         element.toggleAttribute(camelToTrain(attributeName), attributeValue);
                     }
@@ -387,9 +387,6 @@ function element<K extends keyof HTMLElementTagNameMap>(
 
 interface WidgetInit<K extends keyof WidgetNameMap> {
     properties?: Parameters<WidgetNameMap[K]["create"]>[0],
-    attributes?: {
-        [name: string]: number | string | boolean | undefined
-    },
     dataset?: {
         [property: string]: string | number | boolean
     },
@@ -409,20 +406,7 @@ function widget<K extends keyof WidgetNameMap>(
     if (widget) {
         const element = <HTMLElement>widget.create(init?.properties);
         if (init) {
-            const {attributes, dataset, slotted, listeners} = init;
-            if (attributes) {
-                Object.keys(attributes).forEach((attributeName) => {
-                    const attributeValue = attributes[attributeName];
-                    if (attributeValue !== void 0) {
-                        if (typeof attributeValue == "boolean") {
-                            element.toggleAttribute(camelToTrain(attributeName), attributeValue);
-                        }
-                        else {
-                            element.setAttribute(camelToTrain(attributeName), attributeValue.toString());
-                        }
-                    }
-                });
-            }
+            const {dataset, slotted, listeners} = init;
             if (dataset) {
                 const {dataset: elementDataset} = element;
                 Object.keys(dataset).forEach((datasetEntry_i) => {
@@ -490,7 +474,7 @@ const reactiveElementsFinalizationRegistry = new FinalizationRegistry((heldValue
 }) => {
     const {model, reactiveElement} = heldValue;
     const reactiveElementsMapEntry = reactiveElementsMap.get(model);
-    if (reactiveElementsMapEntry !== void 0) {
+    if (reactiveElementsMapEntry !== undefined) {
         const {reactiveElementsArray} = reactiveElementsMapEntry;
         reactiveElementsArray.splice(reactiveElementsArray.indexOf(reactiveElement), 1);
     }
@@ -549,8 +533,8 @@ function reactiveElement<M extends ModelNode, E extends Element>(
     properties.forEach((property_i) => {
         if (property_i in model) {
             const value = Reflect.get(model, property_i, model);
-            if (value !== void 0) {
-                react(element, <any>property_i, <any>void 0, value);
+            if (value !== undefined) {
+                react(element, <any>property_i, <any>undefined, value);
             }
         }
     });

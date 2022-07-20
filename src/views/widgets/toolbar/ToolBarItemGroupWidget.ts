@@ -32,4 +32,8 @@ Widget({
     create() {
         return <HTMLElement>this.#template.cloneNode(true);
     }
+
+    slot(group: HTMLElement) {
+        return group;
+    }
 }));

@@ -311,7 +311,7 @@ var EToolBarItem = <EToolBarItemConstructor>Object.assign(
                 value: value,
                 type: type
             },
-            children: menubutton ? [menubutton] : select ? [select] : void 0,
+            children: menubutton ? [menubutton] : select ? [select] : undefined,
             listeners: {
                 trigger: trigger
             }

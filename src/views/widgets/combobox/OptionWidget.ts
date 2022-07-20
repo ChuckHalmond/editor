@@ -62,23 +62,23 @@ class OptionWidgetFactoryBase extends WidgetFactory implements OptionWidgetFacto
         disabled?: boolean;
     }): HTMLElement {
         const option = <HTMLElement>this.#template.cloneNode(true);
-        if (init !== void 0) {
+        if (init !== undefined) {
             const {label, name, value, disabled} = init;
             let {selected} = init;
             selected = selected ?? false;
-            if (selected !== void 0) {
+            if (selected !== undefined) {
                 this.setSelected(option, selected);
             }
-            if (label !== void 0) {
+            if (label !== undefined) {
                 this.setLabel(option, label);
             }
-            if (name !== void 0) {
+            if (name !== undefined) {
                 this.setName(option, name);
             }
-            if (value !== void 0) {
+            if (value !== undefined) {
                 this.setValue(option, value);
             }
-            if (disabled !== void 0) {
+            if (disabled !== undefined) {
                 this.setDisabled(option, disabled);
             }
         }

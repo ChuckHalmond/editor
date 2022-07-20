@@ -136,30 +136,30 @@ class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetF
     }): HTMLElement {
         const item = <HTMLElement>this.#template.cloneNode(true);
         item.addEventListener("click", this.#handleClickEvent.bind(this));
-        if (init !== void 0) {
+        if (init !== undefined) {
             const {keyshortcut, checked, type, label, name, value, disabled} = init;
-            if (keyshortcut !== void 0) {
+            if (keyshortcut !== undefined) {
                 this.setKeyShortcut(item, keyshortcut);
             }
-            if (checked !== void 0) {
+            if (checked !== undefined) {
                 this.setChecked(item, checked);
             }
-            if (type !== void 0) {
+            if (type !== undefined) {
                 if (type == "menu" || type == "submenu") {
                     this.setExpanded(item, false);
                 }
                 this.setType(item, type);
             }
-            if (label !== void 0) {
+            if (label !== undefined) {
                 this.setLabel(item, label);
             }
-            if (name !== void 0) {
+            if (name !== undefined) {
                 this.setName(item, name);
             }
-            if (value !== void 0) {
+            if (value !== undefined) {
                 this.setValue(item, value);
             }
-            if (disabled !== void 0) {
+            if (disabled !== undefined) {
                 this.setDisabled(item, disabled);
             }
         }

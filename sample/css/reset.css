@@ -3,13 +3,15 @@
 }
 
 html {
-    scrollbar-color: var(--accent-color) Canvas;
+    /*scrollbar-color: var(--accent-color) Canvas;*/
 }
-  
-:root { accent-color: var(--accent-color); }
+
+:root {
+    accent-color: var(--accent-color);
+}
 
 :focus-visible {
-    outline-color: var(--accent-color);
+    outline: none;
 }
 
 ::selection {
@@ -40,12 +42,12 @@ progress {
 input:is([type="radio"], [type="checkbox"]) {
     width: var(--line-height); 
 }
-
+/*
 *:focus-visible {
-    /*outline: 1px solid var(--focused-item-outline-color);
-    outline-offset: -1px;*/
+    outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;
     outline: none;
-}
+}*/
 
 input[type="color" i] {
     border: none;
