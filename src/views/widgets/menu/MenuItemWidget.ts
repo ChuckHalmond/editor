@@ -13,6 +13,7 @@ declare global {
 
 interface MenuItemWidgetFactory extends WidgetFactory {
     create(properties?: {
+        id?: string;
         type?: MenuItemType;
         checked?: boolean;
         label?: string;
@@ -126,6 +127,7 @@ class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetF
     }
 
     create(init?: {
+        id?: string;
         type: MenuItemType;
         checked?: boolean;
         label?: string;
@@ -137,7 +139,10 @@ class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetF
         const item = <HTMLElement>this.#template.cloneNode(true);
         item.addEventListener("click", this.#handleClickEvent.bind(this));
         if (init !== undefined) {
-            const {keyshortcut, checked, type, label, name, value, disabled} = init;
+            const {id, keyshortcut, checked, type, label, name, value, disabled} = init;
+            if (id !== undefined) {
+                item.id = id;
+            }
             if (keyshortcut !== undefined) {
                 this.setKeyShortcut(item, keyshortcut);
             }
@@ -174,7 +179,7 @@ class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetF
         const hasChildMenu = Array.from(slot.childNodes).some(
             childNode_i => childNode_i instanceof HTMLElement && childNode_i.classList.contains("menu")
         );
-        item.setAttribute("aria-haspopup", hasChildMenu.toString());
+        item.setAttribute("aria-haspopup", String(hasChildMenu));
     }
 
     #label(item: HTMLElement): HTMLElement {
@@ -282,11 +287,11 @@ class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetF
     }
 
     getChecked(item: HTMLElement): boolean {
-        return JSON.parse(item.getAttribute("aria-checked") ?? false.toString());
+        return JSON.parse(item.getAttribute("aria-checked") ?? String(false));
     }
 
     setChecked(item: HTMLElement, value: boolean): void {
-        item.setAttribute("aria-checked", value.toString());
+        item.setAttribute("aria-checked", String(value));
     }
 
     getDisabled(item: HTMLElement): boolean {
@@ -298,11 +303,11 @@ class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetF
     }
 
     setExpanded(item: HTMLElement, value: boolean): void {
-        item.setAttribute("aria-expanded", value.toString());
+        item.setAttribute("aria-expanded", String(value));
     }
 
     getExpanded(item: HTMLElement): boolean {
-        return JSON.parse(item.getAttribute("aria-expanded") ?? false.toString());
+        return JSON.parse(item.getAttribute("aria-expanded") ?? String(false));
     }
 
     toggle(item: HTMLElement, force?: boolean): void {

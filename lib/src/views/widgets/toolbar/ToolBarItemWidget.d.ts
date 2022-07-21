@@ -8,6 +8,7 @@ declare global {
 }
 interface ToolBarItemWidgetFactory extends WidgetFactory {
     create(init?: {
+        id?: string;
         type: ToolBarItemType;
         pressed?: boolean;
         label?: string;
@@ -33,9 +34,10 @@ interface ToolBarItemWidgetFactory extends WidgetFactory {
     setType(item: HTMLElement, value: ToolBarItemType): void;
 }
 declare var toolbarItemWidget: {
-    "__#52@#template": HTMLElement;
-    "__#52@#types": ToolBarItemType[];
+    "__#17805@#template": HTMLElement;
+    "__#17805@#types": ToolBarItemType[];
     create(init?: {
+        id?: string;
         type?: ToolBarItemType;
         pressed?: boolean;
         label?: string;
@@ -70,8 +72,8 @@ declare var toolbarItemWidget: {
     setDisabled(item: HTMLElement, value: boolean): void;
     setActive(item: HTMLElement, value: boolean): void;
     getActive(item: HTMLElement): boolean;
-    "__#52@#handleFocusOutEvent"(event: FocusEvent): void;
-    "__#52@#handleClickEvent"(event: MouseEvent): void;
-    "__#52@#positionMenu"(item: HTMLElement): void;
-    "__#52@#label"(item: HTMLElement): HTMLElement;
+    "__#17805@#handleFocusOutEvent"(event: FocusEvent): void;
+    "__#17805@#handleClickEvent"(event: MouseEvent): void;
+    "__#17805@#positionMenu"(item: HTMLElement): void;
+    "__#17805@#label"(item: HTMLElement): HTMLElement;
 };

@@ -260,7 +260,7 @@ class GridWidget {
             const {dataset} = target;
             let sortorder = dataset.sortorder ? parseInt(dataset.sortorder) : 1;
             sortorder *= -1;
-            target.dataset.sortorder = sortorder.toString();
+            target.dataset.sortorder = String(sortorder);
             const {model} = this;
             const {rows, columns} = model;
             const column = Array.from(columns.values()).find(
@@ -269,8 +269,8 @@ class GridWidget {
             if (column) {
                 rows.sort(
                     (row_1, row_2) => {
-                        const cell_1 = <string>column.extract(row_1).toString();
-                        const cell_2 = <string>column.extract(row_2).toString();
+                        const cell_1 = String(column.extract(row_1));
+                        const cell_2 = String(column.extract(row_2));
                         return sortorder * cell_1.localeCompare(cell_2);
                     }
                 );

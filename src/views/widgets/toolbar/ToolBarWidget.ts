@@ -11,11 +11,11 @@ declare global {
 }
 
 interface ToolBarWidgetFactory extends WidgetFactory {
-    create(init?: {
+    create(properties?: {
+        id?: string;
+        classList?: string[];
         tabIndex?: number;
     }): HTMLElement;
-    setTabIndex(toolbar: HTMLElement, value: number): void;
-    getTabIndex(toolbar: HTMLElement): number;
     setOrientation(toolbar: HTMLElement, value: ToolBarOrientation): void;
     getOrientation(toolbar: HTMLElement): ToolBarOrientation;
 }
@@ -43,7 +43,9 @@ Widget({
         )
     }
 
-    create(init?: {
+    create(properties?: {
+        id?: string;
+        classList?: string[];
         tabIndex?: number;
     }) {
         const toolbar = <HTMLElement>this.#template.cloneNode(true);
@@ -52,10 +54,16 @@ Widget({
         toolbar.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         toolbar.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         toolbar.addEventListener("click", this.#handleClickEvent.bind(this));
-        if (init !== undefined) {
-            const {tabIndex} = init;
+        if (properties !== undefined) {
+            const {id, classList, tabIndex} = properties;
+            if (id !== undefined) {
+                toolbar.id = id;
+            }
+            if (classList !== undefined) {
+                toolbar.classList.add(...classList);
+            }
             if (tabIndex !== undefined) {
-                this.setTabIndex(toolbar, tabIndex);
+                toolbar.tabIndex = tabIndex;
             }
         }
         return toolbar;
@@ -75,14 +83,6 @@ Widget({
         return Array.from(toolbar.querySelectorAll<HTMLElement>(
             ":is(:scope, :scope > .toolbaritemgroup) > .toolbaritem"
         ));
-    }
-
-    setTabIndex(toolbar: HTMLElement, value: number): void {
-        toolbar.tabIndex = value;
-    }
-
-    getTabIndex(toolbar: HTMLElement): number {
-        return toolbar.tabIndex;
     }
 
     setOrientation(toolbar: HTMLElement, value: ToolBarOrientation): void {
@@ -285,8 +285,6 @@ Widget({
                 else {
                     targetToolbar.focus({preventScroll: true});
                 }
-                //this.#setActiveItem(targetToolbar, null);
-                //targetToolbar.focus();
                 event.stopPropagation();
                 break;
             }

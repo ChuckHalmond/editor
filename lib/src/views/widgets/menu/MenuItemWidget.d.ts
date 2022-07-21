@@ -8,6 +8,7 @@ declare global {
 }
 interface MenuItemWidgetFactory extends WidgetFactory {
     create(properties?: {
+        id?: string;
         type?: MenuItemType;
         checked?: boolean;
         label?: string;
@@ -39,12 +40,12 @@ interface MenuItemWidgetFactory extends WidgetFactory {
     collapse(item: HTMLElement): void;
 }
 declare var menuItemWidget: {
-    "__#15581@#iconPartTemplate": HTMLElement;
-    "__#15581@#arrowPartTemplate": HTMLElement;
-    "__#15581@#keyshortcutsPartTemplate": HTMLElement;
-    "__#15581@#template": HTMLElement;
-    "__#15581@#types": MenuItemType[];
-    "__#15581@#typesFeatures": {
+    "__#17800@#iconPartTemplate": HTMLElement;
+    "__#17800@#arrowPartTemplate": HTMLElement;
+    "__#17800@#keyshortcutsPartTemplate": HTMLElement;
+    "__#17800@#template": HTMLElement;
+    "__#17800@#types": MenuItemType[];
+    "__#17800@#typesFeatures": {
         button: {
             role: string;
             hasIcon: boolean;
@@ -72,6 +73,7 @@ declare var menuItemWidget: {
         };
     };
     create(init?: {
+        id?: string;
         type: MenuItemType;
         checked?: boolean;
         label?: string;
@@ -82,7 +84,7 @@ declare var menuItemWidget: {
     }): HTMLElement;
     slot(item: HTMLElement): HTMLElement | null;
     slottedCallback(item: HTMLElement, slot: HTMLElement): void;
-    "__#15581@#label"(item: HTMLElement): HTMLElement;
+    "__#17800@#label"(item: HTMLElement): HTMLElement;
     getMenu(item: HTMLElement): HTMLElement | null;
     getKeyShortcut(item: HTMLElement): string | null;
     setKeyShortcut(item: HTMLElement, value: string | null): void;
@@ -103,6 +105,6 @@ declare var menuItemWidget: {
     toggle(item: HTMLElement, force?: boolean): void;
     expand(item: HTMLElement): void;
     collapse(item: HTMLElement): void;
-    "__#15581@#handleClickEvent"(event: MouseEvent): void;
-    "__#15581@#positionMenu"(item: HTMLElement): void;
+    "__#17800@#handleClickEvent"(event: MouseEvent): void;
+    "__#17800@#positionMenu"(item: HTMLElement): void;
 };

@@ -6,38 +6,38 @@ declare global {
     }
 }
 interface ToolBarWidgetFactory extends WidgetFactory {
-    create(init?: {
+    create(properties?: {
+        id?: string;
+        classList?: string[];
         tabIndex?: number;
     }): HTMLElement;
-    setTabIndex(toolbar: HTMLElement, value: number): void;
-    getTabIndex(toolbar: HTMLElement): number;
     setOrientation(toolbar: HTMLElement, value: ToolBarOrientation): void;
     getOrientation(toolbar: HTMLElement): ToolBarOrientation;
 }
 declare type ToolBarOrientation = "horizontal" | "vertical";
 declare var toolbarWidget: {
-    "__#53@#template": HTMLElement;
-    "__#53@#walker": TreeWalker;
-    create(init?: {
+    "__#14421@#template": HTMLElement;
+    "__#14421@#walker": TreeWalker;
+    create(properties?: {
+        id?: string;
+        classList?: string[];
         tabIndex?: number;
     }): HTMLElement;
     slot(toolbar: HTMLElement): HTMLElement;
-    "__#53@#getActiveItem"(toolbar: HTMLElement): HTMLElement | null;
+    "__#14421@#getActiveItem"(toolbar: HTMLElement): HTMLElement | null;
     items(toolbar: HTMLElement): HTMLElement[];
-    setTabIndex(toolbar: HTMLElement, value: number): void;
-    getTabIndex(toolbar: HTMLElement): number;
     setOrientation(toolbar: HTMLElement, value: ToolBarOrientation): void;
     getOrientation(toolbar: HTMLElement): ToolBarOrientation;
-    "__#53@#walkerNodeFilter"(node: Node): number;
-    "__#53@#firstItem"(toolbar: Element): HTMLElement | null;
-    "__#53@#lastItem"(toolbar: Element): HTMLElement | null;
-    "__#53@#previousItem"(item: HTMLElement): HTMLElement | null;
-    "__#53@#nextItem"(item: HTMLElement): HTMLElement | null;
-    "__#53@#firstChildItem"(item: HTMLElement): HTMLElement | null;
-    "__#53@#setActiveItem"(tree: HTMLElement, item: HTMLElement | null): void;
-    "__#53@#handleClickEvent"(event: Event): void;
-    "__#53@#handleFocusEvent"(event: FocusEvent): void;
-    "__#53@#handleFocusInEvent"(event: FocusEvent): void;
-    "__#53@#handleFocusOutEvent"(event: FocusEvent): void;
-    "__#53@#handleKeyDownEvent"(event: KeyboardEvent): void;
+    "__#14421@#walkerNodeFilter"(node: Node): number;
+    "__#14421@#firstItem"(toolbar: Element): HTMLElement | null;
+    "__#14421@#lastItem"(toolbar: Element): HTMLElement | null;
+    "__#14421@#previousItem"(item: HTMLElement): HTMLElement | null;
+    "__#14421@#nextItem"(item: HTMLElement): HTMLElement | null;
+    "__#14421@#firstChildItem"(item: HTMLElement): HTMLElement | null;
+    "__#14421@#setActiveItem"(tree: HTMLElement, item: HTMLElement | null): void;
+    "__#14421@#handleClickEvent"(event: Event): void;
+    "__#14421@#handleFocusEvent"(event: FocusEvent): void;
+    "__#14421@#handleFocusInEvent"(event: FocusEvent): void;
+    "__#14421@#handleFocusOutEvent"(event: FocusEvent): void;
+    "__#14421@#handleKeyDownEvent"(event: KeyboardEvent): void;
 };

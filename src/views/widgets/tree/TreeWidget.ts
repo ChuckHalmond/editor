@@ -5,12 +5,12 @@ import { treeItemWidget } from "./TreeItemWidget";
 export { treeWidget };
 
 interface TreeWidgetFactory extends WidgetFactory {
-    create(init: {
-        multisectable?: boolean;
+    create(properties?: {
+        id?: string;
+        classList?: string[];
         tabIndex?: number;
+        multisectable?: boolean;
     }): HTMLElement;
-    setTabIndex(tree: HTMLElement, value: number): void;
-    getTabIndex(tree: HTMLElement): number;
     items(tree: HTMLElement): HTMLElement[];
     selectedItems(tree: HTMLElement): HTMLElement[];
     beginSelection(tree: HTMLElement): void;
@@ -49,9 +49,11 @@ Widget({
         );
     }
 
-    create(init?: {
-        multisectable?: boolean;
+    create(properties?: {
+        id?: string;
+        classList?: string[];
         tabIndex?: number;
+        multisectable?: boolean;
     }): HTMLElement {
         const tree = <HTMLElement>this.#template.cloneNode(true);
         tree.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
@@ -67,13 +69,19 @@ Widget({
         tree.addEventListener("select", this.#handleSelectEvent.bind(this));
         this.#onSelection.set(tree, false);
         this.#hasSelectionChanged.set(tree, false);
-        if (init !== undefined) {
-            const {multisectable, tabIndex} = init;
-            if (multisectable !== undefined) {
-                this.setMultiSelectable(tree, multisectable);
+        if (properties !== undefined) {
+            const {id, classList, tabIndex, multisectable} = properties;
+            if (id !== undefined) {
+                tree.id = id;
+            }
+            if (classList !== undefined) {
+                tree.classList.add(...classList);
             }
             if (tabIndex !== undefined) {
-                this.setTabIndex(tree, tabIndex);
+                tree.tabIndex = tabIndex;
+            }
+            if (multisectable !== undefined) {
+                this.setMultiSelectable(tree, multisectable);
             }
         }
         return tree;
@@ -127,19 +135,11 @@ Widget({
     }
 
     setMultiSelectable(tree: HTMLElement, value: boolean): void {
-        tree.setAttribute("aria-multiselectable", value.toString());
+        tree.setAttribute("aria-multiselectable", String(value));
     }
 
     getMultiSelectable(tree: HTMLElement): boolean {
-        return JSON.parse(tree.getAttribute("aria-multiselectable") ?? false.toString());
-    }
-
-    setTabIndex(tree: HTMLElement, value: number): void {
-        tree.tabIndex = value;
-    }
-
-    getTabIndex(tree: HTMLElement): number {
-        return tree.tabIndex;
+        return JSON.parse(tree.getAttribute("aria-multiselectable") ?? String(false));
     }
 
     #getActiveItem(tree: HTMLElement): HTMLElement | null {

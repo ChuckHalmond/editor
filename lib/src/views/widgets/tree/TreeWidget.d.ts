@@ -1,12 +1,12 @@
 import { WidgetFactory } from "../Widget";
 export { treeWidget };
 interface TreeWidgetFactory extends WidgetFactory {
-    create(init: {
-        multisectable?: boolean;
+    create(properties?: {
+        id?: string;
+        classList?: string[];
         tabIndex?: number;
+        multisectable?: boolean;
     }): HTMLElement;
-    setTabIndex(tree: HTMLElement, value: number): void;
-    getTabIndex(tree: HTMLElement): number;
     items(tree: HTMLElement): HTMLElement[];
     selectedItems(tree: HTMLElement): HTMLElement[];
     beginSelection(tree: HTMLElement): void;
@@ -18,13 +18,15 @@ declare global {
     }
 }
 declare var treeWidget: {
-    "__#47@#template": HTMLElement;
-    "__#47@#walker": TreeWalker;
-    "__#47@#onSelection": WeakMap<HTMLElement, boolean>;
-    "__#47@#hasSelectionChanged": WeakMap<HTMLElement, boolean>;
-    create(init?: {
-        multisectable?: boolean;
+    "__#17802@#template": HTMLElement;
+    "__#17802@#walker": TreeWalker;
+    "__#17802@#onSelection": WeakMap<HTMLElement, boolean>;
+    "__#17802@#hasSelectionChanged": WeakMap<HTMLElement, boolean>;
+    create(properties?: {
+        id?: string;
+        classList?: string[];
         tabIndex?: number;
+        multisectable?: boolean;
     }): HTMLElement;
     slot(tree: HTMLElement): HTMLElement;
     slottedCallback(tree: HTMLElement, slot: HTMLElement): void;
@@ -34,32 +36,30 @@ declare var treeWidget: {
     endSelection(tree: HTMLElement): void;
     setMultiSelectable(tree: HTMLElement, value: boolean): void;
     getMultiSelectable(tree: HTMLElement): boolean;
-    setTabIndex(tree: HTMLElement, value: number): void;
-    getTabIndex(tree: HTMLElement): number;
-    "__#47@#getActiveItem"(tree: HTMLElement): HTMLElement | null;
-    "__#47@#getDropTargetItem"(tree: HTMLElement): HTMLElement | null;
-    "__#47@#setDropTargetItem"(tree: HTMLElement, item: HTMLElement | null): void;
-    "__#47@#nodeFilter"(node: Node): number;
-    "__#47@#getItemsRange"(from: HTMLElement, to: HTMLElement): HTMLElement[];
-    "__#47@#setSelection"(tree: HTMLElement, ...items: HTMLElement[]): void;
-    "__#47@#addToSelection"(tree: HTMLElement, ...items: HTMLElement[]): void;
-    "__#47@#removeFromSelection"(tree: HTMLElement, ...items: HTMLElement[]): void;
-    "__#47@#clearSelection"(tree: HTMLElement): void;
-    "__#47@#setActiveItem"(tree: HTMLElement, item: HTMLElement | null): void;
-    "__#47@#firstItem"(tree: HTMLElement): HTMLElement | null;
-    "__#47@#lastItem"(tree: HTMLElement): HTMLElement | null;
-    "__#47@#previousItem"(item: HTMLElement): HTMLElement | null;
-    "__#47@#nextItem"(item: HTMLElement): HTMLElement | null;
-    "__#47@#deepestItem"(item: HTMLElement): HTMLElement;
-    "__#47@#handleMouseDownEvent"(event: MouseEvent): void;
-    "__#47@#handleDragEndEvent"(event: DragEvent): void;
-    "__#47@#handleDragEnterEvent"(event: DragEvent): void;
-    "__#47@#handleDragOverEvent"(event: DragEvent): void;
-    "__#47@#handleDragLeaveEvent"(event: DragEvent): void;
-    "__#47@#handleDropEvent"(event: DragEvent): void;
-    "__#47@#handleFocusEvent"(event: FocusEvent): void;
-    "__#47@#handleFocusInEvent"(event: FocusEvent): void;
-    "__#47@#handleFocusOutEvent"(event: FocusEvent): void;
-    "__#47@#handleKeyDownEvent"(event: KeyboardEvent): void;
-    "__#47@#handleSelectEvent"(event: Event): void;
+    "__#17802@#getActiveItem"(tree: HTMLElement): HTMLElement | null;
+    "__#17802@#getDropTargetItem"(tree: HTMLElement): HTMLElement | null;
+    "__#17802@#setDropTargetItem"(tree: HTMLElement, item: HTMLElement | null): void;
+    "__#17802@#nodeFilter"(node: Node): number;
+    "__#17802@#getItemsRange"(from: HTMLElement, to: HTMLElement): HTMLElement[];
+    "__#17802@#setSelection"(tree: HTMLElement, ...items: HTMLElement[]): void;
+    "__#17802@#addToSelection"(tree: HTMLElement, ...items: HTMLElement[]): void;
+    "__#17802@#removeFromSelection"(tree: HTMLElement, ...items: HTMLElement[]): void;
+    "__#17802@#clearSelection"(tree: HTMLElement): void;
+    "__#17802@#setActiveItem"(tree: HTMLElement, item: HTMLElement | null): void;
+    "__#17802@#firstItem"(tree: HTMLElement): HTMLElement | null;
+    "__#17802@#lastItem"(tree: HTMLElement): HTMLElement | null;
+    "__#17802@#previousItem"(item: HTMLElement): HTMLElement | null;
+    "__#17802@#nextItem"(item: HTMLElement): HTMLElement | null;
+    "__#17802@#deepestItem"(item: HTMLElement): HTMLElement;
+    "__#17802@#handleMouseDownEvent"(event: MouseEvent): void;
+    "__#17802@#handleDragEndEvent"(event: DragEvent): void;
+    "__#17802@#handleDragEnterEvent"(event: DragEvent): void;
+    "__#17802@#handleDragOverEvent"(event: DragEvent): void;
+    "__#17802@#handleDragLeaveEvent"(event: DragEvent): void;
+    "__#17802@#handleDropEvent"(event: DragEvent): void;
+    "__#17802@#handleFocusEvent"(event: FocusEvent): void;
+    "__#17802@#handleFocusInEvent"(event: FocusEvent): void;
+    "__#17802@#handleFocusOutEvent"(event: FocusEvent): void;
+    "__#17802@#handleKeyDownEvent"(event: KeyboardEvent): void;
+    "__#17802@#handleSelectEvent"(event: Event): void;
 };

@@ -7,6 +7,9 @@ declare global {
 }
 interface MenuWidgetFactory extends WidgetFactory {
     create(properties?: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         contextual?: boolean;
     }): HTMLElement;
     positionContextual(menu: HTMLElement, x: number, y: number): void;
@@ -20,7 +23,10 @@ declare var menuWidget: {
     "__#44@#toggleTimeouts": WeakMap<HTMLElement, {
         clear(): void;
     }>;
-    create(init?: {
+    create(properties?: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         contextual?: boolean;
     }): HTMLElement;
     slot(menu: HTMLElement): HTMLElement | null;

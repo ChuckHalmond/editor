@@ -6,6 +6,9 @@ export { comboBoxWidget };
 
 interface ComboBoxWidgetFactory extends WidgetFactory {
     create(properties?: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         name?: string;
         disabled?: boolean;
         multiselectable?: boolean;
@@ -73,7 +76,10 @@ class ComboBoxWidgetFactoryBase extends WidgetFactory implements ComboBoxWidgetF
         });
     }
 
-    create(init?: {
+    create(properties?: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         name?: string;
         disabled?: boolean;
         multiselectable?: boolean;
@@ -88,8 +94,17 @@ class ComboBoxWidgetFactoryBase extends WidgetFactory implements ComboBoxWidgetF
         combobox.addEventListener("click", this.#handleClickEvent.bind(this));
         combobox.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
         this.setExpanded(combobox, false);
-        if (init !== undefined) {
-            const {name, disabled, multiselectable} = init;
+        if (properties !== undefined) {
+            const {id, classList, tabIndex, name, disabled, multiselectable} = properties;
+            if (id !== undefined) {
+                combobox.id = id;
+            }
+            if (classList !== undefined) {
+                combobox.classList.add(...classList);
+            }
+            if (tabIndex !== undefined) {
+                combobox.tabIndex = tabIndex;
+            }
             if (name !== undefined) {
                 this.setName(combobox, name);
             }
@@ -159,19 +174,19 @@ class ComboBoxWidgetFactoryBase extends WidgetFactory implements ComboBoxWidgetF
     }
 
     setExpanded(combobox: HTMLElement, value: boolean): void {
-        combobox.setAttribute("aria-expanded", value.toString());
+        combobox.setAttribute("aria-expanded", String(value));
     }
 
     getExpanded(combobox: HTMLElement): boolean {
-        return JSON.parse(combobox.getAttribute("aria-expanded") ?? false.toString());
+        return JSON.parse(combobox.getAttribute("aria-expanded") ?? String(false));
     }
 
     setMultiSelectable(combobox: HTMLElement, value: boolean): void {
-        combobox.setAttribute("aria-multiselectable", value.toString());
+        combobox.setAttribute("aria-multiselectable", String(value));
     }
 
     getMultiSelectable(combobox: HTMLElement): boolean {
-        return JSON.parse(combobox.getAttribute("aria-multiselectable") ?? false.toString());
+        return JSON.parse(combobox.getAttribute("aria-multiselectable") ?? String(false));
     }
 
     expand(combobox: HTMLElement): void {

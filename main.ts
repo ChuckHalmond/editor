@@ -1,5 +1,5 @@
 //import { MenuItemGroupWidget, MenuItemWidget, MenuWidget, MenuBarWidget } from "./src/views/MenuBarWidget";
-import { tree, TreeItemModel, TreeModel, TreeView } from "./src/views/TreeeView";
+import { treeView, TreeItemModel, TreeModel, TreeView } from "./src/views/TreeeView";
 
 import "./index";
 import { ListItemModel, ListModel, ListView } from "./src/views/ListView";
@@ -142,7 +142,7 @@ export async function main() {
             return bLabel.localeCompare(aLabel);
         }
     });
-    const treeElement = tree.create(treeModel);
+    const treeElement = treeView.create(treeModel);
     document.body.append(treeElement);
     
     treeModel.childItems.append(

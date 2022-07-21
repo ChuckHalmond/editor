@@ -91,6 +91,9 @@ declare function element<E extends HTMLElementTagNameMap[K], K extends keyof HTM
 declare function element(tagName: string, init?: HTMLElementInit): HTMLElement;
 interface WidgetInit<K extends keyof WidgetNameMap> {
     properties?: Parameters<WidgetNameMap[K]["create"]>[0];
+    attributes?: {
+        [name: string]: number | string | boolean;
+    };
     dataset?: {
         [property: string]: string | number | boolean;
     };

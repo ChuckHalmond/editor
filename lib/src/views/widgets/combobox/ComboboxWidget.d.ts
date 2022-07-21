@@ -2,6 +2,9 @@ import { WidgetFactory } from "../Widget";
 export { comboBoxWidget };
 interface ComboBoxWidgetFactory extends WidgetFactory {
     create(properties?: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         name?: string;
         disabled?: boolean;
         multiselectable?: boolean;
@@ -23,21 +26,24 @@ declare global {
     }
 }
 declare var comboBoxWidget: {
-    "__#60@#template": HTMLElement;
-    "__#60@#walker": TreeWalker;
-    "__#60@#optionsObserver": MutationObserver;
-    create(init?: {
+    "__#17810@#template": HTMLElement;
+    "__#17810@#walker": TreeWalker;
+    "__#17810@#optionsObserver": MutationObserver;
+    create(properties?: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         name?: string;
         disabled?: boolean;
         multiselectable?: boolean;
     }): HTMLElement;
     slot(combobox: HTMLElement): HTMLElement;
     slottedCallback(combobox: HTMLElement, slot: HTMLElement, name: string | null): void;
-    "__#60@#box"(combobox: HTMLElement): HTMLElement;
+    "__#17810@#box"(combobox: HTMLElement): HTMLElement;
     options(combobox: HTMLElement): HTMLElement[];
     selectedOption(combobox: HTMLElement): HTMLElement | null;
-    "__#60@#getActiveOption"(combobox: HTMLElement): HTMLElement | null;
-    "__#60@#value"(combobox: HTMLElement): HTMLElement;
+    "__#17810@#getActiveOption"(combobox: HTMLElement): HTMLElement | null;
+    "__#17810@#value"(combobox: HTMLElement): HTMLElement;
     getName(combobox: HTMLElement): string;
     setName(combobox: HTMLElement, value: string): void;
     getDisabled(combobox: HTMLElement): boolean;
@@ -49,17 +55,17 @@ declare var comboBoxWidget: {
     expand(combobox: HTMLElement): void;
     collapse(combobox: HTMLElement): void;
     toggle(combobox: HTMLElement, force?: boolean): void;
-    "__#60@#optionsMutationCallback"(mutationsList: MutationRecord[]): void;
-    "__#60@#walkerNodeFilter"(node: Node): number;
-    "__#60@#firstOption"(combobox: HTMLElement): HTMLElement | null;
-    "__#60@#lastOption"(combobox: HTMLElement): HTMLElement | null;
-    "__#60@#previousOption"(option: HTMLElement): HTMLElement | null;
-    "__#60@#nextOption"(option: HTMLElement): HTMLElement | null;
-    "__#60@#selectOption"(combobox: HTMLElement, option: HTMLElement): void;
-    "__#60@#setSelectedOption"(combobox: HTMLElement, option: HTMLElement): void;
-    "__#60@#positionBox"(combobox: HTMLElement): void;
-    "__#60@#handleClickEvent"(event: MouseEvent): void;
-    "__#60@#handleFocusOutEvent"(event: FocusEvent): void;
-    "__#60@#handleKeyDownEvent"(event: KeyboardEvent): void;
-    "__#60@#handleMouseOverEvent"(event: MouseEvent): void;
+    "__#17810@#optionsMutationCallback"(mutationsList: MutationRecord[]): void;
+    "__#17810@#walkerNodeFilter"(node: Node): number;
+    "__#17810@#firstOption"(combobox: HTMLElement): HTMLElement | null;
+    "__#17810@#lastOption"(combobox: HTMLElement): HTMLElement | null;
+    "__#17810@#previousOption"(option: HTMLElement): HTMLElement | null;
+    "__#17810@#nextOption"(option: HTMLElement): HTMLElement | null;
+    "__#17810@#selectOption"(combobox: HTMLElement, option: HTMLElement): void;
+    "__#17810@#setSelectedOption"(combobox: HTMLElement, option: HTMLElement): void;
+    "__#17810@#positionBox"(combobox: HTMLElement): void;
+    "__#17810@#handleClickEvent"(event: MouseEvent): void;
+    "__#17810@#handleFocusOutEvent"(event: FocusEvent): void;
+    "__#17810@#handleKeyDownEvent"(event: KeyboardEvent): void;
+    "__#17810@#handleMouseOverEvent"(event: MouseEvent): void;
 };

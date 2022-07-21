@@ -6,8 +6,9 @@ export { treeItemWidget };
 type TreeItemType = "parent" | "leaf";
 
 interface TreeItemWidgetFactory extends WidgetFactory {
-    create(init?: {
-        type: TreeItemType;
+    create(properties?: {
+        id?: string;
+        type?: TreeItemType;
         label?: string;
         disabled?: boolean;
         draggable?: boolean;
@@ -82,7 +83,8 @@ Widget({
         return item.querySelector<HTMLElement>(":scope > .treeitemgroup");
     }
 
-    create(init?: {
+    create(properties?: {
+        id?: string;
         type?: TreeItemType;
         label?: string;
         disabled?: boolean;
@@ -90,13 +92,16 @@ Widget({
     }): HTMLElement {
         const item = <HTMLElement>this.#template.cloneNode(true);
         item.addEventListener("click", this.#handleClickEvent.bind(this));
-        if (init !== undefined) {
-            const {label, disabled, draggable} = init;
-            let {type} = init;
+        if (properties !== undefined) {
+            const {id, label, disabled, draggable} = properties;
+            let {type} = properties;
             type = type ?? "leaf";
             this.setType(item, type);
             if (type === "parent") {
                 this.setExpanded(item, false);
+            }
+            if (id !== undefined) {
+                item.id = id;
             }
             if (label !== undefined) {
                 this.setLabel(item, label);

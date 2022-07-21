@@ -12,6 +12,9 @@ declare global {
 
 interface MenuWidgetFactory extends WidgetFactory {
     create(properties?: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         contextual?: boolean;
     }): HTMLElement;
     positionContextual(menu: HTMLElement, x: number, y: number): void;
@@ -47,7 +50,10 @@ Widget({
         this.#toggleTimeouts = new WeakMap();
     }
 
-    create(init?: {
+    create(properties?: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         contextual?: boolean;
     }): HTMLElement {
         const menu = <HTMLElement>this.#template.cloneNode(true);
@@ -56,8 +62,17 @@ Widget({
         menu.addEventListener("mouseout", this.#handleMouseOutEvent.bind(this));
         menu.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         menu.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
-        if (init !== undefined) {
-            const {contextual} = init;
+        if (properties !== undefined) {
+            const {id, classList, tabIndex, contextual} = properties;
+            if (id !== undefined) {
+                menu.id = id;
+            }
+            if (classList !== undefined) {
+                menu.classList.add(...classList);
+            }
+            if (tabIndex !== undefined) {
+                menu.tabIndex = tabIndex;
+            }
             if (contextual !== undefined) {
                 this.setContextual(menu, contextual);
             }

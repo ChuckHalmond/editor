@@ -13,6 +13,7 @@ declare global {
 
 interface ToolBarItemWidgetFactory extends WidgetFactory {
     create(init?: {
+        id?: string;
         type: ToolBarItemType;
         pressed?: boolean;
         label?: string;
@@ -67,6 +68,7 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
     }
 
     create(init?: {
+        id?: string;
         type?: ToolBarItemType;
         pressed?: boolean;
         label?: string;
@@ -79,7 +81,10 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
         item.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         item.addEventListener("click", this.#handleClickEvent.bind(this));
         if (init !== void 0) {
-            const {keyshortcut, pressed, type, label, name, value, disabled} = init;
+            const {id, keyshortcut, pressed, type, label, name, value, disabled} = init;
+            if (id !== undefined) {
+                item.id = id;
+            }
             if (keyshortcut !== undefined) {
                 this.setKeyShortcut(item, keyshortcut);
             }
@@ -113,7 +118,7 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
         const hasChildMenu = Array.from(slot.childNodes).some(
             childNode_i => childNode_i instanceof HTMLElement && childNode_i.classList.contains("menu")
         );
-        item.setAttribute("aria-haspopup", hasChildMenu.toString());
+        item.setAttribute("aria-haspopup", String(hasChildMenu));
     }
 
     menu(item: HTMLElement): HTMLElement | null {
@@ -219,11 +224,11 @@ class ToolBarItemWidgetFactoryBase extends WidgetFactory implements ToolBarItemW
     }
 
     getPressed(item: HTMLElement): boolean {
-        return JSON.parse(item.getAttribute("aria-pressed") ?? false.toString());
+        return JSON.parse(item.getAttribute("aria-pressed") ?? String(false));
     }
 
     setPressed(item: HTMLElement, value: boolean): void {
-        item.setAttribute("aria-pressed", value.toString());
+        item.setAttribute("aria-pressed", String(value));
     }
 
     getDisabled(item: HTMLElement): boolean {

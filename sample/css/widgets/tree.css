@@ -61,8 +61,7 @@
     padding-left: calc(var(--level) * var(--indent-width, 12px));
 }
 
-.treeitem:not(.treeitem-parent) > .treeitemgroup,
-.treeitem[aria-expanded="false"] > .treeitemgroup {
+.treeitem:is(:not([aria-expanded]), [aria-expanded="false"]) > .treeitemgroup {
     display: none;
 }
 
@@ -73,7 +72,7 @@
     margin: 1px 4px 1px 1px;
 }
 
-.treeitem-parent > .content > .arrow::before {
+.treeitem[aria-expanded] > .content > .arrow::before {
     display: inline-block;
     width: 18px;
     height: 18px;

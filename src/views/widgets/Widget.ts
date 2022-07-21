@@ -13,7 +13,7 @@ interface WidgetFactoryConstructor {
 }
 
 interface WidgetFactory {
-    create(init?: object): HTMLElement;
+    create(properties?: object): HTMLElement;
     slot(root: HTMLElement, name: string | null): HTMLElement | null;
 }
 
@@ -77,8 +77,8 @@ class WidgetFactoryBase implements WidgetFactory {
         const widget = <WidgetFactory>this;
         this.create = new Proxy(
             this.create, {
-                apply: (target, thisArg, argumentsList) => {
-                    const element = Reflect.apply(target, thisArg, argumentsList);
+                apply: (target, thisArg, argumentsList: Parameters<WidgetFactory["create"]>) => {
+                    const element = <HTMLElement>Reflect.apply(target, thisArg, argumentsList);
                     const observedSlots = <(string | null)[]>(widget as any)["observedSlots"];
                     if (Array.isArray(observedSlots)) {
                         const slots = observedSlots

@@ -5,7 +5,12 @@ import { listItemWidget } from "./ListItemWidget";
 export  { listWidget };
 
 interface ListWidgetFactory extends WidgetFactory {
-    create(): HTMLElement;
+    create(properties: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
+        multisectable?: boolean;
+    }): HTMLElement;
     items(list: HTMLElement): HTMLElement[];
     beginSelection(list: HTMLElement): void;
     endSelection(list: HTMLElement): void;
@@ -43,16 +48,13 @@ Widget({
         );
     }
 
-    create(init?: {
+    create(properties?: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         multisectable?: boolean;
     }): HTMLElement {
         const list = <HTMLElement>this.#template.cloneNode(true);
-        if (init !== undefined) {
-            const {multisectable} = init;
-            if (multisectable !== undefined) {
-                this.setMultiSelectable(list, multisectable);
-            }
-        }
         list.addEventListener("dragend", this.#handleDragEndEvent.bind(this));
         list.addEventListener("dragenter", this.#handleDragEnterEvent.bind(this));
         list.addEventListener("dragleave", this.#handleDragLeaveEvent.bind(this));
@@ -65,6 +67,21 @@ Widget({
         list.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         list.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
         list.addEventListener("select", this.#handleSelectEvent.bind(this));
+        if (properties !== undefined) {
+            const {id, classList, tabIndex, multisectable} = properties;
+            if (id !== undefined) {
+                list.id = id;
+            }
+            if (classList !== undefined) {
+                list.classList.add(...classList);
+            }
+            if (tabIndex !== undefined) {
+                list.tabIndex = tabIndex;
+            }
+            if (multisectable !== undefined) {
+                this.setMultiSelectable(list, multisectable);
+            }
+        }
         this.#onSelection.set(list, false);
         this.#hasSelectionChanged.set(list, false);
         return list;
@@ -84,11 +101,11 @@ Widget({
     }
 
     setMultiSelectable(tree: HTMLElement, value: boolean): void {
-        tree.setAttribute("aria-multiselectable", value.toString());
+        tree.setAttribute("aria-multiselectable", String(value));
     }
 
     getMultiSelectable(tree: HTMLElement): boolean {
-        return JSON.parse(tree.getAttribute("aria-multiselectable") ?? false.toString());
+        return JSON.parse(tree.getAttribute("aria-multiselectable") ?? String(false));
     }
 
     #getActiveItem(tree: HTMLElement): HTMLElement | null {

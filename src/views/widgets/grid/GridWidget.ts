@@ -8,7 +8,10 @@ export { gridWidget };
 type GridSelectBy = "cell" | "row";
 
 interface GridRowWidgetFactory extends WidgetFactory {
-    create(init?: {
+    create(properties?: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         multisectable?: boolean;
         selectby?: GridSelectBy
     }): HTMLElement;
@@ -99,20 +102,14 @@ Widget({
         );
     }
 
-    create(init?: {
+    create(properties?: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         multisectable?: boolean;
         selectby?: GridSelectBy;
     }) {
         const grid = <HTMLElement>this.#template.cloneNode(true);
-        if (init !== undefined) {
-            const {selectby, multisectable} = init;
-            if (selectby !== undefined) {
-                this.setSelectBy(grid, selectby);
-            }
-            if (multisectable !== undefined) {
-                this.setMultiSelectable(grid, multisectable);
-            }
-        }
         grid.addEventListener("contextmenu", this.#handleContextMenuEvent.bind(this));
         grid.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
         grid.addEventListener("focus", this.#handleFocusEvent.bind(this));
@@ -120,6 +117,24 @@ Widget({
         grid.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         grid.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         grid.addEventListener("select", this.#handleSelectEvent.bind(this));
+        if (properties !== undefined) {
+            const {id, classList, tabIndex, selectby, multisectable} = properties;
+            if (id !== undefined) {
+                grid.id = id;
+            }
+            if (classList !== undefined) {
+                grid.classList.add(...classList);
+            }
+            if (tabIndex !== undefined) {
+                grid.tabIndex = tabIndex;
+            }
+            if (selectby !== undefined) {
+                this.setSelectBy(grid, selectby);
+            }
+            if (multisectable !== undefined) {
+                this.setMultiSelectable(grid, multisectable);
+            }
+        }
         return grid;
     }
 
@@ -143,11 +158,11 @@ Widget({
     }
 
     setMultiSelectable(grid: HTMLElement, value: boolean): void {
-        grid.setAttribute("aria-multiselectable", value.toString());
+        grid.setAttribute("aria-multiselectable", String(value));
     }
 
     getMultiSelectable(grid: HTMLElement): boolean {
-        return JSON.parse(grid.getAttribute("aria-multiselectable") ?? false.toString());
+        return JSON.parse(grid.getAttribute("aria-multiselectable") ?? String(false));
     }
 
     setSelectBy(grid: HTMLElement, value: GridSelectBy): void {

@@ -280,6 +280,7 @@ class TreeViewBase extends View implements TreeView {
         const {model} = this;
         const treeElement = widget("tree", {
             properties: {
+                classList: ["lol"],
                 tabIndex: 0,
             },
             slotted: reactiveChildElements(
@@ -650,13 +651,13 @@ class TreeViewBase extends View implements TreeView {
 
 var TreeView: TreeViewConstructor = TreeViewBase;
 
-export var tree = new class Tree {
+export var treeView = new class TreeViewFactory {
     #models: WeakMap<HTMLElement, TreeModel>;
-    #dragImagesElementsMap: WeakMap<TreeItemModel, WeakRef<Element>>;
+    #dragImages: WeakMap<TreeItemModel, WeakRef<Element>>;
     
     constructor() {
         this.#models = new WeakMap();
-        this.#dragImagesElementsMap = new WeakMap();
+        this.#dragImages = new WeakMap();
     }
 
     create(model: TreeModel): HTMLElement {
@@ -676,27 +677,26 @@ export var tree = new class Tree {
                 focusout: <EventListener>this.#handleFocusOutEvent.bind(this),
             }
         });
-        document.body.append(
-            element("div", {
-                attributes: {
-                    class: "offscreen",
-                    hidden: true
-                },
-                children: reactiveChildElements(model.items,
-                    item => this.#renderTreeItemDragImage(item)
-                )
-            })
-        );
+        const rootElement = element("div", {
+            children: [
+                treeElement,
+                element("div", {
+                    attributes: {
+                        class: "offscreen",
+                        hidden: true
+                    },
+                    children: reactiveChildElements(model.items,
+                        item => this.#renderTreeItemDragImage(item)
+                    )
+                })
+            ]
+        });
         this.#models.set(treeElement, model);
-        return treeElement;
+        return rootElement;
     }
     
     getModel(tree: HTMLElement): TreeModel  | null {
         return this.#models.get(tree) ?? null;
-    }
-
-    getDragImageElement(model: TreeItemModel): Element | null {
-        return this.#dragImagesElementsMap.get(model)?.deref() ?? null;
     }
 
     selectedItems(tree: HTMLElement): TreeItemModel[] {
@@ -705,6 +705,10 @@ export var tree = new class Tree {
         return selectedElements.map(
             item_i => <TreeItemModel>model.getItemByUri(item_i.dataset.uri!)
         );
+    }
+
+    #getDragImage(model: TreeItemModel): Element | null {
+        return this.#dragImages.get(model)?.deref() ?? null;
     }
 
     #renderTreeItem(item: TreeItemModel): Element {
@@ -812,7 +816,7 @@ export var tree = new class Tree {
                 span.textContent = newValue;
             }
         );
-        this.#dragImagesElementsMap.set(item, new WeakRef(dragImageElement));
+        this.#dragImages.set(item, new WeakRef(dragImageElement));
         return dragImageElement;
     }
 
@@ -842,7 +846,7 @@ export var tree = new class Tree {
                 if (lastItem && dataTransfer) {
                     dataTransfer.dropEffect = "move";
                     dataTransfer.setData("text/plain", selectedUrisString);
-                    const dragImage = this.getDragImageElement(lastItem);
+                    const dragImage = this.#getDragImage(lastItem);
                     if (dragImage) {
                         dataTransfer.setDragImage(dragImage, -16, 0);
                     }

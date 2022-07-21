@@ -64,7 +64,7 @@ const AttributeProperty: AttributePropertyDecorator = function(
     ) => {
         const {constructor} = target;
         const {prototype} = constructor;
-        const propertyName = property.toString();
+        const propertyName = String(property);
         const attributeName = camelToTrain(propertyName);
         const defaultValue = init.defaultValue ?? null;
         const observed = init.observed ?? false;
@@ -262,7 +262,7 @@ const QueryProperty: QueryPropertyDecorator = function(
     ) => {
         const {constructor} = target;
         const {prototype} = constructor;
-        const propertyName = propertyKey.toString();
+        const propertyName = String(propertyKey);
         const {selector} = init;
         const withinShadowRoot = init.withinShadowRoot ?? false;
         const getter = withinShadowRoot ? function(this: HTMLElement) {
@@ -296,7 +296,7 @@ const QueryAllProperty: QueryAllPropertyDecorator = function(
     ) => {
         const {constructor} = target;
         const {prototype} = constructor;
-        const propertyName = propertyKey.toString();
+        const propertyName = String(propertyKey);
         const {selector} = init;
         const withinShadowRoot = init.withinShadowRoot ?? false;
         const getter = withinShadowRoot ? function(this: HTMLElement) {
@@ -344,14 +344,13 @@ function element<K extends keyof HTMLElementTagNameMap>(
         const {options, attributes, dataset, children, listeners} = init;
         const element = document.createElement(tagName, options);
         if (attributes) {
-            Object.keys(attributes).forEach((attributeName) => {
-                const attributeValue = attributes[attributeName];
+            Object.entries(attributes).forEach(([attributeName, attributeValue]) => {
                 if (attributeValue !== undefined) {
                     if (typeof attributeValue == "boolean") {
                         element.toggleAttribute(camelToTrain(attributeName), attributeValue);
                     }
                     else {
-                        element.setAttribute(camelToTrain(attributeName), attributeValue.toString());
+                        element.setAttribute(camelToTrain(attributeName), String(attributeValue));
                     }
                 }
             });
@@ -359,7 +358,7 @@ function element<K extends keyof HTMLElementTagNameMap>(
         if (dataset) {
             const {dataset: elementDataset} = element;
             Object.keys(dataset).forEach((datasetEntry_i) => {
-                elementDataset[datasetEntry_i] = dataset[datasetEntry_i].toString();
+                elementDataset[datasetEntry_i] = String(dataset[datasetEntry_i]);
             });
         }
         if (children) {
@@ -387,6 +386,9 @@ function element<K extends keyof HTMLElementTagNameMap>(
 
 interface WidgetInit<K extends keyof WidgetNameMap> {
     properties?: Parameters<WidgetNameMap[K]["create"]>[0],
+    attributes?: {
+        [name: string]: number | string | boolean
+    },
     dataset?: {
         [property: string]: string | number | boolean
     },
@@ -404,13 +406,25 @@ function widget<K extends keyof WidgetNameMap>(
     name: K, init?: WidgetInit<K>): HTMLElement {
     const widget = widgets.get(name);
     if (widget) {
-        const element = <HTMLElement>widget.create(init?.properties);
-        if (init) {
-            const {dataset, slotted, listeners} = init;
+        if (init !== undefined) {
+            const {properties, attributes, dataset, slotted, listeners} = init;
+            const element = widget.create(properties);
+            if (attributes) {
+                Object.entries(attributes).forEach(([attributeName, attributeValue]) => {
+                    if (attributeValue !== undefined) {
+                        if (typeof attributeValue == "boolean") {
+                            element.toggleAttribute(camelToTrain(attributeName), attributeValue);
+                        }
+                        else {
+                            element.setAttribute(camelToTrain(attributeName), String(attributeValue));
+                        }
+                    }
+                });
+            }
             if (dataset) {
                 const {dataset: elementDataset} = element;
                 Object.keys(dataset).forEach((datasetEntry_i) => {
-                    elementDataset[datasetEntry_i] = dataset[datasetEntry_i].toString();
+                    elementDataset[datasetEntry_i] = String(dataset[datasetEntry_i]);
                 });
             }
             if (slotted) {
@@ -449,8 +463,11 @@ function widget<K extends keyof WidgetNameMap>(
                     }
                 });
             }
+            return element;
         }
-        return element;
+        else {
+            return widget.create();
+        }
     }
     throw new Error(`Unknown widget ${name}.`);
 }

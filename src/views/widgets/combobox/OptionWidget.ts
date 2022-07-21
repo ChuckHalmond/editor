@@ -54,7 +54,7 @@ class OptionWidgetFactoryBase extends WidgetFactory implements OptionWidgetFacto
         });
     }
 
-    create(init?: {
+    create(properties?: {
         selected?: boolean;
         label?: string;
         name?: string;
@@ -62,9 +62,9 @@ class OptionWidgetFactoryBase extends WidgetFactory implements OptionWidgetFacto
         disabled?: boolean;
     }): HTMLElement {
         const option = <HTMLElement>this.#template.cloneNode(true);
-        if (init !== undefined) {
-            const {label, name, value, disabled} = init;
-            let {selected} = init;
+        if (properties !== undefined) {
+            const {label, name, value, disabled} = properties;
+            let {selected} = properties;
             selected = selected ?? false;
             if (selected !== undefined) {
                 this.setSelected(option, selected);
@@ -128,11 +128,11 @@ class OptionWidgetFactoryBase extends WidgetFactory implements OptionWidgetFacto
     }
 
     getSelected(option: HTMLElement): boolean {
-        return JSON.parse(option.getAttribute("aria-selected") ?? false.toString());
+        return JSON.parse(option.getAttribute("aria-selected") ?? String(false));
     }
 
     setSelected(option: HTMLElement, value: boolean): void {
-        option.setAttribute("aria-selected", value.toString());
+        option.setAttribute("aria-selected", String(value));
     }
 
     getDisabled(option: HTMLElement): boolean {

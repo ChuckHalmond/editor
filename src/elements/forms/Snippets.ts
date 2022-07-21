@@ -67,16 +67,16 @@ const setFormState = (form: HTMLFormElement, state: FormState) => {
         namedElements.forEach((element) => {
             const stateValue = state[name].value;
             if (element.type == "radio") {
-                (<HTMLInputElement>element).checked = (stateValue !== null && element.value == stateValue.toString());
+                (<HTMLInputElement>element).checked = (stateValue !== null && element.value == String(stateValue));
             }
             else if (element.type == "checkbox") {
                 (<HTMLInputElement>element).checked = !!stateValue;
             }
             else if (element.type == "number") {
-                element.value = (stateValue !== null) ? stateValue.toString() : "";
+                element.value = (stateValue !== null) ? String(stateValue) : "";
             }
             else {
-                element.value = (stateValue !== null) ? stateValue.toString() : "";
+                element.value = (stateValue !== null) ? String(stateValue) : "";
             }
         });
     });

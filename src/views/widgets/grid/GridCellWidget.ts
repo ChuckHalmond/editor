@@ -100,7 +100,7 @@ Widget({
     }
 
     setPosInSet(item: HTMLElement, value: number): void {
-        item.setAttribute("aria-posinset", value.toString());
+        item.setAttribute("aria-posinset", String(value));
     }
 
     getPosInSet(item: HTMLElement): number {
@@ -147,12 +147,12 @@ Widget({
     }
 
     setSelected(item: HTMLElement, value: boolean): void {
-        item.setAttribute("aria-selected", value.toString());
+        item.setAttribute("aria-selected", String(value));
         item.dispatchEvent(new Event("select", {bubbles: true}));
     }
 
     getSelected(item: HTMLElement): boolean {
-        return JSON.parse(item.getAttribute("aria-selected") ?? false.toString());
+        return JSON.parse(item.getAttribute("aria-selected") ?? String(false));
     }
 
     #label(item: HTMLElement): HTMLElement {
