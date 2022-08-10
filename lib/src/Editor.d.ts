@@ -22,7 +22,7 @@ interface CheckboxAction {
     key?: string;
 }
 interface EditorConstructor {
-    readonly prototype: Editor;
+    prototype: Editor;
     new (): Editor;
 }
 interface Editor {

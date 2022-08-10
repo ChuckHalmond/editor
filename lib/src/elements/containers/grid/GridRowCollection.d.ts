@@ -1,7 +1,7 @@
 import { HTMLEGridRowElement } from "./GridRow";
 export { HTMLEGridRowCollection };
 interface HTMLEGridRowCollectionConstructor {
-    readonly prototype: HTMLEGridRowCollection;
+    prototype: HTMLEGridRowCollection;
     new (root: HTMLElement): HTMLEGridRowCollection;
 }
 interface HTMLEGridRowCollection {

@@ -3,7 +3,7 @@ import { CustomElement, AttributeProperty, element } from "../../Element";
 export { HTMLEDraggableElement };
 
 interface HTMLEDraggableElementConstructor {
-    readonly prototype: HTMLEDraggableElement;
+    prototype: HTMLEDraggableElement;
     new(): HTMLEDraggableElement;
 }
 

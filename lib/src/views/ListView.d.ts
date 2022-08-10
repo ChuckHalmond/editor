@@ -32,7 +32,7 @@ declare class ListItemModel extends ModelObject implements TreeItem {
     remove(): void;
 }
 interface ListViewConstructor {
-    readonly prototype: ListView;
+    prototype: ListView;
     new (): ListView;
     new (model: ListModel): ListView;
 }

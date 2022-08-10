@@ -11,7 +11,7 @@ interface View extends HTMLElement {
 }
 
 interface ViewConstructor {
-    readonly prototype: View;
+    prototype: View;
     new(): View;
 }
 

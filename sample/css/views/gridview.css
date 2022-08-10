@@ -2,21 +2,20 @@
     display: block;
 }
 
-e-grid[selectby="row"] e-gridbody e-gridcell:is(:hover, [selected], [active]),
-e-grid[selectby="cell"] e-gridbody e-gridrow:is(:hover, [selected], [active]),
-e-grid e-gridhead e-gridrow:is(:hover, [selected], [active]) {
+.grid[selectby="row"] .gridbody .gridcell:is(:hover, [selected], [active]),
+.grid[selectby="cell"] .gridbody .gridrow:is(:hover, [selected], [active]) {
     background: revert;
 }
 
-e-gridrow[hidden] {
+.gridrow[hidden] {
     display: none;
 }
 
-e-gridcell {
+.gridcell {
     padding-left: 4px;
 }
 
-e-gridbody e-gridcell {
+.gridbody .gridcell {
     max-width: 0;
 
     overflow: clip;
@@ -24,11 +23,11 @@ e-gridbody e-gridcell {
     white-space: nowrap;
 }
 
-e-gridcell .gridcell-content {
+.gridcell .gridcell-content {
     overflow: clip;
 }
 
-e-gridhead .gridcell-content {
+.gridhead .gridcell-content {
     display: flex;
 }
 
@@ -41,10 +40,6 @@ e-gridhead .gridcell-content {
 
 .gridcell-content > e-wsash {
     flex: 0 0 auto;
-    cursor: col-resize;
-}
-
-e-gridhead e-gridcell {
     border-right: 1px solid lightgrey;
 }
 
@@ -53,7 +48,7 @@ e-gridhead e-gridcell {
     overflow: clip;
 }
 
-e-gridhead e-gridcell {
+.gridhead .gridheader {
     min-width: 64px;
 }
 

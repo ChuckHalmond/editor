@@ -144,7 +144,7 @@ class ListItemModel extends ModelObject implements TreeItem {
 }
 
 interface ListViewConstructor {
-    readonly prototype: ListView;
+    prototype: ListView;
     new(): ListView;
     new(model: ListModel): ListView;
 }

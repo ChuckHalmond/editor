@@ -3,7 +3,7 @@ import { CustomElement, element, AttributeProperty } from "../../Element";
 export { HTMLEGridCellElement };
 
 interface HTMLEGridCellElementConstructor {
-    readonly prototype: HTMLEGridCellElement;
+    prototype: HTMLEGridCellElement;
     new(): HTMLEGridCellElement;
 }
 

@@ -1,10 +1,10 @@
-import { element, reactiveChildElements, CustomElement, fragment, AttributeProperty, reactiveElement, widget } from "../elements/Element";
+import { HTMLEGridElement } from "../elements/containers/grid/Grid";
+import { HTMLEGridCellElement } from "../elements/containers/grid/GridCell";
+import { HTMLEGridRowElement } from "../elements/containers/grid/GridRow";
+import { element, reactiveChildElements, CustomElement, fragment, AttributeProperty, reactiveElement } from "../elements/Element";
 import { ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { View } from "./View";
 import { HTMLEMenuItemElement } from "../elements/containers/menus/MenuItem";
-import { gridHeaderWidget } from "./widgets/grid/GridHeaderWidget";
-import { gridWidget } from "./widgets/grid/GridWidget";
-import { gridRowWidget } from "./widgets/grid/GridRowWidget";
 
 export { GridModel };
 export { GridRowModel };
@@ -140,7 +140,7 @@ class GridViewBase extends View implements GridView {
     #displayFilters: (GridRowFilter & {name: string})[];
     #searchFilter: GridRowFilter | null;
 
-    #gridRowElementsMap: WeakMap<GridRowModel, WeakRef<HTMLElement>>
+    #gridRowElementsMap: WeakMap<GridRowModel, WeakRef<HTMLEGridRowElement>>
     
     constructor()
     constructor(model: GridModel)
@@ -177,7 +177,7 @@ class GridViewBase extends View implements GridView {
         }
     }
 
-    get gridElement(): HTMLElement {
+    get gridElement(): HTMLEGridElement {
         return this.getGridElement()!;
     }
 
@@ -189,20 +189,20 @@ class GridViewBase extends View implements GridView {
         this.#cellDelegate = delegate;
     }
 
-    getGridElement(): HTMLElement | null {
+    getGridElement(): HTMLEGridElement | null {
         return this.shadowRoot.querySelector(`:scope > e-grid`);
     }
 
-    getRowElement(row: GridRowModel): HTMLElement | null {
+    getRowElement(row: GridRowModel): HTMLEGridRowElement | null {
         return this.#gridRowElementsMap.get(row)?.deref() ?? null;
     }
 
-    getColumnHeaderElement(column: GridColumnModel): HTMLElement | null {
-        return this.shadowRoot.querySelector(`:scope > .grid > .gridhead > .gridrow > .gridheader[id=${column.name}-columnheader]`);
+    getColumnHeaderElement(column: GridColumnModel): HTMLEGridCellElement | null {
+        return this.shadowRoot.querySelector(`:scope > e-grid > e-gridhead > e-gridrow > e-gridcell[type=columnheader][name=${column.name}]`);
     }
-    
-    getColumnDataElements(column: GridColumnModel): HTMLElement[] {
-        return Array.from(this.shadowRoot.querySelectorAll(`:scope > .grid > .gridbody > .gridrow > .gridcell[headers~=${column.name}]`));
+
+    getColumnDataElements(column: GridColumnModel): HTMLEGridCellElement[] {
+        return Array.from(this.shadowRoot.querySelectorAll(`:scope > e-grid > e-gridbody > e-gridrow > e-gridcell[headers~=${column.name}]`));
     }
 
     renderShadow(): Node {
@@ -232,29 +232,29 @@ class GridViewBase extends View implements GridView {
                     })
                 ]
             }),
-            widget("grid", {
-                properties: {
-                    tabIndex: 0,
-                    selectby: "row",
-                    multisectable: true
+            element("e-grid", {
+                attributes: {
+                    tabindex: 0,
+                    selectby: "row"
                 },
-                slotted: {
-                    headers: reactiveChildElements(
-                        model.columns, column => this.#renderGridColumnHeaderCell(column)
-                    ),
-                    rows: reactiveChildElements(
-                        model.rows, row => this.#renderGridBodyRow(row)
-                    )
-                }
+                children: [
+                    element("e-gridhead", {
+                        children: [
+                            element("e-gridrow", {
+                                children: reactiveChildElements(
+                                    model.columns, column => this.#renderGridColumnHeaderCell(column)
+                                )
+                            })
+                        ]
+                    }),
+                    element("e-gridbody", {
+                        children: reactiveChildElements(
+                            model.rows, row => this.#renderGridBodyRow(row)
+                        )
+                    })
+                ]
             })
         );
-    }
-
-    #clearSelection(): void {
-        const {gridElement} = this;
-        gridWidget.beginSelection(gridElement);
-        gridWidget.selectedRows(gridElement).forEach(selectedRow_i => gridRowWidget.setSelected(selectedRow_i, false));
-        gridWidget.endSelection(gridElement);
     }
 
     setSearchFilter(filter: GridRowFilter | null): void {
@@ -267,7 +267,10 @@ class GridViewBase extends View implements GridView {
                     && !(filter?.filter(row_i) ?? true);
             }
         });
-        this.#clearSelection();
+        const {gridElement} = this;
+        gridElement.beginSelection();
+        gridElement.selectedRows().forEach(selectedRow_i => selectedRow_i.selected = false);
+        gridElement.endSelection();
     }
 
     addDisplayFilter(filter: (GridRowFilter & {name: string;})): void {
@@ -281,7 +284,10 @@ class GridViewBase extends View implements GridView {
                 }
             });
         }
-        this.#clearSelection();
+        const {gridElement} = this;
+        gridElement.beginSelection();
+        gridElement.selectedRows().forEach(selectedRow_i => selectedRow_i.selected = false);
+        gridElement.endSelection();
     }
 
     removeDisplayFilter(filter: (GridRowFilter & {name: string;})): void {
@@ -296,7 +302,10 @@ class GridViewBase extends View implements GridView {
                 }
             });
         }
-        this.#clearSelection();
+        const {gridElement} = this;
+        gridElement.beginSelection();
+        gridElement.selectedRows().forEach(selectedRow_i => selectedRow_i.selected = false);
+        gridElement.endSelection();
     }
 
     #renderGridColumnHeaderCell(column: GridColumnModel): Element {
@@ -306,7 +315,8 @@ class GridViewBase extends View implements GridView {
             element("e-gridcell", {
                 attributes: {
                     tabindex: -1,
-                    id: `${column.name}-columnheader`,
+                    name: column.name,
+                    id: this.resizable ? `${column.name}-columnheader` : undefined,
                     type: "columnheader"
                 },
                 children: [
@@ -514,11 +524,11 @@ class GridViewBase extends View implements GridView {
 
     #renderGridBodyRow(row: GridRowModel): Element {
         const {model} = this;
-        const gridRowElement = widget("gridrow", {
+        const gridRowElement = element("e-gridrow", {
             attributes: {
                 tabindex: -1
             },
-            slotted: reactiveChildElements(
+            children: reactiveChildElements(
                 model.columns, column => this.#renderGridDataCell(row, column)
             )
         });
@@ -527,11 +537,12 @@ class GridViewBase extends View implements GridView {
     }
 
     #renderGridDataCell(row: GridRowModel, column: GridColumnModel): Element {
-        const gridCellElement = widget("gridcell", {
-            properties: {
+        const gridCellElement = element("e-gridcell", {
+            attributes: {
+                type: "gridcell",
                 headers: column.name
             },
-            slotted: [
+            children: [
                 this.#cellDelegate(row, column)
             ]
         });
@@ -553,9 +564,9 @@ class GridViewBase extends View implements GridView {
         const {model} = this;
         const {columns} = model;
         if (currentTarget instanceof Element) {
-            const targetCell = currentTarget.closest(".gridheader");
+            const targetCell = currentTarget.closest("e-gridcell");
             if (targetCell) {
-                const targetColumn = Array.from(columns.values()).find(column_i => column_i.name == targetCell.id);
+                const targetColumn = Array.from(columns.values()).find(column_i => column_i.name == targetCell.name);
                 if (targetColumn) {
                     const sortorder = targetColumn.sortorder !== undefined ? -targetColumn.sortorder : 1;
                     model.sortByColumn(targetColumn, sortorder);

@@ -5,7 +5,7 @@ export { HTMLEMenuItemGroupElement };
 export { EMenuItemGroup };
 
 interface HTMLEMenuItemGroupElementConstructor {
-    readonly prototype: HTMLEMenuItemGroupElement;
+    prototype: HTMLEMenuItemGroupElement;
     new(): HTMLEMenuItemGroupElement;
 }
 
@@ -92,7 +92,7 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
 var HTMLEMenuItemGroupElement: HTMLEMenuItemGroupElementConstructor = HTMLEMenuItemGroupElementBase;
 
 interface EMenuItemGroupConstructor {
-    readonly prototype: HTMLEMenuItemGroupElement;
+    prototype: HTMLEMenuItemGroupElement;
     new(init: {
         name?: string;
         items: HTMLEMenuItemElement[];

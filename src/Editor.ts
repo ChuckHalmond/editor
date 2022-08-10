@@ -37,7 +37,7 @@ interface CheckboxAction {
 }
 
 interface EditorConstructor {
-    readonly prototype: Editor;
+    prototype: Editor;
     new(): Editor;
 }
 

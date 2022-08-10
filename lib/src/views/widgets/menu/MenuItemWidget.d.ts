@@ -40,12 +40,12 @@ interface MenuItemWidgetFactory extends WidgetFactory {
     collapse(item: HTMLElement): void;
 }
 declare var menuItemWidget: {
-    "__#17800@#iconPartTemplate": HTMLElement;
-    "__#17800@#arrowPartTemplate": HTMLElement;
-    "__#17800@#keyshortcutsPartTemplate": HTMLElement;
-    "__#17800@#template": HTMLElement;
-    "__#17800@#types": MenuItemType[];
-    "__#17800@#typesFeatures": {
+    "__#9752@#iconPartTemplate": HTMLElement;
+    "__#9752@#arrowPartTemplate": HTMLElement;
+    "__#9752@#keyshortcutsPartTemplate": HTMLElement;
+    "__#9752@#template": HTMLElement;
+    "__#9752@#types": MenuItemType[];
+    "__#9752@#typesFeatures": {
         button: {
             role: string;
             hasIcon: boolean;
@@ -73,18 +73,18 @@ declare var menuItemWidget: {
         };
     };
     create(init?: {
-        id?: string;
+        id?: string | undefined;
         type: MenuItemType;
-        checked?: boolean;
-        label?: string;
-        name?: string;
-        keyshortcut?: string;
-        value?: string;
-        disabled?: boolean;
-    }): HTMLElement;
+        checked?: boolean | undefined;
+        label?: string | undefined;
+        name?: string | undefined;
+        keyshortcut?: string | undefined;
+        value?: string | undefined;
+        disabled?: boolean | undefined;
+    } | undefined): HTMLElement;
     slot(item: HTMLElement): HTMLElement | null;
     slottedCallback(item: HTMLElement, slot: HTMLElement): void;
-    "__#17800@#label"(item: HTMLElement): HTMLElement;
+    "__#9752@#label"(item: HTMLElement): HTMLElement;
     getMenu(item: HTMLElement): HTMLElement | null;
     getKeyShortcut(item: HTMLElement): string | null;
     setKeyShortcut(item: HTMLElement, value: string | null): void;
@@ -102,9 +102,9 @@ declare var menuItemWidget: {
     setDisabled(item: HTMLElement, value: boolean): void;
     setExpanded(item: HTMLElement, value: boolean): void;
     getExpanded(item: HTMLElement): boolean;
-    toggle(item: HTMLElement, force?: boolean): void;
+    toggle(item: HTMLElement, force?: boolean | undefined): void;
     expand(item: HTMLElement): void;
     collapse(item: HTMLElement): void;
-    "__#17800@#handleClickEvent"(event: MouseEvent): void;
-    "__#17800@#positionMenu"(item: HTMLElement): void;
+    "__#9752@#handleClickEvent"(event: MouseEvent): void;
+    "__#9752@#positionMenu"(item: HTMLElement): void;
 };

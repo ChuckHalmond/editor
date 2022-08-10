@@ -8,7 +8,7 @@ interface HTMLEToolBarElement extends HTMLElement {
     name: string;
 }
 interface HTMLEToolbarElementConstructor {
-    readonly prototype: HTMLEToolBarElement;
+    prototype: HTMLEToolBarElement;
     new (): HTMLEToolBarElement;
 }
 declare global {

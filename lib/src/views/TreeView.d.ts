@@ -1,8 +1,7 @@
 import { ModelList, ModelObject } from "../models/Model";
-import { View } from "./View";
 export { TreeModel };
 export { TreeItemModel };
-export { TreeView };
+export { treeView };
 declare class TreeModel extends ModelObject {
     #private;
     readonly items: ModelList<TreeItemModel>;
@@ -41,17 +40,19 @@ declare class TreeItemModel extends ModelObject implements TreeItem {
     display(): void;
     remove(): void;
 }
-interface TreeViewConstructor {
-    readonly prototype: TreeView;
-    new (): TreeView;
-    new (model: TreeModel): TreeView;
-}
-interface TreeView extends View {
-    model: TreeModel;
-}
-declare global {
-    interface HTMLElementTagNameMap {
-        "v-tree": TreeView;
-    }
-}
-declare var TreeView: TreeViewConstructor;
+declare var treeView: {
+    "__#26180@#models": WeakMap<HTMLElement, TreeModel>;
+    "__#26180@#dragImages": WeakMap<TreeItemModel, WeakRef<Element>>;
+    create(model: TreeModel): HTMLElement;
+    getModel(tree: HTMLElement): TreeModel | null;
+    selectedItems(tree: HTMLElement): TreeItemModel[];
+    "__#26180@#getDragImage"(model: TreeItemModel): Element | null;
+    "__#26180@#renderTreeItem"(item: TreeItemModel): Element;
+    "__#26180@#renderTreeItemDragImage"(item: TreeItemModel): Element;
+    "__#26180@#handleDragStartEvent"(event: DragEvent): void;
+    "__#26180@#handleDropEvent"(event: DragEvent): void;
+    "__#26180@#handleContextMenuEvent"(event: MouseEvent): void;
+    "__#26180@#handleFocusInEvent"(event: FocusEvent): void;
+    "__#26180@#handleFocusOutEvent"(event: FocusEvent): void;
+    "__#26180@#handleKeyDownEvent"(event: KeyboardEvent): void;
+};

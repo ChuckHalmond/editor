@@ -5,7 +5,7 @@ import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
 export { HTMLETreeItemElement };
 
 interface HTMLETreeItemElementConstructor {
-    readonly prototype: HTMLETreeItemElement;
+    prototype: HTMLETreeItemElement;
     new(): HTMLETreeItemElement;
 }
 

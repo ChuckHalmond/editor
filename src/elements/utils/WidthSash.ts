@@ -3,7 +3,7 @@ import { CustomElement, AttributeProperty, element } from "../Element";
 export { HTMLEWidthSashElement };
 
 interface HTMLEWidthSashElementConstructor {
-    readonly prototype: HTMLEWidthSashElement;
+    prototype: HTMLEWidthSashElement;
     new(): HTMLEWidthSashElement;
 }
 
@@ -63,19 +63,18 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
                             
                             width: 4px;
                             
-                            background-color: rgb(135, 206, 250);
+                            background-color: transparent;
                             cursor: ew-resize;
         
                             transition-property: opacity;
                             transition-delay: 0.2s;
                             transition-duration: 0.2s;
                             transition-timing-function: ease-out;
-                            opacity: 0;
                         }
         
                         :host(:active),
                         :host(:hover) {
-                            opacity: 1;
+                            background-color: rgb(135, 206, 250);
                         }
                     `
                 ]

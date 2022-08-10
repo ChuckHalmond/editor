@@ -4,7 +4,7 @@ import { HTMLEDraggableElement } from "./Draggable";
 export { HTMLEDragzoneElement };
 
 interface HTMLEDragzoneElementConstructor {
-    readonly prototype: HTMLEDragzoneElement;
+    prototype: HTMLEDragzoneElement;
     new(): HTMLEDragzoneElement
 }
 

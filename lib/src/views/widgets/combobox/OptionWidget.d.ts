@@ -25,17 +25,17 @@ declare global {
     }
 }
 declare var optionWidget: {
-    "__#17809@#template": HTMLElement;
+    "__#11853@#template": HTMLElement;
     create(properties?: {
-        selected?: boolean;
-        label?: string;
-        name?: string;
-        value?: string;
-        disabled?: boolean;
-    }): HTMLElement;
+        selected?: boolean | undefined;
+        label?: string | undefined;
+        name?: string | undefined;
+        value?: string | undefined;
+        disabled?: boolean | undefined;
+    } | undefined): HTMLElement;
     readonly observedAttributes: string[];
     attributeChangedCallback(option: HTMLElement, name: string, oldValue: string, newValue: string): void;
-    "__#17809@#label"(option: HTMLElement): HTMLElement;
+    "__#11853@#label"(option: HTMLElement): HTMLElement;
     getLabel(option: HTMLElement): string;
     setLabel(option: HTMLElement, value: string): void;
     getValue(option: HTMLElement): string;

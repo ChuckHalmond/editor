@@ -1,7 +1,7 @@
 import { Widget, element } from "../../../elements/Element";
 import { WidgetFactory } from "../Widget";
 
-export { gridcellWidget };
+export { gridHeaderWidget };
 
 interface GridHeaderWidgetFactory extends WidgetFactory {
     create(init: {
@@ -19,7 +19,7 @@ declare global {
     }
 }
 
-var gridcellWidget = new (
+var gridHeaderWidget = new (
 Widget({
     name: "gridheader"
 })(class GridHeaderWidgetFactoryBase extends WidgetFactory implements GridHeaderWidgetFactory {

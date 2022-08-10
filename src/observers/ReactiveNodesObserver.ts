@@ -3,7 +3,7 @@
 export { ReactiveNodesObserver };
 
 interface ReactiveNodesObserverConstructor {
-    readonly prototype: ReactiveNodesObserver;
+    prototype: ReactiveNodesObserver;
     new(): ReactiveNodesObserver;
 }
 

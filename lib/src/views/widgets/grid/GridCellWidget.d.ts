@@ -4,6 +4,7 @@ interface GridCellWidgetFactory extends WidgetFactory {
     create(init: {
         label?: string;
         disabled?: boolean;
+        headers?: string;
     }): HTMLElement;
     getHeaders(item: HTMLElement): string;
     setHeaders(item: HTMLElement, value: string): void;
@@ -26,11 +27,12 @@ declare global {
     }
 }
 declare var gridCellWidget: {
-    "__#17806@#template": HTMLElement;
+    "__#29033@#template": HTMLElement;
     create(init?: {
-        label?: string;
-        disabled?: boolean;
-    }): HTMLElement;
+        label?: string | undefined;
+        disabled?: boolean | undefined;
+        headers?: string | undefined;
+    } | undefined): HTMLElement;
     slot(cell: HTMLElement): HTMLElement | null;
     getHeaders(item: HTMLElement): string;
     setHeaders(item: HTMLElement, value: string): void;
@@ -46,5 +48,5 @@ declare var gridCellWidget: {
     getDisabled(item: HTMLElement): boolean;
     setSelected(item: HTMLElement, value: boolean): void;
     getSelected(item: HTMLElement): boolean;
-    "__#17806@#label"(item: HTMLElement): HTMLElement;
+    "__#29033@#label"(item: HTMLElement): HTMLElement;
 };

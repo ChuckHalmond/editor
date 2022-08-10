@@ -15,7 +15,7 @@ interface HTMLEMenuElement extends HTMLElement {
 }
 
 interface HTMLEMenuElementConstructor {
-    readonly prototype: HTMLEMenuElement;
+    prototype: HTMLEMenuElement;
     new(): HTMLEMenuElement;
 }
 
@@ -444,7 +444,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
 var HTMLEMenuElement: HTMLEMenuElementConstructor = HTMLEMenuElementBase;
 
 interface EMenuConstructor {
-    readonly prototype: HTMLEMenuElement;
+    prototype: HTMLEMenuElement;
     new(init: {
         name?: string;
         children?: (HTMLEMenuItemElement | HTMLEMenuItemGroupElement | HTMLHRElement)[];

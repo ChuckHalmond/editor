@@ -4,7 +4,7 @@ import { element, CustomElement, AttributeProperty } from "../../Element";
 export { HTMLEToolBarItemGroupElement };
 
 interface HTMLEToolBarItemGroupElementConstructor {
-    readonly prototype: HTMLEToolBarItemGroupElement;
+    prototype: HTMLEToolBarItemGroupElement;
     new(): HTMLEToolBarItemGroupElement;
 }
 

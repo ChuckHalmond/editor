@@ -1,6 +1,6 @@
 export { HTMLEListItemGroupElement };
 interface HTMLEListItemGroupElementConstructor {
-    readonly prototype: HTMLEListItemGroupElement;
+    prototype: HTMLEListItemGroupElement;
     new (): HTMLEListItemGroupElement;
 }
 interface HTMLEListItemGroupElement extends HTMLElement {

@@ -1,6 +1,6 @@
 export { HTMLELoaderElement };
 interface HTMLELoaderElementConstructor {
-    readonly prototype: HTMLELoaderElement;
+    prototype: HTMLELoaderElement;
     new (): HTMLELoaderElement;
 }
 interface HTMLELoaderElement extends HTMLElement {

@@ -1,7 +1,7 @@
 import { HTMLEMenuItemElement } from "./MenuItem";
 export { HTMLEMenuBarElement };
 interface HTMLEMenuBarElementConstructor {
-    readonly prototype: HTMLEMenuBarElement;
+    prototype: HTMLEMenuBarElement;
     new (): HTMLEMenuBarElement;
 }
 interface HTMLEMenuBarElement extends HTMLElement {

@@ -3,7 +3,7 @@ import { CustomElement, AttributeProperty, element } from "../../Element";
 export { HTMLEDialogElement };
 
 interface HTMLEDialogElementConstructor {
-    readonly prototype: HTMLEDialogElement;
+    prototype: HTMLEDialogElement;
     new(): HTMLEDialogElement;
 }
 

@@ -8,7 +8,7 @@ declare global {
 }
 
 interface WidgetFactoryConstructor {
-    readonly prototype: WidgetFactory;
+    prototype: WidgetFactory;
     new(): WidgetFactory;
 }
 

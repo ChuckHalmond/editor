@@ -4,7 +4,7 @@ import { HTMLEMenuButtonElement } from "../menus/MenuButton";
 export { HTMLEToolBarItemElement };
 export { EToolBarItem };
 interface HTMLEToolBarItemElementConstructor {
-    readonly prototype: HTMLEToolBarItemElement;
+    prototype: HTMLEToolBarItemElement;
     new (): HTMLEToolBarItemElement;
 }
 interface HTMLEToolBarItemElement extends HTMLEActionElement {
@@ -23,7 +23,7 @@ declare global {
 }
 declare var HTMLEToolBarItemElement: HTMLEToolBarItemElementConstructor;
 interface EToolBarItemConstructor {
-    readonly prototype: HTMLEToolBarItemElement;
+    prototype: HTMLEToolBarItemElement;
     new (init: {
         name: string;
         label: string;

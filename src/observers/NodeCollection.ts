@@ -1,7 +1,7 @@
 export { NodeCollection };
 
 interface NodeCollectionConstructor {
-    readonly prototype: NodeCollection;
+    prototype: NodeCollection;
     new(root: Node, filter: NodeFilter): NodeCollection<Node>;
     new<N extends Node>(root: Node, filter: NodeFilter): NodeCollection<N>;
 }

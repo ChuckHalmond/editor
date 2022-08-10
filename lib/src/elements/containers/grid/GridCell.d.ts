@@ -1,6 +1,6 @@
 export { HTMLEGridCellElement };
 interface HTMLEGridCellElementConstructor {
-    readonly prototype: HTMLEGridCellElement;
+    prototype: HTMLEGridCellElement;
     new (): HTMLEGridCellElement;
 }
 interface HTMLEGridCellElement extends HTMLElement {

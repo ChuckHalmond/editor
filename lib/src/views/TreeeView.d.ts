@@ -1,8 +1,7 @@
 import { ModelList, ModelObject } from "../models/Model";
-import { View } from "./View";
 export { TreeModel };
 export { TreeItemModel };
-export { TreeView };
+export { treeView };
 declare class TreeModel extends ModelObject {
     #private;
     readonly items: ModelList<TreeItemModel>;
@@ -41,33 +40,19 @@ declare class TreeItemModel extends ModelObject implements TreeItem {
     display(): void;
     remove(): void;
 }
-interface TreeViewConstructor {
-    readonly prototype: TreeView;
-    new (): TreeView;
-    new (model: TreeModel): TreeView;
-}
-interface TreeView extends View {
-    model: TreeModel;
-}
-declare global {
-    interface HTMLElementTagNameMap {
-        "v-treee": TreeView;
-    }
-}
-declare var TreeView: TreeViewConstructor;
-export declare var treeView: {
-    "__#23961@#models": WeakMap<HTMLElement, TreeModel>;
-    "__#23961@#dragImages": WeakMap<TreeItemModel, WeakRef<Element>>;
+declare var treeView: {
+    "__#24382@#models": WeakMap<HTMLElement, TreeModel>;
+    "__#24382@#dragImages": WeakMap<TreeItemModel, WeakRef<Element>>;
     create(model: TreeModel): HTMLElement;
     getModel(tree: HTMLElement): TreeModel | null;
     selectedItems(tree: HTMLElement): TreeItemModel[];
-    "__#23961@#getDragImage"(model: TreeItemModel): Element | null;
-    "__#23961@#renderTreeItem"(item: TreeItemModel): Element;
-    "__#23961@#renderTreeItemDragImage"(item: TreeItemModel): Element;
-    "__#23961@#handleDragStartEvent"(event: DragEvent): void;
-    "__#23961@#handleDropEvent"(event: DragEvent): void;
-    "__#23961@#handleContextMenuEvent"(event: MouseEvent): void;
-    "__#23961@#handleFocusInEvent"(event: FocusEvent): void;
-    "__#23961@#handleFocusOutEvent"(event: FocusEvent): void;
-    "__#23961@#handleKeyDownEvent"(event: KeyboardEvent): void;
+    "__#24382@#getDragImage"(model: TreeItemModel): Element | null;
+    "__#24382@#renderTreeItem"(item: TreeItemModel): Element;
+    "__#24382@#renderTreeItemDragImage"(item: TreeItemModel): Element;
+    "__#24382@#handleDragStartEvent"(event: DragEvent): void;
+    "__#24382@#handleDropEvent"(event: DragEvent): void;
+    "__#24382@#handleContextMenuEvent"(event: MouseEvent): void;
+    "__#24382@#handleFocusInEvent"(event: FocusEvent): void;
+    "__#24382@#handleFocusOutEvent"(event: FocusEvent): void;
+    "__#24382@#handleKeyDownEvent"(event: KeyboardEvent): void;
 };

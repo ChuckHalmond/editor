@@ -2,7 +2,7 @@ import { HTMLEListElement } from "./List";
 import { HTMLEListItemElement } from "./ListItem";
 export { HTMLEListItemCollection };
 interface HTMLEListItemCollectionConstructor {
-    readonly prototype: HTMLEListItemCollection;
+    prototype: HTMLEListItemCollection;
     new (root: HTMLEListElement): HTMLEListItemCollection;
 }
 interface HTMLEListItemCollection {

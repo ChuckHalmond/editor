@@ -5,7 +5,7 @@ export { ETabChangeEvent };
 export { HTMLETabElement };
 
 interface HTMLETabElementConstructor {
-    readonly prototype: HTMLETabElement;
+    prototype: HTMLETabElement;
     new(): HTMLETabElement;
 }
 

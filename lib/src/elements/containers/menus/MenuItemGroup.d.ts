@@ -2,7 +2,7 @@ import { HTMLEMenuItemElement } from "./MenuItem";
 export { HTMLEMenuItemGroupElement };
 export { EMenuItemGroup };
 interface HTMLEMenuItemGroupElementConstructor {
-    readonly prototype: HTMLEMenuItemGroupElement;
+    prototype: HTMLEMenuItemGroupElement;
     new (): HTMLEMenuItemGroupElement;
 }
 interface HTMLEMenuItemGroupElement extends HTMLElement {
@@ -18,7 +18,7 @@ declare global {
 }
 declare var HTMLEMenuItemGroupElement: HTMLEMenuItemGroupElementConstructor;
 interface EMenuItemGroupConstructor {
-    readonly prototype: HTMLEMenuItemGroupElement;
+    prototype: HTMLEMenuItemGroupElement;
     new (init: {
         name?: string;
         items: HTMLEMenuItemElement[];

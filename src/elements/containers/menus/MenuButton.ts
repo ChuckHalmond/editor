@@ -6,7 +6,7 @@ export { HTMLEMenuButtonElement };
 export { EMenuButton };
 
 interface HTMLEMenuButtonElementConstructor {
-    readonly prototype: HTMLEMenuButtonElement;
+    prototype: HTMLEMenuButtonElement;
     new(): HTMLEMenuButtonElement;
 }
 
@@ -184,7 +184,7 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
 var HTMLEMenuButtonElement: HTMLEMenuButtonElementConstructor = HTMLEMenuButtonElementBase;
 
 interface EMenuButtonConstructor {
-    readonly prototype: HTMLEMenuButtonElement;
+    prototype: HTMLEMenuButtonElement;
     new(init: {
         menu: HTMLEMenuElement
     }): HTMLEMenuButtonElement;

@@ -3,7 +3,7 @@ import { areAttributesMatching, AttributeMutationMixin } from "../elements/Eleme
 export { AttributeMixinsObserver };
 
 interface AttributeMixinsObserverConstructor {
-    readonly prototype: AttributeMixinsObserver;
+    prototype: AttributeMixinsObserver;
     new(mixins: AttributeMutationMixin[]): AttributeMixinsObserver;
 }
 

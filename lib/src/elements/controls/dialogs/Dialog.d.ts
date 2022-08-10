@@ -1,6 +1,6 @@
 export { HTMLEDialogElement };
 interface HTMLEDialogElementConstructor {
-    readonly prototype: HTMLEDialogElement;
+    prototype: HTMLEDialogElement;
     new (): HTMLEDialogElement;
 }
 declare type DialogElementType = "confirm" | "alert";

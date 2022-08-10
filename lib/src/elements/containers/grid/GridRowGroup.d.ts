@@ -1,6 +1,6 @@
 export { HTMLEGridRowGroupElement };
 interface HTMLEGridRowGroupElementConstructor {
-    readonly prototype: HTMLEGridRowGroupElement;
+    prototype: HTMLEGridRowGroupElement;
     new (): HTMLEGridRowGroupElement;
 }
 interface HTMLEGridRowGroupElement extends HTMLElement {

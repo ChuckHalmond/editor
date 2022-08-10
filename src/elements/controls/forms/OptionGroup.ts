@@ -3,7 +3,7 @@ import { CustomElement, element } from "../../Element";
 export { HTMLEOptionGroupElement };
 
 interface HTMLEOptionGroupElementConstructor {
-    readonly prototype: HTMLEOptionGroupElement;
+    prototype: HTMLEOptionGroupElement;
     new(): HTMLEOptionGroupElement;
 }
 

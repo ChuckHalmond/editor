@@ -3,7 +3,7 @@ import { CustomElement, AttributeProperty, element } from "../Element";
 export { HTMLELoaderElement };
 
 interface HTMLELoaderElementConstructor {
-    readonly prototype: HTMLELoaderElement;
+    prototype: HTMLELoaderElement;
     new(): HTMLELoaderElement;
 }
 

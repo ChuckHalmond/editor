@@ -3,7 +3,7 @@ import { CustomElement, AttributeProperty, element } from "../Element";
 export { HTMLEHeightSashElement };
 
 interface HTMLEHeightSashElementConstructor {
-    readonly prototype: HTMLEHeightSashElement;
+    prototype: HTMLEHeightSashElement;
     new(): HTMLEHeightSashElement;
 }
 

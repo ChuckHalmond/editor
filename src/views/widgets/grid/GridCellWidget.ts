@@ -7,6 +7,7 @@ interface GridCellWidgetFactory extends WidgetFactory {
     create(init: {
         label?: string;
         disabled?: boolean;
+        headers?: string;
     }): HTMLElement;
     getHeaders(item: HTMLElement): string;
     setHeaders(item: HTMLElement, value: string): void;
@@ -64,15 +65,19 @@ Widget({
     create(init?: {
         label?: string;
         disabled?: boolean;
+        headers?: string;
     }): HTMLElement {
         const cell = <HTMLElement>this.#template.cloneNode(true);
         if (init !== undefined) {
-            const {label, disabled} = init;
+            const {label, disabled, headers} = init;
             if (label !== undefined) {
                 this.setLabel(cell, label);
             }
             if (disabled !== undefined) {
                 this.setDisabled(cell, disabled);
+            }
+            if (headers !== undefined) {
+                this.setHeaders(cell, headers);
             }
             this.setSelected(cell, false);
         }

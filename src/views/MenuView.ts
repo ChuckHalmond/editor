@@ -47,7 +47,7 @@ class MenuItemModel extends ModelObject {
 }
 
 interface MenuViewConstructor {
-    readonly prototype: MenuView;
+    prototype: MenuView;
     new(): MenuView;
     new(model: MenuModel): MenuView;
 }

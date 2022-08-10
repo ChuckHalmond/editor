@@ -1,7 +1,7 @@
 import { HTMLETabElement } from "./Tab";
 export { HTMLETabListElement };
 interface HTMLETabListElementConstructor {
-    readonly prototype: HTMLETabListElement;
+    prototype: HTMLETabListElement;
     new (): HTMLETabListElement;
 }
 interface HTMLETabListElement extends HTMLElement {

@@ -6,7 +6,7 @@ export { HTMLEDropzoneElement };
 export { EDataChangeEvent };
 
 interface HTMLEDropzoneElementConstructor {
-    readonly prototype: HTMLEDropzoneElement;
+    prototype: HTMLEDropzoneElement;
     new(): HTMLEDropzoneElement;
 }
 

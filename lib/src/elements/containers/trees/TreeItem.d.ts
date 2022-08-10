@@ -1,7 +1,7 @@
 import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
 export { HTMLETreeItemElement };
 interface HTMLETreeItemElementConstructor {
-    readonly prototype: HTMLETreeItemElement;
+    prototype: HTMLETreeItemElement;
     new (): HTMLETreeItemElement;
 }
 interface HTMLETreeItemElement extends HTMLElement {

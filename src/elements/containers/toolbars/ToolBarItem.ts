@@ -7,7 +7,7 @@ export { HTMLEToolBarItemElement };
 export { EToolBarItem };
 
 interface HTMLEToolBarItemElementConstructor {
-    readonly prototype: HTMLEToolBarItemElement;
+    prototype: HTMLEToolBarItemElement;
     new(): HTMLEToolBarItemElement;
 }
 
@@ -246,7 +246,7 @@ class HTMLEToolBarItemElementBase extends HTMLEActionElement implements HTMLEToo
 var HTMLEToolBarItemElement: HTMLEToolBarItemElementConstructor = HTMLEToolBarItemElementBase;
 
 interface EToolBarItemConstructor {
-    readonly prototype: HTMLEToolBarItemElement;
+    prototype: HTMLEToolBarItemElement;
     new(init: {
         name: string;
         label: string;

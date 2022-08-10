@@ -1,6 +1,6 @@
 export { HTMLEOptionElement };
 interface HTMLEOptionElementConstructor {
-    readonly prototype: HTMLEOptionElement;
+    prototype: HTMLEOptionElement;
     new (): HTMLEOptionElement;
 }
 interface HTMLEOptionElement extends HTMLElement {

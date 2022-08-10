@@ -5,7 +5,7 @@ import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
 export { HTMLEMenuBarElement };
 
 interface HTMLEMenuBarElementConstructor {
-    readonly prototype: HTMLEMenuBarElement;
+    prototype: HTMLEMenuBarElement;
     new(): HTMLEMenuBarElement;
 }
 

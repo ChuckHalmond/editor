@@ -3,7 +3,7 @@ import { CustomElement, AttributeProperty, element } from "../Element";
 export { HTMLEHandleElement };
 
 interface HTMLEHandleElementConstructor {
-    readonly prototype: HTMLEHandleElement;
+    prototype: HTMLEHandleElement;
     new(): HTMLEHandleElement;
 }
 

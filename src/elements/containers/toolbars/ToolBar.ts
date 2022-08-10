@@ -16,7 +16,7 @@ interface HTMLEToolBarElement extends HTMLElement {
 }
 
 interface HTMLEToolbarElementConstructor {
-    readonly prototype: HTMLEToolBarElement;
+    prototype: HTMLEToolBarElement;
     new(): HTMLEToolBarElement;
 }
 

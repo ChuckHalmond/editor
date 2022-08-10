@@ -1,7 +1,7 @@
 import { AttributeMutationMixin } from "../elements/Element";
 export { AttributeMixinsObserver };
 interface AttributeMixinsObserverConstructor {
-    readonly prototype: AttributeMixinsObserver;
+    prototype: AttributeMixinsObserver;
     new (mixins: AttributeMutationMixin[]): AttributeMixinsObserver;
 }
 interface AttributeMixinsObserver {

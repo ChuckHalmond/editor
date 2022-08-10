@@ -4,7 +4,7 @@ export { HTMLEActionElement };
 export { ActionType };
 
 interface HTMLEActionElementConstructor {
-    readonly prototype: HTMLEActionElement;
+    prototype: HTMLEActionElement;
     new(): HTMLEActionElement;
 }
 

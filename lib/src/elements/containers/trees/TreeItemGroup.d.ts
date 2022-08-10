@@ -1,6 +1,6 @@
 export { HTMLETreeItemGroupElement };
 interface HTMLETreeItemGroupElementConstructor {
-    readonly prototype: HTMLETreeItemGroupElement;
+    prototype: HTMLETreeItemGroupElement;
     new (): HTMLETreeItemGroupElement;
 }
 interface HTMLETreeItemGroupElement extends HTMLElement {

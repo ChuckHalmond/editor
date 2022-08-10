@@ -3,7 +3,7 @@ import { CustomElement, AttributeProperty, element } from "../../Element";
 export { HTMLEOptionElement };
 
 interface HTMLEOptionElementConstructor {
-    readonly prototype: HTMLEOptionElement;
+    prototype: HTMLEOptionElement;
     new(): HTMLEOptionElement;
 }
 

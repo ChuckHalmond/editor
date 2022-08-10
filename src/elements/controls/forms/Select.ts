@@ -24,7 +24,7 @@ interface HTMLESelectElement extends HTMLEActionElement {
 }
 
 interface HTMLESelectElementConstructor {
-    readonly prototype: HTMLESelectElement;
+    prototype: HTMLESelectElement;
     new(): HTMLESelectElement;
 }
 

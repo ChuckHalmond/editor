@@ -1,6 +1,6 @@
 export { HTMLEHeightSashElement };
 interface HTMLEHeightSashElementConstructor {
-    readonly prototype: HTMLEHeightSashElement;
+    prototype: HTMLEHeightSashElement;
     new (): HTMLEHeightSashElement;
 }
 interface HTMLEHeightSashElement extends HTMLElement {

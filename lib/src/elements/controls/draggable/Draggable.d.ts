@@ -1,6 +1,6 @@
 export { HTMLEDraggableElement };
 interface HTMLEDraggableElementConstructor {
-    readonly prototype: HTMLEDraggableElement;
+    prototype: HTMLEDraggableElement;
     new (): HTMLEDraggableElement;
 }
 interface HTMLEDraggableElement extends HTMLElement {

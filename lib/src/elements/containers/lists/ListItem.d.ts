@@ -2,7 +2,7 @@ import { HTMLEMenuElement } from "../menus/Menu";
 import { HTMLEToolBarElement } from "../toolbars/ToolBar";
 export { HTMLEListItemElement };
 interface HTMLEListItemElementConstructor {
-    readonly prototype: HTMLEListItemElement;
+    prototype: HTMLEListItemElement;
     new (): HTMLEListItemElement;
 }
 interface HTMLEListItemElement extends HTMLElement {

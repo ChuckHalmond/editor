@@ -12,7 +12,7 @@ e-gridcell:hover {
 }
 
 e-gridcell:focus {
-    background-color: var(--focus-background-color);
+    background-color: var(--focused-item-color);
 }
 
 e-gridcell[active] {

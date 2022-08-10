@@ -5,7 +5,7 @@ import { HTMLESelectElement } from "./Select";
 export { HTMLEOptionCollection };
 
 interface HTMLEOptionCollectionConstructor {
-    readonly prototype: HTMLEOptionCollection;
+    prototype: HTMLEOptionCollection;
     new(root: HTMLESelectElement): HTMLEOptionCollection;
 }
 

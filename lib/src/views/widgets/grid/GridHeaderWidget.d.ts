@@ -1,5 +1,5 @@
 import { WidgetFactory } from "../Widget";
-export { gridcellWidget };
+export { gridHeaderWidget };
 interface GridHeaderWidgetFactory extends WidgetFactory {
     create(init: {
         label?: string;
@@ -14,15 +14,15 @@ declare global {
         "gridheader": GridHeaderWidgetFactory;
     }
 }
-declare var gridcellWidget: {
-    "__#58@#template": HTMLElement;
+declare var gridHeaderWidget: {
+    "__#29654@#template": HTMLElement;
     create(init?: {
-        label?: string;
-    }): HTMLElement;
+        label?: string | undefined;
+    } | undefined): HTMLElement;
     getLabel(header: HTMLElement): string;
     setLabel(header: HTMLElement, value: string): void;
     setActive(item: HTMLElement, value: boolean): void;
     getActive(item: HTMLElement): boolean;
-    "__#58@#label"(header: HTMLElement): HTMLElement;
+    "__#29654@#label"(header: HTMLElement): HTMLElement;
     slot(root: HTMLElement, name: string | null): HTMLElement | null;
 };

@@ -5,7 +5,7 @@ export { HTMLEMenuItemElement };
 export { EMenuItem };
 
 interface HTMLEMenuItemElementConstructor {
-    readonly prototype: HTMLEMenuItemElement;
+    prototype: HTMLEMenuItemElement;
     new(): HTMLEMenuItemElement;
 }
 
@@ -218,7 +218,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
 var HTMLEMenuItemElement: HTMLEMenuItemElementConstructor = HTMLEMenuItemElementBase;
 
 interface EMenuItemConstructor {
-    readonly prototype: HTMLEMenuItemElement;
+    prototype: HTMLEMenuItemElement;
     new(init: {
         name: string;
         label: string;

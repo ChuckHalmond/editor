@@ -1,7 +1,7 @@
 export { State };
 
 interface StateConstructor {
-    readonly prototype: State;
+    prototype: State;
     new(): State;
 }
 

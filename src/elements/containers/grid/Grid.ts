@@ -10,7 +10,7 @@ import { HTMLEGridRowGroupElement } from "./GridRowGroup";
 export { HTMLEGridElement };
 
 interface HTMLEGridElementConstructor {
-    readonly prototype: HTMLEGridElement;
+    prototype: HTMLEGridElement;
     new(): HTMLEGridElement;
 }
 

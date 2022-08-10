@@ -8,7 +8,7 @@ export { ModelChangeObserverOptions };
 export { ModelChangeObserver };
 
 interface ModelChangeRecordConstructor {
-    readonly prototype: ModelChangeRecord;
+    prototype: ModelChangeRecord;
     new(
         init: {
             target: ModelNode | ModelList;
@@ -120,7 +120,7 @@ class ModelChangeRecordBase implements ModelChangeRecord {
 var ModelChangeRecord: ModelChangeRecordConstructor = ModelChangeRecordBase;
 
 interface ModelNodesListConstructor {
-    readonly prototype: ModelNodesList;
+    prototype: ModelNodesList;
     new(items: any[]): ModelNodesList;
 }
 
@@ -153,7 +153,7 @@ class ModelNodesListBase implements ModelNodesList {
 var ModelNodesList: ModelNodesListConstructor = ModelNodesListBase;
 
 interface ModelEventConstructor {
-    readonly prototype: ModelEvent;
+    prototype: ModelEvent;
     new(type: string): ModelEvent;
 }
 
@@ -209,7 +209,7 @@ delete ModelEventBase.ModelEventTargetAccessor;
 var ModelEvent: ModelEventConstructor = ModelEventBase;
 
 interface ModelEventTargetConstructor {
-    readonly prototype: ModelEventTarget;
+    prototype: ModelEventTarget;
     new(): ModelEventTarget;
 }
 
@@ -272,7 +272,7 @@ class ModelEventTargetBase implements ModelEventTarget {
 var ModelEventTarget: ModelEventTargetConstructor = ModelEventTargetBase;
 
 interface ModelNodeConstructor {
-    readonly prototype: ModelNode;
+    prototype: ModelNode;
     new(): ModelNode;
 }
 
@@ -438,7 +438,7 @@ const ModelProperty: ModelPropertyDecorator = function(
 }
 
 interface ModelObjectConstructor {
-    readonly prototype: ModelObject;
+    prototype: ModelObject;
     new(): ModelObject;
 }
 
@@ -478,7 +478,7 @@ delete ModelObjectBase.ModelObjectPropertiesAccessor;
 var ModelObject: ModelObjectConstructor = ModelObjectBase;
 
 interface ModelListConstructor {
-    readonly prototype: ModelList;
+    prototype: ModelList;
     new<Model extends ModelNode>(): ModelList<Model>;
     new<Model extends ModelNode>(items: Model[]): ModelList<Model>;
 }
@@ -675,7 +675,7 @@ class ModelListBase<Model extends ModelNode = ModelNode> extends ModelNodeBase i
 var ModelList: ModelListConstructor = ModelListBase!;
 
 interface ModelChangeObserverConstructor {
-    readonly prototype: ModelChangeObserver;
+    prototype: ModelChangeObserver;
     new(callback: (records: ModelChangeRecord[]) => void): ModelChangeObserver;
 }
 

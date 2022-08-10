@@ -1,6 +1,6 @@
 export { HTMLEToolBarItemGroupElement };
 interface HTMLEToolBarItemGroupElementConstructor {
-    readonly prototype: HTMLEToolBarItemGroupElement;
+    prototype: HTMLEToolBarItemGroupElement;
     new (): HTMLEToolBarItemGroupElement;
 }
 interface HTMLEToolBarItemGroupElement extends HTMLElement {

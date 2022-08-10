@@ -1,6 +1,6 @@
 export { HTMLETabPanelElement };
 interface HTMLETabPanelElementConstructor {
-    readonly prototype: HTMLETabPanelElement;
+    prototype: HTMLETabPanelElement;
     new (): HTMLETabPanelElement;
 }
 interface HTMLETabPanelElement extends HTMLElement {

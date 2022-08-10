@@ -5,7 +5,7 @@ import { HTMLEListItemGroupElement } from "./ListItemGroup";
 export { HTMLEListElement };
 
 interface HTMLEListElementConstructor {
-    readonly prototype: HTMLEListElement;
+    prototype: HTMLEListElement;
     new(): HTMLEListElement;
 }
 

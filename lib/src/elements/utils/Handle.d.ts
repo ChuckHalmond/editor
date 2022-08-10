@@ -1,6 +1,6 @@
 export { HTMLEHandleElement };
 interface HTMLEHandleElementConstructor {
-    readonly prototype: HTMLEHandleElement;
+    prototype: HTMLEHandleElement;
     new (): HTMLEHandleElement;
 }
 interface HTMLEHandleElement extends HTMLElement {

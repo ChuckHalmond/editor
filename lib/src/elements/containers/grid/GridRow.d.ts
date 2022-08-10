@@ -2,7 +2,7 @@ import { HTMLEMenuElement } from "../menus/Menu";
 import { HTMLEGridCellCollection } from "./GridCellCollection";
 export { HTMLEGridRowElement };
 interface HTMLEGridRowElementConstructor {
-    readonly prototype: HTMLEGridRowElement;
+    prototype: HTMLEGridRowElement;
     new (): HTMLEGridRowElement;
 }
 interface HTMLEGridRowElement extends HTMLElement {

@@ -3,7 +3,7 @@ import { HTMLEMenuItemElement } from "./MenuItem";
 export { HTMLEMenuButtonElement };
 export { EMenuButton };
 interface HTMLEMenuButtonElementConstructor {
-    readonly prototype: HTMLEMenuButtonElement;
+    prototype: HTMLEMenuButtonElement;
     new (): HTMLEMenuButtonElement;
 }
 interface HTMLEMenuButtonElement extends HTMLElement {
@@ -19,7 +19,7 @@ interface HTMLEMenuButtonElement extends HTMLElement {
 }
 declare var HTMLEMenuButtonElement: HTMLEMenuButtonElementConstructor;
 interface EMenuButtonConstructor {
-    readonly prototype: HTMLEMenuButtonElement;
+    prototype: HTMLEMenuButtonElement;
     new (init: {
         menu: HTMLEMenuElement;
     }): HTMLEMenuButtonElement;

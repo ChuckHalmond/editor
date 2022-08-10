@@ -19,7 +19,7 @@ interface HTMLESelectElement extends HTMLEActionElement {
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
 }
 interface HTMLESelectElementConstructor {
-    readonly prototype: HTMLESelectElement;
+    prototype: HTMLESelectElement;
     new (): HTMLESelectElement;
 }
 declare global {

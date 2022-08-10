@@ -8,7 +8,7 @@ interface View extends HTMLElement {
     refresh(): void;
 }
 interface ViewConstructor {
-    readonly prototype: View;
+    prototype: View;
     new (): View;
 }
 declare var View: ViewConstructor;

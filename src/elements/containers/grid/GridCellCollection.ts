@@ -7,7 +7,7 @@ import { HTMLEGridBodyElement } from "./GridBody";
 export { HTMLEGridCellCollection };
 
 interface HTMLEGridCellCollectionConstructor {
-    readonly prototype: HTMLEGridCellCollection;
+    prototype: HTMLEGridCellCollection;
     new(root: HTMLElement): HTMLEGridCellCollection;
 }
 

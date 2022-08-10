@@ -2,7 +2,7 @@ import { HTMLEGridCellCollection } from "./GridCellCollection";
 import { HTMLEGridRowCollection } from "./GridRowCollection";
 export { HTMLEGridHeadElement };
 interface HTMLEGridHeadElementConstructor {
-    readonly prototype: HTMLEGridHeadElement;
+    prototype: HTMLEGridHeadElement;
     new (): HTMLEGridHeadElement;
 }
 interface HTMLEGridHeadElement extends HTMLElement {

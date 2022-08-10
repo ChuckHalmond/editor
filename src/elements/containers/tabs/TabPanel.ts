@@ -3,7 +3,7 @@ import { CustomElement, AttributeProperty, element } from "../../Element";
 export { HTMLETabPanelElement };
 
 interface HTMLETabPanelElementConstructor {
-    readonly prototype: HTMLETabPanelElement;
+    prototype: HTMLETabPanelElement;
     new(): HTMLETabPanelElement;
 }
 

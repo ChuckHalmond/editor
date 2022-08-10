@@ -11,7 +11,7 @@ interface HTMLEMenuElement extends HTMLElement {
     positionContextual(x: number, y: number): void;
 }
 interface HTMLEMenuElementConstructor {
-    readonly prototype: HTMLEMenuElement;
+    prototype: HTMLEMenuElement;
     new (): HTMLEMenuElement;
 }
 declare global {
@@ -21,7 +21,7 @@ declare global {
 }
 declare var HTMLEMenuElement: HTMLEMenuElementConstructor;
 interface EMenuConstructor {
-    readonly prototype: HTMLEMenuElement;
+    prototype: HTMLEMenuElement;
     new (init: {
         name?: string;
         children?: (HTMLEMenuItemElement | HTMLEMenuItemGroupElement | HTMLHRElement)[];

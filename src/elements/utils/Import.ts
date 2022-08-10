@@ -3,7 +3,7 @@ import { CustomElement, AttributeProperty } from "../Element";
 export { HTMLEImportElement };
 
 interface HTMLEImportElementConstructor {
-    readonly prototype: HTMLEImportElement;
+    prototype: HTMLEImportElement;
     new(): HTMLEImportElement;
 }
 

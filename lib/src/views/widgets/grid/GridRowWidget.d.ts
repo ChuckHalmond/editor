@@ -22,10 +22,10 @@ declare global {
     }
 }
 declare var gridRowWidget: {
-    "__#17807@#template": HTMLElement;
+    "__#11513@#template": HTMLElement;
     create(init?: {
-        disabled?: boolean;
-    }): HTMLElement;
+        disabled?: boolean | undefined;
+    } | undefined): HTMLElement;
     slot(row: HTMLElement): HTMLElement | null;
     cells(row: HTMLElement): HTMLElement[];
     setPosInSet(row: HTMLElement, value: number): void;

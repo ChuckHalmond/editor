@@ -1,6 +1,6 @@
 export { HTMLEImportElement };
 interface HTMLEImportElementConstructor {
-    readonly prototype: HTMLEImportElement;
+    prototype: HTMLEImportElement;
     new (): HTMLEImportElement;
 }
 interface HTMLEImportElement extends HTMLElement {

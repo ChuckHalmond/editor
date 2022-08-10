@@ -4,7 +4,7 @@ import { HTMLEGridCellElement } from "./GridCell";
 export { HTMLEGridRowGroupElement };
 
 interface HTMLEGridRowGroupElementConstructor {
-    readonly prototype: HTMLEGridRowGroupElement;
+    prototype: HTMLEGridRowGroupElement;
     new(): HTMLEGridRowGroupElement;
 }
 

@@ -1,5 +1,5 @@
 //import { MenuItemGroupWidget, MenuItemWidget, MenuWidget, MenuBarWidget } from "./src/views/MenuBarWidget";
-import { treeView, TreeItemModel, TreeModel, TreeView } from "./src/views/TreeeView";
+import { treeView, TreeItemModel, TreeModel } from "./src/views/TreeView";
 
 import "./index";
 import { ListItemModel, ListModel, ListView } from "./src/views/ListView";
@@ -236,8 +236,7 @@ export async function main() {
             ]
         })
     );
-
-    //document.body.append(gridView);
+    document.body.append(gridView);
     
     const menuView = widget("menubar", {
         slotted: [

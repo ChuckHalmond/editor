@@ -1,6 +1,6 @@
 export { HTMLEWidthSashElement };
 interface HTMLEWidthSashElementConstructor {
-    readonly prototype: HTMLEWidthSashElement;
+    prototype: HTMLEWidthSashElement;
     new (): HTMLEWidthSashElement;
 }
 interface HTMLEWidthSashElement extends HTMLElement {

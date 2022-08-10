@@ -7,7 +7,7 @@ export { ModelList };
 export { ModelChangeObserverOptions };
 export { ModelChangeObserver };
 interface ModelChangeRecordConstructor {
-    readonly prototype: ModelChangeRecord;
+    prototype: ModelChangeRecord;
     new (init: {
         target: ModelNode | ModelList;
         changeType: number;
@@ -43,7 +43,7 @@ interface ModelChangeRecord {
 }
 declare var ModelChangeRecord: ModelChangeRecordConstructor;
 interface ModelNodesListConstructor {
-    readonly prototype: ModelNodesList;
+    prototype: ModelNodesList;
     new (items: any[]): ModelNodesList;
 }
 interface ModelNodesList {
@@ -53,7 +53,7 @@ interface ModelNodesList {
 }
 declare var ModelNodesList: ModelNodesListConstructor;
 interface ModelEventConstructor {
-    readonly prototype: ModelEvent;
+    prototype: ModelEvent;
     new (type: string): ModelEvent;
 }
 interface ModelEvent {
@@ -63,7 +63,7 @@ interface ModelEvent {
 }
 declare var ModelEvent: ModelEventConstructor;
 interface ModelEventTargetConstructor {
-    readonly prototype: ModelEventTarget;
+    prototype: ModelEventTarget;
     new (): ModelEventTarget;
 }
 interface ModelEventTarget {
@@ -74,7 +74,7 @@ interface ModelEventTarget {
 }
 declare var ModelEventTarget: ModelEventTargetConstructor;
 interface ModelNodeConstructor {
-    readonly prototype: ModelNode;
+    prototype: ModelNode;
     new (): ModelNode;
 }
 interface ModelNode extends ModelEventTarget {
@@ -92,14 +92,14 @@ interface ModelPropertyDecorator {
 }
 declare const ModelProperty: ModelPropertyDecorator;
 interface ModelObjectConstructor {
-    readonly prototype: ModelObject;
+    prototype: ModelObject;
     new (): ModelObject;
 }
 interface ModelObject extends ModelNode {
 }
 declare var ModelObject: ModelObjectConstructor;
 interface ModelListConstructor {
-    readonly prototype: ModelList;
+    prototype: ModelList;
     new <Model extends ModelNode>(): ModelList<Model>;
     new <Model extends ModelNode>(items: Model[]): ModelList<Model>;
 }
@@ -119,7 +119,7 @@ interface ModelList<Model extends ModelNode = ModelNode> extends ModelNode {
 }
 declare var ModelList: ModelListConstructor;
 interface ModelChangeObserverConstructor {
-    readonly prototype: ModelChangeObserver;
+    prototype: ModelChangeObserver;
     new (callback: (records: ModelChangeRecord[]) => void): ModelChangeObserver;
 }
 interface ModelChangeObserver {
