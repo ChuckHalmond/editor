@@ -56,6 +56,8 @@ export * from "./src/views/widgets/toolbar/ToolBarWidget";
 export * from "./src/views/widgets/toolbar/ToolBarItemWidget";
 export * from "./src/views/widgets/toolbar/ToolBarItemGroupWidget";
 export * from "./src/views/widgets/grid/GridWidget";
+export * from "./src/views/widgets/grid/GridBodyWidget";
+export * from "./src/views/widgets/grid/GridHeadWidget";
 export * from "./src/views/widgets/grid/GridHeaderWidget";
 export * from "./src/views/widgets/grid/GridCellWidget";
 export * from "./src/views/widgets/grid/GridRowWidget";

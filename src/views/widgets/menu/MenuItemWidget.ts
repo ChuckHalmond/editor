@@ -14,6 +14,8 @@ declare global {
 interface MenuItemWidgetFactory extends WidgetFactory {
     create(properties?: {
         id?: string;
+        classList?: string[];
+        tabIndex?: number;
         type?: MenuItemType;
         checked?: boolean;
         label?: string;
@@ -128,6 +130,8 @@ class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetF
 
     create(init?: {
         id?: string;
+        classList?: string[];
+        tabIndex?: number;
         type: MenuItemType;
         checked?: boolean;
         label?: string;
@@ -139,9 +143,15 @@ class MenuItemWidgetFactoryBase extends WidgetFactory implements MenuItemWidgetF
         const item = <HTMLElement>this.#template.cloneNode(true);
         item.addEventListener("click", this.#handleClickEvent.bind(this));
         if (init !== undefined) {
-            const {id, keyshortcut, checked, type, label, name, value, disabled} = init;
+            const {id, classList, tabIndex, keyshortcut, checked, type, label, name, value, disabled} = init;
             if (id !== undefined) {
                 item.id = id;
+            }
+            if (classList !== undefined) {
+                item.classList.add(...classList);
+            }
+            if (tabIndex !== undefined) {
+                item.tabIndex = tabIndex;
             }
             if (keyshortcut !== undefined) {
                 this.setKeyShortcut(item, keyshortcut);

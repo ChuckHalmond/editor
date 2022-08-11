@@ -9,6 +9,8 @@ declare global {
 interface MenuItemWidgetFactory extends WidgetFactory {
     create(properties?: {
         id?: string;
+        classList?: string[];
+        tabIndex?: number;
         type?: MenuItemType;
         checked?: boolean;
         label?: string;
@@ -40,12 +42,12 @@ interface MenuItemWidgetFactory extends WidgetFactory {
     collapse(item: HTMLElement): void;
 }
 declare var menuItemWidget: {
-    "__#9752@#iconPartTemplate": HTMLElement;
-    "__#9752@#arrowPartTemplate": HTMLElement;
-    "__#9752@#keyshortcutsPartTemplate": HTMLElement;
-    "__#9752@#template": HTMLElement;
-    "__#9752@#types": MenuItemType[];
-    "__#9752@#typesFeatures": {
+    "__#42@#iconPartTemplate": HTMLElement;
+    "__#42@#arrowPartTemplate": HTMLElement;
+    "__#42@#keyshortcutsPartTemplate": HTMLElement;
+    "__#42@#template": HTMLElement;
+    "__#42@#types": MenuItemType[];
+    "__#42@#typesFeatures": {
         button: {
             role: string;
             hasIcon: boolean;
@@ -74,6 +76,8 @@ declare var menuItemWidget: {
     };
     create(init?: {
         id?: string | undefined;
+        classList?: string[] | undefined;
+        tabIndex?: number | undefined;
         type: MenuItemType;
         checked?: boolean | undefined;
         label?: string | undefined;
@@ -84,7 +88,7 @@ declare var menuItemWidget: {
     } | undefined): HTMLElement;
     slot(item: HTMLElement): HTMLElement | null;
     slottedCallback(item: HTMLElement, slot: HTMLElement): void;
-    "__#9752@#label"(item: HTMLElement): HTMLElement;
+    "__#42@#label"(item: HTMLElement): HTMLElement;
     getMenu(item: HTMLElement): HTMLElement | null;
     getKeyShortcut(item: HTMLElement): string | null;
     setKeyShortcut(item: HTMLElement, value: string | null): void;
@@ -105,6 +109,6 @@ declare var menuItemWidget: {
     toggle(item: HTMLElement, force?: boolean | undefined): void;
     expand(item: HTMLElement): void;
     collapse(item: HTMLElement): void;
-    "__#9752@#handleClickEvent"(event: MouseEvent): void;
-    "__#9752@#positionMenu"(item: HTMLElement): void;
+    "__#42@#handleClickEvent"(event: MouseEvent): void;
+    "__#42@#positionMenu"(item: HTMLElement): void;
 };

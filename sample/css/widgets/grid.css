@@ -15,6 +15,7 @@
 .gridcell,
 .gridheader {
     display: table-cell;
+    text-align: left;
 }
 
 .grid:is(:not([data-selectby]), [data-selectby="cell"]) .gridcell:hover,

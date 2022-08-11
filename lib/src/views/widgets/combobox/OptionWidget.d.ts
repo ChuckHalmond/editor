@@ -25,7 +25,7 @@ declare global {
     }
 }
 declare var optionWidget: {
-    "__#11853@#template": HTMLElement;
+    "__#59@#template": HTMLElement;
     create(properties?: {
         selected?: boolean | undefined;
         label?: string | undefined;
@@ -35,7 +35,7 @@ declare var optionWidget: {
     } | undefined): HTMLElement;
     readonly observedAttributes: string[];
     attributeChangedCallback(option: HTMLElement, name: string, oldValue: string, newValue: string): void;
-    "__#11853@#label"(option: HTMLElement): HTMLElement;
+    "__#59@#label"(option: HTMLElement): HTMLElement;
     getLabel(option: HTMLElement): string;
     setLabel(option: HTMLElement, value: string): void;
     getValue(option: HTMLElement): string;

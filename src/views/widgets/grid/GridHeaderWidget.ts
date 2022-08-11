@@ -5,6 +5,9 @@ export { gridHeaderWidget };
 
 interface GridHeaderWidgetFactory extends WidgetFactory {
     create(init: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         label?: string;
     }): HTMLElement;
     getLabel(item: HTMLElement): string;
@@ -45,15 +48,31 @@ Widget({
     }
 
     create(init?: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         label?: string;
     }): HTMLElement {
         const header = <HTMLElement>this.#template.cloneNode(true);
         if (init !== undefined) {
-            const {label} = init;
+            const {id, classList, tabIndex, label} = init;
+            if (id !== undefined) {
+                header.id = id;
+            }
+            if (classList !== undefined) {
+                header.classList.add(...classList);
+            }
+            if (tabIndex !== undefined) {
+                header.tabIndex = tabIndex;
+            }
             if (label !== undefined) {
                 this.setLabel(header, label);
             }
         }
+        return header;
+    }
+
+    slot(header: HTMLElement): HTMLElement | null {
         return header;
     }
 

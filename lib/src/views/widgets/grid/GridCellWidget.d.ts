@@ -2,6 +2,9 @@ import { WidgetFactory } from "../Widget";
 export { gridCellWidget };
 interface GridCellWidgetFactory extends WidgetFactory {
     create(init: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         label?: string;
         disabled?: boolean;
         headers?: string;
@@ -27,8 +30,11 @@ declare global {
     }
 }
 declare var gridCellWidget: {
-    "__#29033@#template": HTMLElement;
+    "__#55@#template": HTMLElement;
     create(init?: {
+        id?: string | undefined;
+        classList?: string[] | undefined;
+        tabIndex?: number | undefined;
         label?: string | undefined;
         disabled?: boolean | undefined;
         headers?: string | undefined;
@@ -48,5 +54,5 @@ declare var gridCellWidget: {
     getDisabled(item: HTMLElement): boolean;
     setSelected(item: HTMLElement, value: boolean): void;
     getSelected(item: HTMLElement): boolean;
-    "__#29033@#label"(item: HTMLElement): HTMLElement;
+    "__#55@#label"(item: HTMLElement): HTMLElement;
 };

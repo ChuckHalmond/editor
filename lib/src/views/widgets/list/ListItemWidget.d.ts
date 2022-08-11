@@ -24,7 +24,7 @@ declare global {
     }
 }
 declare var listItemWidget: {
-    "__#10040@#template": HTMLElement;
+    "__#49@#template": HTMLElement;
     create(init?: {
         label?: string | undefined;
         disabled?: boolean | undefined;
@@ -43,5 +43,5 @@ declare var listItemWidget: {
     getDisabled(item: HTMLElement): boolean;
     setSelected(row: HTMLElement, value: boolean): void;
     getSelected(row: HTMLElement): boolean;
-    "__#10040@#label"(item: HTMLElement): Node;
+    "__#49@#label"(item: HTMLElement): Node;
 };

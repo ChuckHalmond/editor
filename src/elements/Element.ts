@@ -346,7 +346,7 @@ function element<K extends keyof HTMLElementTagNameMap>(
         if (attributes) {
             Object.entries(attributes).forEach(([attributeName, attributeValue]) => {
                 if (attributeValue !== undefined) {
-                    if (typeof attributeValue == "boolean") {
+                    if (typeof attributeValue === "boolean") {
                         element.toggleAttribute(camelToTrain(attributeName), attributeValue);
                     }
                     else {
@@ -362,7 +362,7 @@ function element<K extends keyof HTMLElementTagNameMap>(
             });
         }
         if (children) {
-            if (typeof children == "function") {
+            if (typeof children === "function") {
                 element.append(...children(element));
             }
             else {
@@ -412,7 +412,7 @@ function widget<K extends keyof WidgetNameMap>(
             if (attributes) {
                 Object.entries(attributes).forEach(([attributeName, attributeValue]) => {
                     if (attributeValue !== undefined) {
-                        if (typeof attributeValue == "boolean") {
+                        if (typeof attributeValue === "boolean") {
                             element.toggleAttribute(camelToTrain(attributeName), attributeValue);
                         }
                         else {
@@ -428,11 +428,11 @@ function widget<K extends keyof WidgetNameMap>(
                 });
             }
             if (slotted) {
-                if (typeof slotted == "function" || Array.isArray(slotted) || slotted instanceof NodeList) {
+                if (typeof slotted === "function" || Array.isArray(slotted) || slotted instanceof NodeList) {
                     const slot = widget.slot(element, null);
                     if (slot) {
-                        if (typeof slotted == "function") {
-                            slot.append(...slotted(element));
+                        if (typeof slotted === "function") {
+                            slot.append(...slotted(slot));
                         }
                         else {
                             slot.append(...Array.from(slotted));
@@ -443,8 +443,8 @@ function widget<K extends keyof WidgetNameMap>(
                     Object.entries(slotted).forEach(([slot_i, slotted]) => {
                         const slot = widget.slot(element, slot_i);
                         if (slot) {
-                            if (typeof slotted == "function") {
-                                slot.append(...slotted(element));
+                            if (typeof slotted === "function") {
+                                slot.append(...slotted(slot));
                             }
                             else {
                                 slot.append(...Array.from(slotted));

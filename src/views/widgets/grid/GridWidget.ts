@@ -24,6 +24,7 @@ interface GridRowWidgetFactory extends WidgetFactory {
     endSelection(grid: HTMLElement): void;
     selectedCells(grid: HTMLElement): HTMLElement[];
     selectedRows(grid: HTMLElement): HTMLElement[];
+    clearSelection(grid: HTMLElement): void;
 }
 
 declare global {
@@ -76,21 +77,7 @@ Widget({
                 class: "grid",
                 role: "grid",
                 tabindex: 0
-            },
-            children: [
-                element("thead", {
-                    attributes: {
-                        class: "gridhead",
-                        role: "row"
-                    }
-                }),
-                element("tbody", {
-                    attributes: {
-                        class: "gridbody",
-                        role: "rowgroup"
-                    }
-                }),
-            ]
+            }
         });
         this.#onSelection = new WeakMap();
         this.#hasSelectionChanged = new WeakMap();
@@ -110,7 +97,7 @@ Widget({
         selectby?: GridSelectBy;
     }) {
         const grid = <HTMLElement>this.#template.cloneNode(true);
-        grid.addEventListener("contextmenu", this.#handleContextMenuEvent.bind(this));
+        //grid.addEventListener("contextmenu", this.#handleContextMenuEvent.bind(this));
         grid.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
         grid.addEventListener("focus", this.#handleFocusEvent.bind(this));
         grid.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
@@ -138,23 +125,8 @@ Widget({
         return grid;
     }
 
-    slot(grid: HTMLElement, name: string | null): HTMLElement | null {
-        switch (name) {
-            case "headers":
-                return grid.querySelector(":scope > .gridhead");
-            case "rows":
-            default:
-                return grid.querySelector(":scope > .gridbody");
-        }
-    }
-
-    slottedCallback(grid: HTMLElement, slot: HTMLElement) {
-        const {childNodes} = slot;
-        Array.from(childNodes).forEach((child_i, i) => {
-            if (child_i instanceof HTMLElement) {
-                gridRowWidget.setPosInSet(child_i, i);
-            }
-        });
+    slot(grid: HTMLElement): HTMLElement | null {
+        return grid;
     }
 
     setMultiSelectable(grid: HTMLElement, value: boolean): void {
@@ -185,7 +157,7 @@ Widget({
         }
     }
 
-    #clearSelection(grid: HTMLElement): void {
+    clearSelection(grid: HTMLElement): void {
         this.#clearCellsSelection(grid);
         this.#clearRowsSelection(grid);
     }
@@ -488,7 +460,7 @@ Widget({
         return null;
     }
 
-    #handleContextMenuEvent(event: MouseEvent) {
+    /*#handleContextMenuEvent(event: MouseEvent) {
         const {currentTarget, target} = event;
         const targetGrid = <HTMLElement>currentTarget;
         const selectby = this.getSelectBy(targetGrid);
@@ -518,7 +490,7 @@ Widget({
             }
         }
         event.preventDefault();
-    }
+    }*/
 
     /*#handleDragEndEvent(event: DragEvent): void {
         const {currentTarget} = event;

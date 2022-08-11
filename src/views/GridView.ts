@@ -5,6 +5,8 @@ import { HTMLEMenuItemElement } from "../elements/containers/menus/MenuItem";
 import { gridHeaderWidget } from "./widgets/grid/GridHeaderWidget";
 import { gridWidget } from "./widgets/grid/GridWidget";
 import { gridRowWidget } from "./widgets/grid/GridRowWidget";
+import { menuWidget } from "./widgets/menu/MenuWidget";
+import { menuItemWidget } from "./widgets/menu/MenuItemWidget";
 
 export { GridModel };
 export { GridRowModel };
@@ -35,7 +37,7 @@ class GridModel extends ModelObject {
 
     sortByColumn(column: GridColumnModel, sortOrder: number) {
         Array.from(this.columns.values()).forEach((column_i) => {
-            column_i.sortorder = column_i == column ? sortOrder : undefined;
+            column_i.sortorder = column_i === column ? sortOrder : undefined;
         });
         this.rows.sort(
             (row_1, row_2) => {
@@ -43,7 +45,7 @@ class GridModel extends ModelObject {
                 const cell_2 = <string>column.extract(row_2).toString();
                 return sortOrder * cell_1.localeCompare(cell_2);
             }
-        )
+        );
     }
 }
 
@@ -190,7 +192,7 @@ class GridViewBase extends View implements GridView {
     }
 
     getGridElement(): HTMLElement | null {
-        return this.shadowRoot.querySelector(`:scope > e-grid`);
+        return this.shadowRoot.querySelector(`:scope > .grid`);
     }
 
     getRowElement(row: GridRowModel): HTMLElement | null {
@@ -198,7 +200,7 @@ class GridViewBase extends View implements GridView {
     }
 
     getColumnHeaderElement(column: GridColumnModel): HTMLElement | null {
-        return this.shadowRoot.querySelector(`:scope > .grid > .gridhead > .gridrow > .gridheader[id=${column.name}-columnheader]`);
+        return this.shadowRoot.querySelector(`:scope > .grid > .gridhead > .gridheader[id=${column.name}]`);
     }
     
     getColumnDataElements(column: GridColumnModel): HTMLElement[] {
@@ -238,78 +240,88 @@ class GridViewBase extends View implements GridView {
                     selectby: "row",
                     multisectable: true
                 },
-                slotted: {
-                    headers: reactiveChildElements(
-                        model.columns, column => this.#renderGridColumnHeaderCell(column)
-                    ),
-                    rows: reactiveChildElements(
-                        model.rows, row => this.#renderGridBodyRow(row)
-                    )
-                }
+                slotted: [
+                    widget("gridhead", {
+                        slotted: reactiveChildElements(
+                            model.columns, column => this.#renderGridColumnHeaderCell(column)
+                        ),
+                        listeners: {
+                            contextmenu: <EventListener>this.#handleHeadContextMenuEvent.bind(this),
+                            click: <EventListener>this.#handleHeadClickEvent.bind(this)
+                        }
+                    }),
+                    widget("gridbody", {
+                        slotted: reactiveChildElements(
+                            model.rows, row => this.#renderGridBodyRow(row)
+                        )
+                    })
+                ]
             })
         );
     }
 
-    #clearSelection(): void {
-        const {gridElement} = this;
-        gridWidget.beginSelection(gridElement);
-        gridWidget.selectedRows(gridElement).forEach(selectedRow_i => gridRowWidget.setSelected(selectedRow_i, false));
-        gridWidget.endSelection(gridElement);
+    #filter(row: GridRowModel): boolean {
+        const displayFilters = this.#displayFilters;
+        const searchFilter = this.#searchFilter;
+        return (displayFilters.length > 0 ? displayFilters.some(filter_i => filter_i.filter(row)) : true) &&
+        (searchFilter ? searchFilter.filter(row) : true);
     }
 
     setSearchFilter(filter: GridRowFilter | null): void {
+        const {model, gridElement} = this;
+        const {rows} = model;
         this.#searchFilter = filter;
-        Array.from(this.model.rows.values()).forEach((row_i) => {
+        Array.from(rows.values()).forEach((row_i) => {
             const rowElement = this.getRowElement(row_i);
             if (rowElement) {
-                rowElement.hidden =
-                    !this.#displayFilters.some(filter_i => filter_i.filter(row_i))
-                    && !(filter?.filter(row_i) ?? true);
+                rowElement.hidden = !this.#filter(row_i);
             }
         });
-        this.#clearSelection();
+        gridWidget.clearSelection(gridElement);
     }
 
     addDisplayFilter(filter: (GridRowFilter & {name: string;})): void {
+        const {model, gridElement} = this;
+        const {rows} = model;
         const displayFilters = this.#displayFilters;
         if (!displayFilters.includes(filter)) {
-            this.#displayFilters.push(filter);
-            Array.from(this.model.rows.values()).forEach((row_i) => {
+            displayFilters.push(filter);
+            Array.from(rows.values()).forEach((row_i) => {
                 const rowElement = this.getRowElement(row_i);
                 if (rowElement) {
-                    rowElement.hidden = !this.#displayFilters.some(filter_i => filter_i.filter(row_i));
+                    rowElement.hidden = !this.#filter(row_i);
                 }
             });
         }
-        this.#clearSelection();
+        gridWidget.clearSelection(gridElement);
     }
 
     removeDisplayFilter(filter: (GridRowFilter & {name: string;})): void {
+        const {model, gridElement} = this;
+        const {rows} = model;
         const displayFilters = this.#displayFilters;
         const filterIndex = displayFilters.indexOf(filter);
         if (filterIndex > -1) {
             displayFilters.splice(filterIndex, 1);
-            Array.from(this.model.rows.values()).forEach((row_i) => {
+            Array.from(rows.values()).forEach((row_i) => {
                 const rowElement = this.getRowElement(row_i);
                 if (rowElement) {
-                    rowElement.hidden = !this.#displayFilters.every(filter_i => filter_i.filter(row_i));
+                    rowElement.hidden = !this.#filter(row_i);
                 }
             });
         }
-        this.#clearSelection();
+        gridWidget.clearSelection(gridElement);
     }
 
     #renderGridColumnHeaderCell(column: GridColumnModel): Element {
-        const {model} = this;
         const gridColumnElement = reactiveElement(
             column,
-            element("e-gridcell", {
-                attributes: {
-                    tabindex: -1,
-                    id: `${column.name}-columnheader`,
-                    type: "columnheader"
+            widget("gridheader", {
+                properties: {
+                    tabIndex: -1,
+                    id: column.name
                 },
-                children: [
+                slotted: [
                     element("span", {
                         attributes: {
                             class: "gridcell-content"
@@ -321,166 +333,13 @@ class GridViewBase extends View implements GridView {
                                 },
                                 children: [
                                     column.label
-                                ],
-                                listeners: {
-                                    click: <EventListener>this.#handleColumnLabelClickEvent.bind(this)
-                                }
-                            }),
-                            element("e-toolbar", {
-                                attributes: {
-                                    tabindex: -1,
-                                },
-                                children: [
-                                    element("e-toolbaritem", {
-                                        attributes: {
-                                            type: "menubutton",
-                                            tabindex: -1,
-                                        },
-                                        children: [
-                                            element("e-menubutton",  {
-                                                attributes: {
-                                                    slot: "menubutton",
-                                                    tabindex: -1,
-                                                },
-                                                children: [
-                                                    element("e-menu",  {
-                                                        attributes: {
-                                                            slot: "menu",
-                                                            tabindex: -1,
-                                                        },
-                                                        children: [
-                                                            element("e-menuitem",  {
-                                                                attributes: {
-                                                                    type: "button",
-                                                                    tabindex: -1,
-                                                                },
-                                                                children: [
-                                                                    "Resize Column"
-                                                                ],
-                                                                listeners: {
-                                                                    click: () => {
-                                                                        const columnHeaderElement = this.getColumnHeaderElement(column);
-                                                                        if (columnHeaderElement) {
-                                                                            const {style} = columnHeaderElement;
-                                                                            style.removeProperty("width");
-                                                                            style.removeProperty("max-width");
-                                                                            this.getColumnDataElements(column).forEach(
-                                                                                cell_i => cell_i.style.maxWidth = "unset"
-                                                                            );
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }),
-                                                            element("e-menuitem",  {
-                                                                attributes: {
-                                                                    type: "submenu",
-                                                                    tabindex: -1,
-                                                                },
-                                                                children: [
-                                                                    "Sort",
-                                                                    reactiveElement(
-                                                                        column,
-                                                                        element("e-menu",  {
-                                                                            attributes: {
-                                                                                slot: "menu",
-                                                                                tabindex: -1,
-                                                                            },
-                                                                            children: [
-                                                                                element("e-menuitem",  {
-                                                                                    attributes: {
-                                                                                        type: "radio",
-                                                                                        name: "sort",
-                                                                                        value: "1",
-                                                                                        tabindex: -1,
-                                                                                    },
-                                                                                    children: [
-                                                                                        "Ascending"
-                                                                                    ]
-                                                                                }),
-                                                                                element("e-menuitem",  {
-                                                                                    attributes: {
-                                                                                        type: "radio",
-                                                                                        name: "sort",
-                                                                                        value: "-1",
-                                                                                        tabindex: -1,
-                                                                                    },
-                                                                                    children: [
-                                                                                        "Descending"
-                                                                                    ]
-                                                                                })
-                                                                            ],
-                                                                            listeners: {
-                                                                                click: (event) => {
-                                                                                    const {target} = event;
-                                                                                    const sortOrder = (<HTMLEMenuItemElement>target).value;
-                                                                                    model.sortByColumn(column, parseInt(sortOrder));
-                                                                                }
-                                                                            }
-                                                                        }),
-                                                                        ["sortorder"],
-                                                                        (menu, property, oldValue, newValue) => {
-                                                                            menu.querySelectorAll<HTMLEMenuItemElement>("e-menuitem[name^=sort]")
-                                                                            .forEach(sortRadioItem_i => {
-                                                                                sortRadioItem_i.checked = parseInt(sortRadioItem_i.value) === newValue;
-                                                                            });
-                                                                        }
-                                                                    )
-                                                                ]
-                                                            }),
-                                                            element("e-menuitem",  {
-                                                                attributes: {
-                                                                    type: "submenu",
-                                                                    tabindex: -1,
-                                                                },
-                                                                children: [
-                                                                    "Filter",
-                                                                    element("e-menu",  {
-                                                                        attributes: {
-                                                                            slot: "menu",
-                                                                            tabindex: -1,
-                                                                        },
-                                                                        children: column.filters.map((filter_i, i) =>
-                                                                            element("e-menuitem", {
-                                                                                attributes: {
-                                                                                    tabindex: -1,
-                                                                                    type: "checkbox",
-                                                                                    checked: this.#displayFilters.includes(filter_i)
-                                                                                },
-                                                                                children: [
-                                                                                    filter_i.name
-                                                                                ],
-                                                                                listeners: {
-                                                                                    click: (event) => {
-                                                                                        const {currentTarget} = event;
-                                                                                        if (currentTarget instanceof HTMLEMenuItemElement) {
-                                                                                            const {checked} = currentTarget;
-                                                                                            if (checked) {
-                                                                                                this.addDisplayFilter(filter_i);
-                                                                                            }
-                                                                                            else {
-                                                                                                this.removeDisplayFilter(filter_i);
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            })
-                                                                        )
-                                                                    })
-                                                                ]
-                                                            })
-                                                        ]
-                                                    })
-                                                ]
-                                            })
-                                        ]
-                                    })
                                 ]
                             })
                         ]).concat(
                             this.resizable ? [
                                 element("e-wsash", {
                                     attributes: {
-                                        controls: `${column.name}-columnheader`
+                                        controls: `${column.name}`
                                     },
                                     listeners: {
                                         resize: () => {
@@ -538,6 +397,129 @@ class GridViewBase extends View implements GridView {
         return gridCellElement;
     }
 
+    #handleHeadContextMenuEvent(event: MouseEvent): void {
+        const {clientX, clientY, currentTarget, target} = event;
+        const targetHead = <HTMLElement>currentTarget;
+        const targetHeader = <HTMLElement>(<HTMLElement>target).closest(".gridheader");
+        const {model} = this;
+        if (targetHeader) {
+            const column = model.getColumnByName(targetHeader.id)!;
+            const menu = widget("menu",  {
+                properties: {
+                    tabIndex: -1,
+                    contextual: true
+                },
+                slotted: [
+                    widget("menuitem",  {
+                        properties: {
+                            type: "button",
+                            tabIndex: -1,
+                            label: "Resize Column"
+                        },
+                        listeners: {
+                            click: () => {
+                                const columnHeaderElement = this.getColumnHeaderElement(column);
+                                if (columnHeaderElement) {
+                                    const {style} = columnHeaderElement;
+                                    style.removeProperty("width");
+                                    style.removeProperty("max-width");
+                                    this.getColumnDataElements(column).forEach(
+                                        cell_i => cell_i.style.maxWidth = "unset"
+                                    );
+                                }
+                            }
+                        }
+                    }),
+                    widget("menuitem",  {
+                        properties: {
+                            type: "submenu",
+                            tabIndex: -1,
+                            label: "Sort",
+                        },
+                        slotted: [
+                            widget("menu",  {
+                                attributes: {
+                                    tabIndex: -1,
+                                },
+                                slotted: [
+                                    widget("menuitem",  {
+                                        properties: {
+                                            type: "radio",
+                                            name: "sort",
+                                            value: "1",
+                                            tabIndex: -1,
+                                            label: "Ascending"
+                                        }
+                                    }),
+                                    widget("menuitem",  {
+                                        properties: {
+                                            type: "radio",
+                                            name: "sort",
+                                            value: "-1",
+                                            tabIndex: -1,
+                                            label: "Descending"
+                                        }
+                                    })
+                                ],
+                                listeners: {
+                                    click: (event) => {
+                                        const {target} = event;
+                                        const targetItem = <HTMLElement>target;
+                                        if (targetItem.classList.contains("menuitem")) {
+                                            const sortOrder = menuItemWidget.getValue(targetItem);
+                                            model.sortByColumn(column, parseInt(sortOrder));
+                                        }
+                                    }
+                                }
+                            })
+                        ]
+                    }),
+                    widget("menuitem",  {
+                        properties: {
+                            type: "submenu",
+                            tabIndex: -1,
+                            label: "Filter"
+                        },
+                        slotted: [
+                            widget("menu",  {
+                                properties: {
+                                    tabIndex: -1,
+                                },
+                                slotted: column.filters.map((filter_i, i) =>
+                                    widget("menuitem", {
+                                        properties: {
+                                            tabIndex: -1,
+                                            type: "checkbox",
+                                            checked: this.#displayFilters.includes(filter_i),
+                                            label: filter_i.name
+                                        },
+                                        listeners: {
+                                            click: (event) => {
+                                                const {currentTarget} = event;
+                                                const targetItem = <HTMLElement>currentTarget;
+                                                const checked = menuItemWidget.getChecked(targetItem);
+                                                if (checked) {
+                                                    this.addDisplayFilter(filter_i);
+                                                }
+                                                else {
+                                                    this.removeDisplayFilter(filter_i);
+                                                }
+                                            }
+                                        }
+                                    })
+                                )
+                            })
+                        ]
+                    })
+                ]
+            });
+            targetHead.append(menu);
+            menuWidget.positionContextual(menu, clientX, clientY);
+            menu.focus({preventScroll: true});
+            event.preventDefault();
+        }
+    }
+
     #handleSearchInputEvent(event: InputEvent) {
         const {target} = event;
         if (target instanceof HTMLInputElement) {
@@ -548,14 +530,15 @@ class GridViewBase extends View implements GridView {
         }
     }
 
-    #handleColumnLabelClickEvent(event: MouseEvent): void {
-        const {currentTarget} = event;
-        const {model} = this;
-        const {columns} = model;
-        if (currentTarget instanceof Element) {
-            const targetCell = currentTarget.closest(".gridheader");
-            if (targetCell) {
-                const targetColumn = Array.from(columns.values()).find(column_i => column_i.name == targetCell.id);
+    #handleHeadClickEvent(event: MouseEvent): void {
+        const {target} = event;
+        const targetIsHeaderLabel = (<HTMLElement>target).matches(".gridcell-label");
+        if (targetIsHeaderLabel) {
+            const targetHeader = <HTMLElement>(<HTMLElement>target).closest(".gridheader");
+            const {model} = this;
+            const {columns} = model;
+            if (targetHeader) {
+                const targetColumn = Array.from(columns.values()).find(column_i => column_i.name == targetHeader.id);
                 if (targetColumn) {
                     const sortorder = targetColumn.sortorder !== undefined ? -targetColumn.sortorder : 1;
                     model.sortByColumn(targetColumn, sortorder);

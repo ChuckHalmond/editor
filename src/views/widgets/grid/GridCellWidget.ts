@@ -5,6 +5,9 @@ export { gridCellWidget };
 
 interface GridCellWidgetFactory extends WidgetFactory {
     create(init: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         label?: string;
         disabled?: boolean;
         headers?: string;
@@ -63,13 +66,25 @@ Widget({
     }
 
     create(init?: {
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         label?: string;
         disabled?: boolean;
         headers?: string;
     }): HTMLElement {
         const cell = <HTMLElement>this.#template.cloneNode(true);
         if (init !== undefined) {
-            const {label, disabled, headers} = init;
+            const {id, classList, tabIndex, label, disabled, headers} = init;
+            if (id !== undefined) {
+                cell.id = id;
+            }
+            if (classList !== undefined) {
+                cell.classList.add(...classList);
+            }
+            if (tabIndex !== undefined) {
+                cell.tabIndex = tabIndex;
+            }
             if (label !== undefined) {
                 this.setLabel(cell, label);
             }
