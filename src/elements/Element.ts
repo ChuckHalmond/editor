@@ -328,7 +328,7 @@ interface HTMLElementInit {
     dataset?: {
         [property: string]: string | number | boolean
     },
-    children?: (Node | string)[] | NodeList | ReactiveChildElements,
+    children?: Node | string | (Node | string)[] | NodeList | ReactiveChildElements,
     listeners?: {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined]
     }
@@ -365,8 +365,11 @@ function element<K extends keyof HTMLElementTagNameMap>(
             if (typeof children === "function") {
                 element.append(...children(element));
             }
-            else {
+            else if (typeof children === "object" && "length" in children) {
                 element.append(...Array.from(children));
+            }
+            else {
+                element.append(children);
             }
         }
         if (listeners) {
@@ -393,8 +396,8 @@ interface WidgetInit<K extends keyof WidgetNameMap> {
         [property: string]: string | number | boolean
     },
     slotted?: {
-        [slot: string]: (Node | string)[] | NodeList | ReactiveChildElements
-    } | ((Node | string)[] | NodeList | ReactiveChildElements),
+        [slot: string]: Node | string | (Node | string)[] | NodeList | ReactiveChildElements
+    } | (Node | string | (Node | string)[] | NodeList | ReactiveChildElements),
     listeners?: {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined]
     }
@@ -428,14 +431,17 @@ function widget<K extends keyof WidgetNameMap>(
                 });
             }
             if (slotted) {
-                if (typeof slotted === "function" || Array.isArray(slotted) || slotted instanceof NodeList) {
+                if (typeof slotted === "function" || Array.isArray(slotted) || slotted instanceof NodeList || typeof slotted === "string" || slotted instanceof Node) {
                     const slot = widget.slot(element, null);
                     if (slot) {
                         if (typeof slotted === "function") {
                             slot.append(...slotted(slot));
                         }
-                        else {
+                        else if (typeof slotted === "object" && "length" in slotted) {
                             slot.append(...Array.from(slotted));
+                        }
+                        else {
+                            slot.append(slotted);
                         }
                     }
                 }
@@ -446,8 +452,11 @@ function widget<K extends keyof WidgetNameMap>(
                             if (typeof slotted === "function") {
                                 slot.append(...slotted(slot));
                             }
-                            else {
+                            else if (typeof slotted === "object" && "length" in slotted) {
                                 slot.append(...Array.from(slotted));
+                            }
+                            else {
+                                slot.append(slotted);
                             }
                         }
                     });

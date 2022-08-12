@@ -232,6 +232,10 @@ export async function main() {
                 new GridRowModel({
                     name: "Charles",
                     age: 25
+                }),
+                new GridRowModel({
+                    name: "Mamagubida",
+                    age: 128
                 })
             ]
         })
@@ -587,70 +591,50 @@ export async function main() {
             slotted: {
                 headers: [
                     widget("gridheader",  {
-                        properties: {
-                            label: "First header"
-                        }
+                        slotted: "First header"
                     }),
                     widget("gridheader",  {
-                        properties: {
-                            label: "Second header"
-                        }
+                        slotted: "Second header"
                     })
                 ],
                 rows: [
                     widget("gridrow",  {
                         slotted: [   
                             widget("gridcell",  {
-                                properties: {
-                                    label: "First cell"
-                                }
+                                slotted: "First cell"
                             }),
                             widget("gridcell",  {
-                                properties: {
-                                    label: "Second cell"
-                                }
+                                slotted: "Second cell"
                             })
                         ]
                     }),
                     widget("gridrow",  {
                         slotted: [   
                             widget("gridcell",  {
-                                properties: {
-                                    label: "Third cell"
-                                }
+                                slotted: "Third cell"
                             }),
                             widget("gridcell",  {
-                                properties: {
-                                    label: "Fourth cell"
-                                }
+                                slotted: "Fourth cell"
                             })
                         ]
                     }),
                     widget("gridrow",  {
                         slotted: [   
                             widget("gridcell",  {
-                                properties: {
-                                    label: "Fifth cell"
-                                }
+                                slotted: "Fifth cell"
                             }),
                             widget("gridcell",  {
-                                properties: {
-                                    label: "Sixth cell"
-                                }
+                                slotted: "Sixth cell"
                             })
                         ]
                     }),
                     widget("gridrow",  {
                         slotted: [   
                             widget("gridcell",  {
-                                properties: {
-                                    label: "Heighth cell"
-                                }
+                                slotted: "Heighth cell"
                             }),
                             widget("gridcell",  {
-                                properties: {
-                                    label: "Nineth cell"
-                                }
+                                slotted: "Nineth cell"
                             })
                         ]
                     })

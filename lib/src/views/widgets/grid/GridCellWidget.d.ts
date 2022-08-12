@@ -5,14 +5,11 @@ interface GridCellWidgetFactory extends WidgetFactory {
         id?: string;
         classList?: string[];
         tabIndex?: number;
-        label?: string;
         disabled?: boolean;
         headers?: string;
     }): HTMLElement;
     getHeaders(item: HTMLElement): string;
     setHeaders(item: HTMLElement, value: string): void;
-    getLabel(item: HTMLElement): string;
-    setLabel(item: HTMLElement, value: string): void;
     setPosInSet(item: HTMLElement, value: number): void;
     getPosInSet(item: HTMLElement): number;
     setActive(item: HTMLElement, value: boolean): void;
@@ -30,12 +27,11 @@ declare global {
     }
 }
 declare var gridCellWidget: {
-    "__#55@#template": HTMLElement;
+    "__#15209@#template": HTMLElement;
     create(init?: {
         id?: string | undefined;
         classList?: string[] | undefined;
         tabIndex?: number | undefined;
-        label?: string | undefined;
         disabled?: boolean | undefined;
         headers?: string | undefined;
     } | undefined): HTMLElement;
@@ -54,5 +50,5 @@ declare var gridCellWidget: {
     getDisabled(item: HTMLElement): boolean;
     setSelected(item: HTMLElement, value: boolean): void;
     getSelected(item: HTMLElement): boolean;
-    "__#55@#label"(item: HTMLElement): HTMLElement;
+    "__#15209@#label"(item: HTMLElement): HTMLElement;
 };

@@ -8,10 +8,10 @@ interface GridHeaderWidgetFactory extends WidgetFactory {
         id?: string;
         classList?: string[];
         tabIndex?: number;
-        label?: string;
+        //label?: string;
     }): HTMLElement;
-    getLabel(item: HTMLElement): string;
-    setLabel(item: HTMLElement, value: string): void;
+    //getLabel(item: HTMLElement): string;
+    //setLabel(item: HTMLElement, value: string): void;
     setActive(item: HTMLElement, value: boolean): void;
     getActive(item: HTMLElement): boolean;
 }
@@ -36,14 +36,14 @@ Widget({
                 scope: "column",
                 role: "columnheader",
                 tabindex: -1
-            },
+            }/*,
             children: [
                 element("span", {
                     attributes: {
                         class: "label"
                     }
                 })
-            ]
+            ]*/
         });
     }
 
@@ -51,11 +51,11 @@ Widget({
         id?: string;
         classList?: string[];
         tabIndex?: number;
-        label?: string;
+        //label?: string;
     }): HTMLElement {
         const header = <HTMLElement>this.#template.cloneNode(true);
         if (init !== undefined) {
-            const {id, classList, tabIndex, label} = init;
+            const {id, classList, tabIndex/*, label*/} = init;
             if (id !== undefined) {
                 header.id = id;
             }
@@ -65,9 +65,9 @@ Widget({
             if (tabIndex !== undefined) {
                 header.tabIndex = tabIndex;
             }
-            if (label !== undefined) {
+            /*if (label !== undefined) {
                 this.setLabel(header, label);
-            }
+            }*/
         }
         return header;
     }
@@ -76,13 +76,13 @@ Widget({
         return header;
     }
 
-    getLabel(header: HTMLElement): string {
+    /*getLabel(header: HTMLElement): string {
         return this.#label(header).textContent ?? "";
     }
 
     setLabel(header: HTMLElement, value: string): void {
         this.#label(header).textContent = value;
-    }
+    }*/
 
     setActive(item: HTMLElement, value: boolean): void {
         const {classList} = item;

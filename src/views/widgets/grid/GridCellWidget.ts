@@ -8,14 +8,14 @@ interface GridCellWidgetFactory extends WidgetFactory {
         id?: string;
         classList?: string[];
         tabIndex?: number;
-        label?: string;
+        //label?: string;
         disabled?: boolean;
         headers?: string;
     }): HTMLElement;
     getHeaders(item: HTMLElement): string;
     setHeaders(item: HTMLElement, value: string): void;
-    getLabel(item: HTMLElement): string;
-    setLabel(item: HTMLElement, value: string): void;
+    //getLabel(item: HTMLElement): string;
+    //setLabel(item: HTMLElement, value: string): void;
     setPosInSet(item: HTMLElement, value: number): void;
     getPosInSet(item: HTMLElement): number;
     setActive(item: HTMLElement, value: boolean): void;
@@ -48,20 +48,20 @@ Widget({
                 role: "gridcell",
                 tabindex: -1
             },
-            children: [
-                element("span", {
-                    attributes: {
-                        class: "content"
-                    },
-                    children: [
-                        element("span", {
-                            attributes: {
-                                class: "label"
-                            }
-                        })
-                    ]
-                })
-            ]
+            // children: [
+            //     element("span", {
+            //         attributes: {
+            //             class: "content"
+            //         },
+            //         children: [
+            //             element("span", {
+            //                 attributes: {
+            //                     class: "label"
+            //                 }
+            //             })
+            //         ]
+            //     })
+            // ]
         });
     }
 
@@ -69,13 +69,13 @@ Widget({
         id?: string;
         classList?: string[];
         tabIndex?: number;
-        label?: string;
+        //label?: string;
         disabled?: boolean;
         headers?: string;
     }): HTMLElement {
         const cell = <HTMLElement>this.#template.cloneNode(true);
         if (init !== undefined) {
-            const {id, classList, tabIndex, label, disabled, headers} = init;
+            const {id, classList, tabIndex, /*label,*/ disabled, headers} = init;
             if (id !== undefined) {
                 cell.id = id;
             }
@@ -85,9 +85,9 @@ Widget({
             if (tabIndex !== undefined) {
                 cell.tabIndex = tabIndex;
             }
-            if (label !== undefined) {
-                this.setLabel(cell, label);
-            }
+            // if (label !== undefined) {
+            //     this.setLabel(cell, label);
+            // }
             if (disabled !== undefined) {
                 this.setDisabled(cell, disabled);
             }

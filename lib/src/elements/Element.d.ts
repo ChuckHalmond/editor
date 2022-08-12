@@ -82,7 +82,7 @@ interface HTMLElementInit {
     dataset?: {
         [property: string]: string | number | boolean;
     };
-    children?: (Node | string)[] | NodeList | ReactiveChildElements;
+    children?: Node | string | (Node | string)[] | NodeList | ReactiveChildElements;
     listeners?: {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined];
     };
@@ -98,8 +98,8 @@ interface WidgetInit<K extends keyof WidgetNameMap> {
         [property: string]: string | number | boolean;
     };
     slotted?: {
-        [slot: string]: (Node | string)[] | NodeList | ReactiveChildElements;
-    } | ((Node | string)[] | NodeList | ReactiveChildElements);
+        [slot: string]: Node | string | (Node | string)[] | NodeList | ReactiveChildElements;
+    } | (Node | string | (Node | string)[] | NodeList | ReactiveChildElements);
     listeners?: {
         [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined];
     };

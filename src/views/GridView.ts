@@ -203,7 +203,7 @@ class GridViewBase extends View implements GridView {
         return this.shadowRoot.querySelector(`:scope > .grid > .gridhead > .gridheader[id=${column.name}]`);
     }
     
-    getColumnDataElements(column: GridColumnModel): HTMLElement[] {
+    getColumnCellsElements(column: GridColumnModel): HTMLElement[] {
         return Array.from(this.shadowRoot.querySelectorAll(`:scope > .grid > .gridbody > .gridrow > .gridcell[headers~=${column.name}]`));
     }
 
@@ -324,29 +324,20 @@ class GridViewBase extends View implements GridView {
                 slotted: [
                     element("span", {
                         attributes: {
-                            class: "gridcell-content"
+                            class: "gridheader-content"
                         },
                         children: (<Node[]>[
-                            element("label", {
+                            element("span", {
                                 attributes: {
-                                    class: "gridcell-label"
+                                    class: "gridheader-label"
                                 },
-                                children: [
-                                    column.label
-                                ]
+                                children: this.#columnDelegate(column)
                             })
                         ]).concat(
                             this.resizable ? [
                                 element("e-wsash", {
                                     attributes: {
                                         controls: `${column.name}`
-                                    },
-                                    listeners: {
-                                        resize: () => {
-                                            this.getColumnDataElements(column).forEach(
-                                                cell_i => cell_i.style.removeProperty("max-width")
-                                            );
-                                        }
                                     }
                                 })
                             ] : []
@@ -390,9 +381,19 @@ class GridViewBase extends View implements GridView {
             properties: {
                 headers: column.name
             },
-            slotted: [
-                this.#cellDelegate(row, column)
-            ]
+            slotted: element("span", {
+                attributes: {
+                    class: "gridcell-content"
+                },
+                children: (<Node[]>[
+                    element("span", {
+                        attributes: {
+                            class: "gridcell-label"
+                        },
+                        children: this.#cellDelegate(row, column)
+                    })
+                ])
+            })
         });
         return gridCellElement;
     }
@@ -401,7 +402,7 @@ class GridViewBase extends View implements GridView {
         const {clientX, clientY, currentTarget, target} = event;
         const targetHead = <HTMLElement>currentTarget;
         const targetHeader = <HTMLElement>(<HTMLElement>target).closest(".gridheader");
-        const {model} = this;
+        const {model, gridElement} = this;
         if (targetHeader) {
             const column = model.getColumnByName(targetHeader.id)!;
             const menu = widget("menu",  {
@@ -414,7 +415,29 @@ class GridViewBase extends View implements GridView {
                         properties: {
                             type: "button",
                             tabIndex: -1,
-                            label: "Resize Column"
+                            label: "Resize Auto"
+                        },
+                        listeners: {
+                            click: () => {
+                                const columnHeaderElement = this.getColumnHeaderElement(column);
+                                if (columnHeaderElement) {
+                                    const {style} = columnHeaderElement;
+                                    const labels = this.getColumnCellsElements(column).map(
+                                        cell_i => cell_i.querySelector(".gridcell-label")!
+                                    );
+                                    const maxWidth = labels.reduce(
+                                        (maxWidth, label) => Math.max(maxWidth, label.getBoundingClientRect().width), 0
+                                    );
+                                    style.setProperty("width", `${maxWidth}px`);
+                                }
+                            }
+                        }
+                    }),
+                    widget("menuitem",  {
+                        properties: {
+                            type: "button",
+                            tabIndex: -1,
+                            label: "Resize To Default"
                         },
                         listeners: {
                             click: () => {
@@ -422,10 +445,6 @@ class GridViewBase extends View implements GridView {
                                 if (columnHeaderElement) {
                                     const {style} = columnHeaderElement;
                                     style.removeProperty("width");
-                                    style.removeProperty("max-width");
-                                    this.getColumnDataElements(column).forEach(
-                                        cell_i => cell_i.style.maxWidth = "unset"
-                                    );
                                 }
                             }
                         }
@@ -525,14 +544,14 @@ class GridViewBase extends View implements GridView {
         if (target instanceof HTMLInputElement) {
             const {value} = target;
             this.setSearchFilter(value !== "" ? {
-                filter: (row) => row.name.toLowerCase().startsWith(value.toLowerCase())
+                filter: (row) => row.name.toLowerCase().includes(value.toLowerCase())
             } : null);
         }
     }
 
     #handleHeadClickEvent(event: MouseEvent): void {
         const {target} = event;
-        const targetIsHeaderLabel = (<HTMLElement>target).matches(".gridcell-label");
+        const targetIsHeaderLabel = (<HTMLElement>target).matches(":is(.gridheader-label, .gridheader-label :scope)");
         if (targetIsHeaderLabel) {
             const targetHeader = <HTMLElement>(<HTMLElement>target).closest(".gridheader");
             const {model} = this;
