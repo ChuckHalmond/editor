@@ -1,5 +1,5 @@
-import { Widget, element } from "../../../elements/Element";
-import { WidgetFactory } from "../Widget";
+import { element } from "../../../elements/Element";
+import { Widget, WidgetFactory } from "../Widget";
 import { listItemWidget } from "./ListItemWidget";
 
 export { listItemGroupWidget };

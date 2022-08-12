@@ -25,7 +25,6 @@ declare type GridRowFilter = {
 declare class GridColumnModel<T extends Constructor = Constructor> extends ModelObject {
     readonly name: string;
     readonly label: string;
-    readonly type: T;
     readonly extract: (row: GridRowModel) => InstanceType<T>;
     readonly filters: (GridRowFilter & {
         name: string;
@@ -34,7 +33,6 @@ declare class GridColumnModel<T extends Constructor = Constructor> extends Model
     constructor(init: {
         name: string;
         label: string;
-        type: T;
         extract: (row: GridRowModel) => InstanceType<T>;
         filters?: (GridRowFilter & {
             name: string;

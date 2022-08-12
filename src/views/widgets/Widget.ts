@@ -1,5 +1,10 @@
+import { ReactiveChildElements } from "../../elements/Element";
+import { camelToTrain } from "../../elements/Snippets";
+
 export { WidgetFactoryConstructor };
 
+export { widget };
+export { Widget };
 export { WidgetFactory };
 export { widgets };
 
@@ -135,3 +140,118 @@ class WidgetFactoryBase implements WidgetFactory {
 
 var WidgetFactory: WidgetFactoryConstructor = WidgetFactoryBase;
 var widgets: Map<string, WidgetFactory> = new Map();
+
+interface WidgetInit<K extends keyof WidgetNameMap> {
+    properties?: Parameters<WidgetNameMap[K]["create"]>[0],
+    attributes?: {
+        [name: string]: number | string | boolean
+    },
+    dataset?: {
+        [property: string]: string | number | boolean
+    },
+    slotted?: {
+        [slot: string]: Node | string | (Node | string)[] | NodeList | ReactiveChildElements
+    } | (Node | string | (Node | string)[] | NodeList | ReactiveChildElements),
+    listeners?: {
+        [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined]
+    }
+}
+
+function widget<K extends keyof WidgetNameMap>(
+    name: K, init?: WidgetInit<K>): ReturnType<WidgetNameMap[K]["create"]>;
+function widget<K extends keyof WidgetNameMap>(
+    name: K, init?: WidgetInit<K>): HTMLElement {
+    const widget = widgets.get(name);
+    if (widget) {
+        if (init !== undefined) {
+            const {properties, attributes, dataset, slotted, listeners} = init;
+            const element = widget.create(properties);
+            if (attributes) {
+                Object.entries(attributes).forEach(([attributeName, attributeValue]) => {
+                    if (attributeValue !== undefined) {
+                        if (typeof attributeValue === "boolean") {
+                            element.toggleAttribute(camelToTrain(attributeName), attributeValue);
+                        }
+                        else {
+                            element.setAttribute(camelToTrain(attributeName), String(attributeValue));
+                        }
+                    }
+                });
+            }
+            if (dataset) {
+                const {dataset: elementDataset} = element;
+                Object.keys(dataset).forEach((datasetEntry_i) => {
+                    elementDataset[datasetEntry_i] = String(dataset[datasetEntry_i]);
+                });
+            }
+            if (slotted) {
+                if (typeof slotted === "function" || Array.isArray(slotted) || slotted instanceof NodeList || typeof slotted === "string" || slotted instanceof Node) {
+                    const slot = widget.slot(element, null);
+                    if (slot) {
+                        if (typeof slotted === "function") {
+                            slot.append(...slotted(slot));
+                        }
+                        else if (typeof slotted === "object" && "length" in slotted) {
+                            slot.append(...Array.from(slotted));
+                        }
+                        else {
+                            slot.append(slotted);
+                        }
+                    }
+                }
+                else {
+                    Object.entries(slotted).forEach(([slot_i, slotted]) => {
+                        const slot = widget.slot(element, slot_i);
+                        if (slot) {
+                            if (typeof slotted === "function") {
+                                slot.append(...slotted(slot));
+                            }
+                            else if (typeof slotted === "object" && "length" in slotted) {
+                                slot.append(...Array.from(slotted));
+                            }
+                            else {
+                                slot.append(slotted);
+                            }
+                        }
+                    });
+                }
+            }
+            if (listeners) {
+                Object.entries(listeners).forEach(([name_i, listener_i]) => {
+                    if (Array.isArray(listener_i)) {
+                        element.addEventListener(name_i, listener_i[0], listener_i[1]);
+                    }
+                    else {
+                        element.addEventListener(name_i, listener_i);
+                    }
+                });
+            }
+            return element;
+        }
+        else {
+            return widget.create();
+        }
+    }
+    throw new Error(`Unknown widget ${name}. The corresponding module might not be imported.`);
+}
+
+interface WidgetDecorator {
+    (init: {
+        name: string;
+    }): <W extends WidgetFactoryConstructor>(widget: W) => W;
+}
+
+const Widget: WidgetDecorator = function(init: {
+    name: string;
+}) {
+    return <W extends WidgetFactoryConstructor>(
+        widget: W
+    ) => {
+        const {name} = init;
+        widgets.set(
+            name,
+            new widget()
+        );
+        return widget;
+    }
+}

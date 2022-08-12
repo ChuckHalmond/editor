@@ -1,12 +1,10 @@
-import { element, reactiveChildElements, CustomElement, fragment, AttributeProperty, reactiveElement, widget } from "../elements/Element";
+import { element, reactiveChildElements, CustomElement, fragment, AttributeProperty, reactiveElement } from "../elements/Element";
 import { ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { View } from "./View";
-import { HTMLEMenuItemElement } from "../elements/containers/menus/MenuItem";
-import { gridHeaderWidget } from "./widgets/grid/GridHeaderWidget";
 import { gridWidget } from "./widgets/grid/GridWidget";
-import { gridRowWidget } from "./widgets/grid/GridRowWidget";
 import { menuWidget } from "./widgets/menu/MenuWidget";
 import { menuItemWidget } from "./widgets/menu/MenuItemWidget";
+import { widget } from "./widgets/Widget";
 
 export { GridModel };
 export { GridRowModel };
@@ -61,7 +59,6 @@ type GridRowFilter = {
 class GridColumnModel<T extends Constructor = Constructor> extends ModelObject {
     readonly name: string;
     readonly label: string;
-    readonly type: T;
     readonly extract: (row: GridRowModel) => InstanceType<T>;
     readonly filters: (GridRowFilter & {name: string})[];
 
@@ -71,15 +68,13 @@ class GridColumnModel<T extends Constructor = Constructor> extends ModelObject {
     constructor(init: {
         name: string,
         label: string,
-        type: T,
         extract: (row: GridRowModel) => InstanceType<T>,
         filters?: (GridRowFilter & {name: string})[]
     }) {
         super();
-        const {name, label, type, extract} = init;
+        const {name, label, extract} = init;
         this.name = name;
         this.label = label;
-        this.type = type;
         this.extract = extract;
         this.filters = init.filters ?? [];
         this.sortorder = 1;
@@ -93,7 +88,10 @@ class GridRowModel extends ModelObject {
     @ModelProperty()
     age: number;
     
-    constructor(init: {name: string, age: number}) {
+    constructor(init: {
+        name: string,
+        age: number
+    }) {
         super();
         const {name, age} = init;
         this.name = name;
@@ -223,16 +221,14 @@ class GridViewBase extends View implements GridView {
                 }
             }),
             element("div", {
-                children: [
-                    element("input", {
-                        attributes: {
-                            type: "search"
-                        },
-                        listeners: {
-                            input: <EventListener>this.#handleSearchInputEvent.bind(this)
-                        }
-                    })
-                ]
+                children: element("input", {
+                    attributes: {
+                        type: "search"
+                    },
+                    listeners: {
+                        input: <EventListener>this.#handleSearchInputEvent.bind(this)
+                    }
+                })
             }),
             widget("grid", {
                 properties: {
@@ -318,7 +314,6 @@ class GridViewBase extends View implements GridView {
             column,
             widget("gridheader", {
                 properties: {
-                    tabIndex: -1,
                     id: column.name
                 },
                 slotted: [
@@ -335,8 +330,8 @@ class GridViewBase extends View implements GridView {
                             })
                         ]).concat(
                             this.resizable ? [
-                                element("e-wsash", {
-                                    attributes: {
+                                widget("widthsash", {
+                                    properties: {
                                         controls: `${column.name}`
                                     }
                                 })
@@ -349,11 +344,12 @@ class GridViewBase extends View implements GridView {
             (cell, property, oldValue, newValue) => {
                 switch (property) {
                     case "sortorder":
+                        const {dataset} = cell;
                         if (typeof newValue !== "undefined") {
-                            cell.dataset.sortorder = newValue.toString();
+                            dataset.sortorder = newValue.toString();
                         }
                         else {
-                            delete cell.dataset.sortorder;
+                            delete dataset.sortorder;
                         }
                         break;
                 }
@@ -365,9 +361,6 @@ class GridViewBase extends View implements GridView {
     #renderGridBodyRow(row: GridRowModel): Element {
         const {model} = this;
         const gridRowElement = widget("gridrow", {
-            attributes: {
-                tabindex: -1
-            },
             slotted: reactiveChildElements(
                 model.columns, column => this.#renderGridDataCell(row, column)
             )
@@ -402,19 +395,20 @@ class GridViewBase extends View implements GridView {
         const {clientX, clientY, currentTarget, target} = event;
         const targetHead = <HTMLElement>currentTarget;
         const targetHeader = <HTMLElement>(<HTMLElement>target).closest(".gridheader");
-        const {model, gridElement} = this;
+        const {model} = this;
         if (targetHeader) {
             const column = model.getColumnByName(targetHeader.id)!;
-            const menu = widget("menu",  {
+            const contextMenu = widget("menu",  {
                 properties: {
-                    tabIndex: -1,
-                    contextual: true
+                    contextual: true,
+                    position: {
+                        x: clientX,
+                        y: clientY
+                    }
                 },
                 slotted: [
                     widget("menuitem",  {
                         properties: {
-                            type: "button",
-                            tabIndex: -1,
                             label: "Resize Auto"
                         },
                         listeners: {
@@ -435,8 +429,6 @@ class GridViewBase extends View implements GridView {
                     }),
                     widget("menuitem",  {
                         properties: {
-                            type: "button",
-                            tabIndex: -1,
                             label: "Resize To Default"
                         },
                         listeners: {
@@ -452,21 +444,16 @@ class GridViewBase extends View implements GridView {
                     widget("menuitem",  {
                         properties: {
                             type: "submenu",
-                            tabIndex: -1,
                             label: "Sort",
                         },
                         slotted: [
                             widget("menu",  {
-                                attributes: {
-                                    tabIndex: -1,
-                                },
                                 slotted: [
                                     widget("menuitem",  {
                                         properties: {
                                             type: "radio",
                                             name: "sort",
                                             value: "1",
-                                            tabIndex: -1,
                                             label: "Ascending"
                                         }
                                     }),
@@ -475,7 +462,6 @@ class GridViewBase extends View implements GridView {
                                             type: "radio",
                                             name: "sort",
                                             value: "-1",
-                                            tabIndex: -1,
                                             label: "Descending"
                                         }
                                     })
@@ -485,8 +471,7 @@ class GridViewBase extends View implements GridView {
                                         const {target} = event;
                                         const targetItem = <HTMLElement>target;
                                         if (targetItem.classList.contains("menuitem")) {
-                                            const sortOrder = menuItemWidget.getValue(targetItem);
-                                            model.sortByColumn(column, parseInt(sortOrder));
+                                            model.sortByColumn(column, Number(menuItemWidget.getValue(targetItem)));
                                         }
                                     }
                                 }
@@ -496,18 +481,13 @@ class GridViewBase extends View implements GridView {
                     widget("menuitem",  {
                         properties: {
                             type: "submenu",
-                            tabIndex: -1,
                             label: "Filter"
                         },
                         slotted: [
                             widget("menu",  {
-                                properties: {
-                                    tabIndex: -1,
-                                },
                                 slotted: column.filters.map((filter_i, i) =>
                                     widget("menuitem", {
                                         properties: {
-                                            tabIndex: -1,
                                             type: "checkbox",
                                             checked: this.#displayFilters.includes(filter_i),
                                             label: filter_i.name
@@ -532,9 +512,8 @@ class GridViewBase extends View implements GridView {
                     })
                 ]
             });
-            targetHead.append(menu);
-            menuWidget.positionContextual(menu, clientX, clientY);
-            menu.focus({preventScroll: true});
+            targetHead.append(contextMenu);
+            contextMenu.focus({preventScroll: true});
             event.preventDefault();
         }
     }

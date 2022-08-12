@@ -1,10 +1,8 @@
-import { WidgetFactoryConstructor } from "../views/widgets/Widget";
 import { ModelList, ModelNode } from "../models/Model";
 export { subtreeNodes };
 export { ancestorNodes };
 export { CustomElement };
-export { Widget };
-export { widget };
+export { ReactiveChildElements };
 export { QueryProperty };
 export { QueryAllProperty };
 export { AttributeProperty };
@@ -50,12 +48,6 @@ interface CustomElementDecorator {
     }): <C extends CustomElementConstructor>(elementCtor: C) => C;
 }
 declare const CustomElement: CustomElementDecorator;
-interface WidgetDecorator {
-    (init: {
-        name: string;
-    }): <W extends WidgetFactoryConstructor>(widget: W) => W;
-}
-declare const Widget: WidgetDecorator;
 declare function subtreeNodes(node: Node): Generator<Node>;
 declare function ancestorNodes(node: Node): Generator<Node>;
 interface QueryPropertyDecorator {
@@ -89,22 +81,6 @@ interface HTMLElementInit {
 }
 declare function element<E extends HTMLElementTagNameMap[K], K extends keyof HTMLElementTagNameMap>(tagName: K, init?: HTMLElementInit): E;
 declare function element(tagName: string, init?: HTMLElementInit): HTMLElement;
-interface WidgetInit<K extends keyof WidgetNameMap> {
-    properties?: Parameters<WidgetNameMap[K]["create"]>[0];
-    attributes?: {
-        [name: string]: number | string | boolean;
-    };
-    dataset?: {
-        [property: string]: string | number | boolean;
-    };
-    slotted?: {
-        [slot: string]: Node | string | (Node | string)[] | NodeList | ReactiveChildElements;
-    } | (Node | string | (Node | string)[] | NodeList | ReactiveChildElements);
-    listeners?: {
-        [EventName in keyof HTMLElementEventMap]?: EventListenerOrEventListenerObject | [EventListenerOrEventListenerObject, boolean | AddEventListenerOptions | undefined];
-    };
-}
-declare function widget<K extends keyof WidgetNameMap>(name: K, init?: WidgetInit<K>): ReturnType<WidgetNameMap[K]["create"]>;
 declare function reactiveElement<M extends ModelNode, E extends Element, K extends string>(model: M, element: E, properties: K[], react: (object: E, property: K, oldValue: any, newValue: any) => void): E;
 interface ReactiveChildElements {
     (parent: Node & ParentNode): (Node | string)[];

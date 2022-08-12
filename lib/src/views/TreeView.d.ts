@@ -41,18 +41,18 @@ declare class TreeItemModel extends ModelObject implements TreeItem {
     remove(): void;
 }
 declare var treeView: {
-    "__#66@#models": WeakMap<HTMLElement, TreeModel>;
-    "__#66@#dragImages": WeakMap<TreeItemModel, WeakRef<Element>>;
+    "__#68@#models": WeakMap<HTMLElement, TreeModel>;
+    "__#68@#dragImages": WeakMap<TreeItemModel, WeakRef<Element>>;
     create(model: TreeModel): HTMLElement;
     getModel(tree: HTMLElement): TreeModel | null;
     selectedItems(tree: HTMLElement): TreeItemModel[];
-    "__#66@#getDragImage"(model: TreeItemModel): Element | null;
-    "__#66@#renderTreeItem"(item: TreeItemModel): Element;
-    "__#66@#renderTreeItemDragImage"(item: TreeItemModel): Element;
-    "__#66@#handleDragStartEvent"(event: DragEvent): void;
-    "__#66@#handleDropEvent"(event: DragEvent): void;
-    "__#66@#handleContextMenuEvent"(event: MouseEvent): void;
-    "__#66@#handleFocusInEvent"(event: FocusEvent): void;
-    "__#66@#handleFocusOutEvent"(event: FocusEvent): void;
-    "__#66@#handleKeyDownEvent"(event: KeyboardEvent): void;
+    "__#68@#getDragImage"(model: TreeItemModel): Element | null;
+    "__#68@#renderTreeItem"(item: TreeItemModel): Element;
+    "__#68@#renderTreeItemDragImage"(item: TreeItemModel): Element;
+    "__#68@#handleDragStartEvent"(event: DragEvent): void;
+    "__#68@#handleDropEvent"(event: DragEvent): void;
+    "__#68@#handleContextMenuEvent"(event: MouseEvent): void;
+    "__#68@#handleFocusInEvent"(event: FocusEvent): void;
+    "__#68@#handleFocusOutEvent"(event: FocusEvent): void;
+    "__#68@#handleKeyDownEvent"(event: KeyboardEvent): void;
 };

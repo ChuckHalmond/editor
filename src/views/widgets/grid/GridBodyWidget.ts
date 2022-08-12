@@ -1,5 +1,5 @@
-import { Widget, element } from "../../../elements/Element";
-import { WidgetFactory } from "../Widget";
+import { element } from "../../../elements/Element";
+import { Widget, WidgetFactory } from "../Widget";
 import { gridRowWidget } from "./GridRowWidget";
 
 export { gridBodyWidget };

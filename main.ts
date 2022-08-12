@@ -4,8 +4,9 @@ import { treeView, TreeItemModel, TreeModel } from "./src/views/TreeView";
 import "./index";
 import { ListItemModel, ListModel, ListView } from "./src/views/ListView";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
-import { element, fragment, widget } from "./src/elements/Element";
+import { element, fragment } from "./src/elements/Element";
 import { treeItemWidget } from "./src/views/widgets/tree/TreeItemWidget";
+import { widget } from "./src/views/widgets/Widget";
 import { Editor } from "./src/Editor";
 import { comboBoxWidget, menuWidget, optionWidget } from "./index";
 
@@ -179,13 +180,11 @@ export async function main() {
     const gridView = new GridView();
     gridView.resizable = true;
     gridView.sortable = true;
-    gridView.setColumnDelegate((column) => {
+    /*gridView.setColumnDelegate((column) => {
         return fragment(
             element("label", {
-                children: [
-                    column.label
-                ]
-            })/*,
+                children: column.label
+            }),
             element("e-toolbar", {
                 children: [
                     element("e-toolbaritem", {
@@ -194,22 +193,20 @@ export async function main() {
                         }
                     })
                 ]
-            })*/
+            })
         );
-    });
+    });*/
     gridView.setModel(
         new GridModel({
             columns: [
                 new GridColumnModel({
                     name: "name",
                     label: "Name",
-                    type: String,
                     extract: (row) => row.name
                 }),
                 new GridColumnModel({
                     name: "age",
                     label: "Age",
-                    type: Number,
                     extract: (row) => row.age,
                     filters: [{
                         name: "Minors",

@@ -26,9 +26,9 @@ declare global {
     }
 }
 declare var comboBoxWidget: {
-    "__#62@#template": HTMLElement;
-    "__#62@#walker": TreeWalker;
-    "__#62@#optionsObserver": MutationObserver;
+    "__#64@#template": HTMLElement;
+    "__#64@#walker": TreeWalker;
+    "__#64@#optionsObserver": MutationObserver;
     create(properties?: {
         id?: string | undefined;
         classList?: string[] | undefined;
@@ -39,11 +39,11 @@ declare var comboBoxWidget: {
     } | undefined): HTMLElement;
     slot(combobox: HTMLElement): HTMLElement;
     slottedCallback(combobox: HTMLElement, slot: HTMLElement, name: string | null): void;
-    "__#62@#box"(combobox: HTMLElement): HTMLElement;
+    "__#64@#box"(combobox: HTMLElement): HTMLElement;
     options(combobox: HTMLElement): HTMLElement[];
     selectedOption(combobox: HTMLElement): HTMLElement | null;
-    "__#62@#getActiveOption"(combobox: HTMLElement): HTMLElement | null;
-    "__#62@#value"(combobox: HTMLElement): HTMLElement;
+    "__#64@#getActiveOption"(combobox: HTMLElement): HTMLElement | null;
+    "__#64@#value"(combobox: HTMLElement): HTMLElement;
     getName(combobox: HTMLElement): string;
     setName(combobox: HTMLElement, value: string): void;
     getDisabled(combobox: HTMLElement): boolean;
@@ -55,17 +55,17 @@ declare var comboBoxWidget: {
     expand(combobox: HTMLElement): void;
     collapse(combobox: HTMLElement): void;
     toggle(combobox: HTMLElement, force?: boolean | undefined): void;
-    "__#62@#optionsMutationCallback"(mutationsList: MutationRecord[]): void;
-    "__#62@#walkerNodeFilter"(node: Node): number;
-    "__#62@#firstOption"(combobox: HTMLElement): HTMLElement | null;
-    "__#62@#lastOption"(combobox: HTMLElement): HTMLElement | null;
-    "__#62@#previousOption"(option: HTMLElement): HTMLElement | null;
-    "__#62@#nextOption"(option: HTMLElement): HTMLElement | null;
-    "__#62@#selectOption"(combobox: HTMLElement, option: HTMLElement): void;
-    "__#62@#setSelectedOption"(combobox: HTMLElement, option: HTMLElement): void;
-    "__#62@#positionBox"(combobox: HTMLElement): void;
-    "__#62@#handleClickEvent"(event: MouseEvent): void;
-    "__#62@#handleFocusOutEvent"(event: FocusEvent): void;
-    "__#62@#handleKeyDownEvent"(event: KeyboardEvent): void;
-    "__#62@#handleMouseOverEvent"(event: MouseEvent): void;
+    "__#64@#optionsMutationCallback"(mutationsList: MutationRecord[]): void;
+    "__#64@#walkerNodeFilter"(node: Node): number;
+    "__#64@#firstOption"(combobox: HTMLElement): HTMLElement | null;
+    "__#64@#lastOption"(combobox: HTMLElement): HTMLElement | null;
+    "__#64@#previousOption"(option: HTMLElement): HTMLElement | null;
+    "__#64@#nextOption"(option: HTMLElement): HTMLElement | null;
+    "__#64@#selectOption"(combobox: HTMLElement, option: HTMLElement): void;
+    "__#64@#setSelectedOption"(combobox: HTMLElement, option: HTMLElement): void;
+    "__#64@#positionBox"(combobox: HTMLElement): void;
+    "__#64@#handleClickEvent"(event: MouseEvent): void;
+    "__#64@#handleFocusOutEvent"(event: FocusEvent): void;
+    "__#64@#handleKeyDownEvent"(event: KeyboardEvent): void;
+    "__#64@#handleMouseOverEvent"(event: MouseEvent): void;
 };

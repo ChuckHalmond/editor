@@ -15,7 +15,7 @@ declare global {
     }
 }
 declare var gridHeaderWidget: {
-    "__#17469@#template": HTMLElement;
+    "__#13887@#template": HTMLElement;
     create(init?: {
         id?: string | undefined;
         classList?: string[] | undefined;
@@ -24,5 +24,4 @@ declare var gridHeaderWidget: {
     slot(header: HTMLElement): HTMLElement | null;
     setActive(item: HTMLElement, value: boolean): void;
     getActive(item: HTMLElement): boolean;
-    "__#17469@#label"(header: HTMLElement): HTMLElement;
 };

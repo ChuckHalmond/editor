@@ -1,5 +1,5 @@
-import { Widget, element } from "../../../elements/Element";
-import { WidgetFactory } from "../Widget";
+import { element } from "../../../elements/Element";
+import { Widget, WidgetFactory } from "../Widget";
 import { menuItemWidget } from "./MenuItemWidget";
 
 export { menuWidget };
@@ -16,8 +16,9 @@ interface MenuWidgetFactory extends WidgetFactory {
         classList?: string[];
         tabIndex?: number;
         contextual?: boolean;
+        position?: {x: number, y: number};
     }): HTMLElement;
-    positionContextual(menu: HTMLElement, x: number, y: number): void;
+    setPosition(menu: HTMLElement, x: number, y: number): void;
     getContextual(menu: HTMLElement): boolean;
     setContextual(menu: HTMLElement, value: boolean): void;
     items(menu: HTMLElement): HTMLElement[];
@@ -55,6 +56,7 @@ Widget({
         classList?: string[];
         tabIndex?: number;
         contextual?: boolean;
+        position?: {x: number, y: number};
     }): HTMLElement {
         const menu = <HTMLElement>this.#template.cloneNode(true);
         menu.addEventListener("click", this.#handleClickEvent.bind(this));
@@ -63,7 +65,7 @@ Widget({
         menu.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         menu.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         if (properties !== undefined) {
-            const {id, classList, tabIndex, contextual} = properties;
+            const {id, classList, tabIndex, contextual, position} = properties;
             if (id !== undefined) {
                 menu.id = id;
             }
@@ -76,6 +78,10 @@ Widget({
             if (contextual !== undefined) {
                 this.setContextual(menu, contextual);
             }
+            if (position !== undefined) {
+                const {x, y} = position;
+                this.setPosition(menu, x, y);
+            }
         }
         return menu;
     }
@@ -84,7 +90,7 @@ Widget({
         return menu;
     }
 
-    positionContextual(menu: HTMLElement, x: number, y: number): void {
+    setPosition(menu: HTMLElement, x: number, y: number): void {
         const {style} = menu;
         const {width: menuWidth, height: menuHeight} = menu.getBoundingClientRect();
         const {scrollX, scrollY} = window;

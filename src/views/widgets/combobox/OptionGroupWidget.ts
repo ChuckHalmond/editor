@@ -1,6 +1,5 @@
-import { Widget, element } from "../../../elements/Element";
-import { WidgetFactory } from "../Widget";
-import { optionWidget } from "./OptionWidget";
+import { element } from "../../../elements/Element";
+import { Widget, WidgetFactory } from "../Widget";
 
 export { optionGroupWidget };
 

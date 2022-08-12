@@ -11,8 +11,12 @@ interface MenuWidgetFactory extends WidgetFactory {
         classList?: string[];
         tabIndex?: number;
         contextual?: boolean;
+        position?: {
+            x: number;
+            y: number;
+        };
     }): HTMLElement;
-    positionContextual(menu: HTMLElement, x: number, y: number): void;
+    setPosition(menu: HTMLElement, x: number, y: number): void;
     getContextual(menu: HTMLElement): boolean;
     setContextual(menu: HTMLElement, value: boolean): void;
     items(menu: HTMLElement): HTMLElement[];
@@ -28,9 +32,13 @@ declare var menuWidget: {
         classList?: string[] | undefined;
         tabIndex?: number | undefined;
         contextual?: boolean | undefined;
+        position?: {
+            x: number;
+            y: number;
+        } | undefined;
     } | undefined): HTMLElement;
     slot(menu: HTMLElement): HTMLElement | null;
-    positionContextual(menu: HTMLElement, x: number, y: number): void;
+    setPosition(menu: HTMLElement, x: number, y: number): void;
     getContextual(menu: HTMLElement): boolean;
     setContextual(menu: HTMLElement, value: boolean): void;
     items(menu: HTMLElement): HTMLElement[];

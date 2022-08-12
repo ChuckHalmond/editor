@@ -1,10 +1,11 @@
-import { element, reactiveChildElements, reactiveElement, widget } from "../elements/Element";
+import { element, reactiveChildElements, reactiveElement } from "../elements/Element";
 import { ModelEvent, ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { menuWidget } from "./widgets/menu/MenuWidget";
 import { toolbarItemWidget } from "./widgets/toolbar/ToolBarItemWidget";
 import { toolbarWidget } from "./widgets/toolbar/ToolBarWidget";
 import { treeItemWidget } from "./widgets/tree/TreeItemWidget";
 import { treeWidget } from "./widgets/tree/TreeWidget";
+import { widget } from "./widgets/Widget";
 
 export { TreeModel };
 export { TreeItemModel };
@@ -499,9 +500,13 @@ var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
         const model = this.getModel(targetTree)!;
         if (targetItem) {
             const activeItem = model.getItemByUri(targetItem.dataset.uri!)!;
-            const menu = widget("menu", {
+            const contextMenu = widget("menu", {
                 properties: {
-                    contextual: true
+                    contextual: true,
+                    position: {
+                        x: clientX,
+                        y: clientY
+                    }
                 },
                 slotted: [
                     widget("menuitemgroup", {
@@ -562,9 +567,8 @@ var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
                     }
                 }
             });
-            targetTree.append(menu);
-            menuWidget.positionContextual(menu, clientX, clientY);
-            menu.focus({preventScroll: true});
+            targetTree.append(contextMenu);
+            contextMenu.focus({preventScroll: true});
             event.preventDefault();
         }
     }

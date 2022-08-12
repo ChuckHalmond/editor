@@ -1,17 +1,12 @@
 :host {
     display: block;
 }
-/*
-.grid[selectby="row"] .gridbody .gridcell:is(:hover, [selected], [active]),
-.grid[selectby="cell"] .gridbody .gridrow:is(:hover, [selected], [active]) {
-    background: revert;
-}*/
 
 .gridrow[hidden] {
     display: none;
 }
 
-.gridbody .gridcell {
+.gridcell {
     max-width: 0;
 
     overflow: clip;
@@ -27,11 +22,11 @@
     padding-left: 4px;
 }
 
-.gridcell .gridcell-content {
+.gridcell-content {
     overflow: clip;
 }
 
-.gridhead .gridheader-content {
+.gridheader-content {
     display: flex;
 }
 
@@ -42,16 +37,10 @@
     white-space: nowrap;
 }
 
-.gridheader-content > e-wsash {
+.gridheader .widthsash:not(:hover) {
     flex: 0 0 auto;
-    border-right: 1px solid lightgrey;
-}
-
-/*
-.gridhead .gridheader {
-    min-width: 64px;
-}*/
-e-menubutton::part(icon) {
-    --icon-color: black;
-    --icon-image: url("/sample/assets/filter_alt_FILL0_wght400_GRAD0_opsz48.svg");
+    background-color: lightgrey;
+    width: 2px;
+    margin-right: 1px;
+    margin-left: 1px;
 }

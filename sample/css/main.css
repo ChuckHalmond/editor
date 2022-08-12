@@ -26,6 +26,7 @@
 
 @import "builtins.css" layer(base);
 
+@import "widgets/sashes.css" layer(base);
 @import "widgets/menu.css" layer(base);
 @import "widgets/tree.css" layer(base);
 @import "widgets/list.css" layer(base);

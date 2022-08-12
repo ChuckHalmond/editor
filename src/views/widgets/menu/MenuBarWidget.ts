@@ -1,6 +1,6 @@
-import { element, Widget } from "../../../elements/Element";
+import { element } from "../../../elements/Element";
 import { menuItemWidget } from "./MenuItemWidget";
-import { WidgetFactory } from "../Widget";
+import { Widget, WidgetFactory } from "../Widget";
 
 export { menuBarWidget };
 

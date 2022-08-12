@@ -1,7 +1,8 @@
-import { CustomElement, reactiveChildElements, reactiveElement, widget } from "../elements/Element";
+import { CustomElement, reactiveChildElements, reactiveElement } from "../elements/Element";
 import { ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { View } from "./View";
 import { menuItemWidget } from "./widgets/menu/MenuItemWidget";
+import { widget } from "./widgets/Widget";
 
 export { MenuModel };
 export { MenuItemModel };
