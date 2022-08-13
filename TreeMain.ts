@@ -1,20 +1,6 @@
-//import { MenuItemGroupWidget, MenuItemWidget, MenuWidget, MenuBarWidget } from "./src/views/MenuBarWidget";
 
-import "./index";
-import { ListItemModel, ListModel, ListView } from "./src/views/ListView";
-import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
-import { element, fragment, reactiveElement } from "./src/elements/Element";
-import { treeItemWidget } from "./src/views/widgets/tree/TreeItemWidget";
-import { widget } from "./src/views/widgets/Widget";
-import { Editor } from "./src/Editor";
-import { toolbarWidget } from "./src/views/widgets/toolbar/ToolBarWidget";
-import { toolbarItemWidget } from "./src/views/widgets/toolbar/ToolBarItemWidget";
-import { comboBoxWidget } from "./src/views/widgets/combobox/ComboBoxWidget";
-import { optionWidget } from "./src/views/widgets/combobox/OptionWidget";
 import { ModelEvent, ModelList, ModelObject, ModelProperty } from "./src/models/Model";
 import { TreeItemList, TreeItemModel, TreeModel, treeView } from "./src/views/TreeView";
-
-class MyTreeModel extends TreeModel {}
 
 class MyTreeItemList extends TreeItemList {
     readonly items!: MyTreeItemModel[];
@@ -80,7 +66,7 @@ class MyTreeItemModel extends TreeItemModel {
 }
 
 export async function TreeMain() {
-    const treeModel = new MyTreeModel({
+    const treeModel = new TreeModel({
         items: [
             new MyTreeItemModel({
                 label: "TI 0",
