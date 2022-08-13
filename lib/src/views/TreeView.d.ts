@@ -3,6 +3,8 @@ export { TreeItemList };
 export { TreeModel };
 export { TreeItemModel };
 export { treeView };
+export { TreeViewFactoryBase };
+export { TreeViewFactory };
 declare class TreeModel extends ModelObject {
     #private;
     readonly items: ModelList<TreeItemModel>;
@@ -20,8 +22,6 @@ declare class TreeItemList {
     readonly items: TreeItemModel[];
     constructor(items: TreeItemModel[]);
     get count(): number;
-    static from(items: TreeItemModel[]): TreeItemList;
-    static of(...items: TreeItemModel[]): TreeItemList;
     remove(): void;
 }
 declare class TreeItemModel extends ModelObject {
@@ -37,23 +37,24 @@ declare class TreeItemModel extends ModelObject {
     });
     remove(): void;
 }
-declare var treeView: {
-    "__#31245@#models": WeakMap<HTMLElement, TreeModel>;
-    "__#31245@#dragImages": WeakMap<TreeItemModel, WeakRef<Element>>;
+interface TreeViewFactory {
+    create(init: {
+        model: TreeModel;
+    }): HTMLElement;
     itemContentDelegate(item: TreeItemModel): string | Node;
-    itemContextMenuDelegate(activeItem: TreeItemModel, selectedItems: TreeItemList): Node | null;
+    itemContextMenuDelegate?(activeItem: TreeItemModel, selectedItems: TreeItemModel[]): Node | null;
+    getModel(tree: HTMLElement): TreeModel | null;
+    selectedItems(tree: HTMLElement): TreeItemModel[];
+}
+declare class TreeViewFactoryBase implements TreeViewFactory {
+    #private;
+    itemContextMenuDelegate?(activeItem: TreeItemModel, selectedItems: TreeItemModel[]): Node | null;
+    itemContentDelegate(item: TreeItemModel): string | Node;
+    constructor();
     create(init: {
         model: TreeModel;
     }): HTMLElement;
     getModel(tree: HTMLElement): TreeModel | null;
     selectedItems(tree: HTMLElement): TreeItemModel[];
-    "__#31245@#getDragImage"(model: TreeItemModel): Element | null;
-    "__#31245@#renderTreeItem"(item: TreeItemModel, model: TreeModel): Element;
-    "__#31245@#renderTreeItemDragImage"(item: TreeItemModel): Element;
-    "__#31245@#handleDragStartEvent"(event: DragEvent): void;
-    "__#31245@#handleDropEvent"(event: DragEvent): void;
-    "__#31245@#handleContextMenuEvent"(event: MouseEvent): void;
-    "__#31245@#handleFocusInEvent"(event: FocusEvent): void;
-    "__#31245@#handleFocusOutEvent"(event: FocusEvent): void;
-    "__#31245@#handleKeyDownEvent"(event: KeyboardEvent): void;
-};
+}
+declare var treeView: TreeViewFactoryBase;

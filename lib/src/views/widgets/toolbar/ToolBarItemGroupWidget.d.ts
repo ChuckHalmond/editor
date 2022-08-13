@@ -9,7 +9,7 @@ interface MenuItemGroupWidgetFactory extends WidgetFactory {
     create(): HTMLElement;
 }
 declare var toolbarItemGroupWidget: {
-    "__#54@#template": HTMLElement;
+    "__#57@#template": HTMLElement;
     create(): HTMLElement;
     slot(group: HTMLElement): HTMLElement;
 };

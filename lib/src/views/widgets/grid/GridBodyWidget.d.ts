@@ -9,7 +9,7 @@ interface GridBodyWidgetFactory extends WidgetFactory {
     create(): HTMLElement;
 }
 declare var gridBodyWidget: {
-    "__#60@#template": HTMLElement;
+    "__#63@#template": HTMLElement;
     create(): HTMLElement;
     slot(body: HTMLElement): HTMLElement;
     slottedCallback(body: HTMLElement, slot: HTMLElement): void;

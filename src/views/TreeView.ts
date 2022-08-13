@@ -11,6 +11,8 @@ export { TreeItemList };
 export { TreeModel };
 export { TreeItemModel };
 export { treeView };
+export { TreeViewFactoryBase };
+export { TreeViewFactory };
 
 class TreeModel extends ModelObject {
     readonly items: ModelList<TreeItemModel>;
@@ -98,14 +100,6 @@ class TreeItemList {
         return this.items.length;
     }
 
-    static from(items: TreeItemModel[]): TreeItemList {
-        return new TreeItemList(items);
-    }
-
-    static of(...items: TreeItemModel[]): TreeItemList {
-        return new TreeItemList(items);
-    }
-
     remove(): void {
         const {items} = this;
         const removedItemsGroups = items.reduce((map, item_i) => {
@@ -175,17 +169,17 @@ class TreeItemModel extends ModelObject {
 interface TreeViewFactory {
     create(init: {
         model: TreeModel;
-        itemContentDelegate?: (item: TreeItemModel) => string | Node;
-        itemContextMenuDelegate?: (activeItem: TreeItemModel, selectedItems: TreeItemList) => Node;
     }): HTMLElement;
+    itemContentDelegate(item: TreeItemModel): string | Node;
+    itemContextMenuDelegate?(activeItem: TreeItemModel, selectedItems: TreeItemModel[]): Node | null;
     getModel(tree: HTMLElement): TreeModel | null;
     selectedItems(tree: HTMLElement): TreeItemModel[];
 }
 
-var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
+class TreeViewFactoryBase implements TreeViewFactory {
     #models: WeakMap<HTMLElement, TreeModel>;
     #dragImages: WeakMap<TreeItemModel, WeakRef<Element>>;
-    
+    itemContextMenuDelegate?(activeItem: TreeItemModel, selectedItems: TreeItemModel[]): Node | null;
 
     itemContentDelegate(item: TreeItemModel): string | Node {
         return reactiveElement(
@@ -198,9 +192,6 @@ var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
         )
     }
 
-    itemContextMenuDelegate(activeItem: TreeItemModel, selectedItems: TreeItemList): Node | null {
-        return null;
-    }
     
     constructor() {
         this.#models = new WeakMap();
@@ -379,7 +370,8 @@ var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
                             }
                         }
                     });
-                    TreeItemList.from(transferedItems).remove();
+                    const itemsList = new TreeItemList(transferedItems);
+                    itemsList.remove();
                     if (sortFunction) {
                         targetList.beginChanges();
                         targetList.append(...transferedItems);
@@ -411,7 +403,6 @@ var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
         const {itemContextMenuDelegate} = this;
         if (itemContextMenuDelegate && targetItem) {
             const activeItem = targetModel.getItemByUri(targetItem.dataset.uri!)!;
-            const selectedItems = TreeItemList.from(this.selectedItems(targetTree));
             const contextMenu = widget("menu", {
                 properties: {
                     contextual: true,
@@ -420,7 +411,7 @@ var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
                         y: clientY
                     }
                 },
-                slotted: itemContextMenuDelegate(activeItem, selectedItems)!,
+                slotted: itemContextMenuDelegate.call(this, activeItem, this.selectedItems(targetTree))!,
                 listeners: {
                     /*click: () => {
                         if (targetItem.isConnected) {
@@ -437,8 +428,8 @@ var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
             });
             targetTree.append(contextMenu);
             contextMenu.focus({preventScroll: true});
-            event.preventDefault();
         }
+        event.preventDefault();
     }
 
     #handleFocusInEvent(event: FocusEvent): void {
@@ -470,7 +461,7 @@ var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
         const targetTree = <HTMLElement>currentTarget;
         switch (key) {
             case "Delete": {
-                const itemsList = TreeItemList.from(this.selectedItems(targetTree));
+                const itemsList = new TreeItemList(this.selectedItems(targetTree));
                 const {count} = itemsList;
                 const doRemove = confirm(`Remove ${count} items?`);
                 if (doRemove) {
@@ -483,3 +474,5 @@ var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
         }
     }
 }
+
+var treeView = new TreeViewFactoryBase();
