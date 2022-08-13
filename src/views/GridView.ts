@@ -19,10 +19,11 @@ class GridModel extends ModelObject {
     constructor(init: {rows: GridRowModel[], columns: GridColumnModel[]})
     constructor(init?: {rows: GridRowModel[], columns: GridColumnModel[]}) {
         super();
-        const rows = new ModelList(init?.rows ?? []);
+        const {rows: initRows = [], columns: initColumns = []} = init ?? {};
+        const rows = new ModelList(initRows);
         rows.setParent(this);
         this.rows = rows;
-        const columns = new ModelList(init?.columns ?? []);
+        const columns = new ModelList(initColumns);
         columns.setParent(this);
         this.columns = columns;
     }
@@ -87,12 +88,12 @@ class GridColumnModel<T extends Constructor = Constructor> extends ModelObject {
         filters?: (GridRowFilter & {name: string})[]
     }) {
         super();
-        const {name, type, label, extract} = init;
+        const {name, type, label, extract, filters = []} = init;
         this.name = name;
         this.type = type;
         this.label = label;
         this.extract = extract;
-        this.filters = init.filters ?? [];
+        this.filters = filters;
         this.sortorder = 1;
     }
 }
@@ -168,20 +169,16 @@ class GridViewBase extends View implements GridView {
         this.#searchFilter = null;
         this.attachShadow({mode: "open"});
         this.setModel(model ?? new GridModel());
-        this.#cellDelegate = (row: GridRowModel, column: GridColumnModel) => {
-            return element("label", {
-                children: [
-                    column.extract(row)
-                ]
-            });
-        };
-        this.#columnDelegate = (column: GridColumnModel) => {
-            return element("label", {
-                children: [
-                    column.label
-                ]
-            });
-        };
+        this.#cellDelegate =
+            (row: GridRowModel, column: GridColumnModel) =>
+                element("label", {
+                    children: column.extract(row)
+                });
+        this.#columnDelegate =
+            (column: GridColumnModel) =>
+                element("label", {
+                    children: column.label
+                });
     }
 
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
@@ -211,7 +208,7 @@ class GridViewBase extends View implements GridView {
     }
 
     getRowElement(row: GridRowModel): HTMLElement | null {
-        return this.shadowRoot.querySelector(`:scope > .grid > .gridbody > .gridrow[data-index=${row.id}]`);
+        return this.shadowRoot.querySelector(`:scope > .grid > .gridbody > .gridrow[data-index='${row.id}']`);
     }
 
     getColumnHeaderElement(column: GridColumnModel): HTMLElement | null {

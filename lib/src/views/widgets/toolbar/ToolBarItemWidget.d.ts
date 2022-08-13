@@ -37,15 +37,15 @@ declare var toolbarItemWidget: {
     "__#52@#template": HTMLElement;
     "__#52@#types": ToolBarItemType[];
     create(init?: {
-        id?: string;
-        type?: ToolBarItemType;
-        pressed?: boolean;
-        label?: string;
-        name?: string;
-        keyshortcut?: string;
-        value?: string;
-        disabled?: boolean;
-    }): HTMLElement;
+        id?: string | undefined;
+        type?: ToolBarItemType | undefined;
+        pressed?: boolean | undefined;
+        label?: string | undefined;
+        name?: string | undefined;
+        keyshortcut?: string | undefined;
+        value?: string | undefined;
+        disabled?: boolean | undefined;
+    } | undefined): HTMLElement;
     slot(item: HTMLElement): HTMLElement | null;
     slottedCallback(item: HTMLElement, slot: HTMLElement): void;
     menu(item: HTMLElement): HTMLElement | null;
@@ -55,7 +55,7 @@ declare var toolbarItemWidget: {
     setLabel(item: HTMLElement, value: string): void;
     getKeyShortcut(item: HTMLElement): string | null;
     setKeyShortcut(item: HTMLElement, value: string | null): void;
-    toggle(item: HTMLElement, force?: boolean): void;
+    toggle(item: HTMLElement, force?: boolean | undefined): void;
     expand(item: HTMLElement): void;
     collapse(item: HTMLElement): void;
     getType(item: HTMLElement): ToolBarItemType | null;

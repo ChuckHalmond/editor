@@ -75,17 +75,17 @@ declare var menuItemWidget: {
         };
     };
     create(init?: {
-        id?: string;
-        classList?: string[];
-        tabIndex?: number;
+        id?: string | undefined;
+        classList?: string[] | undefined;
+        tabIndex?: number | undefined;
         type: MenuItemType;
-        checked?: boolean;
-        label?: string;
-        name?: string;
-        keyshortcut?: string;
-        value?: string;
-        disabled?: boolean;
-    }): HTMLElement;
+        checked?: boolean | undefined;
+        label?: string | undefined;
+        name?: string | undefined;
+        keyshortcut?: string | undefined;
+        value?: string | undefined;
+        disabled?: boolean | undefined;
+    } | undefined): HTMLElement;
     slot(item: HTMLElement): HTMLElement | null;
     slottedCallback(item: HTMLElement, slot: HTMLElement): void;
     "__#42@#label"(item: HTMLElement): HTMLElement;
@@ -106,7 +106,7 @@ declare var menuItemWidget: {
     setDisabled(item: HTMLElement, value: boolean): void;
     setExpanded(item: HTMLElement, value: boolean): void;
     getExpanded(item: HTMLElement): boolean;
-    toggle(item: HTMLElement, force?: boolean): void;
+    toggle(item: HTMLElement, force?: boolean | undefined): void;
     expand(item: HTMLElement): void;
     collapse(item: HTMLElement): void;
     "__#42@#handleClickEvent"(event: MouseEvent): void;

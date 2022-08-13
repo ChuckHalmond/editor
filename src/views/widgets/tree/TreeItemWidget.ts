@@ -8,8 +8,11 @@ type TreeItemType = "parent" | "leaf";
 interface TreeItemWidgetFactory extends WidgetFactory {
     create(properties?: {
         id?: string;
+        classList?: string[];
+        tabIndex?: number;
         type?: TreeItemType;
         label?: string;
+        title?: string;
         disabled?: boolean;
         draggable?: boolean;
     }): HTMLElement;
@@ -67,11 +70,6 @@ Widget({
                             attributes: {
                                 class: "arrow"
                             }
-                        }),
-                        element("span", {
-                            attributes: {
-                                class: "label"
-                            }
                         })
                     ]
                 })
@@ -85,26 +83,36 @@ Widget({
 
     create(properties?: {
         id?: string;
-        type?: TreeItemType;
+        classList?: string[];
+        tabIndex?: number;
         label?: string;
+        title?: string;
+        type?: TreeItemType;
         disabled?: boolean;
         draggable?: boolean;
     }): HTMLElement {
         const item = <HTMLElement>this.#template.cloneNode(true);
         item.addEventListener("click", this.#handleClickEvent.bind(this));
         if (properties !== undefined) {
-            const {id, label, disabled, draggable} = properties;
-            let {type} = properties;
-            type = type ?? "leaf";
-            this.setType(item, type);
-            if (type === "parent") {
-                this.setExpanded(item, false);
-            }
+            const {id, classList, tabIndex, label, title, type = "leaf", disabled, draggable} = properties;
             if (id !== undefined) {
                 item.id = id;
             }
+            if (classList !== undefined) {
+                item.classList.add(...classList);
+            }
+            if (tabIndex !== undefined) {
+                item.tabIndex = tabIndex;
+            }
             if (label !== undefined) {
                 this.setLabel(item, label);
+            }
+            if (title !== undefined) {
+                this.setTitle(item, title);
+            }
+            this.setType(item, type);
+            if (type === "parent") {
+                this.setExpanded(item, false);
             }
             if (disabled !== undefined) {
                 this.setDisabled(item, disabled);
@@ -133,22 +141,24 @@ Widget({
 
     #content(item: HTMLElement): HTMLElement {
         const content = item.querySelector<HTMLElement>(":scope > .content")!;
-        if (!content) throw new Error("Missing content.");
+        if (!content) throw new Error("Missing .content slot.");
         return content;
     }
 
-    #label(item: HTMLElement): HTMLElement {
-        const label = item.querySelector<HTMLElement>(":scope > .content > .label");
-        if (!label) throw new Error("Missing label.");
-        return label;
-    }
-
     getLabel(item: HTMLElement): string {
-        return this.#label(item).textContent ?? "";
+        return item.getAttribute("aria-label") ?? "";
     }
 
     setLabel(item: HTMLElement, value: string): void {
-        this.#label(item).textContent = value;
+        item.setAttribute("aria-label", value);
+    }
+
+    getTitle(item: HTMLElement): string {
+        return item.title;
+    }
+
+    setTitle(item: HTMLElement, value: string): void {
+        item.title = value;
     }
 
     setPosInSet(item: HTMLElement, value: number): void {

@@ -26,9 +26,9 @@ declare global {
 declare var listItemWidget: {
     "__#49@#template": HTMLElement;
     create(init?: {
-        label?: string;
-        disabled?: boolean;
-    }): HTMLElement;
+        label?: string | undefined;
+        disabled?: boolean | undefined;
+    } | undefined): HTMLElement;
     slot(root: HTMLElement): HTMLElement | null;
     group(item: HTMLElement): HTMLElement | null;
     getLabel(item: HTMLElement): string;

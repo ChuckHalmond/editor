@@ -37,12 +37,12 @@ declare var gridWidget: {
     "__#59@#onSelection": WeakMap<HTMLElement, boolean>;
     "__#59@#hasSelectionChanged": WeakMap<HTMLElement, boolean>;
     create(properties?: {
-        id?: string;
-        classList?: string[];
-        tabIndex?: number;
-        multisectable?: boolean;
-        selectby?: GridSelectBy;
-    }): HTMLElement;
+        id?: string | undefined;
+        classList?: string[] | undefined;
+        tabIndex?: number | undefined;
+        multisectable?: boolean | undefined;
+        selectby?: GridSelectBy | undefined;
+    } | undefined): HTMLElement;
     slot(grid: HTMLElement): HTMLElement | null;
     setMultiSelectable(grid: HTMLElement, value: boolean): void;
     getMultiSelectable(grid: HTMLElement): boolean;

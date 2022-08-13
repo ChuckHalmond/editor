@@ -20,11 +20,12 @@ class TreeModel extends ModelObject {
     constructor(init: {items: TreeItemModel[], sortFunction?: (item_a: TreeItemModel, item_b: TreeItemModel) => number})
     constructor(init?: {items: TreeItemModel[], sortFunction?: (item_a: TreeItemModel, item_b: TreeItemModel) => number}) {
         super();
-        const childItems = new ModelList(init?.items ?? []);
+        const {items, sortFunction} = init ?? {};
+        const childItems = new ModelList(items ?? []);
         childItems.setParent(this);
         this.childItems = childItems;
         this.items = new ModelList(this.flattenItems());
-        this.sortFunction = init?.sortFunction ??
+        this.sortFunction = sortFunction ??
             function(item_a: TreeItemModel, item_b: TreeItemModel) {
                 return item_a.label.localeCompare(item_b.label);
             };
@@ -151,10 +152,10 @@ class TreeItemModel extends ModelObject implements TreeItem {
     readonly type: "leaf" | "parent";
     readonly label: string;
 
-    @ModelProperty(/*{type: Number}*/)
+    @ModelProperty()
     childCount: number;
 
-    @ModelProperty(/*{type: Boolean}*/)
+    @ModelProperty()
     visibility: boolean;
 
     get uri(): string {
@@ -175,8 +176,8 @@ class TreeItemModel extends ModelObject implements TreeItem {
     
     constructor(init: {label: string, type: "leaf" | "parent", items?: TreeItemModel[]}) {
         super();
-        const {label, type} = init;
-        const childItems = new ModelList(init.items ?? []);
+        const {label, type, items} = init;
+        const childItems = new ModelList(items ?? []);
         childItems.setParent(this);
         this.childItems = childItems;
         this.label = label;
@@ -299,14 +300,6 @@ var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
                     uri: item.uri
                 },
                 slotted: {
-                    group:
-                        <Node[]>((item.type == "parent") ? [
-                        widget("treeitemgroup", {
-                            slotted: reactiveChildElements(item.childItems,
-                                item => this.#renderTreeItem(item)
-                            )
-                        })
-                    ] : []),
                     content: <Node[]>
                         ([
                             element("span", {
@@ -342,13 +335,25 @@ var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
                                     })
                                 ]
                             })
-                        ])
+                        ]),
+                    group:
+                        <Node[]>((item.type == "parent") ? [
+                        widget("treeitemgroup", {
+                            slotted: reactiveChildElements(item.childItems,
+                                item => this.#renderTreeItem(item)
+                            )
+                        })
+                    ] : [])
                 }
             }),
             ["label", "childCount", "visibility"],
             (treeitem, property, oldValue, newValue) => {
                 switch (property) {
                     case "label": {
+                        const label = treeitem.querySelector<HTMLElement>(":scope > .content > .label");
+                        if (label) {
+                            label.textContent = `${newValue}`;
+                        }
                         treeItemWidget.setLabel(treeitem, newValue);
                         break;
                     }
@@ -399,7 +404,7 @@ var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
         const {currentTarget, target} = event;
         const targetTree = <HTMLElement>currentTarget;
         const targetItem = <HTMLElement>(<HTMLElement>target).closest(".treeitem");
-        const model = this.getModel(targetTree)!;
+        const targetModel = this.getModel(targetTree)!;
         if (targetItem) {
             const {dataTransfer} = event;
             const selectedElements = treeWidget.selectedItems(targetTree);
@@ -417,7 +422,7 @@ var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
                     );
                 const selectedUrisString = selectedUris.join("\n");
                 const lastUri = selectedUris[selectedUris.length - 1];
-                const lastItem = model.getItemByUri(lastUri);
+                const lastItem = targetModel.getItemByUri(lastUri);
                 if (lastItem && dataTransfer) {
                     dataTransfer.dropEffect = "move";
                     dataTransfer.setData("text/plain", selectedUrisString);
@@ -434,18 +439,18 @@ var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
         const {currentTarget, target} = event;
         const targetTree = <HTMLElement>currentTarget;
         const targetItem = <HTMLElement>(<HTMLElement>target).closest(".treeitem");
-        const model = this.getModel(targetTree)!;
-        const {sortFunction} = model;
+        const targetModel = this.getModel(targetTree)!;
+        const {sortFunction} = targetModel;
         if (targetItem) {
             const {dataTransfer} = event;
             if (dataTransfer) {
                 const targetUri = targetItem.dataset.uri!;
-                const targetItemModel = model.getItemByUri(targetUri)!;
+                const targetItemModel = targetModel.getItemByUri(targetUri)!;
                 const transferedUris = dataTransfer.getData("text/plain").split("\n");
                 const targetIsWithin = transferedUris.some(uri_i => targetUri.startsWith(`${uri_i}/`) || uri_i == targetUri);
                 if (!targetIsWithin) {
                     const transferedItems = <TreeItemModel[]>transferedUris.map(
-                        uri_i => model.getItemByUri(uri_i)
+                        uri_i => targetModel.getItemByUri(uri_i)
                     ).filter(
                         item_i => item_i !== null
                     );
@@ -454,7 +459,7 @@ var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
                         targetItemModel :
                         targetParentItem ?
                         targetParentItem :
-                        model;
+                        targetModel;
                     const targetItems = Array.from(targetList.values());
                     targetItems.forEach((item_i) => {
                         const sameLabelIndex = transferedItems.findIndex(item_j => item_j.label == item_i.label);
@@ -497,9 +502,9 @@ var treeView = new class TreeViewFactoryBase implements TreeViewFactory {
         const {clientX, clientY, currentTarget, target} = event;
         const targetTree = <HTMLElement>currentTarget;
         const targetItem = <HTMLElement>(<HTMLElement>target).closest(".treeitem");
-        const model = this.getModel(targetTree)!;
+        const targetModel = this.getModel(targetTree)!;
         if (targetItem) {
-            const activeItem = model.getItemByUri(targetItem.dataset.uri!)!;
+            const activeItem = targetModel.getItemByUri(targetItem.dataset.uri!)!;
             const contextMenu = widget("menu", {
                 properties: {
                     contextual: true,

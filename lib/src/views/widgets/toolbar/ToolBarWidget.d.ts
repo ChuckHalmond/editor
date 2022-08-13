@@ -19,10 +19,10 @@ declare var toolbarWidget: {
     "__#53@#template": HTMLElement;
     "__#53@#walker": TreeWalker;
     create(properties?: {
-        id?: string;
-        classList?: string[];
-        tabIndex?: number;
-    }): HTMLElement;
+        id?: string | undefined;
+        classList?: string[] | undefined;
+        tabIndex?: number | undefined;
+    } | undefined): HTMLElement;
     slot(toolbar: HTMLElement): HTMLElement;
     "__#53@#getActiveItem"(toolbar: HTMLElement): HTMLElement | null;
     items(toolbar: HTMLElement): HTMLElement[];
