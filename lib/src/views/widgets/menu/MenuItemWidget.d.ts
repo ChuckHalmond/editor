@@ -48,12 +48,12 @@ declare var menuItemWidget: {
     "__#42@#template": HTMLElement;
     "__#42@#types": MenuItemType[];
     "__#42@#typesFeatures": {
-        menu: {
+        button: {
             role: string;
             hasIcon: boolean;
             hasArrow: boolean;
         };
-        button: {
+        menu: {
             role: string;
             hasIcon: boolean;
             hasArrow: boolean;

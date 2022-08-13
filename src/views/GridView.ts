@@ -346,7 +346,7 @@ class GridViewBase extends View implements GridView {
                             this.resizable ? [
                                 widget("widthsash", {
                                     properties: {
-                                        controls: `${column.name}`
+                                        controls: column.name
                                     }
                                 })
                             ] : []
