@@ -21,12 +21,12 @@ declare var widthSashWidget: {
     "__#55@#queuedPointerCallbacks": WeakMap<HTMLElement, FrameRequestCallback | null>;
     "__#55@#pointerMovements": WeakMap<HTMLElement, number>;
     create(properties?: {
-        id?: string | undefined;
-        classList?: string[] | undefined;
-        tabIndex?: number | undefined;
-        controls?: string | undefined;
-        growDir?: "left" | "right" | undefined;
-    } | undefined): HTMLElement;
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
+        controls?: string;
+        growDir?: "left" | "right";
+    }): HTMLElement;
     getGrowDir(sash: HTMLElement): "right" | "left";
     setGrowDir(sash: HTMLElement, value: "right" | "left"): void;
     getControls(sash: HTMLElement): string | null;

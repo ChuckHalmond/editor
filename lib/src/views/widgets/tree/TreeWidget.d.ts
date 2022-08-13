@@ -23,11 +23,11 @@ declare var treeWidget: {
     "__#47@#onSelection": WeakMap<HTMLElement, boolean>;
     "__#47@#hasSelectionChanged": WeakMap<HTMLElement, boolean>;
     create(properties?: {
-        id?: string | undefined;
-        classList?: string[] | undefined;
-        tabIndex?: number | undefined;
-        multisectable?: boolean | undefined;
-    } | undefined): HTMLElement;
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
+        multisectable?: boolean;
+    }): HTMLElement;
     slot(tree: HTMLElement): HTMLElement;
     slottedCallback(tree: HTMLElement, slot: HTMLElement): void;
     items(tree: HTMLElement): HTMLElement[];

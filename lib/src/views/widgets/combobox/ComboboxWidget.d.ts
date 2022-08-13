@@ -30,13 +30,13 @@ declare var comboBoxWidget: {
     "__#64@#walker": TreeWalker;
     "__#64@#optionsObserver": MutationObserver;
     create(properties?: {
-        id?: string | undefined;
-        classList?: string[] | undefined;
-        tabIndex?: number | undefined;
-        name?: string | undefined;
-        disabled?: boolean | undefined;
-        multiselectable?: boolean | undefined;
-    } | undefined): HTMLElement;
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
+        name?: string;
+        disabled?: boolean;
+        multiselectable?: boolean;
+    }): HTMLElement;
     slot(combobox: HTMLElement): HTMLElement;
     slottedCallback(combobox: HTMLElement, slot: HTMLElement, name: string | null): void;
     "__#64@#box"(combobox: HTMLElement): HTMLElement;
@@ -54,7 +54,7 @@ declare var comboBoxWidget: {
     getMultiSelectable(combobox: HTMLElement): boolean;
     expand(combobox: HTMLElement): void;
     collapse(combobox: HTMLElement): void;
-    toggle(combobox: HTMLElement, force?: boolean | undefined): void;
+    toggle(combobox: HTMLElement, force?: boolean): void;
     "__#64@#optionsMutationCallback"(mutationsList: MutationRecord[]): void;
     "__#64@#walkerNodeFilter"(node: Node): number;
     "__#64@#firstOption"(combobox: HTMLElement): HTMLElement | null;

@@ -24,8 +24,8 @@ declare global {
 declare var gridRowWidget: {
     "__#58@#template": HTMLElement;
     create(init?: {
-        disabled?: boolean | undefined;
-    } | undefined): HTMLElement;
+        disabled?: boolean;
+    }): HTMLElement;
     slot(row: HTMLElement): HTMLElement | null;
     cells(row: HTMLElement): HTMLElement[];
     setPosInSet(row: HTMLElement, value: number): void;

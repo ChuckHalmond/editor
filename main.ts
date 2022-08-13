@@ -196,16 +196,19 @@ export async function main() {
             })
         );
     });*/
+    const year = new Date().getFullYear();
     gridView.setModel(
         new GridModel({
             columns: [
                 new GridColumnModel({
                     name: "name",
+                    type: String,
                     label: "Name",
                     extract: (row) => row.name
                 }),
                 new GridColumnModel({
                     name: "age",
+                    type: Number,
                     label: "Age",
                     extract: (row) => row.age,
                     filters: [{
@@ -215,22 +218,32 @@ export async function main() {
                         name: "Majors",
                         filter: (row) => row.age >= 18
                     }]
-                })
+                }),
+                new GridColumnModel({
+                    name: "birthyear",
+                    type: String,
+                    label: "Brith Year",
+                    extract: (row) => year - row.age
+                }),
             ],
             rows: [
                 new GridRowModel({
+                    id: 1,
                     name: "Denis",
                     age: 13
                 }),
                 new GridRowModel({
+                    id: 2,
                     name: "Jean-Charles",
                     age: 32
                 }),
                 new GridRowModel({
+                    id: 3,
                     name: "Charles",
                     age: 25
                 }),
                 new GridRowModel({
+                    id: 4,
                     name: "Mamagubida",
                     age: 128
                 })

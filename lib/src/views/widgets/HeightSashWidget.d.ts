@@ -21,12 +21,12 @@ declare var heightSashWidget: {
     "__#56@#queuedPointerCallbacks": WeakMap<HTMLElement, FrameRequestCallback | null>;
     "__#56@#pointerMovements": WeakMap<HTMLElement, number>;
     create(properties?: {
-        id?: string | undefined;
-        classList?: string[] | undefined;
-        tabIndex?: number | undefined;
-        controls?: string | undefined;
-        growDir?: "top" | "bottom" | undefined;
-    } | undefined): HTMLElement;
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
+        controls?: string;
+        growDir?: "top" | "bottom";
+    }): HTMLElement;
     getGrowDir(sash: HTMLElement): "top" | "bottom";
     setGrowDir(sash: HTMLElement, value: "top" | "bottom"): void;
     getControls(sash: HTMLElement): string | null;

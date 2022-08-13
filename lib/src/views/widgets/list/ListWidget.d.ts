@@ -23,11 +23,11 @@ declare var listWidget: {
     "__#50@#onSelection": WeakMap<HTMLElement, boolean>;
     "__#50@#hasSelectionChanged": WeakMap<HTMLElement, boolean>;
     create(properties?: {
-        id?: string | undefined;
-        classList?: string[] | undefined;
-        tabIndex?: number | undefined;
-        multisectable?: boolean | undefined;
-    } | undefined): HTMLElement;
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
+        multisectable?: boolean;
+    }): HTMLElement;
     slot(list: HTMLElement): HTMLElement;
     slottedCallback(list: HTMLElement, slot: HTMLElement): void;
     setMultiSelectable(tree: HTMLElement, value: boolean): void;

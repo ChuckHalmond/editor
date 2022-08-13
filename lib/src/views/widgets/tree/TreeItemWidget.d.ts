@@ -40,12 +40,12 @@ declare var treeItemWidget: {
     "__#46@#types": TreeItemType[];
     group(item: HTMLElement): HTMLElement | null;
     create(properties?: {
-        id?: string | undefined;
-        type?: TreeItemType | undefined;
-        label?: string | undefined;
-        disabled?: boolean | undefined;
-        draggable?: boolean | undefined;
-    } | undefined): HTMLElement;
+        id?: string;
+        type?: TreeItemType;
+        label?: string;
+        disabled?: boolean;
+        draggable?: boolean;
+    }): HTMLElement;
     readonly observedSlots: string[];
     slot(item: HTMLElement, name: string | null): HTMLElement | null;
     "__#46@#content"(item: HTMLElement): HTMLElement;
@@ -70,6 +70,6 @@ declare var treeItemWidget: {
     getSelected(item: HTMLElement): boolean;
     setLevel(item: HTMLElement, value: number): void;
     getLevel(item: HTMLElement): number;
-    toggle(item: HTMLElement, force?: boolean | undefined): void;
+    toggle(item: HTMLElement, force?: boolean): void;
     "__#46@#handleClickEvent"(event: MouseEvent): void;
 };

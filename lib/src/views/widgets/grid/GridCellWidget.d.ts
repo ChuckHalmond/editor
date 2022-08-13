@@ -29,12 +29,12 @@ declare global {
 declare var gridCellWidget: {
     "__#57@#template": HTMLElement;
     create(init?: {
-        id?: string | undefined;
-        classList?: string[] | undefined;
-        tabIndex?: number | undefined;
-        disabled?: boolean | undefined;
-        headers?: string | undefined;
-    } | undefined): HTMLElement;
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
+        disabled?: boolean;
+        headers?: string;
+    }): HTMLElement;
     slot(cell: HTMLElement): HTMLElement | null;
     getHeaders(item: HTMLElement): string;
     setHeaders(item: HTMLElement, value: string): void;

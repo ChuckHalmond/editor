@@ -37,13 +37,26 @@ class GridModel extends ModelObject {
         Array.from(this.columns.values()).forEach((column_i) => {
             column_i.sortorder = column_i === column ? sortOrder : undefined;
         });
-        this.rows.sort(
-            (row_1, row_2) => {
-                const cell_1 = <string>column.extract(row_1).toString();
-                const cell_2 = <string>column.extract(row_2).toString();
-                return sortOrder * cell_1.localeCompare(cell_2);
+        const sortTest = (() => {
+            const {type} = column;
+            switch (type) {
+                case String: {
+                    return (row_1: GridRowModel, row_2: GridRowModel) => {
+                        const cell_1 = String(column.extract(row_1));
+                        const cell_2 = String(column.extract(row_2));
+                        return sortOrder * cell_1.localeCompare(cell_2);
+                    };
+                }
+                default: {
+                    return (row_1: GridRowModel, row_2: GridRowModel) => {
+                        const cell_1 = Number(column.extract(row_1));
+                        const cell_2 = Number(column.extract(row_2));
+                        return Math.sign(sortOrder * (cell_1 - cell_2));
+                    };
+                }
             }
-        );
+        })();
+        this.rows.sort(sortTest);
     }
 }
 
@@ -57,7 +70,8 @@ type GridRowFilter = {
 }
 
 class GridColumnModel<T extends Constructor = Constructor> extends ModelObject {
-    readonly name: string;
+    readonly name: string
+    readonly type: NumberConstructor | StringConstructor | DateConstructor;
     readonly label: string;
     readonly extract: (row: GridRowModel) => InstanceType<T>;
     readonly filters: (GridRowFilter & {name: string})[];
@@ -67,13 +81,15 @@ class GridColumnModel<T extends Constructor = Constructor> extends ModelObject {
 
     constructor(init: {
         name: string,
+        type: NumberConstructor | StringConstructor | DateConstructor,
         label: string,
         extract: (row: GridRowModel) => InstanceType<T>,
         filters?: (GridRowFilter & {name: string})[]
     }) {
         super();
-        const {name, label, extract} = init;
+        const {name, type, label, extract} = init;
         this.name = name;
+        this.type = type;
         this.label = label;
         this.extract = extract;
         this.filters = init.filters ?? [];
@@ -82,6 +98,8 @@ class GridColumnModel<T extends Constructor = Constructor> extends ModelObject {
 }
 
 class GridRowModel extends ModelObject {
+    id: number;
+
     @ModelProperty()
     name: string;
 
@@ -89,11 +107,13 @@ class GridRowModel extends ModelObject {
     age: number;
     
     constructor(init: {
+        id: number;
         name: string,
         age: number
     }) {
         super();
-        const {name, age} = init;
+        const {id, name, age} = init;
+        this.id = id;
         this.name = name;
         this.age = age;
     }
@@ -139,8 +159,6 @@ class GridViewBase extends View implements GridView {
 
     #displayFilters: (GridRowFilter & {name: string})[];
     #searchFilter: GridRowFilter | null;
-
-    #gridRowElementsMap: WeakMap<GridRowModel, WeakRef<HTMLElement>>
     
     constructor()
     constructor(model: GridModel)
@@ -148,7 +166,6 @@ class GridViewBase extends View implements GridView {
         super();
         this.#displayFilters = [];
         this.#searchFilter = null;
-        this.#gridRowElementsMap = new WeakMap();
         this.attachShadow({mode: "open"});
         this.setModel(model ?? new GridModel());
         this.#cellDelegate = (row: GridRowModel, column: GridColumnModel) => {
@@ -194,7 +211,7 @@ class GridViewBase extends View implements GridView {
     }
 
     getRowElement(row: GridRowModel): HTMLElement | null {
-        return this.#gridRowElementsMap.get(row)?.deref() ?? null;
+        return this.shadowRoot.querySelector(`:scope > .grid > .gridbody > .gridrow[data-index=${row.id}]`);
     }
 
     getColumnHeaderElement(column: GridColumnModel): HTMLElement | null {
@@ -361,11 +378,13 @@ class GridViewBase extends View implements GridView {
     #renderGridBodyRow(row: GridRowModel): Element {
         const {model} = this;
         const gridRowElement = widget("gridrow", {
+            dataset: {
+                index: row.id
+            },
             slotted: reactiveChildElements(
                 model.columns, column => this.#renderGridDataCell(row, column)
             )
         });
-        this.#gridRowElementsMap.set(row, new WeakRef(gridRowElement));
         return gridRowElement;
     }
 
