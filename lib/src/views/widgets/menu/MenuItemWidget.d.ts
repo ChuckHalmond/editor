@@ -48,17 +48,12 @@ declare var menuItemWidget: {
     "__#8@#template": HTMLElement;
     "__#8@#types": MenuItemType[];
     "__#8@#typesFeatures": {
-        menu: {
-            role: string;
-            hasIcon: boolean;
-            hasArrow: boolean;
-        };
         button: {
             role: string;
             hasIcon: boolean;
             hasArrow: boolean;
         };
-        radio: {
+        menu: {
             role: string;
             hasIcon: boolean;
             hasArrow: boolean;
@@ -69,6 +64,11 @@ declare var menuItemWidget: {
             hasArrow: boolean;
         };
         submenu: {
+            role: string;
+            hasIcon: boolean;
+            hasArrow: boolean;
+        };
+        radio: {
             role: string;
             hasIcon: boolean;
             hasArrow: boolean;

@@ -21,6 +21,7 @@ interface HTMLEGridElement extends HTMLElement {
     readonly activeRowIndex: number;
     selectby: "cell" | "row";
     name: string;
+    multiselectable: boolean;
     beginSelection(): void;
     endSelection(): void;
     clearSelection(): void;

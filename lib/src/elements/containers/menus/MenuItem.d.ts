@@ -9,6 +9,7 @@ interface HTMLEMenuItemElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     readonly menu: HTMLEMenuElement | null;
     name: string;
+    label: string | null;
     value: string;
     hotkey: string;
     disabled: boolean;
@@ -28,38 +29,38 @@ declare var HTMLEMenuItemElement: HTMLEMenuItemElementConstructor;
 interface EMenuItemConstructor {
     prototype: HTMLEMenuItemElement;
     new (init: {
-        name: string;
+        name?: string;
         label: string;
-        type: "button" | "checkbox" | "radio" | "menu" | "submenu";
+        type?: "button" | "checkbox" | "radio" | "menu" | "submenu";
         value?: string;
         trigger?: () => void;
         menu?: HTMLEMenuElement;
     }): HTMLEMenuItemElement;
     button(init: {
-        name: string;
+        name?: string;
         label: string;
         value?: string;
         trigger?: () => void;
     }): HTMLEMenuItemElement;
     checkbox(init: {
-        name: string;
+        name?: string;
         label: string;
         value?: string;
         trigger?: () => void;
     }): HTMLEMenuItemElement;
     radio(init: {
-        name: string;
+        name?: string;
         label: string;
         value?: string;
         trigger?: () => void;
     }): HTMLEMenuItemElement;
     menu(init: {
-        name: string;
+        name?: string;
         label: string;
         menu: HTMLEMenuElement;
     }): HTMLEMenuItemElement;
     submenu(init: {
-        name: string;
+        name?: string;
         label: string;
         menu: HTMLEMenuElement;
     }): HTMLEMenuItemElement;

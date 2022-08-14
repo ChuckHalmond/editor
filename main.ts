@@ -14,6 +14,11 @@ import { comboBoxWidget } from "./src/views/widgets/combobox/ComboBoxWidget";
 import { optionWidget } from "./src/views/widgets/combobox/OptionWidget";
 import { TreeMain } from "./TreeMain";
 
+declare global {
+    interface ElementInternals {
+        role: string;
+    }
+}
 // const menubar = new MenuBarWidget([
 //     new MenuItemWidget({
 //         label: "File",

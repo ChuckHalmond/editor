@@ -1,4 +1,4 @@
-import { element, reactiveChildElements, reactiveElement } from "../elements/Element";
+import { element, fragment, reactiveChildElements, reactiveElement } from "../elements/Element";
 import { ModelEvent, ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { menuWidget } from "./widgets/menu/MenuWidget";
 import { toolbarItemWidget } from "./widgets/toolbar/ToolBarItemWidget";
@@ -171,7 +171,7 @@ interface TreeViewFactory {
         model: TreeModel;
     }): HTMLElement;
     itemContentDelegate(item: TreeItemModel): string | Node;
-    itemContextMenuDelegate?(activeItem: TreeItemModel, selectedItems: TreeItemModel[]): Node | null;
+    itemContextMenuDelegate(activeItem: TreeItemModel, selectedItems: TreeItemModel[]): Node;
     getModel(tree: HTMLElement): TreeModel | null;
     selectedItems(tree: HTMLElement): TreeItemModel[];
 }
@@ -179,7 +179,30 @@ interface TreeViewFactory {
 class TreeViewFactoryBase implements TreeViewFactory {
     #models: WeakMap<HTMLElement, TreeModel>;
     #dragImages: WeakMap<TreeItemModel, WeakRef<Element>>;
-    itemContextMenuDelegate?(activeItem: TreeItemModel, selectedItems: TreeItemModel[]): Node | null;
+
+    itemContextMenuDelegate(activeItem: TreeItemModel, selectedItems: TreeItemModel[]): Node {
+        return fragment(
+            widget("menuitemgroup", {
+                slotted: [
+                    widget("menuitem", {
+                        properties: {
+                            label: "Delete"
+                        },
+                        listeners: {
+                            click: () => {
+                                const itemsList = new TreeItemList(selectedItems);
+                                const {count} = itemsList;
+                                const doRemove = confirm(`Remove ${count} items?`);
+                                if (doRemove) {
+                                    itemsList.remove();
+                                }
+                            }
+                        }
+                    })
+                ]
+            })
+        );
+    }
 
     itemContentDelegate(item: TreeItemModel): string | Node {
         return reactiveElement(

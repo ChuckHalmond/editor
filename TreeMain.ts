@@ -1,6 +1,7 @@
-
+import { EMenuItem } from "./src/elements/containers/menus/MenuItem";
 import { element, fragment, reactiveElement } from "./src/elements/Element";
 import { ModelEvent, ModelList, ModelObject, ModelProperty } from "./src/models/Model";
+import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
 import { TreeItemList, TreeItemModel, TreeModel, TreeViewFactory, TreeViewFactoryBase } from "./src/views/TreeView";
 import { toolbarItemWidget } from "./src/views/widgets/toolbar/ToolBarItemWidget";
 import { toolbarWidget } from "./src/views/widgets/toolbar/ToolBarWidget";
@@ -71,7 +72,7 @@ class MyTreeItemModel extends TreeItemModel {
 
 export async function TreeMain() {
     const myTreeView = new class extends TreeViewFactoryBase {
-        itemContextMenuDelegate(activeItem: MyTreeItemModel, selectedItems: MyTreeItemModel[]): Node {
+        /*itemContextMenuDelegate(activeItem: MyTreeItemModel, selectedItems: MyTreeItemModel[]): Node {
             const self = this;
             return fragment(
                 widget("menuitemgroup", {
@@ -194,8 +195,64 @@ export async function TreeMain() {
                     )
                 ])
             );
-        }
+        }*/
     };
+    const gridView = new GridView();
+    gridView.resizable = true;
+    gridView.setModel(
+        new GridModel({
+            columns: [
+                new GridColumnModel({
+                    name: "name",
+                    type: String,
+                    label: "Name",
+                    extract: (row) => row.name
+                }),
+                new GridColumnModel({
+                    name: "age",
+                    type: Number,
+                    label: "Age",
+                    extract: (row) => row.age,
+                    filters: [{
+                        name: "Minors",
+                        filter: (row) => row.age < 18
+                    },{
+                        name: "Majors",
+                        filter: (row) => row.age >= 18
+                    }]
+                }),
+                new GridColumnModel({
+                    name: "birthyear",
+                    type: String,
+                    label: "Brith Year",
+                    extract: (row) => new Date().getFullYear() - row.age
+                }),
+            ],
+            rows: [
+                new GridRowModel({
+                    id: 1,
+                    name: "Denis",
+                    age: 13
+                }),
+                new GridRowModel({
+                    id: 2,
+                    name: "Jean-Charles",
+                    age: 32
+                }),
+                new GridRowModel({
+                    id: 3,
+                    name: "Charles",
+                    age: 25
+                }),
+                new GridRowModel({
+                    id: 4,
+                    name: "Mamagubida",
+                    age: 128
+                })
+            ]
+        })
+    );
+    document.body.append(gridView);
 
     const treeModel = new TreeModel({
         items: [
@@ -258,4 +315,172 @@ export async function TreeMain() {
         model: treeModel
     });
     document.body.append(treeElement);
+
+    document.body.append(
+        element("e-menubar", {
+            children: element("e-menuitem", {
+                attributes: {
+                    type: "menu",
+                    label: "Menu 1"
+                },
+                children: [
+                    "Menu 1",
+                    element("e-menu", {
+                        attributes: {
+                            slot: "menu"
+                        },
+                        children: [
+                            element("e-menuitem", {
+                                attributes: {
+                                    type: "checkbox"
+                                },
+                                children: "Hey"
+                            }),
+                            element("e-menuitem", {
+                                attributes: {
+                                    type: "submenu"
+                                },
+                                children: [
+                                    "Submenu 1",
+                                    element("e-menu", {
+                                        attributes: {
+                                            slot: "menu"
+                                        },
+                                        children: [
+                                            /*element("e-menuitem", {
+                                                attributes: {
+                                                    type: "checkbox"
+                                                },
+                                                children: "Yo"
+                                            })*/
+                                            new EMenuItem({
+                                                label: "Yo"
+                                            })
+                                        ]
+                                    })
+                                ]
+                            })
+                        ]
+                    })
+                ]
+            })
+        })
+    );
+        
+    const menuView = widget("menubar", {
+    slotted: [
+        widget("menuitem", {
+            properties: {
+                label: "MenuItem 0",
+                name: "MenuItem 0",
+                type: "menu",
+                disabled: true
+            },
+            slotted: [
+                widget("menu", {
+                    slotted: [
+                        widget("menuitem", {
+                            properties: {
+                                label: "MenuItem 1",
+                                name: "MenuItem 1",
+                                type: "checkbox"
+                            }
+                        })
+                    ]
+                })
+            ]
+        }),
+        widget("menuitem", {
+            properties: {
+                label: "MenuItem 0",
+                name: "MenuItem 0",
+                type: "menu"
+            },
+            slotted: [
+                widget("menu", {
+                    slotted: [
+                        widget("menuitem", {
+                            properties: {
+                                label: "MenuItem 1",
+                                name: "MenuItem 1",
+                                type: "checkbox"
+                            }
+                        })
+                    ]
+                })
+            ]
+        }),
+        widget("menuitem", {
+            properties: {
+                label: "MenuItem 1",
+                name: "MenuItem 1",
+                type: "menu"
+            },
+            slotted: [
+                widget("menu", {
+                    slotted: [
+                        widget("menuitemgroup", {
+                            slotted: [
+                                widget("menuitem", {
+                                    properties: {
+                                        label: "MenuItem 1",
+                                        type: "checkbox",
+                                        keyshortcut: "Ctrl+B",
+                                        disabled: true,
+                                        checked: true
+                                    }
+                                }),
+                                widget("menuitem", {
+                                    properties: {
+                                        type: "button",
+                                        label: "MenuItem 2",
+                                        keyshortcut: "Ctrl+A"
+                                    }
+                                })
+                            ]
+                        }),
+                        widget("separator"),
+                        widget("menuitem", {
+                            properties: {
+                                label: "Submenu",
+                                type: "submenu"
+                            },
+                            slotted: [
+                                widget("menu", {
+                                    slotted: [
+                                        widget("menuitem", {
+                                            properties: {
+                                                label: "MenuItem 1",
+                                                type: "radio",
+                                                name: "radio",
+                                                value: "1"
+                                            }
+                                        }),
+                                        widget("menuitem", {
+                                            properties: {
+                                                type: "radio",
+                                                label: "MenuItem 2",
+                                                name: "radio",
+                                                value: "2"
+                                            }
+                                        }),
+                                        widget("menuitem", {
+                                            properties: {
+                                                type: "radio",
+                                                label: "MenuItem 3",
+                                                name: "radio",
+                                                value: "3"
+                                            }
+                                        })
+                                    ]
+                                })
+                            ]
+                        })
+                    ]
+                })
+            ]
+        })
+    ]
+})
+document.body.append(menuView);
 }

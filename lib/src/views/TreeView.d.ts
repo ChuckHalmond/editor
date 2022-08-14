@@ -42,13 +42,13 @@ interface TreeViewFactory {
         model: TreeModel;
     }): HTMLElement;
     itemContentDelegate(item: TreeItemModel): string | Node;
-    itemContextMenuDelegate?(activeItem: TreeItemModel, selectedItems: TreeItemModel[]): Node | null;
+    itemContextMenuDelegate(activeItem: TreeItemModel, selectedItems: TreeItemModel[]): Node;
     getModel(tree: HTMLElement): TreeModel | null;
     selectedItems(tree: HTMLElement): TreeItemModel[];
 }
 declare class TreeViewFactoryBase implements TreeViewFactory {
     #private;
-    itemContextMenuDelegate?(activeItem: TreeItemModel, selectedItems: TreeItemModel[]): Node | null;
+    itemContextMenuDelegate(activeItem: TreeItemModel, selectedItems: TreeItemModel[]): Node;
     itemContentDelegate(item: TreeItemModel): string | Node;
     constructor();
     create(init: {

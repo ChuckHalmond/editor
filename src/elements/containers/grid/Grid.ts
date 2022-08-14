@@ -26,6 +26,7 @@ interface HTMLEGridElement extends HTMLElement {
     readonly activeRowIndex: number;
     selectby: "cell" | "row";
     name: string;
+    multiselectable: boolean;
     beginSelection(): void;
     endSelection(): void;
     clearSelection(): void;
@@ -87,6 +88,9 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
     @AttributeProperty({type: String, defaultValue: "cell"})
     selectby!: "cell" | "row";
 
+    @AttributeProperty({type: Boolean})
+    multiselectable!: boolean;
+
     #activeCellIndex: number;
     #activeRowIndex: number;
 
@@ -113,7 +117,6 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
-        this.addEventListener("contextmenu", this.#handleContextMenuEvent.bind(this));
         this.addEventListener("click", this.#handleClickEvent.bind(this));
         this.addEventListener("focus", this.#handleFocusEvent.bind(this));
         this.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
@@ -151,10 +154,7 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
         if (node instanceof HTMLEGridCellElement && !node.hidden) {
             return NodeFilter.FILTER_ACCEPT;
         }
-        if (node instanceof HTMLEGridBodyElement) {
-            return NodeFilter.FILTER_SKIP;
-        }
-        if (node instanceof HTMLEGridRowGroupElement) {
+        if (node instanceof HTMLEGridBodyElement || node instanceof HTMLEGridRowGroupElement) {
             return NodeFilter.FILTER_SKIP;
         }
         if (node instanceof HTMLEGridRowElement) {
@@ -167,10 +167,7 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
         if (node instanceof HTMLEGridRowElement && !node.hidden) {
             return NodeFilter.FILTER_ACCEPT;
         }
-        if (node instanceof HTMLEGridBodyElement) {
-            return NodeFilter.FILTER_SKIP;
-        }
-        if (node instanceof HTMLEGridRowGroupElement) {
+        if (node instanceof HTMLEGridBodyElement || node instanceof HTMLEGridRowGroupElement) {
             return NodeFilter.FILTER_SKIP;
         }
         return NodeFilter.FILTER_REJECT;
@@ -442,46 +439,6 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
             }
         }
         return null;
-    }
-
-    #handleContextMenuEvent(event: MouseEvent) {
-        const {selectby} = this;
-        switch (selectby) {
-            case "cell": {
-                const composedPath = event.composedPath();
-                const targetCell = composedPath.find(
-                    target_i => target_i instanceof HTMLEGridBodyElement
-                ) ? composedPath.find(
-                    target_i => target_i instanceof HTMLEGridCellElement
-                ) : null;
-                if (targetCell instanceof HTMLEGridCellElement) {
-                    const selectedCells = this.selectedCells();
-                    if (!selectedCells.includes(targetCell)) {
-                        this.#setCellsSelection(targetCell);
-                    }
-                    targetCell.focus({preventScroll: true});
-                    event.preventDefault();
-                }
-                break;
-            }
-            case "row": {
-                const composedPath = event.composedPath();
-                const targetRow = composedPath.find(
-                    target_i => target_i instanceof HTMLEGridBodyElement
-                ) ? composedPath.find(
-                    target_i => target_i instanceof HTMLEGridRowElement
-                ) : null;
-                if (targetRow instanceof HTMLEGridRowElement) {
-                    const selectedRows = this.selectedRows();
-                    if (!selectedRows.includes(targetRow)) {
-                        this.#setRowsSelection(targetRow);
-                    }
-                    targetRow.focus({preventScroll: true});
-                }
-                break;
-            }
-        }
-        event.preventDefault();
     }
 
     #handleClickEvent(event: MouseEvent): void {

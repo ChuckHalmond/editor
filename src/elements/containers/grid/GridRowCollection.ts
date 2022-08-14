@@ -1,4 +1,3 @@
-import { HTMLEGridElement } from "./Grid";
 import { HTMLEGridRowGroupElement } from "./GridRowGroup";
 import { HTMLEGridRowElement } from "./GridRow";
 import { HTMLEGridBodyElement } from "./GridBody";
@@ -35,13 +34,10 @@ class HTMLEGridRowCollectionBase implements HTMLEGridRowCollection {
     }
 
     #nodeFilter(node: Node): number {
-        if (node instanceof HTMLEGridBodyElement) {
-            return NodeFilter.FILTER_SKIP;
-        }
         if (node instanceof HTMLEGridRowElement) {
             return NodeFilter.FILTER_ACCEPT;
         }
-        if (node instanceof HTMLEGridRowGroupElement) {
+        if (node instanceof HTMLEGridBodyElement || node instanceof HTMLEGridRowGroupElement) {
             return NodeFilter.FILTER_SKIP;
         }
         return NodeFilter.FILTER_REJECT;

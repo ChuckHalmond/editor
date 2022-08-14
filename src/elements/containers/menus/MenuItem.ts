@@ -13,6 +13,7 @@ interface HTMLEMenuItemElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     readonly menu: HTMLEMenuElement | null;
     name: string;
+    label: string | null;
     value: string;
     hotkey: string;
     disabled: boolean;
@@ -38,9 +39,13 @@ var shadowTemplate: HTMLTemplateElement;
 class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemElement {
 
     readonly shadowRoot!: ShadowRoot;
+    readonly internals: ElementInternals;
 
     @AttributeProperty({type: String})
     name!: string;
+
+    @AttributeProperty({type: String, observed: true})
+    label!: string | null;
 
     @AttributeProperty({type: String})
     value!: string;
@@ -48,17 +53,53 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
     @AttributeProperty({type: String})
     hotkey!: string;
 
-    @AttributeProperty({type: Boolean})
+    @AttributeProperty({type: Boolean, observed: true})
     disabled!: boolean;
 
-    @AttributeProperty({type: Boolean})
+    @AttributeProperty({type: Boolean, observed: true})
     checked!: boolean;
 
-    @AttributeProperty({type: Boolean})
+    @AttributeProperty({type: Boolean, observed: true})
     expanded!: boolean;
 
     @AttributeProperty({type: String, defaultValue: "button", observed: true})
     type!: "button" | "checkbox" | "radio" | "menu" | "submenu";
+
+    attributeChangedCallback(attributeName: string, oldValue: string | null, newValue: string | null) {
+        const {internals} = this;
+        switch (attributeName) {
+            case "type": {
+                switch (newValue) {
+                    case "checkbox":
+                    case "radio": {
+                        internals.role = `menuitem${newValue}`;
+                        break;
+                    }
+                    default: {
+                        internals.role = "menuitem";
+                        break;
+                    }
+                }
+                break;
+            }
+            case "checked": {
+                internals.ariaChecked = String(newValue !== null);
+                break;
+            }
+            case "disabled": {
+                internals.ariaDisabled = String(newValue !== null);
+                break;
+            }
+            case "expanded": {
+                internals.ariaExpanded = String(newValue !== null);
+                break;
+            }
+            case "label": {
+                internals.ariaLabel = newValue;
+                break;
+            }
+        }
+    }
 
     static {
         shadowTemplate = element("template");
@@ -92,6 +133,9 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
     constructor() {
         super();
         const shadowRoot = this.attachShadow({mode: "open"});
+        const internals = this.attachInternals();
+        this.internals = internals;
+        internals.role = "menuitem";
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
@@ -115,6 +159,10 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                 break;
             }
         }
+    }
+
+    connectedCallback() {
+        this.tabIndex = this.tabIndex;
     }
 
     expand(): void {
@@ -220,38 +268,38 @@ var HTMLEMenuItemElement: HTMLEMenuItemElementConstructor = HTMLEMenuItemElement
 interface EMenuItemConstructor {
     prototype: HTMLEMenuItemElement;
     new(init: {
-        name: string;
+        name?: string;
         label: string;
-        type: "button" | "checkbox" | "radio" | "menu" | "submenu";
+        type?: "button" | "checkbox" | "radio" | "menu" | "submenu";
         value?: string;
         trigger?: () => void;
         menu?: HTMLEMenuElement;
     }): HTMLEMenuItemElement;
     button(init: {
-        name: string;
+        name?: string;
         label: string;
         value?: string;
         trigger?: () => void;
     }): HTMLEMenuItemElement;
     checkbox(init: {
-        name: string;
+        name?: string;
         label: string;
         value?: string;
         trigger?: () => void;
     }): HTMLEMenuItemElement;
     radio(init: {
-        name: string;
+        name?: string;
         label: string;
         value?: string;
         trigger?: () => void;
     }): HTMLEMenuItemElement;
     menu(init: {
-        name: string;
+        name?: string;
         label: string;
         menu: HTMLEMenuElement;
     }): HTMLEMenuItemElement;
     submenu(init: {
-        name: string;
+        name?: string;
         label: string;
         menu: HTMLEMenuElement;
     }): HTMLEMenuItemElement;
@@ -259,9 +307,9 @@ interface EMenuItemConstructor {
 
 var EMenuItem = <EMenuItemConstructor>Object.assign(
     <Function>function(init: {
-        name: string;
+        name?: string;
         label: string;
-        type: "button" | "checkbox" | "radio" | "menu" | "submenu";
+        type?: "button" | "checkbox" | "radio" | "menu" | "submenu";
         value?: string;
         trigger?: () => void;
         menu?: HTMLEMenuElement;
@@ -291,7 +339,7 @@ var EMenuItem = <EMenuItemConstructor>Object.assign(
     }, {
         prototype: HTMLEMenuItemElement.prototype,
         button(init: {
-            name: string,
+            name?: string,
             label: string,
             value?: string,
             trigger?: () => void;
@@ -301,7 +349,7 @@ var EMenuItem = <EMenuItemConstructor>Object.assign(
             });
         },
         checkbox(init: {
-            name: string;
+            name?: string;
             label: string;
             value?: string;
             trigger?: () => void;
@@ -311,7 +359,7 @@ var EMenuItem = <EMenuItemConstructor>Object.assign(
             });
         },
         radio(init: {
-            name: string;
+            name?: string;
             label: string;
             value?: string;
             trigger?: () => void;
@@ -321,7 +369,7 @@ var EMenuItem = <EMenuItemConstructor>Object.assign(
             });
         },
         menu(init: {
-            name: string;
+            name?: string;
             label: string;
             menu: HTMLEMenuElement;
         }) {
@@ -330,7 +378,7 @@ var EMenuItem = <EMenuItemConstructor>Object.assign(
             });
         },
         submenu(init: {
-            name: string;
+            name?: string;
             label: string;
             menu: HTMLEMenuElement;
         }) {
