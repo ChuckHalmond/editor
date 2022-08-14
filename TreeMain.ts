@@ -2,7 +2,7 @@ import { EMenuItem } from "./src/elements/containers/menus/MenuItem";
 import { element, fragment, reactiveElement } from "./src/elements/Element";
 import { ModelEvent, ModelList, ModelObject, ModelProperty } from "./src/models/Model";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
-import { TreeItemList, TreeItemModel, TreeModel, TreeViewFactory, TreeViewFactoryBase } from "./src/views/TreeView";
+import { TreeItemList, TreeItemModel, TreeModel, TreeView } from "./src/views/TreeView";
 import { toolbarItemWidget } from "./src/views/widgets/toolbar/ToolBarItemWidget";
 import { toolbarWidget } from "./src/views/widgets/toolbar/ToolBarWidget";
 import { widget } from "./src/views/widgets/Widget";
@@ -35,7 +35,7 @@ class MyTreeItemList extends TreeItemList {
 }
 
 class MyTreeItemModel extends TreeItemModel {
-
+    
     @ModelProperty()
     childCount: number;
 
@@ -71,132 +71,6 @@ class MyTreeItemModel extends TreeItemModel {
 }
 
 export async function TreeMain() {
-    const myTreeView = new class extends TreeViewFactoryBase {
-        /*itemContextMenuDelegate(activeItem: MyTreeItemModel, selectedItems: MyTreeItemModel[]): Node {
-            const self = this;
-            return fragment(
-                widget("menuitemgroup", {
-                    slotted: [
-                        widget("menuitem", {
-                            properties: {
-                                label: "Display"
-                            },
-                            listeners: {
-                                click: () => {
-                                    const itemsList = new MyTreeItemList(selectedItems);
-                                    itemsList.display();
-                                }
-                            }
-                        }),
-                        widget("menuitem", {
-                            properties: {
-                                label: "Delete"
-                            },
-                            listeners: {
-                                click: () => {
-                                    const itemsList = new MyTreeItemList(selectedItems);
-                                    const {count} = itemsList;
-                                    const doRemove = confirm(`Remove ${count} items?`);
-                                    if (doRemove) {
-                                        itemsList.remove();
-                                    }
-                                    //TODO: focus the tree
-                                }
-                            }
-                        })
-                    ]
-                }),
-                widget("menuitemgroup", {
-                    slotted: [
-                        widget("menuitem", {
-                            properties: {
-                                type: "checkbox",
-                                label: activeItem.visibility ? "Hide" : "Show"
-                            },
-                            listeners: {
-                                click: () => {
-                                    const itemsList = new MyTreeItemList(selectedItems);
-                                    activeItem.visibility ?
-                                        itemsList.hide() :
-                                        itemsList.show();
-                                }
-                            }
-                        })
-                    ]
-                })
-            )
-        }
-        itemContentDelegate(item: MyTreeItemModel): string | Node {
-            return fragment(
-                ...([
-                    reactiveElement(
-                        item,
-                        element("span", {
-                            attributes: {
-                                class: "label"
-                            }
-                        }),
-                        ["label"],
-                        (label, property, oldValue, newValue) => {
-                            label.textContent = newValue;
-                        }
-                    )
-                ]).concat(
-                    (item.type == "parent") ? [
-                        reactiveElement(
-                            item,
-                            element("span", {
-                                attributes: {
-                                    class: "badge"
-                                }
-                            }),
-                            ["childCount"],
-                            (badge, property, oldValue, newValue) => {
-                                badge.textContent = `(${newValue})`;
-                            }
-                        )
-                    ] : []
-                ).concat([
-                    reactiveElement(
-                        item,
-                        widget("toolbar", {
-                            slotted: [
-                                widget("toolbaritem", {
-                                    properties: {
-                                        name: "visibility",
-                                        type: "checkbox",
-                                        label: "Visibility"
-                                    },
-                                    listeners: {
-                                        click: () => {
-                                            item.visibility ?
-                                                item.hide() :
-                                                item.show();
-                                        }
-                                    }
-                                })
-                            ]
-                        }),
-                        ["visibility"],
-                        (toolbar, property, oldValue, newValue) => {
-                            switch (property) {
-                                case "visibility": {
-                                    const visibilityItem = toolbarWidget.slot(toolbar)
-                                        ?.querySelector<HTMLElement>(".toolbaritem[name=visibility]");
-                                    if (visibilityItem) {
-                                        const label = newValue ? "Hide" : "Show";
-                                        toolbarItemWidget.setLabel(visibilityItem, label);
-                                        toolbarItemWidget.setTitle(visibilityItem, label);
-                                        toolbarItemWidget.setPressed(visibilityItem, newValue);
-                                    }
-                                }
-                            }
-                        }
-                    )
-                ])
-            );
-        }*/
-    };
     const gridView = new GridView();
     gridView.resizable = true;
     gridView.setModel(
@@ -311,10 +185,136 @@ export async function TreeMain() {
             return bLabel.localeCompare(aLabel);
         }
     });
-    const treeElement = myTreeView.create({
-        model: treeModel
-    });
-    document.body.append(treeElement);
+    const treeView = new TreeView(treeModel);
+    treeView.itemContentDelegate = <typeof treeView.itemContentDelegate>(
+        (item: MyTreeItemModel) => {
+            return fragment(
+                ...([
+                    reactiveElement(
+                        item,
+                        element("span", {
+                            attributes: {
+                                class: "label"
+                            }
+                        }),
+                        ["label"],
+                        (label, property, oldValue, newValue) => {
+                            label.textContent = newValue;
+                        }
+                    )
+                ]).concat(
+                    (item.type == "parent") ? [
+                        reactiveElement(
+                            item,
+                            element("span", {
+                                attributes: {
+                                    class: "badge"
+                                }
+                            }),
+                            ["childCount"],
+                            (badge, property, oldValue, newValue) => {
+                                badge.textContent = `(${newValue})`;
+                            }
+                        )
+                    ] : []
+                ).concat([
+                    reactiveElement(
+                        item,
+                        widget("toolbar", {
+                            slotted: [
+                                widget("toolbaritem", {
+                                    properties: {
+                                        name: "visibility",
+                                        type: "checkbox",
+                                        label: "Visibility"
+                                    },
+                                    listeners: {
+                                        click: () => {
+                                            item.visibility ?
+                                                item.hide() :
+                                                item.show();
+                                        }
+                                    }
+                                })
+                            ]
+                        }),
+                        ["visibility"],
+                        (toolbar, property, oldValue, newValue) => {
+                            switch (property) {
+                                case "visibility": {
+                                    const visibilityItem = toolbarWidget.slot(toolbar)
+                                        ?.querySelector<HTMLElement>(".toolbaritem[name=visibility]");
+                                    if (visibilityItem) {
+                                        const label = newValue ? "Hide" : "Show";
+                                        toolbarItemWidget.setLabel(visibilityItem, label);
+                                        toolbarItemWidget.setTitle(visibilityItem, label);
+                                        toolbarItemWidget.setPressed(visibilityItem, newValue);
+                                    }
+                                }
+                            }
+                        }
+                    )
+                ])
+            );
+        }
+    );
+    treeView.itemContextMenuDelegate = <typeof treeView.itemContextMenuDelegate>(
+        (activeItem: MyTreeItemModel, selectedItems: MyTreeItemModel[]) => {
+            return fragment(
+                widget("menuitemgroup", {
+                    slotted: [
+                        widget("menuitem", {
+                            properties: {
+                                label: "Display"
+                            },
+                            listeners: {
+                                click: () => {
+                                    const itemsList = new MyTreeItemList(selectedItems);
+                                    itemsList.display();
+                                }
+                            }
+                        }),
+                        widget("menuitem", {
+                            properties: {
+                                label: "Delete"
+                            },
+                            listeners: {
+                                click: () => {
+                                    const itemsList = new MyTreeItemList(selectedItems);
+                                    const {count} = itemsList;
+                                    const doRemove = confirm(`Remove ${count} items?`);
+                                    if (doRemove) {
+                                        itemsList.remove();
+                                    }
+                                    //TODO: focus the tree
+                                }
+                            }
+                        })
+                    ]
+                }),
+                widget("menuitemgroup", {
+                    slotted: [
+                        widget("menuitem", {
+                            properties: {
+                                type: "checkbox",
+                                label: activeItem.visibility ? "Hide" : "Show"
+                            },
+                            listeners: {
+                                click: () => {
+                                    const itemsList = new MyTreeItemList(selectedItems);
+                                    activeItem.visibility ?
+                                        itemsList.hide() :
+                                        itemsList.show();
+                                }
+                            }
+                        })
+                    ]
+                })
+            )
+        }
+    );
+    treeView.refresh();
+    document.body.append(treeView);
 
     document.body.append(
         element("e-menubar", {

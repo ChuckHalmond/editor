@@ -137,12 +137,12 @@ interface GridView extends View {
 
 declare global {
     interface HTMLElementTagNameMap {
-        "v-grid": GridView,
+        "e-gridview": GridView,
     }
 }
 
 @CustomElement({
-    name: "v-grid"
+    name: "e-gridview"
 })
 class GridViewBase extends View implements GridView {
 
@@ -151,7 +151,7 @@ class GridViewBase extends View implements GridView {
 
     #columnDelegate: (column: GridColumnModel) => string | Node;
     #cellDelegate: (row: GridRowModel, column: GridColumnModel) => string | Node;
-
+    
     @AttributeProperty({type: Boolean, observed: true})
     resizable!: boolean;
 
@@ -168,7 +168,6 @@ class GridViewBase extends View implements GridView {
         this.#displayFilters = [];
         this.#searchFilter = null;
         this.attachShadow({mode: "open"});
-        this.setModel(model ?? new GridModel());
         this.#cellDelegate =
             (row: GridRowModel, column: GridColumnModel) =>
                 element("label", {
@@ -179,6 +178,7 @@ class GridViewBase extends View implements GridView {
                 element("label", {
                     children: column.label
                 });
+        this.setModel(model ?? new GridModel());
     }
 
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {

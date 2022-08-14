@@ -28,8 +28,10 @@ class ViewBase extends HTMLElement implements View {
     }
     
     setModel(model: ModelObject): void {
-        this.#model = model;
-        this.#render();            
+        if (model !== this.#model) {
+            this.#model = model;
+            this.#render();
+        }
     }
 
     renderLight(): Node | undefined {
@@ -46,9 +48,9 @@ class ViewBase extends HTMLElement implements View {
 
     #render(): void {
         const {shadowRoot} = this;
-        const shadow = this.renderShadow();
-        if (shadow) {
-            if (shadowRoot) {
+        if (shadowRoot !== null) {
+            const shadow = this.renderShadow();
+            if (shadow) {
                 shadowRoot.replaceChildren(shadow);
             }
         }

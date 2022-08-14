@@ -1,8 +1,6 @@
-import { element, fragment, reactiveChildElements, reactiveElement } from "../elements/Element";
-import { ModelEvent, ModelList, ModelObject, ModelProperty } from "../models/Model";
-import { menuWidget } from "./widgets/menu/MenuWidget";
-import { toolbarItemWidget } from "./widgets/toolbar/ToolBarItemWidget";
-import { toolbarWidget } from "./widgets/toolbar/ToolBarWidget";
+import { CustomElement, element, fragment, reactiveChildElements, reactiveElement } from "../elements/Element";
+import { ModelEvent, ModelList, ModelObject } from "../models/Model";
+import { View } from "./View";
 import { treeItemWidget } from "./widgets/tree/TreeItemWidget";
 import { treeWidget } from "./widgets/tree/TreeWidget";
 import { widget } from "./widgets/Widget";
@@ -10,9 +8,7 @@ import { widget } from "./widgets/Widget";
 export { TreeItemList };
 export { TreeModel };
 export { TreeItemModel };
-export { treeView };
-export { TreeViewFactoryBase };
-export { TreeViewFactory };
+export { TreeView };
 
 class TreeModel extends ModelObject {
     readonly items: ModelList<TreeItemModel>;
@@ -166,71 +162,86 @@ class TreeItemModel extends ModelObject {
     }
 }
 
-interface TreeViewFactory {
-    create(init: {
-        model: TreeModel;
-    }): HTMLElement;
-    itemContentDelegate(item: TreeItemModel): string | Node;
-    itemContextMenuDelegate(activeItem: TreeItemModel, selectedItems: TreeItemModel[]): Node;
-    getModel(tree: HTMLElement): TreeModel | null;
-    selectedItems(tree: HTMLElement): TreeItemModel[];
+interface TreeViewConstructor {
+    prototype: TreeView;
+    new(): TreeView;
+    new(model: TreeModel): TreeView;
 }
 
-class TreeViewFactoryBase implements TreeViewFactory {
-    #models: WeakMap<HTMLElement, TreeModel>;
+interface TreeView extends View {
+    readonly shadowRoot: ShadowRoot;
+    readonly model: TreeModel;
+    itemContentDelegate: <Item extends TreeItemModel>(item: Item) => string | Node;
+    itemContextMenuDelegate: <Item extends TreeItemModel>(activeItem: Item, selectedItems: Item[]) => string | Node;
+}
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "e-treeview": TreeView,
+    }
+}
+
+@CustomElement({
+    name: "e-treeview"
+})
+class TreeViewBase extends View implements TreeView {
+    readonly shadowRoot!: ShadowRoot;
+    readonly model!: TreeModel;
     #dragImages: WeakMap<TreeItemModel, WeakRef<Element>>;
 
-    itemContextMenuDelegate(activeItem: TreeItemModel, selectedItems: TreeItemModel[]): Node {
-        return fragment(
-            widget("menuitemgroup", {
-                slotted: [
-                    widget("menuitem", {
-                        properties: {
-                            label: "Delete"
-                        },
-                        listeners: {
-                            click: () => {
-                                const itemsList = new TreeItemList(selectedItems);
-                                const {count} = itemsList;
-                                const doRemove = confirm(`Remove ${count} items?`);
-                                if (doRemove) {
-                                    itemsList.remove();
+    itemContentDelegate: <Item extends TreeItemModel>(item: Item) => string | Node;
+    itemContextMenuDelegate: <Item extends TreeItemModel>(activeItem: Item, selectedItems: Item[]) => string | Node;
+    
+    constructor()
+    constructor(model: TreeModel)
+    constructor(model?: TreeModel) {
+        super();
+        this.attachShadow({mode: "open"});
+        this.#dragImages = new WeakMap();
+        this.itemContentDelegate = function(item: TreeItemModel) {
+            return reactiveElement(
+                item,
+                element("span"),
+                ["label"],
+                (label, property, oldValue, newValue) => {
+                    label.textContent = newValue;
+                }
+            );
+        };
+        this.itemContextMenuDelegate = function(activeItem: TreeItemModel, selectedItems: TreeItemModel[]) {
+            return fragment(
+                widget("menuitemgroup", {
+                    slotted: [
+                        widget("menuitem", {
+                            properties: {
+                                label: "Delete"
+                            },
+                            listeners: {
+                                click: () => {
+                                    const itemsList = new TreeItemList(selectedItems);
+                                    const {count} = itemsList;
+                                    const doRemove = confirm(`Remove ${count} items?`);
+                                    if (doRemove) {
+                                        itemsList.remove();
+                                    }
                                 }
                             }
-                        }
-                    })
-                ]
-            })
-        );
+                        })
+                    ]
+                })
+            );
+        };
+        this.setModel(model ?? new TreeModel());
     }
 
-    itemContentDelegate(item: TreeItemModel): string | Node {
-        return reactiveElement(
-            item,
-            element("span"),
-            ["label"],
-            (label, property, oldValue, newValue) => {
-                label.textContent = newValue;
-            }
-        )
-    }
-
-    
-    constructor() {
-        this.#models = new WeakMap();
-        this.#dragImages = new WeakMap();
-    }
-
-    create(init: {
-        model: TreeModel;
-    }): HTMLElement {
-        const {model} = init;
+    renderShadow(): Node {
+        const {model} = this;
         const treeElement = widget("tree", {
             properties: {
                 tabIndex: 0,
             },
             slotted: reactiveChildElements(
-                model.childItems, item => this.#renderTreeItem(<TreeItemModel>item, <TreeModel><unknown>model)
+                model.childItems, item => this.#renderTreeItem(item, model)
             ),
             listeners: {
                 dragstart: <EventListener>this.#handleDragStartEvent.bind(this),
@@ -241,33 +252,34 @@ class TreeViewFactoryBase implements TreeViewFactory {
                 focusout: <EventListener>this.#handleFocusOutEvent.bind(this),
             }
         });
-        const rootElement = element("div", {
-            attributes: {
-                class: "tree-view",
-            },
-            children: [
-                treeElement,
-                element("div", {
-                    attributes: {
-                        class: "offscreen",
-                        hidden: true
-                    },
-                    children: reactiveChildElements(model.items,
-                        item => this.#renderTreeItemDragImage(item)
-                    )
-                })
-            ]
-        });
-        this.#models.set(treeElement, <TreeModel><unknown>model);
-        return rootElement;
-    }
-    
-    getModel(tree: HTMLElement): TreeModel | null {
-        return this.#models.get(tree) ?? null;
+        return fragment(
+            element("link", {
+                attributes: {
+                    rel: "stylesheet",
+                    href: "css/main.css"
+                }
+            }),
+            element("link", {
+                attributes: {
+                    rel: "stylesheet",
+                    href: "css/views/gridview.css"
+                }
+            }),
+            treeElement,
+            element("div", {
+                attributes: {
+                    class: "offscreen",
+                    hidden: true
+                },
+                children: reactiveChildElements(model.items,
+                    item => this.#renderTreeItemDragImage(item)
+                )
+            })
+        );
     }
 
     selectedItems(tree: HTMLElement): TreeItemModel[] {
-        const model = this.getModel(tree)!;
+        const {model} = this;
         const selectedElements = treeWidget.selectedItems(tree);
         return selectedElements.map(
             item_i => <TreeItemModel>model.getItemByUri(item_i.dataset.uri!)
@@ -288,7 +300,7 @@ class TreeViewFactoryBase implements TreeViewFactory {
                 uri: item.uri
             },
             slotted: {
-                content: this.itemContentDelegate(item),
+                content: this.itemContentDelegate.call(this, item),
                 group:
                     <Node[]>((item.type == "parent") ? [
                     widget("treeitemgroup", {
@@ -323,7 +335,7 @@ class TreeViewFactoryBase implements TreeViewFactory {
         const {currentTarget, target} = event;
         const targetTree = <HTMLElement>currentTarget;
         const targetItem = <HTMLElement>(<HTMLElement>target).closest(".treeitem");
-        const targetModel = this.getModel(targetTree)!;
+        const {model} = this;
         if (targetItem) {
             const {dataTransfer} = event;
             const selectedElements = treeWidget.selectedItems(targetTree);
@@ -341,7 +353,7 @@ class TreeViewFactoryBase implements TreeViewFactory {
                     );
                 const selectedUrisString = selectedUris.join("\n");
                 const lastUri = selectedUris[selectedUris.length - 1];
-                const lastItem = targetModel.getItemByUri(lastUri);
+                const lastItem = model.getItemByUri(lastUri);
                 if (lastItem && dataTransfer) {
                     dataTransfer.dropEffect = "move";
                     dataTransfer.setData("text/plain", selectedUrisString);
@@ -358,18 +370,18 @@ class TreeViewFactoryBase implements TreeViewFactory {
         const {currentTarget, target} = event;
         const targetTree = <HTMLElement>currentTarget;
         const targetItem = <HTMLElement>(<HTMLElement>target).closest(".treeitem");
-        const targetModel = this.getModel(targetTree)!;
-        const {sortFunction} = targetModel;
+        const {model} = this;
+        const {sortFunction} = model;
         if (targetItem) {
             const {dataTransfer} = event;
             if (dataTransfer) {
                 const targetUri = targetItem.dataset.uri!;
-                const targetItemModel = targetModel.getItemByUri(targetUri)!;
+                const targetItemModel = model.getItemByUri(targetUri)!;
                 const transferedUris = dataTransfer.getData("text/plain").split("\n");
                 const targetIsWithin = transferedUris.some(uri_i => targetUri.startsWith(`${uri_i}/`) || uri_i == targetUri);
                 if (!targetIsWithin) {
                     const transferedItems = <TreeItemModel[]>transferedUris.map(
-                        uri_i => targetModel.getItemByUri(uri_i)
+                        uri_i => model.getItemByUri(uri_i)
                     ).filter(
                         item_i => item_i !== null
                     );
@@ -378,7 +390,7 @@ class TreeViewFactoryBase implements TreeViewFactory {
                         targetItemModel :
                         targetParentItem ?
                         targetParentItem :
-                        targetModel;
+                        model;
                     const targetItems = Array.from(targetList.values());
                     targetItems.forEach((item_i) => {
                         const sameLabelIndex = transferedItems.findIndex(item_j => item_j.label == item_i.label);
@@ -422,10 +434,9 @@ class TreeViewFactoryBase implements TreeViewFactory {
         const {clientX, clientY, currentTarget, target} = event;
         const targetTree = <HTMLElement>currentTarget;
         const targetItem = <HTMLElement>(<HTMLElement>target).closest(".treeitem");
-        const targetModel = this.getModel(targetTree)!;
-        const {itemContextMenuDelegate} = this;
+        const {model, itemContextMenuDelegate} = this;
         if (itemContextMenuDelegate && targetItem) {
-            const activeItem = targetModel.getItemByUri(targetItem.dataset.uri!)!;
+            const activeItem = model.getItemByUri(targetItem.dataset.uri!)!;
             const contextMenu = widget("menu", {
                 properties: {
                     contextual: true,
@@ -498,4 +509,4 @@ class TreeViewFactoryBase implements TreeViewFactory {
     }
 }
 
-var treeView = new TreeViewFactoryBase();
+var TreeView: TreeViewConstructor = TreeViewBase;

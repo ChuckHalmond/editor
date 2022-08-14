@@ -1,5 +1,5 @@
 //import { MenuItemGroupWidget, MenuItemWidget, MenuWidget, MenuBarWidget } from "./src/views/MenuBarWidget";
-import { treeView, TreeItemModel, TreeModel, TreeItemList } from "./src/views/TreeView";
+import { TreeItemModel, TreeModel, TreeItemList } from "./src/views/TreeView";
 
 import "./index";
 import { ListItemModel, ListModel, ListView } from "./src/views/ListView";

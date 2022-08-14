@@ -39,22 +39,22 @@ declare global {
     }
 }
 declare var treeItemWidget: {
-    "__#12@#template": HTMLElement;
-    "__#12@#types": TreeItemType[];
+    "__#20@#template": HTMLElement;
+    "__#20@#types": TreeItemType[];
     group(item: HTMLElement): HTMLElement | null;
     create(properties?: {
-        id?: string | undefined;
-        classList?: string[] | undefined;
-        tabIndex?: number | undefined;
-        label?: string | undefined;
-        title?: string | undefined;
-        type?: TreeItemType | undefined;
-        disabled?: boolean | undefined;
-        draggable?: boolean | undefined;
-    } | undefined): HTMLElement;
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
+        label?: string;
+        title?: string;
+        type?: TreeItemType;
+        disabled?: boolean;
+        draggable?: boolean;
+    }): HTMLElement;
     readonly observedSlots: string[];
     slot(item: HTMLElement, name: string | null): HTMLElement | null;
-    "__#12@#content"(item: HTMLElement): HTMLElement;
+    "__#20@#content"(item: HTMLElement): HTMLElement;
     getLabel(item: HTMLElement): string;
     setLabel(item: HTMLElement, value: string): void;
     getTitle(item: HTMLElement): string;
@@ -77,6 +77,6 @@ declare var treeItemWidget: {
     getSelected(item: HTMLElement): boolean;
     setLevel(item: HTMLElement, value: number): void;
     getLevel(item: HTMLElement): number;
-    toggle(item: HTMLElement, force?: boolean | undefined): void;
-    "__#12@#handleClickEvent"(event: MouseEvent): void;
+    toggle(item: HTMLElement, force?: boolean): void;
+    "__#20@#handleClickEvent"(event: MouseEvent): void;
 };

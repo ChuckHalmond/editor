@@ -1,10 +1,9 @@
 import { ModelList, ModelObject } from "../models/Model";
+import { View } from "./View";
 export { TreeItemList };
 export { TreeModel };
 export { TreeItemModel };
-export { treeView };
-export { TreeViewFactoryBase };
-export { TreeViewFactory };
+export { TreeView };
 declare class TreeModel extends ModelObject {
     #private;
     readonly items: ModelList<TreeItemModel>;
@@ -37,24 +36,20 @@ declare class TreeItemModel extends ModelObject {
     });
     remove(): void;
 }
-interface TreeViewFactory {
-    create(init: {
-        model: TreeModel;
-    }): HTMLElement;
-    itemContentDelegate(item: TreeItemModel): string | Node;
-    itemContextMenuDelegate(activeItem: TreeItemModel, selectedItems: TreeItemModel[]): Node;
-    getModel(tree: HTMLElement): TreeModel | null;
-    selectedItems(tree: HTMLElement): TreeItemModel[];
+interface TreeViewConstructor {
+    prototype: TreeView;
+    new (): TreeView;
+    new (model: TreeModel): TreeView;
 }
-declare class TreeViewFactoryBase implements TreeViewFactory {
-    #private;
-    itemContextMenuDelegate(activeItem: TreeItemModel, selectedItems: TreeItemModel[]): Node;
-    itemContentDelegate(item: TreeItemModel): string | Node;
-    constructor();
-    create(init: {
-        model: TreeModel;
-    }): HTMLElement;
-    getModel(tree: HTMLElement): TreeModel | null;
-    selectedItems(tree: HTMLElement): TreeItemModel[];
+interface TreeView extends View {
+    readonly shadowRoot: ShadowRoot;
+    readonly model: TreeModel;
+    itemContentDelegate: <Item extends TreeItemModel>(item: Item) => string | Node;
+    itemContextMenuDelegate: <Item extends TreeItemModel>(activeItem: Item, selectedItems: Item[]) => string | Node;
 }
-declare var treeView: TreeViewFactoryBase;
+declare global {
+    interface HTMLElementTagNameMap {
+        "e-treeview": TreeView;
+    }
+}
+declare var TreeView: TreeViewConstructor;

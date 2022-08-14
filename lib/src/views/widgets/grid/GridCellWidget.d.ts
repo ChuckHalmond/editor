@@ -27,14 +27,14 @@ declare global {
     }
 }
 declare var gridCellWidget: {
-    "__#60@#template": HTMLElement;
+    "__#12@#template": HTMLElement;
     create(init?: {
-        id?: string | undefined;
-        classList?: string[] | undefined;
-        tabIndex?: number | undefined;
-        disabled?: boolean | undefined;
-        headers?: string | undefined;
-    } | undefined): HTMLElement;
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
+        disabled?: boolean;
+        headers?: string;
+    }): HTMLElement;
     slot(cell: HTMLElement): HTMLElement | null;
     getHeaders(item: HTMLElement): string;
     setHeaders(item: HTMLElement, value: string): void;
@@ -50,5 +50,5 @@ declare var gridCellWidget: {
     getDisabled(item: HTMLElement): boolean;
     setSelected(item: HTMLElement, value: boolean): void;
     getSelected(item: HTMLElement): boolean;
-    "__#60@#label"(item: HTMLElement): HTMLElement;
+    "__#12@#label"(item: HTMLElement): HTMLElement;
 };

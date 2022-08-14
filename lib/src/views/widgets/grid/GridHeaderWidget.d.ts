@@ -15,12 +15,12 @@ declare global {
     }
 }
 declare var gridHeaderWidget: {
-    "__#65@#template": HTMLElement;
+    "__#67@#template": HTMLElement;
     create(init?: {
-        id?: string | undefined;
-        classList?: string[] | undefined;
-        tabIndex?: number | undefined;
-    } | undefined): HTMLElement;
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
+    }): HTMLElement;
     slot(header: HTMLElement): HTMLElement | null;
     setActive(item: HTMLElement, value: boolean): void;
     getActive(item: HTMLElement): boolean;

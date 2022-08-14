@@ -66,7 +66,7 @@ interface GridView extends View {
 }
 declare global {
     interface HTMLElementTagNameMap {
-        "v-grid": GridView;
+        "e-gridview": GridView;
     }
 }
 declare var GridView: GridViewConstructor;

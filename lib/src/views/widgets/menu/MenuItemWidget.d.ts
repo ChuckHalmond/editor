@@ -42,18 +42,23 @@ interface MenuItemWidgetFactory extends WidgetFactory {
     collapse(item: HTMLElement): void;
 }
 declare var menuItemWidget: {
-    "__#8@#iconPartTemplate": HTMLElement;
-    "__#8@#arrowPartTemplate": HTMLElement;
-    "__#8@#keyshortcutsPartTemplate": HTMLElement;
-    "__#8@#template": HTMLElement;
-    "__#8@#types": MenuItemType[];
-    "__#8@#typesFeatures": {
+    "__#15@#iconPartTemplate": HTMLElement;
+    "__#15@#arrowPartTemplate": HTMLElement;
+    "__#15@#keyshortcutsPartTemplate": HTMLElement;
+    "__#15@#template": HTMLElement;
+    "__#15@#types": MenuItemType[];
+    "__#15@#typesFeatures": {
         button: {
             role: string;
             hasIcon: boolean;
             hasArrow: boolean;
         };
         menu: {
+            role: string;
+            hasIcon: boolean;
+            hasArrow: boolean;
+        };
+        radio: {
             role: string;
             hasIcon: boolean;
             hasArrow: boolean;
@@ -68,27 +73,22 @@ declare var menuItemWidget: {
             hasIcon: boolean;
             hasArrow: boolean;
         };
-        radio: {
-            role: string;
-            hasIcon: boolean;
-            hasArrow: boolean;
-        };
     };
     create(init?: {
-        id?: string | undefined;
-        classList?: string[] | undefined;
-        tabIndex?: number | undefined;
+        id?: string;
+        classList?: string[];
+        tabIndex?: number;
         type: MenuItemType;
-        checked?: boolean | undefined;
-        label?: string | undefined;
-        name?: string | undefined;
-        keyshortcut?: string | undefined;
-        value?: string | undefined;
-        disabled?: boolean | undefined;
-    } | undefined): HTMLElement;
+        checked?: boolean;
+        label?: string;
+        name?: string;
+        keyshortcut?: string;
+        value?: string;
+        disabled?: boolean;
+    }): HTMLElement;
     slot(item: HTMLElement): HTMLElement | null;
     slottedCallback(item: HTMLElement, slot: HTMLElement): void;
-    "__#8@#label"(item: HTMLElement): HTMLElement;
+    "__#15@#label"(item: HTMLElement): HTMLElement;
     getMenu(item: HTMLElement): HTMLElement | null;
     getKeyShortcut(item: HTMLElement): string | null;
     setKeyShortcut(item: HTMLElement, value: string | null): void;
@@ -106,9 +106,9 @@ declare var menuItemWidget: {
     setDisabled(item: HTMLElement, value: boolean): void;
     setExpanded(item: HTMLElement, value: boolean): void;
     getExpanded(item: HTMLElement): boolean;
-    toggle(item: HTMLElement, force?: boolean | undefined): void;
+    toggle(item: HTMLElement, force?: boolean): void;
     expand(item: HTMLElement): void;
     collapse(item: HTMLElement): void;
-    "__#8@#handleClickEvent"(event: MouseEvent): void;
-    "__#8@#positionMenu"(item: HTMLElement): void;
+    "__#15@#handleClickEvent"(event: MouseEvent): void;
+    "__#15@#positionMenu"(item: HTMLElement): void;
 };
