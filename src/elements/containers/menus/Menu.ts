@@ -285,12 +285,17 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                 if (activeItem) {
                     const {type} = activeItem;
                     switch (type) {
+                        case "menu":
                         case "submenu": {
                             activeItem.expand();
                             if (activeItem.expanded) {
                                 const firstChildItem = this.#firstChildItem(activeItem);
                                 firstChildItem?.focus({preventScroll: true});
                             }
+                            break;
+                        }
+                        default: {
+                            activeItem.click();
                             break;
                         }
                     }

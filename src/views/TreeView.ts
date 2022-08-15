@@ -171,6 +171,8 @@ interface TreeViewConstructor {
 interface TreeView extends View {
     readonly shadowRoot: ShadowRoot;
     readonly model: TreeModel;
+    treeElement(): HTMLElement;
+    treeItemElement(item: TreeItemModel): HTMLElement;
     itemContentDelegate: <Item extends TreeItemModel>(item: Item) => string | Node;
     itemContextMenuDelegate: <Item extends TreeItemModel>(activeItem: Item, selectedItems: Item[]) => string | Node;
 }
@@ -196,7 +198,7 @@ class TreeViewBase extends View implements TreeView {
     constructor(model: TreeModel)
     constructor(model?: TreeModel) {
         super();
-        this.attachShadow({mode: "open"});
+        //this.attachShadow({mode: "open"});
         this.#dragImages = new WeakMap();
         this.itemContentDelegate = function(item: TreeItemModel) {
             return reactiveElement(
@@ -234,7 +236,15 @@ class TreeViewBase extends View implements TreeView {
         this.setModel(model ?? new TreeModel());
     }
 
-    renderShadow(): Node {
+    treeElement(): HTMLElement {
+        return this.shadowRoot.querySelector<HTMLElement>(".tree")!;
+    }
+
+    treeItemElement(item: TreeItemModel): HTMLElement {
+        return this.shadowRoot.querySelector<HTMLElement>(`.treeitem[uri=${item.uri}]`)!;
+    }
+
+    renderLight(): Node {
         const {model} = this;
         const treeElement = widget("tree", {
             properties: {
@@ -253,7 +263,7 @@ class TreeViewBase extends View implements TreeView {
             }
         });
         return fragment(
-            element("link", {
+            /*element("link", {
                 attributes: {
                     rel: "stylesheet",
                     href: "css/main.css"
@@ -264,7 +274,7 @@ class TreeViewBase extends View implements TreeView {
                     rel: "stylesheet",
                     href: "css/views/gridview.css"
                 }
-            }),
+            }),*/
             treeElement,
             element("div", {
                 attributes: {

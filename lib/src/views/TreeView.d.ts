@@ -44,6 +44,8 @@ interface TreeViewConstructor {
 interface TreeView extends View {
     readonly shadowRoot: ShadowRoot;
     readonly model: TreeModel;
+    treeElement(): HTMLElement;
+    treeItemElement(item: TreeItemModel): HTMLElement;
     itemContentDelegate: <Item extends TreeItemModel>(item: Item) => string | Node;
     itemContextMenuDelegate: <Item extends TreeItemModel>(activeItem: Item, selectedItems: Item[]) => string | Node;
 }

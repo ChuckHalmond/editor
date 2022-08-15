@@ -186,7 +186,7 @@ export async function TreeMain() {
         }
     });
     const treeView = new TreeView(treeModel);
-    treeView.itemContentDelegate = <typeof treeView.itemContentDelegate>(
+    /*treeView.itemContentDelegate = <typeof treeView.itemContentDelegate>(
         (item: MyTreeItemModel) => {
             return fragment(
                 ...([
@@ -257,7 +257,7 @@ export async function TreeMain() {
                 ])
             );
         }
-    );
+    );*/
     treeView.itemContextMenuDelegate = <typeof treeView.itemContextMenuDelegate>(
         (activeItem: MyTreeItemModel, selectedItems: MyTreeItemModel[]) => {
             return fragment(
@@ -286,7 +286,7 @@ export async function TreeMain() {
                                     if (doRemove) {
                                         itemsList.remove();
                                     }
-                                    //TODO: focus the tree
+                                    treeView.treeElement().focus();
                                 }
                             }
                         })
@@ -368,119 +368,127 @@ export async function TreeMain() {
     );
         
     const menuView = widget("menubar", {
-    slotted: [
-        widget("menuitem", {
-            properties: {
-                label: "MenuItem 0",
-                name: "MenuItem 0",
-                type: "menu",
-                disabled: true
-            },
-            slotted: [
-                widget("menu", {
-                    slotted: [
-                        widget("menuitem", {
-                            properties: {
-                                label: "MenuItem 1",
-                                name: "MenuItem 1",
-                                type: "checkbox"
-                            }
-                        })
-                    ]
-                })
-            ]
-        }),
-        widget("menuitem", {
-            properties: {
-                label: "MenuItem 0",
-                name: "MenuItem 0",
-                type: "menu"
-            },
-            slotted: [
-                widget("menu", {
-                    slotted: [
-                        widget("menuitem", {
-                            properties: {
-                                label: "MenuItem 1",
-                                name: "MenuItem 1",
-                                type: "checkbox"
-                            }
-                        })
-                    ]
-                })
-            ]
-        }),
-        widget("menuitem", {
-            properties: {
-                label: "MenuItem 1",
-                name: "MenuItem 1",
-                type: "menu"
-            },
-            slotted: [
-                widget("menu", {
-                    slotted: [
-                        widget("menuitemgroup", {
-                            slotted: [
-                                widget("menuitem", {
-                                    properties: {
-                                        label: "MenuItem 1",
-                                        type: "checkbox",
-                                        keyshortcut: "Ctrl+B",
-                                        disabled: true,
-                                        checked: true
-                                    }
-                                }),
-                                widget("menuitem", {
-                                    properties: {
-                                        type: "button",
-                                        label: "MenuItem 2",
-                                        keyshortcut: "Ctrl+A"
-                                    }
-                                })
-                            ]
-                        }),
-                        widget("separator"),
-                        widget("menuitem", {
-                            properties: {
-                                label: "Submenu",
-                                type: "submenu"
-                            },
-                            slotted: [
-                                widget("menu", {
-                                    slotted: [
-                                        widget("menuitem", {
-                                            properties: {
-                                                label: "MenuItem 1",
-                                                type: "radio",
-                                                name: "radio",
-                                                value: "1"
-                                            }
-                                        }),
-                                        widget("menuitem", {
-                                            properties: {
-                                                type: "radio",
-                                                label: "MenuItem 2",
-                                                name: "radio",
-                                                value: "2"
-                                            }
-                                        }),
-                                        widget("menuitem", {
-                                            properties: {
-                                                type: "radio",
-                                                label: "MenuItem 3",
-                                                name: "radio",
-                                                value: "3"
-                                            }
-                                        })
-                                    ]
-                                })
-                            ]
-                        })
-                    ]
-                })
-            ]
+        slotted: [
+            widget("menuitem", {
+                properties: {
+                    label: "MenuItem 0",
+                    name: "MenuItem 0",
+                    type: "menu",
+                    disabled: true
+                },
+                slotted: [
+                    widget("menu", {
+                        slotted: [
+                            widget("menuitem", {
+                                properties: {
+                                    label: "MenuItem 1",
+                                    name: "MenuItem 1",
+                                    type: "checkbox"
+                                }
+                            })
+                        ]
+                    })
+                ]
+            }),
+            widget("menuitem", {
+                properties: {
+                    label: "MenuItem 0",
+                    name: "MenuItem 0",
+                    type: "menu"
+                },
+                slotted: [
+                    widget("menu", {
+                        slotted: [
+                            widget("menuitem", {
+                                properties: {
+                                    label: "MenuItem 1",
+                                    name: "MenuItem 1",
+                                    type: "checkbox"
+                                }
+                            })
+                        ]
+                    })
+                ]
+            }),
+            widget("menuitem", {
+                properties: {
+                    label: "MenuItem 1",
+                    name: "MenuItem 1",
+                    type: "menu"
+                },
+                slotted: [
+                    widget("menu", {
+                        slotted: [
+                            widget("menuitemgroup", {
+                                slotted: [
+                                    widget("menuitem", {
+                                        properties: {
+                                            label: "MenuItem 1",
+                                            type: "checkbox",
+                                            keyshortcut: "Ctrl+B",
+                                            disabled: true,
+                                            checked: true
+                                        }
+                                    }),
+                                    widget("menuitem", {
+                                        properties: {
+                                            type: "button",
+                                            label: "MenuItem 2",
+                                            keyshortcut: "Ctrl+A"
+                                        }
+                                    })
+                                ]
+                            }),
+                            widget("separator"),
+                            widget("menuitem", {
+                                properties: {
+                                    label: "Submenu",
+                                    type: "submenu"
+                                },
+                                slotted: [
+                                    widget("menu", {
+                                        slotted: [
+                                            widget("menuitem", {
+                                                properties: {
+                                                    label: "MenuItem 1",
+                                                    type: "radio",
+                                                    name: "radio",
+                                                    value: "1"
+                                                }
+                                            }),
+                                            widget("menuitem", {
+                                                properties: {
+                                                    type: "radio",
+                                                    label: "MenuItem 2",
+                                                    name: "radio",
+                                                    value: "2"
+                                                }
+                                            }),
+                                            widget("menuitem", {
+                                                properties: {
+                                                    type: "radio",
+                                                    label: "MenuItem 3",
+                                                    name: "radio",
+                                                    value: "3"
+                                                }
+                                            })
+                                        ]
+                                    })
+                                ]
+                            })
+                        ]
+                    })
+                ]
+            })
+        ]
+    })
+    document.body.append(menuView);
+
+    document.body.append(
+        element("e-import", {
+            attributes: {
+                src: "containers/tree.html"
+            }
         })
-    ]
-})
-document.body.append(menuView);
+    );
 }
