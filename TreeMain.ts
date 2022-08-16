@@ -186,7 +186,7 @@ export async function TreeMain() {
         }
     });
     const treeView = new TreeView(treeModel);
-    /*treeView.itemContentDelegate = <typeof treeView.itemContentDelegate>(
+    treeView.itemContentDelegate = <typeof treeView.itemContentDelegate>(
         (item: MyTreeItemModel) => {
             return fragment(
                 ...([
@@ -257,7 +257,7 @@ export async function TreeMain() {
                 ])
             );
         }
-    );*/
+    );
     treeView.itemContextMenuDelegate = <typeof treeView.itemContextMenuDelegate>(
         (activeItem: MyTreeItemModel, selectedItems: MyTreeItemModel[]) => {
             return fragment(
@@ -485,10 +485,25 @@ export async function TreeMain() {
     document.body.append(menuView);
 
     document.body.append(
-        element("e-import", {
-            attributes: {
-                src: "containers/tree.html"
-            }
+        widget("combobox", {
+            slotted: [
+                widget("option",  {
+                    properties: {
+                        label: "First option"
+                    }
+                }),
+                widget("option",  {
+                    properties: {
+                        label: "Second option"
+                    }
+                }),
+                widget("option",  {
+                    properties: {
+                        label: "Third option",
+                        selected: true
+                    }
+                })
+            ]
         })
     );
 }

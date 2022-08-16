@@ -1,6 +1,6 @@
 import { HTMLESelectElement } from "../../controls/forms/Select";
-import { CustomElement, AttributeProperty, element } from "../../Element";
-import { HTMLEActionElement } from "../actions/Action";
+import { CustomElement, AttributeProperty, element, QueryProperty } from "../../Element";
+import { HTMLEMenuElement } from "../menus/Menu";
 import { HTMLEMenuButtonElement } from "../menus/MenuButton";
 
 export { HTMLEToolBarItemElement };
@@ -11,14 +11,20 @@ interface HTMLEToolBarItemElementConstructor {
     new(): HTMLEToolBarItemElement;
 }
 
-interface HTMLEToolBarItemElement extends HTMLEActionElement {
+interface HTMLEToolBarItemElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly menubutton: HTMLEMenuButtonElement | null;
+    readonly menu: HTMLEMenuElement | null;
     readonly select: HTMLESelectElement | null;
+    value: string;
     name: string;
     label: string;
     active: boolean;
+    pressed: boolean;
+    expanded: boolean;
     type: "button" | "checkbox" | "radio" | "menubutton" | "select";
+    toggle(force?: boolean): void;
+    expand(): void;
+    collapse(): void;
 }
 
 declare global {
@@ -34,20 +40,24 @@ var slottedTriggerListeners: WeakMap<HTMLElement, EventListener>;
 @CustomElement({
     name: "e-toolbaritem"
 })
-class HTMLEToolBarItemElementBase extends HTMLEActionElement implements HTMLEToolBarItemElement {
+class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarItemElement {
     
     readonly shadowRoot!: ShadowRoot;
 
-    get menubutton(): HTMLEMenuButtonElement | null {
-        return this.#menubutton;
-    }
+    @QueryProperty({selector: ":scope > e-menu[slot=menu]"})
+    readonly menu!: HTMLEMenuElement | null;
     
-    get select(): HTMLESelectElement | null {
-        return this.#select;
-    }
+    @QueryProperty({selector: ":scope > e-select[slot=select]"})
+    readonly select!: HTMLESelectElement | null;
 
     @AttributeProperty({type: Boolean})
     active!: boolean;
+
+    @AttributeProperty({type: Boolean})
+    pressed!: boolean;
+
+    @AttributeProperty({type: Boolean})
+    expanded!: boolean;
 
     @AttributeProperty({type: String, observed: true})
     value!: string;
@@ -60,14 +70,11 @@ class HTMLEToolBarItemElementBase extends HTMLEActionElement implements HTMLEToo
 
     @AttributeProperty({type: String})
     type!: "button" | "checkbox" | "radio" | "menubutton" | "select";
-    
-    #menubutton: HTMLEMenuButtonElement | null;
-    #select: HTMLESelectElement | null;
 
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
-            element("span", {
+            /*element("span", {
                 attributes: {
                     part: "content"
                 },
@@ -93,6 +100,17 @@ class HTMLEToolBarItemElementBase extends HTMLEActionElement implements HTMLEToo
                         }
                     })
                 ]
+            })*/
+            element("slot"),
+            element("slot", {
+                attributes: {
+                    name: "select"
+                }
+            }),
+            element("slot", {
+                attributes: {
+                    name: "menubutton"
+                }
             })
         )
         slottedKeyboardListeners = new WeakMap();
@@ -101,36 +119,11 @@ class HTMLEToolBarItemElementBase extends HTMLEActionElement implements HTMLEToo
 
     constructor() {
         super();
-        this.#menubutton = null;
-        this.#select = null;
         const shadowRoot = this.attachShadow({mode: "open"});
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
-        shadowRoot.addEventListener("slotchange", this.#handleSlotChangeEvent.bind(this));
-    }
-
-    toggle(): void {
-        const {type} = this;
-        switch (type) {
-            case "menubutton": {
-                const {menubutton} = this;
-                if (menubutton) {
-                    menubutton.toggle();
-                    if (menubutton.expanded) {
-                        menubutton.firstItem?.focus({preventScroll: true});
-                    }
-                }
-                break;
-            }
-            case "select": {
-                const {select} = this;
-                if (select) {
-                    select.toggle();
-                }
-                break;
-            }
-        }
+        this.addEventListener("click", this.#handleClickEvent.bind(this));
     }
 
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
@@ -153,6 +146,29 @@ class HTMLEToolBarItemElementBase extends HTMLEActionElement implements HTMLEToo
         }
     }
 
+    toggle(force?: boolean): void {
+        const expand = force ?? !this.expanded;
+        this.expanded = expand;
+        if (expand) {
+            this.#positionMenu();
+        }
+    }
+
+    expand(): void {
+        const {expanded} = this;
+        if (!expanded) {
+            this.expanded = true;
+            this.#positionMenu();
+        }
+    }
+
+    collapse(): void {
+        const {expanded} = this;
+        if (expanded) {
+            this.expanded = false;
+        }
+    }
+
     #updateSelectValue(): void {
         const {select} = this;
         if (select) {
@@ -164,7 +180,61 @@ class HTMLEToolBarItemElementBase extends HTMLEActionElement implements HTMLEToo
         }
     }
 
-    #addSlottedKeyboardHandler(element: HTMLElement): void {
+    #handleClickEvent(event: MouseEvent): void {
+        const {target} = event;
+        if (target == this) {
+            const {type} = this;
+            switch (type) {
+                case "checkbox": {
+                    this.pressed = !this.pressed;
+                    break;
+                }
+                case "radio": {
+                    this.pressed = true;
+                    break;
+                }
+                case "menubutton": {
+                    const {menu} = this;
+                    if (menu && !menu.contains(<Node>target)) {
+                        this.toggle();
+                        const {expanded} = this;
+                        if (expanded) {
+                            menu?.focus({preventScroll: true});
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    #positionMenu(): void {
+        const {type} = this;
+        if (type == "menubutton") {
+            const {menu} = this;
+            if (menu !== null) {
+                const {style: menuStyle} = menu;
+                const {top: itemTop, bottom: itemBottom, left: itemLeft, right: itemRight} = this.getBoundingClientRect();
+                const {width: menuWidth, height: menuHeight} = menu.getBoundingClientRect();
+                const {scrollY, scrollX} = window;
+                const {clientWidth, clientHeight} = document.body;
+                const overflowX = itemRight + menuWidth - clientWidth;
+                const overflowY = itemTop + menuHeight - clientHeight;
+                menuStyle.setProperty("left", `${
+                    overflowX > 0 ?
+                    scrollX + itemLeft - menuWidth :
+                    scrollX + itemLeft
+                }px`);
+                menuStyle.setProperty("top", `${
+                    overflowY > 0 ?
+                    scrollY + itemTop - menuHeight :
+                    scrollY + itemBottom
+                }px`);
+            }
+        }
+    }
+
+    /*#addSlottedKeyboardHandler(element: HTMLElement): void {
         const listener = <EventListener>this.#handleSlottedKeyboardEvent.bind(this);
         slottedKeyboardListeners.set(element, listener);
         element.addEventListener("keydown", listener);
@@ -240,7 +310,7 @@ class HTMLEToolBarItemElementBase extends HTMLEActionElement implements HTMLEToo
                 break;
             }
         }
-    }
+    }*/
 }
 
 var HTMLEToolBarItemElement: HTMLEToolBarItemElementConstructor = HTMLEToolBarItemElementBase;

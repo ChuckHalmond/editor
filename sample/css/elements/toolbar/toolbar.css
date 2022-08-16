@@ -1,8 +1,9 @@
-e-tree {
-    display: block;
+.toolbar {
+    display: flex;
+    flex-direction: row;
 }
 
-e-tree:focus {
+.toolbar:focus {
     outline: 1px solid var(--focused-item-outline-color);
     outline-offset: -1px;
 }

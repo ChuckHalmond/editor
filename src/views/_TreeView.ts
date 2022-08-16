@@ -398,7 +398,7 @@ class TreeViewBase extends View implements TreeView {
                             const visibilityItem = toolbar.querySelector<HTMLEToolBarItemElement>("e-toolbaritem[name=visibility]");
                             if (visibilityItem) {
                                 visibilityItem.title = newValue ? "Hide" : "Show";
-                                visibilityItem.checked = newValue;
+                                visibilityItem.pressed = newValue;
                             }
                         }
                     }

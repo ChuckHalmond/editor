@@ -1,4 +1,4 @@
-e-select {
+/*e-select {
     display: flex;
     flex-direction: column;
     user-select: none;
@@ -59,4 +59,110 @@ e-select::part(separator) {
     margin: 10px 0px 10px 36px;
     border: none;
     border-top: 1px solid lightgrey;
+}*/
+
+e-select {
+    display: inline-block;
+    user-select: none;
+    line-height: 22px;
+}
+
+e-select:focus-within {
+    background-color: var(--focused-item-color);
+}
+
+e-select:hover:not(:focus-within) {
+    background-color: var(--hovered-item-color);
+}
+
+e-select[disabled] {
+    opacity: 0.38;
+    pointer-events: none;
+}
+
+e-select::part(content) {
+    flex: 1;
+    overflow: hidden;
+    padding: 0 4px;
+}
+
+e-select::part(value) {
+    flex: auto;
+    text-align: right;
+}
+
+e-select::part(box) {
+    z-index: 1;
+    position: absolute;
+
+    display: block;
+    padding: 6px 0;
+    width: max-content;
+
+    background-color: white;
+
+    -webkit-box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
+    -moz-box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
+}
+
+e-select:not([expanded])::part(box) {
+    opacity: 0;
+    pointer-events: none;
+}
+
+e-select::part(content)::after {
+    display: inline-block;
+    text-align: center;
+    width: 18px;
+    height: 18px;
+    margin-left: 6px;
+    content: "▾";
+}
+
+e-option {
+    display: flex;
+    user-select: none;
+    white-space: nowrap;
+    line-height: 22px;
+    padding: 0 12px;
+}
+
+e-option:hover {
+    background-color: var(--hovered-item-color);
+}
+
+e-option:focus-within {
+    outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;
+}
+
+e-option[selected] {
+    background-color: var(--selected-item-color);
+}
+
+e-option[disabled] {
+    opacity: 0.38;
+    pointer-events: none;
+}
+
+e-option::before {
+    display: flex;
+    content: "";
+    width: 18px;
+    height: 18px;
+    margin-right: 6px;
+
+    mask-size: 18px 18px;
+    -webkit-mask-size: 18px 18px;
+    background-color: var(--icon-color, none);
+    -webkit-mask-image: var(--icon-image, none);
+    mask-image: var(--icon-image, none);
+}
+
+e-option[default]::after {
+    display: inline-block;
+    content: "(default)";
+    margin-left: 24px;
+    text-align: right;
 }

@@ -11,7 +11,7 @@ e-treeitem[active]:focus-visible {
     outline: none;
 }
 
-e-treeitem[active]::part(content) {
+e-tree:focus-within e-treeitem[active]::part(content) {
     outline: 1px solid var(--focused-item-outline-color);
     outline-offset: -1px;
 }

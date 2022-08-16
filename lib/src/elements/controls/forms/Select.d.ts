@@ -5,9 +5,7 @@ export { HTMLESelectElement };
 interface HTMLESelectElement extends HTMLEActionElement {
     readonly shadowRoot: ShadowRoot;
     readonly options: HTMLEOptionCollection;
-    readonly activeIndex: number;
     readonly activeOption: HTMLEOptionElement | null;
-    readonly selectedIndex: number;
     readonly selectedOption: HTMLEOptionElement | null;
     name: string;
     label: string;
@@ -16,7 +14,6 @@ interface HTMLESelectElement extends HTMLEActionElement {
     expand(): void;
     collapse(): void;
     toggle(force?: boolean): void;
-    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
 }
 interface HTMLESelectElementConstructor {
     prototype: HTMLESelectElement;

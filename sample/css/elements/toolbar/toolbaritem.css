@@ -1,4 +1,56 @@
+e-toolbar {
+    display: flex;
+    flex-direction: row;
+}
+
+e-toolbar:focus {
+    outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;
+}
+
+e-toolbaritemgroup {
+    display: flex;
+    width: max-content;
+    flex-direction: row;
+}
+
 e-toolbaritem {
+    display: flex;
+    user-select: none;
+    white-space: nowrap;
+    cursor: pointer;
+    line-height: 22px;
+}
+
+e-toolbaritem[disabled] {
+    opacity: 0.38;
+    pointer-events: none;
+}
+
+e-toolbaritem:hover {
+    background-color: var(--hovered-item-color);
+}
+
+e-toolbaritem[pressed] {
+    background-color: var(--activated-item-color);
+}
+
+e-toolbar:focus-within e-toolbaritem.active {
+    outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;
+}
+
+e-toolbaritem[type="menubutton"] > e-menu {
+    z-index: 1;
+    position: absolute;
+}
+
+e-toolbaritem[type="menubutton"]:not([expanded]) > e-menu {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/*e-toolbaritem {
     display: flex;
     user-select: none;
     white-space: nowrap;
@@ -67,4 +119,4 @@ e-toolbaritem:is(:not([type]), [type="button"], [type="radio"], [type="checkbox"
     -webkit-mask-image: var(--icon-image, none);
     mask-image: var(--icon-image, none);
     filter: var(--icon-filter, none);
-}
+}*/

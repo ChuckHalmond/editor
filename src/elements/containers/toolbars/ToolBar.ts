@@ -87,8 +87,8 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
-        this.addEventListener("change", this.#handleChangeEvent.bind(this));
-        this.addEventListener("click", this.#handleClickEvent.bind(this));
+        //this.addEventListener("change", this.#handleChangeEvent.bind(this));
+        //this.addEventListener("click", this.#handleClickEvent.bind(this));
         this.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
         this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
@@ -144,7 +144,7 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         }
     }
 
-    #handleChangeEvent(event: Event): void {
+    /*#handleChangeEvent(event: Event): void {
         const {target} = event;
         if (target instanceof HTMLESelectElement) {
             const item = target.closest("e-toolbaritem");
@@ -160,14 +160,14 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
                 }
             }
         }
-    }
+    }*/
 
-    #handleClickEvent(event: MouseEvent): void {
+    /*#handleClickEvent(event: MouseEvent): void {
         const {target} = event;
         if (target instanceof HTMLEToolBarItemElement) {
             const {type} = target;
             switch (type) {
-                /*case "menubutton": {
+                case "menubutton": {
                     const {menubutton} = target;
                     if (menubutton) {
                         const {expanded} = menubutton;
@@ -184,14 +184,14 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
                         select.toggle();
                     }
                     break;
-                }*/
+                }
                 default: {
                     target.trigger();
                     break;
                 }
             }
         }
-    }
+    }*/
 
     #handleFocusInEvent(event: FocusEvent): void {
         const {target} = event;
@@ -199,6 +199,7 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
             item_i => item_i.contains(<Node>target)
         ) ?? null;
         this.#setActiveItem(activeItem);
+        this.tabIndex = -1;
     }
 
     #handleFocusOutEvent(event: FocusEvent): void {
@@ -206,6 +207,7 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         const lostFocusWithin = !this.contains(<Node>relatedTarget);
         if (lostFocusWithin) {
             this.#setActiveItem(null);
+            this.tabIndex = 0;
         }
     }
 
@@ -218,13 +220,10 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
                     const {type} = activeItem;
                     switch (type) {
                         case "menubutton": {
-                            const {menubutton} = activeItem;
-                            if (menubutton) {
-                                const {expanded} = menubutton;
-                                if (!expanded) {
-                                    menubutton.expand();
-                                    menubutton.firstItem?.focus({preventScroll: true});
-                                }
+                            const {menu, expanded} = activeItem;
+                            if (menu && !expanded) {
+                                activeItem.expand();
+                                menu.firstItem()?.focus({preventScroll: true});
                             }
                             break;
                         }
@@ -236,7 +235,7 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
                             break;
                         }
                         default: {
-                            activeItem.trigger();
+                            activeItem.click();
                             break;
                         }
                     }
@@ -326,7 +325,7 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
                 this.querySelectorAll<HTMLEToolBarItemElement>(
                     `:is(:scope, :scope > e-toolbaritemgroup) > e-toolbaritem[type=radio][name=${name}]`
                 ).forEach((radio_i) => {
-                    radio_i.checked = radio_i.value == value;
+                    radio_i.pressed = radio_i.value == value;
                 });
             }
         }

@@ -8,6 +8,7 @@ export { EMenu };
 interface HTMLEMenuElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     readonly activeItem: HTMLEMenuItemElement | null;
+    firstItem(): HTMLEMenuItemElement | null;
     items(): HTMLEMenuItemElement[];
     name: string;
     contextual: boolean;
@@ -129,7 +130,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         return NodeFilter.FILTER_REJECT;
     }
 
-    #firstItem(): HTMLEMenuItemElement | null {
+    firstItem(): HTMLEMenuItemElement | null {
         const walker = this.#walker;
         walker.currentNode = walker.root;
         return <HTMLEMenuItemElement | null>walker.firstChild();
@@ -156,7 +157,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     #firstChildItem(item: HTMLEMenuItemElement): HTMLEMenuItemElement | null {
         const {menu} = item;
         return menu instanceof HTMLEMenuElementBase ?
-            menu.#firstItem() :
+            menu.firstItem() :
             null;
     }
 
@@ -255,21 +256,21 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
             case "ArrowUp": {
                 const previousItem = activeItem ?
                     this.#previousItem(activeItem) ?? this.#lastItem() :
-                    this.#firstItem();
+                    this.firstItem();
                 previousItem?.focus({preventScroll: true});
                 event.stopPropagation();
                 break;
             }
             case "ArrowDown": {
                 const nextItem = activeItem ?
-                    this.#nextItem(activeItem) ?? this.#firstItem() :
-                    this.#firstItem();
+                    this.#nextItem(activeItem) ?? this.firstItem() :
+                    this.firstItem();
                 nextItem?.focus({preventScroll: true});
                 event.stopPropagation();
                 break;
             }
             case "Home": {
-                const firstItem = this.#firstItem();
+                const firstItem = this.firstItem();
                 firstItem?.focus({preventScroll: true});
                 event.stopPropagation();
                 break;

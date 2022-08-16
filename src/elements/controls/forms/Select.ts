@@ -9,9 +9,7 @@ export { HTMLESelectElement };
 interface HTMLESelectElement extends HTMLEActionElement {
     readonly shadowRoot: ShadowRoot;
     readonly options: HTMLEOptionCollection;
-    readonly activeIndex: number;
     readonly activeOption: HTMLEOptionElement | null;
-    readonly selectedIndex: number;
     readonly selectedOption: HTMLEOptionElement | null;
     name: string;
     label: string;
@@ -20,7 +18,7 @@ interface HTMLESelectElement extends HTMLEActionElement {
     expand(): void;
     collapse(): void;
     toggle(force?: boolean): void;
-    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
+    //attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
 }
 
 interface HTMLESelectElementConstructor {
@@ -44,20 +42,12 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
     readonly shadowRoot!: ShadowRoot;
     readonly options: HTMLEOptionCollection;
 
-    get activeIndex(): number {
-        return this.#activeIndex;
-    }
-
-    get selectedIndex(): number {
-        return this.#selectedIndex;
-    }
-
     get activeOption(): HTMLEOptionElement | null {
-        return this.options.item(this.#activeIndex) ?? null;
+        return this.querySelector("e-option[active]") ?? null;
     }
 
     get selectedOption(): HTMLEOptionElement | null {
-        return this.options.item(this.#selectedIndex) ?? null;
+        return this.querySelector("e-option[selected]") ?? null;
     }
 
     @AttributeProperty({type: String})
@@ -76,8 +66,7 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
     expanded!: boolean;
 
     #walker: TreeWalker;
-    #activeIndex: number;
-    #selectedIndex: number;
+    #optionsObserver: MutationObserver;
 
     static {
         shadowTemplate = element("template");
@@ -101,76 +90,51 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
             }),
             element("div", {
                 attributes: {
-                    part: "options"
+                    part: "box"
                 },
-                children: [
-                    element("slot"),
-                    element("hr", {
-                        attributes: {
-                            part: "separator"
-                        }
-                    }),
-                    element("span", {
-                        attributes: {
-                            part: "description"
-                        }
-                    })
-                ]
+                children: element("slot")
             })
         );
     }
 
     constructor() {
         super();
-        this.#walker = document.createTreeWalker(
-            this, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
-        );
-        this.#activeIndex = -1;
-        this.#selectedIndex = -1;
-        this.options = new HTMLEOptionCollection(this);
         const shadowRoot = this.attachShadow({mode: "open"});
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
-        this.addEventListener("click", this.#handleClickEvent.bind(this));
-        this.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
+        this.#walker = document.createTreeWalker(
+            document, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
+        );
         this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
+        this.addEventListener("click", this.#handleClickEvent.bind(this));
         this.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
-        shadowRoot.addEventListener("slotchange", this.#handleSlotChangeEvent.bind(this));
+        this.#optionsObserver = new MutationObserver(
+            this.#mutationCallback.bind(this)
+        );
+        this.#optionsObserver.observe(this, {
+            childList: true,
+            subtree: true
+        });
+        this.options = new HTMLEOptionCollection(this);
     }
 
-    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
-        switch (name) {
-            case "label": {
-                const {shadowRoot} = this;
-                const labelPart = shadowRoot.querySelector("[part=label]");
-                if (labelPart) {
-                    labelPart.textContent = newValue;
-                }
-                break;
-            }
-            case "value": {
-                const {options} = this;
-                const matchingOption = Array.from(options.values()).find(option => option.value == newValue);
-                if (matchingOption) {
-                    this.#setSelectedOption(matchingOption);
-                    this.dispatchEvent(new Event("change", {bubbles: true}));
-                }
-                break;
-            }
+    connectedCallback() {
+        const {selectedOption} = this;
+        if (selectedOption !== null) {
+            this.#value().textContent = selectedOption.getAttribute("label");
         }
     }
 
     expand(): void {
-        const {expanded, options} = this;
+        const {expanded} = this;
         if (!expanded) {
             this.expanded = true;
-            const {selectedIndex} = this;
-            this.#positionOptions();
-            const option = options.item(selectedIndex);
-            if (option) {
-                option.focus({preventScroll: true});
+            this.#positionBox();
+            const {selectedOption} = this;
+            if (selectedOption) {
+                selectedOption.focus({preventScroll: true});
             }
         }
     }
@@ -189,11 +153,56 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
         expand ? this.expand() : this.collapse();
     }
 
+    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
+        switch (name) {
+            case "label": {
+                const {shadowRoot} = this;
+                const labelPart = shadowRoot.querySelector<HTMLElement>("[part=label]");
+                if (labelPart) {
+                    labelPart.textContent = newValue;
+                }
+                break;
+            }
+        }
+    }
+
+    #value(): HTMLElement {
+        return this.shadowRoot.querySelector<HTMLElement>("[part=value]")!;
+    }
+
+    #box(): HTMLElement {
+        return this.shadowRoot.querySelector<HTMLElement>("[part=box]")!;
+    }
+
+    #mutationCallback(mutationsList: MutationRecord[]): void {
+        mutationsList.forEach((mutation: MutationRecord) => {
+            const {type} = mutation;
+            switch (type) {
+                case "childList": {
+                    const {addedNodes} = mutation;
+                    const selector = "e-option[selected]";
+                    for (let node of addedNodes) {
+                        if (node instanceof HTMLElement) {
+                            const selectedOption = <HTMLEOptionElement | null>(
+                                node.matches(selector) ? node :
+                                node.querySelector(selector)
+                            );
+                            if (selectedOption !== null) {
+                                this.#setSelectedOption(selectedOption);
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        });
+    }
+
     #walkerNodeFilter(node: Node): number {
-        if (node instanceof HTMLEOptionElement) {
+        if (node instanceof HTMLOptionElement && !node.disabled && !node.hidden) {
             return NodeFilter.FILTER_ACCEPT;
         }
-        if (node instanceof HTMLEOptionGroupElement) {
+        else if (node instanceof HTMLEOptionGroupElement) {
             return NodeFilter.FILTER_SKIP;
         }
         return NodeFilter.FILTER_REJECT;
@@ -201,135 +210,95 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
 
     #firstOption(): HTMLEOptionElement | null {
         const walker = this.#walker;
-        walker.currentNode = walker.root;
+        walker.currentNode = this;
         return <HTMLEOptionElement | null>walker.firstChild();
     }
 
     #lastOption(): HTMLEOptionElement | null {
         const walker = this.#walker;
-        walker.currentNode = walker.root;
+        walker.currentNode = this;
         return <HTMLEOptionElement | null>walker.lastChild();
     }
     
-    #previousOption(item: HTMLEOptionElement): HTMLEOptionElement | null {
+    #previousOption(option: HTMLElement): HTMLEOptionElement | null {
         const walker = this.#walker;
-        walker.currentNode = item;
+        walker.currentNode = option;
         return <HTMLEOptionElement | null>walker.previousNode();
     }
 
-    #nextOption(item: HTMLEOptionElement): HTMLEOptionElement | null {
+    #nextOption(option: HTMLEOptionElement): HTMLEOptionElement | null {
         const walker = this.#walker;
-        walker.currentNode = item;
+        walker.currentNode = option;
         return <HTMLEOptionElement | null>walker.nextNode();
     }
 
-    #selectOption(option: HTMLEOptionElement): void {
-        if (option && !option.disabled) {
-            this.value = option.value;
+    #selectOption(option: HTMLEOptionElement) {
+        const {selectedOption} = this;
+        if (selectedOption) {
+            selectedOption.selected = false;
+        }
+        if (option !== selectedOption) {
+            option.selected = true;
+            this.#setSelectedOption(option);
+            this.dispatchEvent(new Event("change", {bubbles: true}));
         }
     }
-
-    #setActiveOption(option: HTMLEOptionElement | null): void {
-        const {options, activeOption} = this;
-        if (activeOption !== null && activeOption !== option) {
-            activeOption.active = false;
-        }
-        if (option !== null) {
-            if (!option.disabled) {
-                const {shadowRoot} = this;
-                const descriptionPart = shadowRoot.querySelector("[part='description']");
-                if (descriptionPart) {
-                    descriptionPart.textContent = option.description;
-                }
-                this.#activeIndex = Array.from(options.values()).indexOf(option);
-            }
-            option.active = true;
-        }
-        else {
-            this.#activeIndex = -1;
-        }
+    
+    #setSelectedOption(option: HTMLEOptionElement) {
+        this.#value().textContent = option.label;
     }
 
-    #setSelectedOption(option: HTMLEOptionElement | null): void {
-        const {options} = this;
-        if (option !== null) {
-            if (!option.disabled) {
-                const {shadowRoot, selectedOption} = this;
-                const valuePart = shadowRoot.querySelector("[part='value']");
-                if (valuePart) {
-                    valuePart.textContent = option.label;
-                }
-                option.selected = true;
-                if (selectedOption) {
-                    selectedOption.selected = false;
-                }
-                this.#selectedIndex = Array.from(options.values()).indexOf(option);
-            }
-        }
-        else {
-            this.#activeIndex = -1;
-        }
-    }
-
-    #positionOptions(): void {
-        const {shadowRoot} = this;
-        const options = shadowRoot.querySelector<HTMLElement>("[part=options]")!;
-        const {style: optionsStyle} = options;  
-        const {bottom: selectBottom, left: selectLeft} = this.getBoundingClientRect();
+    #positionBox(): void {
+        const box = this.#box()
+        const {style: optionsStyle} = box;  
+        const {bottom, left} = this.getBoundingClientRect();
         const {scrollX, scrollY} = window;
-        optionsStyle.setProperty("top", `${selectBottom + scrollY}px`);
-        optionsStyle.setProperty("left", `${selectLeft + scrollX}px`);
+        optionsStyle.setProperty("top", `${bottom + scrollY}px`);
+        optionsStyle.setProperty("left", `${left + scrollX}px`);
     }
 
     #handleClickEvent(event: MouseEvent): void {
         const {target} = event;
-        if (target instanceof HTMLEOptionElement) {
-            this.#selectOption(target);
-            this.collapse();
+        this.toggle();
+        const {expanded} = this;
+        if (expanded) {
+            const {selectedOption} = this;
+            (selectedOption ?? this.options.item(0))?.focus({preventScroll: true});
         }
         else {
-            if (target == this) {
-                this.toggle();
+            const targetOption = (<HTMLElement>target).closest<HTMLEOptionElement>("e-option");
+            
+            if (targetOption) {
+                this.#selectOption(targetOption);
             }
-        }
-    }
-
-    #handleFocusInEvent(event: FocusEvent): void {
-        const {target} = event;
-        const {expanded} = this;
-        if (target instanceof HTMLEOptionElement) {
-            if (!expanded) {
-                this.expand();
-            }
-            this.#setActiveOption(target);
         }
     }
 
     #handleFocusOutEvent(event: FocusEvent): void {
         const {relatedTarget} = event;
-        const {expanded} = this;
         const lostFocusWithin = !this.contains(<Node>relatedTarget);
         if (lostFocusWithin) {
-            if (expanded) {
-                this.collapse();
-            }
-            this.#setActiveOption(null);
+            this.collapse();
         }
     }
 
     #handleKeyDownEvent(event: KeyboardEvent): void {
         const {key} = event;
-        const {options, activeOption, selectedOption, selectedIndex, expanded} = this;
+        const {expanded, activeOption, selectedOption} = this;
         switch (key) {
             case "ArrowUp": {
-                if (expanded && activeOption !== null) {
-                    const previousOption = this.#previousOption(activeOption) ?? this.#firstOption();
+                if (expanded) {
+                    const previousOption = activeOption ?
+                        this.#previousOption(activeOption) :
+                        this.#firstOption();
                     if (previousOption) {
                         previousOption.focus({preventScroll: true});
                     }
                 }
-                else if (!expanded && selectedOption !== null) {
-                    const previousOption = this.#previousOption(selectedOption) ?? this.#firstOption();
+                else {
+                    const previousOption = selectedOption ?
+                        this.#previousOption(selectedOption) :
+                        this.#firstOption();
                     if (previousOption) {
                         this.#selectOption(previousOption);
                     }
@@ -338,14 +307,18 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
                 break;
             }
             case "ArrowDown": {
-                if (expanded && activeOption !== null) {
-                    const nextOption = this.#nextOption(activeOption) ?? this.#lastOption();
+                if (expanded) {
+                    const nextOption = activeOption ?
+                        this.#nextOption(activeOption) :
+                        this.#lastOption();
                     if (nextOption) {
                         nextOption.focus({preventScroll: true});
                     }
                 }
-                else if (!expanded && selectedOption !== null) {
-                    const nextOption = this.#nextOption(selectedOption) ?? this.#lastOption();
+                else {
+                    const nextOption = selectedOption ?
+                        this.#nextOption(selectedOption) :
+                        this.#lastOption();
                     if (nextOption) {
                         this.#selectOption(nextOption);
                     }
@@ -355,7 +328,7 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
             }
             case "Home": {
                 const firstOption = this.#firstOption();
-                if (firstOption !== null) {
+                if (firstOption) {
                     if (expanded) {
                         firstOption.focus({preventScroll: true});
                     }
@@ -368,7 +341,7 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
             }
             case "End": {
                 const lastOption = this.#lastOption();
-                if (lastOption !== null) {
+                if (lastOption) {
                     if (expanded) {
                         lastOption.focus({preventScroll: true});
                     }
@@ -382,15 +355,13 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
             case "Enter": {
                 if (expanded) {
                     this.collapse();
-                    if (activeOption !== null) {
+                    if (activeOption) {
                         this.#selectOption(activeOption);
                     }
                 }
                 else {
-                    const option = options.item(selectedIndex);
-                    if (option !== null) {
-                        option.focus({preventScroll: true});
-                    }
+                    this.expand();
+                    selectedOption?.focus({preventScroll: true});
                 }
                 event.stopPropagation();
                 break;
@@ -403,23 +374,18 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
                 break;
             }
             default: {
-                const {activeIndex} = this;
                 const {length: keyLength} = key;
                 if (keyLength == 1) {
                     const keyCode = key.charCodeAt(0);
-                    const optionsArray = Array.from(options.values());
-                    const firstMatchIndex = optionsArray.findIndex(
-                        option_i => option_i.label.toLowerCase().charCodeAt(0) == keyCode
-                    );
-                    const nextMatchIndex = optionsArray.findIndex(
+                    const options = Array.from(this.options.values());
+                    const activeIndex = activeOption ? options.indexOf(activeOption) : -1;
+                    const matchingOption = options.find(
                         (option_i, i) => option_i.label.toLowerCase().charCodeAt(0) == keyCode && i > activeIndex
+                    ) ?? options.find(
+                        (option_i) => option_i.label.toLowerCase().charCodeAt(0) == keyCode
                     );
-                    const matchIndex = nextMatchIndex > -1 ?
-                        nextMatchIndex :
-                        firstMatchIndex;
-                    const option = options.item(matchIndex);
-                    if (option !== null) {
-                        option.focus({preventScroll: true});
+                    if (matchingOption) {
+                        matchingOption.focus({preventScroll: true});
                     }
                     event.stopPropagation();
                 }
@@ -430,39 +396,9 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
 
     #handleMouseOverEvent(event: MouseEvent): void {
         const {target} = event;
-        if (target instanceof HTMLEOptionElement) {
-            target.focus({preventScroll: true});
-        }
-    }
-
-    #handleSlotChangeEvent(event: Event): void {
-        const {target} = event;
-        const options = <HTMLEOptionElement[]>(<HTMLSlotElement>target)
-            .assignedElements()
-            .filter(
-                element_i => element_i instanceof HTMLEOptionElement
-            );
-        if (options.length > 0) {
-            let selectedOption: HTMLEOptionElement | null = null;
-            let {value} = this;
-            if (value) {
-                selectedOption = options.find(option => option.value == value) ?? null;
-            }
-            if (selectedOption == null) {
-                selectedOption = options.find(option => option.selected) ?? null;
-            }
-            if (selectedOption == null) {
-                selectedOption = options.find(option => option.default) ?? null;
-            }
-            if (selectedOption == null) {
-                selectedOption = this.#firstOption();
-            }
-            options.forEach(option_i => {
-                option_i.selected = option_i == selectedOption
-            });
-            if (selectedOption !== null) {
-                this.#setSelectedOption(selectedOption);
-            }
+        const targetItem = (<Element>target).closest<HTMLElement>(".option");
+        if (targetItem) {
+            targetItem.focus({preventScroll: true});
         }
     }
 }

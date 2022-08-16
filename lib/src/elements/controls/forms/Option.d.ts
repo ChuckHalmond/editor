@@ -9,7 +9,6 @@ interface HTMLEOptionElement extends HTMLElement {
     active: boolean;
     value: string;
     label: string;
-    description: string;
     disabled: boolean;
     selected: boolean;
     default: boolean;

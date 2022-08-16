@@ -13,7 +13,6 @@ interface HTMLEOptionElement extends HTMLElement {
     active: boolean;
     value: string;
     label: string;
-    description: string;
     disabled: boolean;
     selected: boolean;
     default: boolean;
@@ -43,9 +42,6 @@ class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
     
     @AttributeProperty({type: String, observed: true})
     label!: string;
-        
-    @AttributeProperty({type: String})
-    description!: string;
 
     @AttributeProperty({type: Boolean})
     disabled!: boolean;
@@ -53,7 +49,7 @@ class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
     @AttributeProperty({type: Boolean})
     active!: boolean;
 
-    @AttributeProperty({type: Boolean})
+    @AttributeProperty({type: Boolean, observed: true})
     selected!: boolean;
 
     @AttributeProperty({type: Boolean})
@@ -62,71 +58,10 @@ class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
-            element("style", {
-                children: [
-                    /*css*/`
-                        :host {
-                            display: flex;
-                            user-select: none;
-                            white-space: nowrap;
-                            padding: 2px 12px;
-                        }
-                        
-                        :host([active]) {
-                            color: black;
-                            background-color: lightgray;
-                        }
-        
-                        :host([disabled]) {
-                            color: lightgray;
-                        }
-
-                        :host::before {
-                            display: flex;
-                            content: "";
-                            width: 18px;
-                            height: 18px;
-                            margin-right: 6px;
-
-                            mask-size: 18px 18px;
-                            -webkit-mask-size: 18px 18px;
-                            background-color: var(--icon-color, none);
-                            -webkit-mask-image: var(--icon-image, none);
-                            mask-image: var(--icon-image, none);
-                        }
-
-                        [part="label"] {
-                            flex: auto;
-                            text-align: left;
-                        }
-
-                        :host([default])::after {
-                            display: inline-block;
-                            content: "(default)";
-                            margin-left: 24px;
-                            text-align: right;
-                        }
-
-                        [part="content"] {
-                            flex: auto;
-                            display: flex;
-                            overflow: hidden;
-                            pointer-events: none;
-                        }
-                    `
-                ]
-            }),
             element("span", {
                 attributes: {
-                    part: "content"
-                },
-                children: [
-                    element("span", {
-                        attributes: {
-                            part: "label"
-                        }
-                    })
-                ]
+                    part: "label"
+                }
             })
         );
     }
@@ -147,6 +82,10 @@ class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
                 if (labelPart) {
                     labelPart.textContent = newValue;
                 }
+                break;
+            }
+            case "selected": {
+                this.dispatchEvent(new Event("select", {bubbles: true}));
                 break;
             }
         }

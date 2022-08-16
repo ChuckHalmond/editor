@@ -335,7 +335,7 @@ class ListViewBase extends View implements ListView {
                                     ["visibility"],
                                     (toolbaritem, property, oldValue, newValue) => {
                                         toolbaritem.title = newValue ? "Hide" : "Show";
-                                        toolbaritem.checked = newValue;
+                                        toolbaritem.pressed = newValue;
                                     }
                                 )
                             ]
