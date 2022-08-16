@@ -43,7 +43,7 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
     readonly options: HTMLEOptionCollection;
 
     get activeOption(): HTMLEOptionElement | null {
-        return this.querySelector("e-option[active]") ?? null;
+        return this.querySelector("e-option:focus-within") ?? null;
     }
 
     get selectedOption(): HTMLEOptionElement | null {
@@ -199,7 +199,7 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
     }
 
     #walkerNodeFilter(node: Node): number {
-        if (node instanceof HTMLOptionElement && !node.disabled && !node.hidden) {
+        if (node instanceof HTMLEOptionElement && !node.disabled && !node.hidden) {
             return NodeFilter.FILTER_ACCEPT;
         }
         else if (node instanceof HTMLEOptionGroupElement) {
@@ -220,7 +220,7 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
         return <HTMLEOptionElement | null>walker.lastChild();
     }
     
-    #previousOption(option: HTMLElement): HTMLEOptionElement | null {
+    #previousOption(option: HTMLEOptionElement): HTMLEOptionElement | null {
         const walker = this.#walker;
         walker.currentNode = option;
         return <HTMLEOptionElement | null>walker.previousNode();

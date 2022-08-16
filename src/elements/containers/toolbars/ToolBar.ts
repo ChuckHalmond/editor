@@ -195,11 +195,11 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
 
     #handleFocusInEvent(event: FocusEvent): void {
         const {target} = event;
-        const activeItem = this.items().find(
-            item_i => item_i.contains(<Node>target)
-        ) ?? null;
-        this.#setActiveItem(activeItem);
-        this.tabIndex = -1;
+        const targetItem = <HTMLEToolBarItemElement | null>(<HTMLElement>target).closest("e-toolbaritem");
+        if (targetItem) {
+            this.#setActiveItem(targetItem);
+            this.tabIndex = -1;
+        }
     }
 
     #handleFocusOutEvent(event: FocusEvent): void {

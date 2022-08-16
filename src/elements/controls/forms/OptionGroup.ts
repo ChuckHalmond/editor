@@ -29,15 +29,6 @@ class HTMLEOptionGroupElementBase extends HTMLElement implements HTMLEOptionGrou
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
-            element("style", {
-                children: [
-                    /*css*/`
-                        :host {
-                            display: block;
-                        }
-                    `
-                ]
-            }),
             element("slot")
         );
     }

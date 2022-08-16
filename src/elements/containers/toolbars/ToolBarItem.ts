@@ -74,33 +74,11 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
-            /*element("span", {
+            element("span", {
                 attributes: {
-                    part: "content"
-                },
-                children: [
-                    element("span", {
-                        attributes: {
-                            part: "icon"
-                        }
-                    }),
-                    element("span", {
-                        attributes: {
-                            part: "label"
-                        }
-                    }),
-                    element("slot", {
-                        attributes: {
-                            name: "select"
-                        }
-                    }),
-                    element("slot", {
-                        attributes: {
-                            name: "menubutton"
-                        }
-                    })
-                ]
-            })*/
+                    part: "icon"
+                }
+            }),
             element("slot"),
             element("slot", {
                 attributes: {
@@ -109,7 +87,7 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
             }),
             element("slot", {
                 attributes: {
-                    name: "menubutton"
+                    name: "menu"
                 }
             })
         )

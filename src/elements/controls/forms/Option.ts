@@ -10,7 +10,6 @@ interface HTMLEOptionElementConstructor {
 interface HTMLEOptionElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     name: string;
-    active: boolean;
     value: string;
     label: string;
     disabled: boolean;
@@ -45,9 +44,6 @@ class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
 
     @AttributeProperty({type: Boolean})
     disabled!: boolean;
-
-    @AttributeProperty({type: Boolean})
-    active!: boolean;
 
     @AttributeProperty({type: Boolean, observed: true})
     selected!: boolean;

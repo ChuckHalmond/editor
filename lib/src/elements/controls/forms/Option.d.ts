@@ -6,7 +6,6 @@ interface HTMLEOptionElementConstructor {
 interface HTMLEOptionElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     name: string;
-    active: boolean;
     value: string;
     label: string;
     disabled: boolean;

@@ -1,7 +1,6 @@
 //import { MenuItemGroupWidget, MenuItemWidget, MenuWidget, MenuBarWidget } from "./src/views/MenuBarWidget";
 import { TreeItemModel, TreeModel, TreeItemList } from "./src/views/TreeView";
 
-import "./index";
 import { ListItemModel, ListModel, ListView } from "./src/views/ListView";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
 import { element, fragment, reactiveElement } from "./src/elements/Element";
@@ -13,6 +12,8 @@ import { toolbarItemWidget } from "./src/views/widgets/toolbar/ToolBarItemWidget
 import { comboBoxWidget } from "./src/views/widgets/combobox/ComboBoxWidget";
 import { optionWidget } from "./src/views/widgets/combobox/OptionWidget";
 import { TreeMain } from "./TreeMain";
+
+import "./index";
 
 declare global {
     interface ElementInternals {

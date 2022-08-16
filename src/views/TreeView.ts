@@ -310,7 +310,7 @@ class TreeViewBase extends View implements TreeView {
                 uri: item.uri
             },
             slotted: {
-                content: this.itemContentDelegate.call(this, item),
+                content: this.itemContentDelegate(item),
                 group:
                     <Node[]>((item.type == "parent") ? [
                     widget("treeitemgroup", {
@@ -444,8 +444,8 @@ class TreeViewBase extends View implements TreeView {
         const {clientX, clientY, currentTarget, target} = event;
         const targetTree = <HTMLElement>currentTarget;
         const targetItem = <HTMLElement>(<HTMLElement>target).closest(".treeitem");
-        const {model, itemContextMenuDelegate} = this;
-        if (itemContextMenuDelegate && targetItem) {
+        const {model} = this;
+        if (targetItem) {
             const activeItem = model.getItemByUri(targetItem.dataset.uri!)!;
             const contextMenu = widget("menu", {
                 properties: {
@@ -455,16 +455,8 @@ class TreeViewBase extends View implements TreeView {
                         y: clientY
                     }
                 },
-                slotted: itemContextMenuDelegate.call(this, activeItem, this.selectedItems(targetTree))!,
+                slotted: this.itemContextMenuDelegate(activeItem, this.selectedItems(targetTree)),
                 listeners: {
-                    /*click: () => {
-                        if (targetItem.isConnected) {
-                            targetItem.focus({preventScroll: true});
-                        }
-                        else {
-                            targetTree.focus({preventScroll: true});
-                        }
-                    },*/
                     close: () => {
                         targetItem.focus({preventScroll: true});
                     }

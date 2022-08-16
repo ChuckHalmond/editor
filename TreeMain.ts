@@ -506,4 +506,47 @@ export async function TreeMain() {
             ]
         })
     );
+
+    document.body.append(
+        widget("toolbar", {
+            slotted: [
+                widget("toolbaritem",  {
+                    properties: {
+                        type: "menubutton"
+                    },
+                    slotted: [
+                        "Yo!",
+                        widget("menu", {
+                            slotted: [
+                                widget("menuitem", {
+                                    properties: {
+                                        label: "MenuItem 1",
+                                        type: "radio",
+                                        name: "radio",
+                                        value: "1"
+                                    }
+                                }),
+                                widget("menuitem", {
+                                    properties: {
+                                        type: "radio",
+                                        label: "MenuItem 2",
+                                        name: "radio",
+                                        value: "2"
+                                    }
+                                }),
+                                widget("menuitem", {
+                                    properties: {
+                                        type: "radio",
+                                        label: "MenuItem 3",
+                                        name: "radio",
+                                        value: "3"
+                                    }
+                                })
+                            ]
+                        })
+                    ]
+                })
+            ]
+        })
+    );
 }
