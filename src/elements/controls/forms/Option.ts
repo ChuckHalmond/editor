@@ -14,7 +14,6 @@ interface HTMLEOptionElement extends HTMLElement {
     label: string;
     disabled: boolean;
     selected: boolean;
-    default: boolean;
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
 }
 
@@ -47,9 +46,6 @@ class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
 
     @AttributeProperty({type: Boolean, observed: true})
     selected!: boolean;
-
-    @AttributeProperty({type: Boolean})
-    default!: boolean;
 
     static {
         shadowTemplate = element("template");

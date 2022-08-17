@@ -1,4 +1,4 @@
-import { CustomElement, AttributeProperty, element } from "../../Element";
+import { CustomElement, AttributeProperty, element, QueryProperty } from "../../Element";
 import { HTMLEMenuElement } from "./Menu";
 import { HTMLEMenuItemElement } from "./MenuItem";
 
@@ -29,9 +29,11 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
 
     readonly shadowRoot!: ShadowRoot;
     
-    get menu(): HTMLEMenuElement | null {
-        return this.#menu;
-    }
+    @QueryProperty({selector: ":scope > e-menu[slot=menu]"})
+    readonly menu!: HTMLEMenuElement | null;
+    
+    @QueryProperty({selector: ":scope > e-menu[slot=menu] e-menuitem"})
+    readonly firstItem!: HTMLEMenuItemElement | null;
 
     @AttributeProperty({type: String})
     name!: string;
@@ -42,30 +44,10 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
     @AttributeProperty({type: Boolean})
     expanded!: boolean;
 
-    #menu: HTMLEMenuElement | null;
-
     constructor() {
         super();
-        this.#menu = null;
         const shadowRoot = this.attachShadow({mode: "open"});
         shadowRoot.append(
-            element("span", {
-                attributes: {
-                    part: "content"
-                },
-                children: [
-                    element("span", {
-                        attributes: {
-                            part: "icon"
-                        }
-                    }),
-                    element("span", {
-                        attributes: {
-                            part: "label"
-                        }
-                    })
-                ]
-            }),
             element("slot", {
                 attributes: {
                     name: "menu"
@@ -75,34 +57,28 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         this.addEventListener("click", this.#handleClickEvent.bind(this));
         this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
-        this.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
-        shadowRoot.addEventListener("slotchange", this.#handleSlotChangeEvent.bind(this));
     }
 
 
-
     toggle(force?: boolean): void {
-        const expand = force ?? !this.expanded;
+        const {expanded} = this;
+        const expand = force ?? !expanded;
         expand ? this.expand() : this.collapse();
     }
 
     expand(): void {
-        if (!this.expanded) {
+        const {expanded} = this;
+        if (!expanded) {
             this.expanded = true;
             this.#positionMenu();
         }
     }
 
     collapse(): void {
-        if (this.expanded) {
+        const {expanded} = this;
+        if (expanded) {
             this.expanded = false;
         }
-    }
-
-    get firstItem(): HTMLEMenuItemElement | null {
-        return this.querySelector<HTMLEMenuItemElement>(
-            ":scope > :is(e-menu, e-menu > e-menuitemgroup) > e-menuitem"
-        );
     }
 
     #positionMenu(): void {
@@ -130,11 +106,12 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
 
     #handleClickEvent(event: FocusEvent): void {
         const {target} = event;
-        if (target == this) {
+        const {menu} = this;
+        if (menu && !menu.contains(<Node>target)) {
             this.toggle();
             const {expanded} = this;
             if (expanded) {
-                this.menu?.focus({preventScroll: true});
+                menu?.focus({preventScroll: true});
             }
         }
     }
@@ -162,22 +139,11 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
             case "Escape":
                 if (expanded) {
                     this.collapse();
-                    this.focus({preventScroll: true});
-                    event.stopPropagation();
                 }
+                this.focus({preventScroll: true});
+                event.stopPropagation();
                 break;
         }
-    }
-
-    #handleSlotChangeEvent(event: Event): void {
-        const {target} = event;
-        const element = (<HTMLSlotElement>target).assignedElements()[0];
-        this.#menu = (element instanceof HTMLEMenuElement) ? element : null;
-    }
-
-    #handleTriggerEvent(): void {
-        this.collapse();
-        this.focus({preventScroll: true});
     }
 }
 

@@ -1,5 +1,4 @@
 import { HTMLESelectElement } from "../../controls/forms/Select";
-import { HTMLEMenuElement } from "../menus/Menu";
 import { HTMLEMenuButtonElement } from "../menus/MenuButton";
 export { HTMLEToolBarItemElement };
 export { EToolBarItem };
@@ -9,18 +8,14 @@ interface HTMLEToolBarItemElementConstructor {
 }
 interface HTMLEToolBarItemElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly menu: HTMLEMenuElement | null;
+    readonly menubutton: HTMLEMenuButtonElement | null;
     readonly select: HTMLESelectElement | null;
     value: string;
     name: string;
     label: string;
     active: boolean;
     pressed: boolean;
-    expanded: boolean;
     type: "button" | "checkbox" | "radio" | "menubutton" | "select";
-    toggle(force?: boolean): void;
-    expand(): void;
-    collapse(): void;
 }
 declare global {
     interface HTMLElementTagNameMap {

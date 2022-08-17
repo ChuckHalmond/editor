@@ -21,9 +21,7 @@ interface HTMLEGridElement extends HTMLElement {
     readonly cells: HTMLEGridCellCollection;
     readonly rows: HTMLEGridRowCollection;
     readonly activeCell: HTMLEGridCellElement | null;
-    readonly activeCellIndex: number;
     readonly activeRow: HTMLEGridRowElement | null;
-    readonly activeRowIndex: number;
     selectby: "cell" | "row";
     name: string;
     multiselectable: boolean;
@@ -58,20 +56,12 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
     readonly cells: HTMLEGridCellCollection;
     readonly rows: HTMLEGridRowCollection;
 
-    get activeCellIndex(): number {
-        return this.#activeCellIndex;
-    }
-
     get activeCell(): HTMLEGridCellElement | null {
-        return this.cells.item(this.#activeCellIndex) ?? null;
-    }
-
-    get activeRowIndex(): number {
-        return this.#activeRowIndex;
+        return this.querySelector<HTMLEGridCellElement>("e-gridcell[active]");
     }
 
     get activeRow(): HTMLEGridRowElement | null {
-        return this.rows.item(this.#activeRowIndex) ?? null;
+        return this.querySelector<HTMLEGridRowElement>("e-gridrow[active]");
     }
 
     get body(): HTMLEGridBodyElement | null {
@@ -91,9 +81,6 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
     @AttributeProperty({type: Boolean})
     multiselectable!: boolean;
 
-    #activeCellIndex: number;
-    #activeRowIndex: number;
-
     #onSelection: boolean;
     #hasSelectionChanged: boolean;
     #cellsWalker: TreeWalker;
@@ -107,8 +94,6 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
         this.#rowsWalker = document.createTreeWalker(
             this, NodeFilter.SHOW_ELEMENT, this.#rowsWalkerNodeFilter.bind(this)
         );
-        this.#activeCellIndex = -1;
-        this.#activeRowIndex = -1;
         this.#onSelection = false;
         this.#hasSelectionChanged = false;
         this.cells = new HTMLEGridCellCollection(this);
@@ -314,42 +299,30 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
     }
 
     #setActiveCell(cell: HTMLEGridCellElement | null): void {
-        const {activeCell, cells} = this;
+        const {activeCell} = this;
         if (activeCell !== null && activeCell !== cell) {
             activeCell.active = false;
             activeCell.tabIndex = -1;
         }
-        else if (cell !== null) {
+        if (cell !== null) {
             const cellsWalker = this.#cellsWalker;
             cellsWalker.currentNode = cell;
             cell.active = true;
             cell.tabIndex = 0;
-            const closestRow = this.#closestRow(cell);
-            if (closestRow) {
-                this.#setActiveRow(closestRow);
-            }
-            this.#activeCellIndex = Array.from(cells.values()).indexOf(cell);
-        }
-        else {
-            this.#activeCellIndex = -1;
         }
     }
 
     #setActiveRow(row: HTMLEGridRowElement | null): void {
-        const {activeRow, rows} = this;
+        const {activeRow} = this;
         if (activeRow !== null && activeRow !== row) {
             activeRow.active = false;
             activeRow.tabIndex = -1;
         }
-        else if (row !== null) {
+        if (row !== null) {
             const rowsWalker = this.#rowsWalker;
             rowsWalker.currentNode = row;
             row.active = true;
             row.tabIndex = 0;
-            this.#activeRowIndex = Array.from(rows.values()).indexOf(row);
-        }
-        else {
-            this.#activeRowIndex = -1;
         }
     }
 
@@ -787,14 +760,16 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
         const {selectby} = this;
         switch (selectby) {
             case "cell": {
-                if (target instanceof HTMLEGridCellElement) {
-                    this.#setActiveCell(target);
+                const targetCell = (<HTMLElement>target).closest<HTMLEGridCellElement>("e-gridcell");
+                if (targetCell) {
+                    this.#setActiveCell(targetCell);
                 }
                 break;
             }
             case "row": {
-                if (target instanceof HTMLEGridRowElement) {
-                    this.#setActiveRow(target);
+                const targetRow = (<HTMLElement>target).closest<HTMLEGridRowElement>("e-gridrow");
+                if (targetRow) {
+                    this.#setActiveRow(targetRow);
                 }
                 break;
             }

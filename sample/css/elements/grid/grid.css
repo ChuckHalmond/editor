@@ -1,54 +1,44 @@
 e-grid {
     display: table;
-}
-
-e-gridcell {
-    display: table-cell;
     user-select: none;
-}
-
-e-gridcell[droptarget] {
-    background-color: var(--droptarget-item-color);
-}
-
-e-gridcell:hover {
-    background-color: var(--hovered-item-color);
-}
-
-e-gridcell:focus {
-    background-color: var(--focused-item-color);
-}
-
-e-gridcell[active] {
-    outline: 1px solid var(--focused-item-outline-color);
-    outline-offset: -1px;
-}
-
-e-gridcell[selected] {
-    background-color: var(--selected-item-color);
 }
 
 e-gridrow {
     display: table-row;
 }
 
-e-gridrow[droptarget] {
-    background-color: var(--droptarget-item-color);
+e-gridbody,
+e-gridhead {
+    display: table-row-group;
 }
 
-e-gridrow:hover {
-    background-color: var(--hovered-item-color);
+e-gridcell,
+e-gridheader {
+    display: table-cell;
+    text-align: left;
 }
 
-e-gridrow:focus {
-    background-color: var(--focused-item-color);
-}
-
-e-gridrow[active] {
+e-grid:focus {
     outline: 1px solid var(--focused-item-outline-color);
     outline-offset: -1px;
 }
 
-e-gridrow[selected] {
+e-grid:is(:not([selectby]), [selectby="cell"]) e-gridcell:hover,
+e-grid:is([selectby="row"]) e-gridrow:hover {
+    background-color: var(--hovered-item-color);
+}
+
+e-grid e-gridheader:hover {
+    background-color: var(--hovered-item-color);
+}
+
+e-grid:focus-within:is(:not([selectby]), [selectby]) e-gridcell[active],
+e-grid:focus-within:is([selectby="row"]) e-gridrow[active] {
+    outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;
+}
+
+e-grid:is(:not([selectby]), [selectby="cell"]) e-gridcell[selected],
+e-grid:is([selectby="row"]) e-gridrow[selected] {
     background-color: var(--selected-item-color);
 }

@@ -16,9 +16,7 @@ interface HTMLEGridElement extends HTMLElement {
     readonly cells: HTMLEGridCellCollection;
     readonly rows: HTMLEGridRowCollection;
     readonly activeCell: HTMLEGridCellElement | null;
-    readonly activeCellIndex: number;
     readonly activeRow: HTMLEGridRowElement | null;
-    readonly activeRowIndex: number;
     selectby: "cell" | "row";
     name: string;
     multiselectable: boolean;

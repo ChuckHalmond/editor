@@ -1,16 +1,15 @@
 import { HTMLEActionElement } from "../../containers/actions/Action";
 import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEOptionElement } from "./Option";
-import { HTMLEOptionCollection } from "./OptionCollection";
 import { HTMLEOptionGroupElement } from "./OptionGroup";
 
 export { HTMLESelectElement };
 
-interface HTMLESelectElement extends HTMLEActionElement {
+interface HTMLESelectElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly options: HTMLEOptionCollection;
-    readonly activeOption: HTMLEOptionElement | null;
-    readonly selectedOption: HTMLEOptionElement | null;
+    get options(): HTMLEOptionElement[];
+    get activeOption(): HTMLEOptionElement | null;
+    get selectedOption(): HTMLEOptionElement | null;
     name: string;
     label: string;
     value: string;
@@ -18,7 +17,6 @@ interface HTMLESelectElement extends HTMLEActionElement {
     expand(): void;
     collapse(): void;
     toggle(force?: boolean): void;
-    //attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
 }
 
 interface HTMLESelectElementConstructor {
@@ -37,10 +35,15 @@ var shadowTemplate: HTMLTemplateElement;
 @CustomElement({
     name: "e-select"
 })
-class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectElement {
+class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
     
     readonly shadowRoot!: ShadowRoot;
-    readonly options: HTMLEOptionCollection;
+
+    get options(): HTMLEOptionElement[] {
+        return Array.from(this.querySelectorAll<HTMLEOptionElement>(
+            "e-option"
+        ));
+    }
 
     get activeOption(): HTMLEOptionElement | null {
         return this.querySelector("e-option:focus-within") ?? null;
@@ -66,7 +69,6 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
     expanded!: boolean;
 
     #walker: TreeWalker;
-    #optionsObserver: MutationObserver;
 
     static {
         shadowTemplate = element("template");
@@ -110,20 +112,19 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         this.addEventListener("click", this.#handleClickEvent.bind(this));
         this.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
-        this.#optionsObserver = new MutationObserver(
-            this.#mutationCallback.bind(this)
-        );
-        this.#optionsObserver.observe(this, {
-            childList: true,
-            subtree: true
-        });
-        this.options = new HTMLEOptionCollection(this);
+        this.addEventListener("select", this.#handleSelectEvent.bind(this));
     }
 
-    connectedCallback() {
-        const {selectedOption} = this;
-        if (selectedOption !== null) {
-            this.#value().textContent = selectedOption.getAttribute("label");
+    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
+        switch (name) {
+            case "label": {
+                const {shadowRoot} = this;
+                const labelPart = shadowRoot.querySelector<HTMLElement>("[part=label]");
+                if (labelPart) {
+                    labelPart.textContent = newValue;
+                }
+                break;
+            }
         }
     }
 
@@ -153,49 +154,12 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
         expand ? this.expand() : this.collapse();
     }
 
-    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
-        switch (name) {
-            case "label": {
-                const {shadowRoot} = this;
-                const labelPart = shadowRoot.querySelector<HTMLElement>("[part=label]");
-                if (labelPart) {
-                    labelPart.textContent = newValue;
-                }
-                break;
-            }
-        }
-    }
-
     #value(): HTMLElement {
         return this.shadowRoot.querySelector<HTMLElement>("[part=value]")!;
     }
 
     #box(): HTMLElement {
         return this.shadowRoot.querySelector<HTMLElement>("[part=box]")!;
-    }
-
-    #mutationCallback(mutationsList: MutationRecord[]): void {
-        mutationsList.forEach((mutation: MutationRecord) => {
-            const {type} = mutation;
-            switch (type) {
-                case "childList": {
-                    const {addedNodes} = mutation;
-                    const selector = "e-option[selected]";
-                    for (let node of addedNodes) {
-                        if (node instanceof HTMLElement) {
-                            const selectedOption = <HTMLEOptionElement | null>(
-                                node.matches(selector) ? node :
-                                node.querySelector(selector)
-                            );
-                            if (selectedOption !== null) {
-                                this.#setSelectedOption(selectedOption);
-                            }
-                        }
-                    }
-                    break;
-                }
-            }
-        });
     }
 
     #walkerNodeFilter(node: Node): number {
@@ -234,12 +198,8 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
 
     #selectOption(option: HTMLEOptionElement) {
         const {selectedOption} = this;
-        if (selectedOption) {
-            selectedOption.selected = false;
-        }
         if (option !== selectedOption) {
             option.selected = true;
-            this.#setSelectedOption(option);
             this.dispatchEvent(new Event("change", {bubbles: true}));
         }
     }
@@ -263,11 +223,10 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
         const {expanded} = this;
         if (expanded) {
             const {selectedOption} = this;
-            (selectedOption ?? this.options.item(0))?.focus({preventScroll: true});
+            (selectedOption ?? this.options[0])?.focus({preventScroll: true});
         }
         else {
             const targetOption = (<HTMLElement>target).closest<HTMLEOptionElement>("e-option");
-            
             if (targetOption) {
                 this.#selectOption(targetOption);
             }
@@ -377,7 +336,7 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
                 const {length: keyLength} = key;
                 if (keyLength == 1) {
                     const keyCode = key.charCodeAt(0);
-                    const options = Array.from(this.options.values());
+                    const {options} = this;
                     const activeIndex = activeOption ? options.indexOf(activeOption) : -1;
                     const matchingOption = options.find(
                         (option_i, i) => option_i.label.toLowerCase().charCodeAt(0) == keyCode && i > activeIndex
@@ -396,9 +355,23 @@ class HTMLESelectElementBase extends HTMLEActionElement implements HTMLESelectEl
 
     #handleMouseOverEvent(event: MouseEvent): void {
         const {target} = event;
-        const targetItem = (<Element>target).closest<HTMLElement>(".option");
-        if (targetItem) {
-            targetItem.focus({preventScroll: true});
+        const targetOption = (<Element>target).closest<HTMLEOptionElement>("e-option");
+        if (targetOption) {
+            targetOption.focus({preventScroll: true});
+        }
+    }
+    
+    #handleSelectEvent(event: Event) {
+        const {target} = event;
+        const targetOption = <HTMLEOptionElement>target;
+        if (targetOption.selected) {
+            const {options} = this;
+            options.forEach((option_i) => {
+                if (option_i !== targetOption && option_i.selected) {
+                    option_i.selected = false;
+                }
+            });
+            this.#setSelectedOption(targetOption);
         }
     }
 }

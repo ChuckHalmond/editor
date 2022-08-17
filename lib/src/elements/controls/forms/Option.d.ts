@@ -10,7 +10,6 @@ interface HTMLEOptionElement extends HTMLElement {
     label: string;
     disabled: boolean;
     selected: boolean;
-    default: boolean;
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
 }
 declare global {

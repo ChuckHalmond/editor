@@ -4,7 +4,12 @@ e-select {
     line-height: 22px;
 }
 
-e-select:focus-within {
+e-select:focus {
+    outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;
+}
+
+e-select:focus-within:not(:focus) {
     background-color: var(--focused-item-color);
 }
 
@@ -23,7 +28,17 @@ e-select::part(content) {
     padding: 0 4px;
 }
 
+e-select::part(content)::after {
+    display: inline-block;
+    text-align: center;
+    width: 18px;
+    height: 18px;
+    margin-left: 6px;
+    content: "▾";
+}
+
 e-select::part(value) {
+    margin-left: 12px;
     flex: auto;
     text-align: right;
 }
@@ -46,15 +61,6 @@ e-select::part(box) {
 e-select:not([expanded])::part(box) {
     opacity: 0;
     pointer-events: none;
-}
-
-e-select::part(content)::after {
-    display: inline-block;
-    text-align: center;
-    width: 18px;
-    height: 18px;
-    margin-left: 6px;
-    content: "▾";
 }
 
 e-optiongroup {
@@ -99,11 +105,4 @@ e-option::before {
     background-color: var(--icon-color, none);
     -webkit-mask-image: var(--icon-image, none);
     mask-image: var(--icon-image, none);
-}
-
-e-option[default]::after {
-    display: inline-block;
-    content: "(default)";
-    margin-left: 24px;
-    text-align: right;
 }

@@ -1,12 +1,10 @@
-import { HTMLEActionElement } from "../../containers/actions/Action";
 import { HTMLEOptionElement } from "./Option";
-import { HTMLEOptionCollection } from "./OptionCollection";
 export { HTMLESelectElement };
-interface HTMLESelectElement extends HTMLEActionElement {
+interface HTMLESelectElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly options: HTMLEOptionCollection;
-    readonly activeOption: HTMLEOptionElement | null;
-    readonly selectedOption: HTMLEOptionElement | null;
+    get options(): HTMLEOptionElement[];
+    get activeOption(): HTMLEOptionElement | null;
+    get selectedOption(): HTMLEOptionElement | null;
     name: string;
     label: string;
     value: string;

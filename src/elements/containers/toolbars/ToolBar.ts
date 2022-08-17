@@ -220,10 +220,10 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
                     const {type} = activeItem;
                     switch (type) {
                         case "menubutton": {
-                            const {menu, expanded} = activeItem;
-                            if (menu && !expanded) {
-                                activeItem.expand();
-                                menu.firstItem()?.focus({preventScroll: true});
+                            const {menubutton} = activeItem;
+                            if (menubutton) {
+                                menubutton.expand();
+                                menubutton.firstItem?.focus({preventScroll: true});
                             }
                             break;
                         }

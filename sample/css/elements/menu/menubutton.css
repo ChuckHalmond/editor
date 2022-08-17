@@ -5,6 +5,19 @@ e-menubutton {
     cursor: pointer;
 }
 
+e-menubutton:focus {
+    outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;
+}
+
+e-menubutton:focus-within:not(:focus) {
+    background-color: var(--focused-item-color);
+}
+
+e-menubutton:hover:not(:focus-within) {
+    background-color: var(--hovered-item-color);
+}
+
 e-menubutton[disabled] {
     color: lightgray;
 }
@@ -20,42 +33,11 @@ e-menubutton:not([expanded]) [slot="menu"] {
     pointer-events: none;
 }
 
-e-menubutton::part(icon) {
-    flex: none;
+e-menubutton::after {
     display: inline-block;
+    text-align: center;
     width: 18px;
     height: 18px;
-    overflow: hidden;
+    margin-left: 6px;
+    content: "▾";
 }
-
-e-menubutton::part(icon)::before {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    content: "";
-    mask-size: 18px 18px;
-    -webkit-mask-size: 18px 18px;
-    background-color: var(--icon-color, none);
-    -webkit-mask-image: var(--icon-image, none);
-    mask-image: var(--icon-image, none);
-    filter: var(--icon-filter, none);
-}
-/*
-e-menubutton::part(content) {
-    width: 18px;
-    height: 18px;
-    line-height: 18px;
-}
-
-e-menubutton::part(content)::after {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    content: "";
-    mask-size: 18px 18px;
-    -webkit-mask-size: 18px 18px;
-    background-color: var(--icon-color, none);
-    -webkit-mask-image: var(--icon-image, none);
-    mask-image: var(--icon-image, none);
-    filter: var(--icon-filter, none);
-}*/

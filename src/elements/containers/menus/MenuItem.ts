@@ -11,7 +11,7 @@ interface HTMLEMenuItemElementConstructor {
 
 interface HTMLEMenuItemElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly menu: HTMLEMenuElement | null;
+    get menu(): HTMLEMenuElement | null;
     name: string;
     label: string | null;
     value: string;
@@ -40,6 +40,9 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
 
     readonly shadowRoot!: ShadowRoot;
     readonly internals: ElementInternals;
+    
+    @QueryProperty({selector: ":scope > e-menu[slot=menu]"})
+    menu!: HTMLEMenuElement | null;
 
     @AttributeProperty({type: String})
     name!: string;
@@ -141,9 +144,6 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
         );
         this.addEventListener("click", this.#handleClickEvent.bind(this));
     }
-
-    @QueryProperty({selector: ":scope > e-menu[slot=menu]"})
-    readonly menu!: HTMLEMenuElement | null;
 
     toggle(force?: boolean): void {
         const {type, expanded} = this;
