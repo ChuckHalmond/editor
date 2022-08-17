@@ -1,4 +1,3 @@
-import { HTMLEActionElement } from "../../containers/actions/Action";
 import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEOptionElement } from "./Option";
 import { HTMLEOptionGroupElement } from "./OptionGroup";
