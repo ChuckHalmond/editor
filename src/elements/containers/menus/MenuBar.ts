@@ -249,8 +249,10 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
             case " ": {
                 if (activeItem) {
                     this.expanded = !expanded;
-                    const firstChildItem = this.#firstChildItem(activeItem);
-                    firstChildItem?.focus({preventScroll: true});
+                    if (!expanded) {
+                        const firstChildItem = this.#firstChildItem(activeItem);
+                        firstChildItem?.focus({preventScroll: true});
+                    }
                 }
                 break;
             }
@@ -265,6 +267,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
                 else {
                     this.focus({preventScroll: true});
                 }
+                event.stopPropagation();
                 break;
             }
         }

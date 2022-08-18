@@ -40,6 +40,12 @@ e-toolbar:focus-within e-toolbaritem:focus-within {
     outline-offset: -1px;
 }
 
+e-toolbaritem:is([type="menubutton"]) > e-menubutton:focus,
+e-toolbaritem:is([type="select"]) > e-select:focus {
+    outline: none;
+    outline-offset: none;
+}
+
 e-toolbaritem[type="menubutton"] > e-menu {
     z-index: 1;
     position: absolute;

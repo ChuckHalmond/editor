@@ -166,11 +166,11 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
     }
 
     expand(): void {
-        const {type} = this;
+        const {type, expanded} = this;
         switch (type) {
             case "menu":
             case "submenu": {
-                if (!this.expanded) {
+                if (!expanded) {
                     this.expanded = true;
                     this.#positionMenu();
                 }
@@ -180,11 +180,11 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
     }
 
     collapse(): void {
-        const {type} = this;
+        const {type, expanded} = this;
         switch (type) {
             case "menu":
             case "submenu": {
-                if (this.expanded) {
+                if (expanded) {
                     this.expanded = false;
                 }
                 break;
@@ -242,7 +242,8 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
 
     #handleClickEvent(event: MouseEvent): void {
         const {target} = event;
-        if (target == this) {
+        const targetMenuItem = (<HTMLElement>target).closest("e-menuitem");
+        if (targetMenuItem === this) {
             const {type} = this;
             switch (type) {
                 case "checkbox": {

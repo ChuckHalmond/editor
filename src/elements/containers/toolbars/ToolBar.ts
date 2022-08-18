@@ -63,16 +63,6 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
-            element("style", {
-                children: [
-                    /*css*/`
-                        :host {
-                            display: flex;
-                            flex-direction: row;
-                        }
-                    `
-                ]
-            }),
             element("slot")
         );
     }
@@ -87,12 +77,9 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
-        //this.addEventListener("change", this.#handleChangeEvent.bind(this));
-        //this.addEventListener("click", this.#handleClickEvent.bind(this));
         this.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
         this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
-        this.addEventListener("trigger", this.#handleTriggerEvent.bind(this));
     }
 
     #nodeFilter(node: Node): number {
@@ -313,20 +300,6 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
                 }
                 event.stopPropagation();
                 break;
-            }
-        }
-    }
-
-    #handleTriggerEvent(event: Event): void {
-        const {target} = event;
-        if (target instanceof HTMLEToolBarItemElement) {
-            const {type, name, value} = target;
-            if (type == "radio") {
-                this.querySelectorAll<HTMLEToolBarItemElement>(
-                    `:is(:scope, :scope > e-toolbaritemgroup) > e-toolbaritem[type=radio][name=${name}]`
-                ).forEach((radio_i) => {
-                    radio_i.pressed = radio_i.value == value;
-                });
             }
         }
     }
