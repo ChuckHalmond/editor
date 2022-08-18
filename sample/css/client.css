@@ -16,14 +16,16 @@ body {
     /*accent-color: var(--accent-color);*/
 }
 
-e-toolbaritem[name="visibility"][checked] {
-    --icon-color: black;
-    --icon-image: url("/sample/assets/visibility_FILL1_wght400_GRAD0_opsz48.svg");
-}
 
 e-toolbaritem[name="visibility"] {
     --icon-color: black;
     --icon-image: url("/sample/assets/visibility_off_FILL1_wght400_GRAD0_opsz48.svg");
+}
+
+e-toolbaritem[name="visibility"][pressed] {
+    --icon-color: black;
+    --icon-image: url("/sample/assets/visibility_FILL1_wght400_GRAD0_opsz48.svg");
+    background-color: revert;
 }
 
 e-menubutton::part(content) {
@@ -63,12 +65,16 @@ e-menuitem,
 e-menuitem::part(icon) {
     border-radius: 2px;
 }*/
-
+/*
 e-treeitem:not([active]):not([selected]) > e-treeitemgroup:hover ~ e-toolbar,
 e-treeitem:not(:hover):not([active]):not([selected]) > e-toolbar {
     display: none;
+}*/
+/*
+e-treeitem:not([active]):not([selected]) > e-toolbar {
+    display: none;
 }
-
+*/
 e-menuitem:is([type="checkbox"], [type="radio"])[checked] {
     --icon-color: black;
     --icon-image: url("/sample/assets/done_FILL0_wght400_GRAD0_opsz48.svg");

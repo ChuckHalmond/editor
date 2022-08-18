@@ -22,6 +22,28 @@ e-toolbaritem {
     line-height: 22px;
 }
 
+e-toolbaritem::part(icon) {
+    flex: none;
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    padding: 2px;
+    overflow: hidden;
+}
+
+e-toolbaritem::part(icon)::before {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    content: "";
+    mask-size: 18px 18px;
+    -webkit-mask-size: 18px 18px;
+    background-color: var(--icon-color, none);
+    -webkit-mask-image: var(--icon-image, none);
+    mask-image: var(--icon-image, none);
+    filter: var(--icon-filter, none);
+}
+
 e-toolbaritem[disabled] {
     opacity: 0.38;
     pointer-events: none;

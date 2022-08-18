@@ -1,57 +1,55 @@
 <e-tree tabindex="0">
-    <!--<e-treeitemgroup slot="group">-->
-        <e-treeitem tabindex="-1" type="parent">
-            Extract
-            <e-treeitemgroup slot="group">
-                <e-treeitem tabindex="-1">
-                    [E.1] CSVExtractor
-                    <e-toolbar tabindex="0">
-                        <e-toolbaritemgroup>
-                            <e-toolbaritem title="Toggle visibility" name="visibility" type="checkbox" tabindex="-1">Toggle visibility</e-toolbaritem>
-                            <e-toolbaritem name="selectTest" type="select" tabindex="-1">
-                                Select
-                                <e-select slot="select" tabindex="-1" label="Choice">
-                                    <e-option tabindex="-1" label="Option 1" value="1" selected description="The first option"></e-option>
-                                    <e-option tabindex="-1" label="Option 2" value="2" description="The second option"></e-option>
-                                    <e-option tabindex="-1" label="Option 3" value="3" description="The third option"></e-option>
-                                </e-select>
-                            </e-toolbaritem>
-                            <e-toolbaritem type="menubutton" tabindex="-1">
-                                Menu button
-                                <e-menubutton slot="menubutton" tabindex="-1">
-                                    <e-menu slot="menu" name="E" tabindex="-1">
-                                        <e-menuitemgroup>
-                                            <e-menuitem name="E1" type="radio" tabindex="-1">E1</e-menuitem>
-                                            <e-menuitem name="E2" type="radio" tabindex="-1">E2</e-menuitem>
-                                            <e-menuitem name="E3" type="radio" tabindex="-1">E3</e-menuitem>
-                                        </e-menuitemgroup>
-                                    </e-menu>
-                                </e-menubutton>
-                            </e-toolbaritem>
-                        </e-toolbaritemgroup>
-                    </e-toolbar>
-                    <span slot="badge">32</span>
-                </e-treeitem>
-                <e-treeitem tabindex="-1">[E.2] NetezzaExtractor</e-treeitem>
-            </e-treeitemgroup>
-        </e-treeitem>
-        <e-treeitem tabindex="-1" type="parent">
-            Transform
-            <e-treeitemgroup slot="group">
-                <e-treeitem tabindex="-1" type="parent">
-                    [T.1] Loop
-                    <e-treeitemgroup slot="group">
-                        <e-treeitem tabindex="-1">[T.1.1] Replace</e-treeitem>
-                        <e-treeitem tabindex="-1">[T.1.2] Merge</e-treeitem>
-                    </e-treeitemgroup>
-                </e-treeitem>
-            </e-treeitemgroup>
-        </e-treeitem>
-        <e-treeitem tabindex="-1" type="parent">
-            Load
-            <e-treeitemgroup slot="group">
-                <e-treeitem tabindex="-1">[L.1] CSVExporter</e-treeitem>
-            </e-treeitemgroup>
-        </e-treeitem>
-    <!--</e-treeitemgroup>-->
+    <e-treeitem tabindex="-1" type="parent">
+        Extract
+        <e-treeitemgroup slot="group">
+            <e-treeitem tabindex="-1">
+                [E.1] CSVExtractor
+                <e-toolbar tabindex="0">
+                    <e-toolbaritemgroup>
+                        <e-toolbaritem title="Toggle visibility" name="visibility" type="checkbox" tabindex="-1">Toggle visibility</e-toolbaritem>
+                        <e-toolbaritem name="selectTest" type="select" tabindex="-1">
+                            Select
+                            <e-select slot="select" tabindex="-1" label="Choice">
+                                <e-option tabindex="-1" label="Option 1" value="1" selected description="The first option"></e-option>
+                                <e-option tabindex="-1" label="Option 2" value="2" description="The second option"></e-option>
+                                <e-option tabindex="-1" label="Option 3" value="3" description="The third option"></e-option>
+                            </e-select>
+                        </e-toolbaritem>
+                        <e-toolbaritem type="menubutton" tabindex="-1">
+                            Menu button
+                            <e-menubutton slot="menubutton" tabindex="-1">
+                                <e-menu slot="menu" name="E" tabindex="-1">
+                                    <e-menuitemgroup>
+                                        <e-menuitem name="E1" type="radio" tabindex="-1">E1</e-menuitem>
+                                        <e-menuitem name="E2" type="radio" tabindex="-1">E2</e-menuitem>
+                                        <e-menuitem name="E3" type="radio" tabindex="-1">E3</e-menuitem>
+                                    </e-menuitemgroup>
+                                </e-menu>
+                            </e-menubutton>
+                        </e-toolbaritem>
+                    </e-toolbaritemgroup>
+                </e-toolbar>
+                <span slot="badge">32</span>
+            </e-treeitem>
+            <e-treeitem tabindex="-1">[E.2] NetezzaExtractor</e-treeitem>
+        </e-treeitemgroup>
+    </e-treeitem>
+    <e-treeitem tabindex="-1" type="parent">
+        Transform
+        <e-treeitemgroup slot="group">
+            <e-treeitem tabindex="-1" type="parent">
+                [T.1] Loop
+                <e-treeitemgroup slot="group">
+                    <e-treeitem tabindex="-1">[T.1.1] Replace</e-treeitem>
+                    <e-treeitem tabindex="-1">[T.1.2] Merge</e-treeitem>
+                </e-treeitemgroup>
+            </e-treeitem>
+        </e-treeitemgroup>
+    </e-treeitem>
+    <e-treeitem tabindex="-1" type="parent">
+        Load
+        <e-treeitemgroup slot="group">
+            <e-treeitem tabindex="-1">[L.1] CSVExporter</e-treeitem>
+        </e-treeitemgroup>
+    </e-treeitem>
 </e-tree>

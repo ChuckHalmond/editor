@@ -161,8 +161,9 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
         }
     }
 
-    connectedCallback() {
-        this.tabIndex = this.tabIndex;
+    connectedCallback(): void {
+        const {tabIndex} = this;
+        this.tabIndex = tabIndex;
     }
 
     expand(): void {

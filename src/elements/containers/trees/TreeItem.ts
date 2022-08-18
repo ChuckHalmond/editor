@@ -1,5 +1,4 @@
 import { CustomElement, element, AttributeProperty } from "../../Element";
-import { HTMLETreeElement } from "./Tree";
 import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
 
 export { HTMLETreeItemElement };

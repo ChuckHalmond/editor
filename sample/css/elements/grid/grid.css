@@ -12,10 +12,13 @@ e-gridhead {
     display: table-row-group;
 }
 
-e-gridcell,
-e-gridheader {
+e-gridcell {
     display: table-cell;
     text-align: left;
+}
+
+e-gridcell[type="columnheader"]:hover {
+    background-color: var(--hovered-item-color);
 }
 
 e-grid:focus {

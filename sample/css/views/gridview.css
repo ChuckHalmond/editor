@@ -37,7 +37,7 @@
     white-space: nowrap;
 }
 
-.gridheader .widthsash:not(:hover) {
+e-gridcell[type="columnheader"] .widthsash:not(:hover) {
     flex: 0 0 auto;
     background-color: lightgrey;
     width: 2px;

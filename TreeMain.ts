@@ -1,4 +1,5 @@
 import { EMenuItem } from "./src/elements/containers/menus/MenuItem";
+import { HTMLEToolBarItemElement } from "./src/elements/containers/toolbars/ToolBarItem";
 import { element, fragment, reactiveElement } from "./src/elements/Element";
 import { ModelEvent, ModelList, ModelObject, ModelProperty } from "./src/models/Model";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
@@ -220,10 +221,10 @@ export async function TreeMain() {
                 ).concat([
                     reactiveElement(
                         item,
-                        widget("toolbar", {
-                            slotted: [
-                                widget("toolbaritem", {
-                                    properties: {
+                        element("e-toolbar", {
+                            children: [
+                                element("e-toolbaritem", {
+                                    attributes: {
                                         name: "visibility",
                                         type: "checkbox",
                                         label: "Visibility"
@@ -243,12 +244,12 @@ export async function TreeMain() {
                             switch (property) {
                                 case "visibility": {
                                     const visibilityItem = toolbarWidget.slot(toolbar)
-                                        ?.querySelector<HTMLElement>(".toolbaritem[name=visibility]");
+                                        ?.querySelector<HTMLEToolBarItemElement>("e-toolbaritem[name=visibility]");
                                     if (visibilityItem) {
                                         const label = newValue ? "Hide" : "Show";
-                                        toolbarItemWidget.setLabel(visibilityItem, label);
-                                        toolbarItemWidget.setTitle(visibilityItem, label);
-                                        toolbarItemWidget.setPressed(visibilityItem, newValue);
+                                        visibilityItem.label = label;
+                                        visibilityItem.title = label;
+                                        visibilityItem.pressed = newValue;
                                     }
                                 }
                             }
@@ -261,12 +262,13 @@ export async function TreeMain() {
     treeView.itemContextMenuDelegate = <typeof treeView.itemContextMenuDelegate>(
         (activeItem: MyTreeItemModel, selectedItems: MyTreeItemModel[]) => {
             return fragment(
-                widget("menuitemgroup", {
-                    slotted: [
-                        widget("menuitem", {
-                            properties: {
+                element("e-menuitemgroup", {
+                    children: [
+                        element("e-menuitem", {
+                            attributes: {
                                 label: "Display"
                             },
+                            children: "Display",
                             listeners: {
                                 click: () => {
                                     const itemsList = new MyTreeItemList(selectedItems);
@@ -274,10 +276,11 @@ export async function TreeMain() {
                                 }
                             }
                         }),
-                        widget("menuitem", {
-                            properties: {
+                        element("e-menuitem", {
+                            attributes: {
                                 label: "Delete"
                             },
+                            children: "Delete",
                             listeners: {
                                 click: () => {
                                     const itemsList = new MyTreeItemList(selectedItems);
@@ -292,13 +295,14 @@ export async function TreeMain() {
                         })
                     ]
                 }),
-                widget("menuitemgroup", {
-                    slotted: [
-                        widget("menuitem", {
-                            properties: {
+                element("e-menuitemgroup", {
+                    children: [
+                        element("e-menuitem", {
+                            attributes: {
                                 type: "checkbox",
                                 label: activeItem.visibility ? "Hide" : "Show"
                             },
+                            children: activeItem.visibility ? "Hide" : "Show",
                             listeners: {
                                 click: () => {
                                     const itemsList = new MyTreeItemList(selectedItems);

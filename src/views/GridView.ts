@@ -5,6 +5,9 @@ import { gridWidget } from "./widgets/grid/GridWidget";
 import { menuWidget } from "./widgets/menu/MenuWidget";
 import { menuItemWidget } from "./widgets/menu/MenuItemWidget";
 import { widget } from "./widgets/Widget";
+import { HTMLEGridCellElement } from "../elements/containers/grid/GridCell";
+import { HTMLEGridElement } from "../elements/containers/grid/Grid";
+import { HTMLEGridRowElement } from "../elements/containers/grid/GridRow";
 
 export { GridModel };
 export { GridRowModel };
@@ -203,20 +206,20 @@ class GridViewBase extends View implements GridView {
         this.#cellDelegate = delegate;
     }
 
-    getGridElement(): HTMLElement | null {
-        return this.shadowRoot.querySelector(`:scope > .grid`);
+    getGridElement(): HTMLEGridElement | null {
+        return this.shadowRoot.querySelector(`e-grid`);
     }
 
-    getRowElement(row: GridRowModel): HTMLElement | null {
-        return this.shadowRoot.querySelector(`:scope > .grid > .gridbody > .gridrow[data-index='${row.id}']`);
+    getRowElement(row: GridRowModel): HTMLEGridRowElement | null {
+        return this.shadowRoot.querySelector(`e-grid > e-gridbody > e-gridrow[data-index='${row.id}']`);
     }
 
-    getColumnHeaderElement(column: GridColumnModel): HTMLElement | null {
-        return this.shadowRoot.querySelector(`:scope > .grid > .gridhead > .gridheader[id=${column.name}]`);
+    getColumnHeaderElement(column: GridColumnModel): HTMLEGridCellElement | null {
+        return this.shadowRoot.querySelector(`e-grid > e-gridhead > e-gridcell[id=${column.name}]`);
     }
     
-    getColumnCellsElements(column: GridColumnModel): HTMLElement[] {
-        return Array.from(this.shadowRoot.querySelectorAll(`:scope > .grid > .gridbody > .gridrow > .gridcell[headers~=${column.name}]`));
+    getColumnCellsElements(column: GridColumnModel): HTMLEGridCellElement[] {
+        return Array.from(this.shadowRoot.querySelectorAll(`e-grid > e-gridbody > e-gridrow > e-gridcell[headers~=${column.name}]`));
     }
 
     renderShadow(): Node {
@@ -244,15 +247,15 @@ class GridViewBase extends View implements GridView {
                     }
                 })
             }),
-            widget("grid", {
-                properties: {
-                    tabIndex: 0,
+            element("e-grid", {
+                attributes: {
+                    tabindex: 0,
                     selectby: "row",
                     multisectable: true
                 },
-                slotted: [
-                    widget("gridhead", {
-                        slotted: reactiveChildElements(
+                children: [
+                    element("e-gridhead", {
+                        children: reactiveChildElements(
                             model.columns, column => this.#renderGridColumnHeaderCell(column)
                         ),
                         listeners: {
@@ -260,8 +263,8 @@ class GridViewBase extends View implements GridView {
                             click: <EventListener>this.#handleHeadClickEvent.bind(this)
                         }
                     }),
-                    widget("gridbody", {
-                        slotted: reactiveChildElements(
+                    element("e-gridbody", {
+                        children: reactiveChildElements(
                             model.rows, row => this.#renderGridBodyRow(row)
                         )
                     })
@@ -326,11 +329,12 @@ class GridViewBase extends View implements GridView {
     #renderGridColumnHeaderCell(column: GridColumnModel): Element {
         const gridColumnElement = reactiveElement(
             column,
-            widget("gridheader", {
-                properties: {
+            element("e-gridcell", {
+                attributes: {
+                    type: "columnheader",
                     id: column.name
                 },
-                slotted: [
+                children: [
                     element("span", {
                         attributes: {
                             class: "gridheader-content"
@@ -374,11 +378,11 @@ class GridViewBase extends View implements GridView {
 
     #renderGridBodyRow(row: GridRowModel): Element {
         const {model} = this;
-        const gridRowElement = widget("gridrow", {
+        const gridRowElement = element("e-gridrow", {
             dataset: {
                 index: row.id
             },
-            slotted: reactiveChildElements(
+            children: reactiveChildElements(
                 model.columns, column => this.#renderGridDataCell(row, column)
             )
         });
@@ -386,11 +390,12 @@ class GridViewBase extends View implements GridView {
     }
 
     #renderGridDataCell(row: GridRowModel, column: GridColumnModel): Element {
-        const gridCellElement = widget("gridcell", {
-            properties: {
+        const gridCellElement = element("e-gridcell", {
+            attributes: {
+                type: "gridcell",
                 headers: column.name
             },
-            slotted: element("span", {
+            children: element("span", {
                 attributes: {
                     class: "gridcell-content"
                 },
@@ -410,26 +415,25 @@ class GridViewBase extends View implements GridView {
     #handleHeadContextMenuEvent(event: MouseEvent): void {
         const {clientX, clientY, currentTarget, target} = event;
         const targetHead = <HTMLElement>currentTarget;
-        const targetHeader = <HTMLElement>(<HTMLElement>target).closest(".gridheader");
+        const targetHeader = <HTMLEGridCellElement>(<HTMLElement>target).closest("e-gridcell");
         const {model} = this;
         if (targetHeader) {
             const column = model.getColumnByName(targetHeader.id)!;
-            const contextMenu = widget("menu",  {
-                properties: {
+            const contextMenu = element("e-menu",  {
+                attributes: {
                     contextual: true,
-                    position: {
-                        x: clientX,
-                        y: clientY
-                    }
                 },
-                slotted: [
-                    widget("menuitem",  {
-                        properties: {
+                children: [
+                    element("e-menuitem",  {
+                        attributes: {
                             label: "Resize Auto"
                         },
+                        children: "Resize auto",
                         listeners: {
                             click: () => {
                                 const columnHeaderElement = this.getColumnHeaderElement(column);
+                                console.log(column);
+                                console.log(columnHeaderElement);
                                 if (columnHeaderElement) {
                                     const {style} = columnHeaderElement;
                                     const labels = this.getColumnCellsElements(column).map(
@@ -438,15 +442,17 @@ class GridViewBase extends View implements GridView {
                                     const maxWidth = labels.reduce(
                                         (maxWidth, label) => Math.max(maxWidth, label.getBoundingClientRect().width), 0
                                     );
+                                    console.log(maxWidth);
                                     style.setProperty("width", `${maxWidth}px`);
                                 }
                             }
                         }
                     }),
-                    widget("menuitem",  {
-                        properties: {
+                    element("e-menuitem",  {
+                        attributes: {
                             label: "Resize To Default"
                         },
+                        children: "Resize to Default",
                         listeners: {
                             click: () => {
                                 const columnHeaderElement = this.getColumnHeaderElement(column);
@@ -457,29 +463,35 @@ class GridViewBase extends View implements GridView {
                             }
                         }
                     }),
-                    widget("menuitem",  {
-                        properties: {
+                    element("e-menuitem",  {
+                        attributes: {
                             type: "submenu",
                             label: "Sort",
                         },
-                        slotted: [
-                            widget("menu",  {
-                                slotted: [
-                                    widget("menuitem",  {
-                                        properties: {
+                        children: [
+                            "Sort",
+                            element("e-menu",  {
+                                attributes: {
+                                    slot: "menu"
+                                },
+                                children: [
+                                    element("e-menuitem",  {
+                                        attributes: {
                                             type: "radio",
                                             name: "sort",
                                             value: "1",
                                             label: "Ascending"
-                                        }
+                                        },
+                                        children: "Ascending"
                                     }),
-                                    widget("menuitem",  {
-                                        properties: {
+                                    element("e-menuitem",  {
+                                        attributes: {
                                             type: "radio",
                                             name: "sort",
                                             value: "-1",
                                             label: "Descending"
-                                        }
+                                        },
+                                        children: "Descending"
                                     })
                                 ],
                                 listeners: {
@@ -494,20 +506,25 @@ class GridViewBase extends View implements GridView {
                             })
                         ]
                     }),
-                    widget("menuitem",  {
-                        properties: {
+                    element("e-menuitem",  {
+                        attributes: {
                             type: "submenu",
                             label: "Filter"
                         },
-                        slotted: [
-                            widget("menu",  {
-                                slotted: column.filters.map((filter_i, i) =>
-                                    widget("menuitem", {
-                                        properties: {
+                        children: [
+                            "Filter",
+                            element("e-menu",  {
+                                attributes: {
+                                    slot: "menu"
+                                },
+                                children: column.filters.map((filter_i, i) =>
+                                    element("e-menuitem", {
+                                        attributes: {
                                             type: "checkbox",
                                             checked: this.#displayFilters.includes(filter_i),
                                             label: filter_i.name
                                         },
+                                        children: filter_i.name,
                                         listeners: {
                                             click: (event) => {
                                                 const {currentTarget} = event;
@@ -529,6 +546,7 @@ class GridViewBase extends View implements GridView {
                 ]
             });
             targetHead.append(contextMenu);
+            contextMenu.positionContextual(clientX, clientY);
             contextMenu.focus({preventScroll: true});
             event.preventDefault();
         }
@@ -548,7 +566,7 @@ class GridViewBase extends View implements GridView {
         const {target} = event;
         const targetIsHeaderLabel = (<HTMLElement>target).matches(":is(.gridheader-label, .gridheader-label :scope)");
         if (targetIsHeaderLabel) {
-            const targetHeader = <HTMLElement>(<HTMLElement>target).closest(".gridheader");
+            const targetHeader = <HTMLEGridCellElement>(<HTMLElement>target).closest("e-gridcell");
             const {model} = this;
             const {columns} = model;
             if (targetHeader) {

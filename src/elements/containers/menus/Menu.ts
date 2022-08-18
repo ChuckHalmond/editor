@@ -88,6 +88,11 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
     }
 
+    connectedCallback(): void {
+        const {tabIndex} = this;
+        this.tabIndex = tabIndex;
+    }
+
     positionContextual(x: number, y: number): void {
         const {style} = this;
         const {width: menuWidth, height: menuHeight} = this.getBoundingClientRect();
