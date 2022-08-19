@@ -13,6 +13,14 @@ e-menu {
 e-menu[contextual] {
     z-index: 1;
     position: absolute;
+
+    transition-property: opacity;
+    transition-duration: 0.2s;
+    opacity: 0;
+}
+
+e-menu[contextual]:focus-within {
+    opacity: 1;
 }
 
 e-menu > hr {

@@ -54,32 +54,6 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
 
     static {
         shadowTemplate = element("template");
-        shadowTemplate.content.append(
-            element("style", {
-                children: [
-                    /*css*/`
-                        :host {
-                            display: inline-block;
-                            
-                            width: 4px;
-                            
-                            background-color: transparent;
-                            cursor: ew-resize;
-        
-                            transition-property: opacity;
-                            transition-delay: 0.2s;
-                            transition-duration: 0.2s;
-                            transition-timing-function: ease-out;
-                        }
-        
-                        :host(:active),
-                        :host(:hover) {
-                            background-color: rgb(135, 206, 250);
-                        }
-                    `
-                ]
-            })
-        );
     }
 
     constructor() {

@@ -49,39 +49,6 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
 
     static {
         shadowTemplate = element("template");
-        shadowTemplate.content.append(
-            element("style", {
-                children: [
-                    /*css*/`
-                        :host {
-                            display: inline-block;
-                            width: 100%;
-        
-                            max-height: 4px;
-                            height: 4px;
-                            min-height: 4px;
-        
-                            margin-top: -2px;
-                            margin-bottom: -2px;
-                            
-                            background-color: rgb(135, 206, 250);
-                            cursor: ns-resize;
-        
-                            transition-property: opacity;
-                            transition-delay: 0.2s;
-                            transition-duration: 0.2s;
-                            transition-timing-function: ease-out;
-                            opacity: 0;
-                        }
-        
-                        :host(:active),
-                        :host(:hover) {
-                            opacity: 1;
-                        }
-                    `
-                ]
-            })
-        );
     }
 
     constructor() {

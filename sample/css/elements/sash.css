@@ -1,0 +1,30 @@
+:is(e-wsash, e-hsash) {
+    display: inline-block;
+    background-color: rgb(135, 206, 250);
+    transition-property: opacity;
+    transition-delay: 0.2s;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-out;
+    opacity: 0;
+}
+
+e-hsash {
+    width: 4px;
+    height: 100%;
+    margin-left: -2px;
+    margin-right: -2px;
+    cursor: ew-resize;
+}
+
+e-hsash {
+    width: 100%;
+    height: 4px;
+    margin-top: -2px;
+    margin-bottom: -2px;
+    cursor: ns-resize;
+}
+
+:is(e-wsash, e-hsash):active,
+:is(e-wsash, e-hsash):hover {
+    opacity: 1;
+}
