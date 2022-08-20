@@ -2,11 +2,11 @@
     display: block;
 }
 
-.gridrow[hidden] {
+e-gridrow[hidden] {
     display: none;
 }
 
-.gridcell {
+e-gridcell[type="gridcell"] {
     max-width: 0;
 
     overflow: clip;
@@ -14,7 +14,7 @@
     white-space: nowrap;
 }
 
-.gridheader {
+e-gridcell[type="columnheader"] {
     width: 120px;
 }
 
@@ -37,7 +37,11 @@
     white-space: nowrap;
 }
 
-e-gridcell[type="columnheader"] .widthsash:not(:hover) {
+e-gridhead e-wsash {
+    opacity: 1;
+}
+
+e-gridhead e-wsash:not(:hover) {
     flex: 0 0 auto;
     background-color: lightgrey;
     width: 2px;

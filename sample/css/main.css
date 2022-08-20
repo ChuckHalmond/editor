@@ -4,6 +4,7 @@
 @import "theme.css" layer(theme);
 @import "client.css" layer(client);
 
+@import "elements/sash.css" layer(base);
 @import "elements/menu/menu.css" layer(base);
 @import "elements/menu/menubar.css" layer(base);
 @import "elements/menu/menubutton.css" layer(base);

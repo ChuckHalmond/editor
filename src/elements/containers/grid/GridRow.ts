@@ -106,7 +106,12 @@ class HTMLEGridRowElementBase extends HTMLElement implements HTMLEGridRowElement
             "slotchange", this.#handleSlotChangeEvent.bind(this)
         );
     }
-
+    
+    connectedCallback(): void {
+        const {tabIndex} = this;
+        this.tabIndex = tabIndex;
+    }
+    
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
         switch (name) {
             case "selected": {

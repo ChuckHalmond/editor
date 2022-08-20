@@ -63,12 +63,12 @@ declare var menuItemWidget: {
             hasIcon: boolean;
             hasArrow: boolean;
         };
-        radio: {
+        submenu: {
             role: string;
             hasIcon: boolean;
             hasArrow: boolean;
         };
-        submenu: {
+        radio: {
             role: string;
             hasIcon: boolean;
             hasArrow: boolean;

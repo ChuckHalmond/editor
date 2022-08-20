@@ -1,13 +1,10 @@
 import { element, reactiveChildElements, CustomElement, fragment, AttributeProperty, reactiveElement } from "../elements/Element";
 import { ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { View } from "./View";
-import { gridWidget } from "./widgets/grid/GridWidget";
-import { menuWidget } from "./widgets/menu/MenuWidget";
-import { menuItemWidget } from "./widgets/menu/MenuItemWidget";
-import { widget } from "./widgets/Widget";
 import { HTMLEGridCellElement } from "../elements/containers/grid/GridCell";
 import { HTMLEGridElement } from "../elements/containers/grid/Grid";
 import { HTMLEGridRowElement } from "../elements/containers/grid/GridRow";
+import { HTMLEMenuItemElement } from "../elements/containers/menus/MenuItem";
 
 export { GridModel };
 export { GridRowModel };
@@ -194,8 +191,8 @@ class GridViewBase extends View implements GridView {
         }
     }
 
-    get gridElement(): HTMLElement {
-        return this.getGridElement()!;
+    get gridElement(): HTMLEGridElement {
+        return this.shadowRoot.querySelector("e-grid")!;
     }
 
     setColumnDelegate(delegate: (column: GridColumnModel) => string | Node): void {
@@ -204,10 +201,6 @@ class GridViewBase extends View implements GridView {
 
     setCellDelegate(delegate: (row: GridRowModel, column: GridColumnModel) => string | Node): void {
         this.#cellDelegate = delegate;
-    }
-
-    getGridElement(): HTMLEGridElement | null {
-        return this.shadowRoot.querySelector(`e-grid`);
     }
 
     getRowElement(row: GridRowModel): HTMLEGridRowElement | null {
@@ -290,7 +283,7 @@ class GridViewBase extends View implements GridView {
                 rowElement.hidden = !this.#filter(row_i);
             }
         });
-        gridWidget.clearSelection(gridElement);
+        gridElement.clearSelection();
     }
 
     addDisplayFilter(filter: (GridRowFilter & {name: string;})): void {
@@ -301,12 +294,13 @@ class GridViewBase extends View implements GridView {
             displayFilters.push(filter);
             Array.from(rows.values()).forEach((row_i) => {
                 const rowElement = this.getRowElement(row_i);
+                console.log(rowElement);
                 if (rowElement) {
                     rowElement.hidden = !this.#filter(row_i);
                 }
             });
         }
-        gridWidget.clearSelection(gridElement);
+        gridElement.clearSelection();
     }
 
     removeDisplayFilter(filter: (GridRowFilter & {name: string;})): void {
@@ -323,7 +317,7 @@ class GridViewBase extends View implements GridView {
                 }
             });
         }
-        gridWidget.clearSelection(gridElement);
+        gridElement.clearSelection();
     }
 
     #renderGridColumnHeaderCell(column: GridColumnModel): Element {
@@ -348,8 +342,8 @@ class GridViewBase extends View implements GridView {
                             })
                         ]).concat(
                             this.resizable ? [
-                                widget("widthsash", {
-                                    properties: {
+                                element("e-wsash", {
+                                    attributes: {
                                         controls: column.name
                                     }
                                 })
@@ -432,8 +426,6 @@ class GridViewBase extends View implements GridView {
                         listeners: {
                             click: () => {
                                 const columnHeaderElement = this.getColumnHeaderElement(column);
-                                console.log(column);
-                                console.log(columnHeaderElement);
                                 if (columnHeaderElement) {
                                     const {style} = columnHeaderElement;
                                     const labels = this.getColumnCellsElements(column).map(
@@ -442,7 +434,6 @@ class GridViewBase extends View implements GridView {
                                     const maxWidth = labels.reduce(
                                         (maxWidth, label) => Math.max(maxWidth, label.getBoundingClientRect().width), 0
                                     );
-                                    console.log(maxWidth);
                                     style.setProperty("width", `${maxWidth}px`);
                                 }
                             }
@@ -497,9 +488,9 @@ class GridViewBase extends View implements GridView {
                                 listeners: {
                                     click: (event) => {
                                         const {target} = event;
-                                        const targetItem = <HTMLElement>target;
-                                        if (targetItem.classList.contains("menuitem")) {
-                                            model.sortByColumn(column, Number(menuItemWidget.getValue(targetItem)));
+                                        const targetItem = (<HTMLElement>target).closest("e-menuitem");
+                                        if (targetItem) {
+                                            model.sortByColumn(column, Number(targetItem.value));
                                         }
                                     }
                                 }
@@ -528,8 +519,8 @@ class GridViewBase extends View implements GridView {
                                         listeners: {
                                             click: (event) => {
                                                 const {currentTarget} = event;
-                                                const targetItem = <HTMLElement>currentTarget;
-                                                const checked = menuItemWidget.getChecked(targetItem);
+                                                const targetItem = <HTMLEMenuItemElement>currentTarget;
+                                                const {checked} = targetItem;
                                                 if (checked) {
                                                     this.addDisplayFilter(filter_i);
                                                 }

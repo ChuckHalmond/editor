@@ -109,7 +109,12 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
         this.addEventListener("select", this.#handleSelectEvent.bind(this));
         shadowRoot.addEventListener("slotchange", this.#handleSlotChangeEvent.bind(this));
     }
-
+    
+    connectedCallback(): void {
+        const {tabIndex} = this;
+        this.tabIndex = tabIndex;
+    }
+    
     beginSelection(): void {
         this.#onSelection = true;
     }

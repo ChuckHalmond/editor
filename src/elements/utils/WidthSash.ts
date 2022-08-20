@@ -25,8 +25,6 @@ declare global {
     }
 }
 
-var shadowTemplate: HTMLTemplateElement;
-
 @CustomElement({
     name: "e-wsash"
 })
@@ -52,16 +50,8 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
     #queuedPointerCallback: FrameRequestCallback | null;
     #pointerMovement: number;
 
-    static {
-        shadowTemplate = element("template");
-    }
-
     constructor() {
         super();
-        const shadowRoot = this.attachShadow({mode: "open"});
-        shadowRoot.append(
-            shadowTemplate.content.cloneNode(true)
-        );
         this.#target = null;
         this.#queuedPointerCallback = null;
         this.#pointerMovement = 0;

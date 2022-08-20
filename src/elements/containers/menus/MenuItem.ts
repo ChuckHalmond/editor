@@ -144,6 +144,11 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
         );
         this.addEventListener("click", this.#handleClickEvent.bind(this));
     }
+    
+    connectedCallback(): void {
+        const {tabIndex} = this;
+        this.tabIndex = tabIndex;
+    }
 
     toggle(force?: boolean): void {
         const {type, expanded} = this;
@@ -159,11 +164,6 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                 break;
             }
         }
-    }
-
-    connectedCallback(): void {
-        const {tabIndex} = this;
-        this.tabIndex = tabIndex;
     }
 
     expand(): void {
