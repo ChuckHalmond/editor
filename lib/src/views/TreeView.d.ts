@@ -24,10 +24,14 @@ declare class TreeItemList {
     remove(): void;
 }
 declare class TreeItemModel extends ModelObject {
+    readonly parentNode: TreeModel | TreeItemModel | null;
     readonly childItems: ModelList<TreeItemModel>;
     readonly type: "leaf" | "parent";
-    readonly label: string;
+    label: string;
+    index: number;
+    get level(): number;
     get uri(): string;
+    get rootTree(): TreeModel | null;
     get parentItem(): TreeItemModel | null;
     constructor(init: {
         label: string;

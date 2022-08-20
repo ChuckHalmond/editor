@@ -1,4 +1,4 @@
-import { CustomElement, AttributeProperty, element } from "../../Element";
+import { CustomElement, AttributeProperty } from "../../Element";
 import { HTMLETreeItemElement } from "./TreeItem";
 import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
 
@@ -26,8 +26,6 @@ declare global {
         "e-tree": HTMLETreeElement,
     }
 }
-
-var shadowTemplate: HTMLTemplateElement;
 
 @CustomElement({
     name: "e-tree"
@@ -59,13 +57,6 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
     #hasSelectionChanged: boolean;
     #walker: TreeWalker;
 
-    static {
-        shadowTemplate = element("template");
-        shadowTemplate.content.append(
-            element("slot")
-        );
-    }
-
     constructor() {
         super();
         this.#walker = document.createTreeWalker(
@@ -74,10 +65,6 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         this.#onSelection = false;
         this.#hasSelectionChanged = false;
         this.items = this.getElementsByTagName("e-treeitem");
-        const shadowRoot = this.attachShadow({mode: "open"});
-        shadowRoot.append(
-            shadowTemplate.content.cloneNode(true)
-        );
         this.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
         this.addEventListener("dragend", this.#handleDragEndEvent.bind(this));
         this.addEventListener("dragenter", this.#handleDragEnterEvent.bind(this));
@@ -89,7 +76,11 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         this.addEventListener("select", this.#handleSelectEvent.bind(this));
-        shadowRoot.addEventListener("slotchange", this.#handleSlotChangeEvent.bind(this));
+    }
+    
+    connectedCallback(): void {
+        const {tabIndex} = this;
+        this.tabIndex = tabIndex;
     }
 
     selectedItems(): HTMLETreeItemElement[] {
@@ -524,19 +515,6 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         else {
             this.dispatchEvent(new Event("selectionchange", {bubbles: true}));
         }
-    }
-
-    #handleSlotChangeEvent(event: Event): void {
-        const {target} = event;
-        const assignedItems = <HTMLETreeItemElement[]>(<HTMLSlotElement>target)
-            .assignedElements()
-            .filter(
-                element_i => element_i instanceof HTMLETreeItemElement
-            );
-        assignedItems.forEach((item_i, i) => {
-            item_i.posinset = i;
-            item_i.level = 0;
-        });
     }
 }
 

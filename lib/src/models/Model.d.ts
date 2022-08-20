@@ -106,8 +106,7 @@ interface ModelListConstructor {
 interface ModelList<Model extends ModelNode = ModelNode> extends ModelNode {
     readonly parentNode: ModelNode | null;
     readonly length: number;
-    index(items: Model): number;
-    index(items: Model, fromIndex: number): number;
+    index(item: Model): number;
     get(index: number): Model | null;
     values(): IterableIterator<Model>;
     sort(compareFunction: (item_a: any, item_b: any) => number): void;

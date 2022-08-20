@@ -4,7 +4,6 @@ interface HTMLETreeItemGroupElementConstructor {
     new (): HTMLETreeItemGroupElement;
 }
 interface HTMLETreeItemGroupElement extends HTMLElement {
-    readonly shadowRoot: ShadowRoot;
 }
 declare global {
     interface HTMLElementTagNameMap {

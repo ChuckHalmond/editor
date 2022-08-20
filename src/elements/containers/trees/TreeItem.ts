@@ -106,7 +106,12 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
         this.addEventListener("click", this.#handleClickEvent.bind(this));
         this.#group = null;
     }
-
+    
+    connectedCallback(): void {
+        const {tabIndex} = this;
+        this.tabIndex = tabIndex;
+    }
+    
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
         switch (name) {
             case "expanded": {

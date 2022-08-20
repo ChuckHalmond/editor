@@ -200,7 +200,7 @@ export async function TreeMain() {
                         }),
                         ["label"],
                         (label, property, oldValue, newValue) => {
-                            label.textContent = newValue;
+                            label.textContent = `${item.label}`;
                         }
                     )
                 ]).concat(
