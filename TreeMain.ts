@@ -29,7 +29,7 @@ class MyTreeItemList extends TreeItemList {
 
     display(): void {
         const result = this.items.reduce(
-            (result, item_i) => `${result} ${item_i.label}`, ""
+            (result, item_i) => `${result} ${item_i.name}`, ""
         );
         console.log(result);
     }
@@ -43,7 +43,7 @@ class MyTreeItemModel extends TreeItemModel {
     @ModelProperty()
     visibility: boolean;
 
-    constructor(init: {label: string, type: "leaf" | "parent", items?: TreeItemModel[]}) {
+    constructor(init: {name: string, type: "leaf" | "parent", items?: TreeItemModel[]}) {
         super(init);
         this.childCount = this.childItems.length;
         this.visibility = true;
@@ -59,7 +59,7 @@ class MyTreeItemModel extends TreeItemModel {
     }
 
     display(): void {
-        console.log(this.label);
+        console.log(this.name);
     }
 
     #handleModelChangeEvent(event: ModelEvent): void {
@@ -132,60 +132,61 @@ export async function TreeMain() {
     const treeModel = new TreeModel({
         items: [
             new MyTreeItemModel({
-                label: "TI 0",
+                name: "TI 0",
                 type: "parent",
                 items: [
                     new MyTreeItemModel({
-                        label: "TI 1A",
+                        name: "TI 1A",
                         type: "parent",
                         items: [
                             new MyTreeItemModel({
                                 type: "leaf",
-                                label: "TI 1AX"
+                                name: "TI 1AX"
                             }),
                         ]
                     }),
                     new MyTreeItemModel({
                         type: "parent",
-                        label: "TI 1B"
+                        name: "TI 1B"
                     })
                 ]
             }),
             new MyTreeItemModel({
-                label: "TI 1",
+                name: "TI 1",
                 type: "parent",
                 items: [
                     new MyTreeItemModel({
-                        label: "TI 1A",
+                        name: "TI 1A",
                         type: "parent",
                         items: [
                             new MyTreeItemModel({
                                 type: "leaf",
-                                label: "TI 1AX"
+                                name: "TI 1AX"
                             }),
                         ]
                     }),
                     new MyTreeItemModel({
                         type: "parent",
-                        label: "TI 1B"
+                        name: "TI 1B"
                     })
                 ]
             }),
             new MyTreeItemModel({
                 type: "leaf",
-                label: "TI 2"
+                name: "TI 2"
             }),
             new MyTreeItemModel({
                 type: "leaf",
-                label: "TI 3"
+                name: "TI 3"
             })
         ],
         sortFunction: (item_a: TreeItemModel, item_b: TreeItemModel) => {
-            const {label: aLabel} = item_a;
-            const {label: bLabel} = item_b;
+            const {name: aLabel} = item_a;
+            const {name: bLabel} = item_b;
             return bLabel.localeCompare(aLabel);
         }
     });
+    (<any>window)["model"] = treeModel;
     const treeView = new TreeView(treeModel);
     treeView.itemContentDelegate = <typeof treeView.itemContentDelegate>(
         (item: MyTreeItemModel) => {
@@ -198,9 +199,9 @@ export async function TreeMain() {
                                 class: "label"
                             }
                         }),
-                        ["label"],
+                        ["name"],
                         (label, property, oldValue, newValue) => {
-                            label.textContent = `${item.label}`;
+                            label.textContent = `${item.name}`;
                         }
                     )
                 ]).concat(

@@ -30,7 +30,7 @@ class TreeModel extends ModelObject {
         this.items = new ModelList(this.flattenItems());
         this.sortFunction = sortFunction ??
             function(item_a: TreeItemModel, item_b: TreeItemModel) {
-                return item_a.label.localeCompare(item_b.label);
+                return item_a.name.localeCompare(item_b.name);
             };
         this.addEventListener("modelchange", this.#handleModelChangeEvent.bind(this));
     }
@@ -60,10 +60,10 @@ class TreeModel extends ModelObject {
         }
     }
 
-    flattenItems(this: TreeModel | TreeItemModel): TreeItemModel[] {
+    flattenItems(): TreeItemModel[] {
         const {childItems} = this;
         return Array.from(childItems.values()).flatMap(
-            treeItem_i => Array.of(treeItem_i, ...TreeModel.prototype.flattenItems.call(treeItem_i))
+            treeItem_i => Array.of(treeItem_i, ...treeItem_i.flattenItems())
         );
     }
 
@@ -124,12 +124,9 @@ class TreeItemList {
 }
 
 class TreeItemModel extends ModelObject {
-    readonly parentNode!: TreeModel | TreeItemModel | null;
     readonly childItems: ModelList<TreeItemModel>;
     readonly type: "leaf" | "parent";
-    
-    @ModelProperty()
-    label: string;
+    readonly name: string;
     
     @ModelProperty()
     index: number;
@@ -139,26 +136,17 @@ class TreeItemModel extends ModelObject {
         if (parentNode instanceof TreeItemModel) {
             return parentNode.level + 1;
         }
-        else if (parentNode instanceof TreeModel) {
+        else {
             return 0;
         }
-        return -1;
     }
 
     get uri(): string {
         const {parentNode} = this;
         if (parentNode instanceof TreeItemModel) {
-            return `${parentNode.uri}/${this.label}`;
+            return `${parentNode.uri}/${this.name}`;
         }
-        return this.label;
-    }
-
-    get rootTree(): TreeModel | null {
-        let {parentNode} = this;
-        while (parentNode instanceof TreeItemModel) {
-            ({parentNode} = parentNode);
-        }
-        return parentNode;
+        return this.name;
     }
 
     get parentItem(): TreeItemModel | null {
@@ -169,16 +157,23 @@ class TreeItemModel extends ModelObject {
         return null;
     }
     
-    constructor(init: {label: string, type: "leaf" | "parent", items?: TreeItemModel[]}) {
+    constructor(init: {name: string, type: "leaf" | "parent", items?: TreeItemModel[]}) {
         super();
-        const {label, type, items = []} = init;
+        const {name, type, items = []} = init;
         items.forEach((item_i, i) => item_i.index = i);
         const childItems = new ModelList(items);
         childItems.setParent(this);
+        this.name = name;
         this.childItems = childItems;
-        this.label = label;
         this.type = type;
         this.index = -1;
+    }
+
+    flattenItems(): TreeItemModel[] {
+        const {childItems} = this;
+        return Array.from(childItems.values()).flatMap(
+            treeItem_i => Array.of(treeItem_i, ...treeItem_i.flattenItems())
+        );
     }
 
     remove(): void {
@@ -444,9 +439,9 @@ class TreeViewBase extends View implements TreeView {
                         targetParentItem ? targetParentItem : model;
                     const targetItems = Array.from(targetList.values());
                     targetItems.forEach((item_i) => {
-                        const sameLabelIndex = transferedItems.findIndex(item_j => item_j.label == item_i.label);
+                        const sameLabelIndex = transferedItems.findIndex(item_j => item_j.name == item_i.name);
                         if (sameLabelIndex > -1) {
-                            const doReplace = confirm(`Replace ${item_i.label}?`);
+                            const doReplace = confirm(`Replace ${item_i.name}?`);
                             if (doReplace) {
                                 targetList.remove(item_i);
                             }
