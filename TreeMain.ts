@@ -296,6 +296,7 @@ export async function TreeMain() {
                         })
                     ]
                 }),
+                element("e-separator"),
                 element("e-menuitemgroup", {
                     children: [
                         element("e-menuitem", {

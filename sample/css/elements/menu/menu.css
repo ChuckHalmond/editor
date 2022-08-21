@@ -23,12 +23,6 @@ e-menu[contextual]:focus-within {
     opacity: 1;
 }
 
-e-menu > hr {
-    margin: 10px 0px 10px 36px;
-    border: none;
-    border-top: 1px solid lightgrey;
-}
-
 e-menuitem {
     display: flex;
     user-select: none;
@@ -76,13 +70,14 @@ e-menuitem::part(icon) {
     width: 18px;
     height: 18px;
     overflow: hidden;
+    margin-right: 4px;
 }
 
 e-menuitem::part(label) {
     flex: auto;
     line-height: 18px;
-    margin-left: 10px;
-    margin-right: 10px;
+    margin-left: 8px;
+    margin-right: 8px;
 }
 
 e-menuitem:is(:not([type]), [type="button"], [type="radio"], [type="checkbox"])[checked]::part(icon) {

@@ -505,11 +505,14 @@ class TreeViewBase extends View implements TreeView {
         const {currentTarget, relatedTarget} = event;
         const targetTree = <HTMLETreeElement>currentTarget;
         if (!targetTree.contains(<Node>relatedTarget)) {
-            const {activeItem} = targetTree;
-            if (activeItem) {
-                const toolbar = activeItem.querySelector("e-toolbar");
-                if (toolbar) {
-                    toolbar.focus();
+            const relatedPosition = (<Node>relatedTarget).compareDocumentPosition(targetTree);
+            if (relatedPosition & Node.DOCUMENT_POSITION_PRECEDING) {
+                const {activeItem} = targetTree;
+                if (activeItem) {
+                    const toolbar = activeItem.querySelector("e-toolbar");
+                    if (toolbar) {
+                        toolbar.focus();
+                    }
                 }
             }
         }
@@ -521,7 +524,6 @@ class TreeViewBase extends View implements TreeView {
         if (targetItem) {
             const toolbar = targetItem.querySelector("e-toolbar");
             if (toolbar) {
-                //targetItem.tabIndex = -1;
                 toolbar.tabIndex = toolbar.contains(<Node>target) ? -1 : 0;
             }
         }
@@ -533,7 +535,7 @@ class TreeViewBase extends View implements TreeView {
         if (targetItem) {
             const toolbar = targetItem.querySelector("e-toolbar");
             if (toolbar) {
-                toolbar.tabIndex = toolbar.contains(<Node>target) ? 0 : -1;
+                toolbar.tabIndex = -1;
             }
         }
     }
