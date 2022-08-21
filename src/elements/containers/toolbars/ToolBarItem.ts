@@ -98,6 +98,11 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
         this.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
     }
 
+    connectedCallback(): void {
+        const {tabIndex} = this;
+        this.tabIndex = tabIndex;
+    }
+
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
         switch (name) {
             case "label": {

@@ -14,6 +14,7 @@ interface HTMLETreeElement extends HTMLElement {
     readonly items: HTMLCollectionOf<HTMLETreeItemElement>;
     readonly activeItem: HTMLETreeItemElement | null;
     readonly dropTargetItem: HTMLETreeItemElement | null;
+    firstItem(): HTMLETreeItemElement | null;
     droptarget: boolean;
     name: string;
     selectedItems(): HTMLETreeItemElement[];
@@ -87,7 +88,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         const selectedItems = [];
         const walker = this.#walker;
         walker.currentNode = walker.root;
-        let item = this.#firstItem();
+        let item = this.firstItem();
         while (item !== null) {
             if (item.selected) {
                 selectedItems.push(item);
@@ -221,7 +222,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         }
     }
 
-    #firstItem(): HTMLETreeItemElement | null {
+    firstItem(): HTMLETreeItemElement | null {
         const walker = this.#walker;
         const {root} = walker;
         walker.currentNode = root;
@@ -420,7 +421,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
                     }
                 }
                 else {
-                    const firstItem = this.#firstItem();
+                    const firstItem = this.firstItem();
                     if (firstItem) {
                         firstItem.focus({preventScroll: true});
                     }
@@ -451,7 +452,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
                 break;
             }
             case "Home": {
-                const firstItem = this.#firstItem();
+                const firstItem = this.firstItem();
                 if (firstItem) {
                     firstItem.focus({preventScroll: true});
                 }
@@ -487,15 +488,16 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
     #handleFocusEvent(event: FocusEvent): void {
         const {relatedTarget} = event;
         const {activeItem} = this;
-        if (activeItem && relatedTarget !== activeItem) {
-            activeItem.focus();
+        if (!this.contains(<Node>relatedTarget)) {
+            (activeItem ?? this.firstItem())?.focus();
         }
     }
 
     #handleFocusInEvent(event: FocusEvent): void {
         const {target} = event;
-        if (target instanceof HTMLETreeItemElement) {
-            this.#setActiveItem(target);
+        const targetItem = <HTMLETreeItemElement | null>(<HTMLElement>target).closest("e-treeitem");
+        if (targetItem) {
+            this.#setActiveItem(targetItem);
             this.tabIndex = -1;
         }
     }

@@ -9,6 +9,7 @@ interface HTMLETreeElement extends HTMLElement {
     readonly items: HTMLCollectionOf<HTMLETreeItemElement>;
     readonly activeItem: HTMLETreeItemElement | null;
     readonly dropTargetItem: HTMLETreeItemElement | null;
+    firstItem(): HTMLETreeItemElement | null;
     droptarget: boolean;
     name: string;
     selectedItems(): HTMLETreeItemElement[];

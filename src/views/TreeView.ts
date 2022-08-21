@@ -283,8 +283,9 @@ class TreeViewBase extends View implements TreeView {
                 drop: <EventListener>this.#handleDropEvent.bind(this),
                 contextmenu: <EventListener>this.#handleContextMenuEvent.bind(this),
                 keydown: <EventListener>this.#handleKeyDownEvent.bind(this),
-                //focusin: <EventListener>this.#handleFocusInEvent.bind(this),
-                //focusout: <EventListener>this.#handleFocusOutEvent.bind(this),
+                focus: <EventListener>this.#handleFocusEvent.bind(this),
+                focusin: <EventListener>this.#handleFocusInEvent.bind(this),
+                focusout: <EventListener>this.#handleFocusOutEvent.bind(this),
             }
         });
         return fragment(
@@ -382,7 +383,7 @@ class TreeViewBase extends View implements TreeView {
     #handleDragStartEvent(event: DragEvent): void {
         const {currentTarget, target} = event;
         const targetTree = <HTMLETreeElement>currentTarget;
-        const targetItem = <HTMLETreeItemElement>(<HTMLElement>target).closest("e-treeitem");
+        const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
         const {model} = this;
         if (targetItem) {
             const {dataTransfer} = event;
@@ -417,7 +418,7 @@ class TreeViewBase extends View implements TreeView {
     #handleDropEvent(event: DragEvent): void {
         const {currentTarget, target} = event;
         const targetTree = <HTMLETreeElement>currentTarget;
-        const targetItem = <HTMLETreeItemElement>(<HTMLElement>target).closest("e-treeitem");
+        const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
         const {model} = this;
         const {sortFunction} = model;
         if (targetItem) {
@@ -478,7 +479,7 @@ class TreeViewBase extends View implements TreeView {
     #handleContextMenuEvent(event: MouseEvent): void {
         const {clientX, clientY, currentTarget, target} = event;
         const targetTree = <HTMLETreeElement>currentTarget;
-        const targetItem = <HTMLETreeItemElement>(<HTMLElement>target).closest("e-treeitem");
+        const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
         const {model} = this;
         if (targetItem) {
             const targetItemModel = model.getItemByUri(targetItem.dataset.uri!)!;
@@ -500,29 +501,42 @@ class TreeViewBase extends View implements TreeView {
         event.preventDefault();
     }
 
-    /*#handleFocusInEvent(event: FocusEvent): void {
+    #handleFocusEvent(event: FocusEvent): void {
+        const {currentTarget, relatedTarget} = event;
+        const targetTree = <HTMLETreeElement>currentTarget;
+        if (!targetTree.contains(<Node>relatedTarget)) {
+            const {activeItem} = targetTree;
+            if (activeItem) {
+                const toolbar = activeItem.querySelector("e-toolbar");
+                if (toolbar) {
+                    toolbar.focus();
+                }
+            }
+        }
+    }
+
+    #handleFocusInEvent(event: FocusEvent): void {
         const {target} = event;
-        const targetElement = <HTMLElement>target;
-        if (targetElement instanceof HTMLETreeItemElement) {
-            const targetItem = targetElement;
-            const toolbar = targetItem.querySelector<HTMLElement>("e-toolbar");
+        const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
+        if (targetItem) {
+            const toolbar = targetItem.querySelector("e-toolbar");
             if (toolbar) {
-                toolbar.tabIndex = 0;
+                //targetItem.tabIndex = -1;
+                toolbar.tabIndex = toolbar.contains(<Node>target) ? -1 : 0;
             }
         }
     }
 
     #handleFocusOutEvent(event: FocusEvent): void {
         const {target} = event;
-        const targetElement = <HTMLElement>target;
-        if (targetElement instanceof HTMLETreeItemElement) {
-            const targetItem = targetElement;
-            const toolbar = targetItem.querySelector<HTMLElement>("e-toolbar");
+        const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
+        if (targetItem) {
+            const toolbar = targetItem.querySelector("e-toolbar");
             if (toolbar) {
-                toolbar.tabIndex = -1;
+                toolbar.tabIndex = toolbar.contains(<Node>target) ? 0 : -1;
             }
         }
-    }*/
+    }
 
     #handleKeyDownEvent(event: KeyboardEvent) {
         const {currentTarget, key} = event;

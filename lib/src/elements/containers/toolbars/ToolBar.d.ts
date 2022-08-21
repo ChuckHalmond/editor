@@ -3,6 +3,7 @@ export { HTMLEToolBarElement };
 interface HTMLEToolBarElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     items(): HTMLEToolBarItemElement[];
+    firstItem(): HTMLEToolBarItemElement | null;
     readonly activeItem: HTMLEToolBarItemElement | null;
     readonly activeIndex: number;
     name: string;

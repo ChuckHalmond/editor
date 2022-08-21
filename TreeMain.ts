@@ -244,8 +244,8 @@ export async function TreeMain() {
                         (toolbar, property, oldValue, newValue) => {
                             switch (property) {
                                 case "visibility": {
-                                    const visibilityItem = toolbarWidget.slot(toolbar)
-                                        ?.querySelector<HTMLEToolBarItemElement>("e-toolbaritem[name=visibility]");
+                                    const visibilityItem = toolbar
+                                        .querySelector<HTMLEToolBarItemElement>("e-toolbaritem[name=visibility]");
                                     if (visibilityItem) {
                                         const label = newValue ? "Hide" : "Show";
                                         visibilityItem.label = label;

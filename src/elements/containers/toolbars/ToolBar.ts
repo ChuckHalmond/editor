@@ -10,6 +10,7 @@ type ToolBarOrientation = "horizontal" | "vertical";
 interface HTMLEToolBarElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     items(): HTMLEToolBarItemElement[];
+    firstItem(): HTMLEToolBarItemElement | null;
     readonly activeItem: HTMLEToolBarItemElement | null;
     readonly activeIndex: number;
     name: string;
@@ -77,9 +78,15 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
+        this.addEventListener("focus", this.#handleFocusEvent.bind(this));
         this.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
         this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
+    }
+
+    connectedCallback(): void {
+        const {tabIndex} = this;
+        this.tabIndex = tabIndex;
     }
 
     #nodeFilter(node: Node): number {
@@ -92,7 +99,7 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         return NodeFilter.FILTER_REJECT;
     }
 
-    #firstItem(): HTMLEToolBarItemElement | null {
+    firstItem(): HTMLEToolBarItemElement | null {
         const walker = this.#walker;
         walker.currentNode = walker.root;
         return <HTMLEToolBarItemElement | null>walker.firstChild();
@@ -180,6 +187,14 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         }
     }*/
 
+    #handleFocusEvent(event: FocusEvent): void {
+        const {relatedTarget} = event;
+        const {activeItem} = this;
+        if (!this.contains(<Node>relatedTarget)) {
+            (activeItem ?? this.firstItem())?.focus();
+        }
+    }
+
     #handleFocusInEvent(event: FocusEvent): void {
         const {target} = event;
         const targetItem = <HTMLEToolBarItemElement | null>(<HTMLElement>target).closest("e-toolbaritem");
@@ -193,7 +208,6 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         const {relatedTarget} = event;
         const lostFocusWithin = !this.contains(<Node>relatedTarget);
         if (lostFocusWithin) {
-            this.#setActiveItem(null);
             this.tabIndex = 0;
         }
     }
@@ -238,7 +252,7 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
                     }
                 }
                 else {
-                    const firstItem = this.#firstItem();
+                    const firstItem = this.firstItem();
                     if (firstItem) {
                         firstItem.focus({preventScroll: true});
                     }
@@ -276,7 +290,7 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
                 break;
             }
             case "Home": {
-                const firstItem = this.#firstItem();
+                const firstItem = this.firstItem();
                 if (firstItem) {
                     firstItem.focus({preventScroll: true});
                 }
