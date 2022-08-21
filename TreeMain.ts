@@ -180,11 +180,11 @@ export async function TreeMain() {
                 name: "TI 3"
             })
         ],
-        sortFunction: (item_a: TreeItemModel, item_b: TreeItemModel) => {
+        /*sortFunction: (item_a: TreeItemModel, item_b: TreeItemModel) => {
             const {name: aLabel} = item_a;
             const {name: bLabel} = item_b;
             return bLabel.localeCompare(aLabel);
-        }
+        }*/
     });
     (<any>window)["model"] = treeModel;
     const treeView = new TreeView(treeModel);

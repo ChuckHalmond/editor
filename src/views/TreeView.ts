@@ -76,10 +76,10 @@ class TreeModel extends ModelObject {
             const {uri: itemUri} = item_i;
             const {length: itemUriLength} = itemUri;
             if (uri.startsWith(itemUri)) {
-                if (uri.charAt(itemUriLength) == "/") {
+                if (uri.charAt(itemUriLength) === "/") {
                     return TreeModel.prototype.getItemByUri.call(item_i, uri);
                 }
-                else if (itemUriLength == uriLength) {
+                else if (itemUriLength === uriLength) {
                     return <TreeItemModel>item_i;
                 }
             }
@@ -214,6 +214,7 @@ declare global {
 class TreeViewBase extends View implements TreeView {
     readonly shadowRoot!: ShadowRoot;
     readonly model!: TreeModel;
+
     #dragImages: WeakMap<TreeItemModel, WeakRef<Element>>;
 
     itemContentDelegate: <Item extends TreeItemModel>(item: Item) => string | Node;
@@ -327,8 +328,7 @@ class TreeViewBase extends View implements TreeView {
     }
 
     #renderTreeItem(item: TreeItemModel, model: TreeModel): HTMLETreeItemElement {
-        const treeItemElement = 
-        reactiveElement(
+        const treeItemElement = reactiveElement(
             item,
             element("e-treeitem", {
                 attributes: {
@@ -392,9 +392,7 @@ class TreeViewBase extends View implements TreeView {
             if (selectedCount > 0) {
                 const selectedUris = 
                     selectedElements
-                    .map((element_i) =>
-                        element_i.dataset.uri!
-                    )
+                    .map(element_i => element_i.dataset.uri!)
                     .filter(
                         (uri_i, _, uris) => !uris.some(
                             uri_j => uri_i.startsWith(`${uri_j}/`)
@@ -467,9 +465,7 @@ class TreeViewBase extends View implements TreeView {
                         transferedItems.map(item_i => `[data-uri="${item_i.uri}"]`).join(",")
                     })`);
                     targetTree.beginSelection();
-                    newElements.forEach((element_i) => {
-                        element_i.selected = true;
-                    });
+                    newElements.forEach(element_i => element_i.selected = true);
                     targetTree.endSelection();
                 }
             }
@@ -535,7 +531,7 @@ class TreeViewBase extends View implements TreeView {
         if (targetItem) {
             const toolbar = targetItem.querySelector("e-toolbar");
             if (toolbar) {
-                toolbar.tabIndex = -1;
+                toolbar.tabIndex = toolbar.contains(<Node>target) ? 0 : -1;
             }
         }
     }
