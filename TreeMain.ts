@@ -189,7 +189,7 @@ export async function TreeMain() {
     (<any>window)["model"] = treeModel;
     const treeView = new TreeView(treeModel);
     treeView.itemContentDelegate = <typeof treeView.itemContentDelegate>(
-        (item: MyTreeItemModel) => {
+        function(this: TreeView, item: MyTreeItemModel) {
             return fragment(
                 ...([
                     reactiveElement(
@@ -261,7 +261,8 @@ export async function TreeMain() {
         }
     );
     treeView.itemContextMenuDelegate = <typeof treeView.itemContextMenuDelegate>(
-        (activeItem: MyTreeItemModel, selectedItems: MyTreeItemModel[]) => {
+        function(this: TreeView, activeItem: MyTreeItemModel, selectedItems: MyTreeItemModel[]) {
+            const treeElement = this.treeElement();
             return fragment(
                 element("e-menuitemgroup", {
                     children: [
@@ -274,6 +275,7 @@ export async function TreeMain() {
                                 click: () => {
                                     const itemsList = new MyTreeItemList(selectedItems);
                                     itemsList.display();
+                                    treeElement.activeItem?.focus();
                                 }
                             }
                         }),
@@ -290,7 +292,7 @@ export async function TreeMain() {
                                     if (doRemove) {
                                         itemsList.remove();
                                     }
-                                    treeView.treeElement().focus();
+                                    treeElement.focus();
                                 }
                             }
                         })
@@ -311,6 +313,7 @@ export async function TreeMain() {
                                     activeItem.visibility ?
                                         itemsList.hide() :
                                         itemsList.show();
+                                    treeElement.activeItem?.focus();
                                 }
                             }
                         })

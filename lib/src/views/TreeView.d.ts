@@ -1,3 +1,5 @@
+import { HTMLETreeElement } from "../elements/containers/trees/Tree";
+import { HTMLETreeItemElement } from "../elements/containers/trees/TreeItem";
 import { ModelList, ModelObject } from "../models/Model";
 import { View } from "./View";
 export { TreeItemList };
@@ -47,8 +49,8 @@ interface TreeViewConstructor {
 interface TreeView extends View {
     readonly shadowRoot: ShadowRoot;
     readonly model: TreeModel;
-    treeElement(): HTMLElement;
-    treeItemElement(item: TreeItemModel): HTMLElement;
+    treeElement(): HTMLETreeElement;
+    treeItemElement(item: TreeItemModel): HTMLETreeItemElement;
     itemContentDelegate: <Item extends TreeItemModel>(item: Item) => string | Node;
     itemContextMenuDelegate: <Item extends TreeItemModel>(activeItem: Item, selectedItems: Item[]) => string | Node;
 }

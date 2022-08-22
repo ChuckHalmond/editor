@@ -196,8 +196,8 @@ interface TreeViewConstructor {
 interface TreeView extends View {
     readonly shadowRoot: ShadowRoot;
     readonly model: TreeModel;
-    treeElement(): HTMLElement;
-    treeItemElement(item: TreeItemModel): HTMLElement;
+    treeElement(): HTMLETreeElement;
+    treeItemElement(item: TreeItemModel): HTMLETreeItemElement;
     itemContentDelegate: <Item extends TreeItemModel>(item: Item) => string | Node;
     itemContextMenuDelegate: <Item extends TreeItemModel>(activeItem: Item, selectedItems: Item[]) => string | Node;
 }
@@ -343,7 +343,7 @@ class TreeViewBase extends View implements TreeView {
                 children: [
                     this.itemContentDelegate(item),
                     ].concat(
-                        (item.type == "parent") ? [
+                        (item.type === "parent") ? [
                             element("e-treeitemgroup", {
                                 attributes: {
                                     slot: "group"
@@ -425,7 +425,7 @@ class TreeViewBase extends View implements TreeView {
                 const targetUri = targetItem.dataset.uri!;
                 const targetItemModel = model.getItemByUri(targetUri)!;
                 const transferedUris = dataTransfer.getData("text/plain").split("\n");
-                const targetIsWithin = transferedUris.some(uri_i => targetUri.startsWith(`${uri_i}/`) || uri_i == targetUri);
+                const targetIsWithin = transferedUris.some(uri_i => targetUri.startsWith(`${uri_i}/`) || uri_i === targetUri);
                 if (!targetIsWithin) {
                     const transferedItems = <TreeItemModel[]>transferedUris.map(
                         uri_i => model.getItemByUri(uri_i)
@@ -434,11 +434,11 @@ class TreeViewBase extends View implements TreeView {
                     );
                     const {type: targetType, parentItem: targetParentItem} = targetItemModel;
                     const {childItems: targetList} =
-                        targetType == "parent" ? targetItemModel :
+                        targetType === "parent" ? targetItemModel :
                         targetParentItem ? targetParentItem : model;
                     const targetItems = Array.from(targetList.values());
                     targetItems.forEach((item_i) => {
-                        const sameLabelIndex = transferedItems.findIndex(item_j => item_j.name == item_i.name);
+                        const sameLabelIndex = transferedItems.findIndex(item_j => item_j.name === item_i.name);
                         if (sameLabelIndex > -1) {
                             const doReplace = confirm(`Replace ${item_i.name}?`);
                             if (doReplace) {
@@ -500,13 +500,14 @@ class TreeViewBase extends View implements TreeView {
     #handleFocusEvent(event: FocusEvent): void {
         const {currentTarget, relatedTarget} = event;
         const targetTree = <HTMLETreeElement>currentTarget;
-        if (!targetTree.contains(<Node>relatedTarget)) {
-            const relatedPosition = (<Node>relatedTarget).compareDocumentPosition(targetTree);
+        if (relatedTarget !== null && !this.contains(<Node>relatedTarget)) {
+            const relatedPosition = (<Node>relatedTarget).compareDocumentPosition(this);
             if (relatedPosition & Node.DOCUMENT_POSITION_PRECEDING) {
                 const {activeItem} = targetTree;
                 if (activeItem) {
                     const toolbar = activeItem.querySelector("e-toolbar");
                     if (toolbar) {
+                        event.preventDefault();
                         toolbar.focus();
                     }
                 }
