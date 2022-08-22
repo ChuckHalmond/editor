@@ -198,18 +198,19 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
 
     #handleClickEvent(event: MouseEvent): void {
         const {target} = event;
-        if (target instanceof HTMLEMenuItemElement) {
-            const {contextual} = this;
+        const targetItem = <HTMLEMenuItemElement>(<Element>target).closest("e-menuitem");
+        if (targetItem) {
+            /*const {contextual} = this;
             if (contextual) {
                 try {
                     this.remove();
                 }
                 catch (error) {};
             }
-            else {
-                const isClosestMenu = this.#isClosestMenu(target);
+            else {*/
+                const isClosestMenu = this.#isClosestMenu(targetItem);
                 if (isClosestMenu) {
-                    const {type, name, value} = target;
+                    const {type, name, value} = targetItem;
                     if (type == "radio") {
                         this.querySelectorAll<HTMLEMenuItemElement>(
                             `:is(:scope, :scope > e-menuitemgroup) > e-menuitem[type=radio][name=${name}]`
@@ -219,7 +220,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                         });
                     }
                 }
-            }
+            //}
         }
     }
 
@@ -318,6 +319,14 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                         activeItem.collapse();
                         activeItem.focus({preventScroll: true});
                         event.stopPropagation();
+                    }
+                    else {
+                        const {contextual} = this;
+                        if (contextual) {
+                            this.blur();
+                            this.dispatchEvent(new Event("close", {bubbles: true}));
+                            event.stopPropagation();
+                        }
                     }
                 }
                 break;

@@ -273,7 +273,8 @@ export async function TreeMain() {
                             children: "Display",
                             listeners: {
                                 click: () => {
-                                    const itemsList = new MyTreeItemList(selectedItems);
+                                    const itemsList = selectedItems.includes(activeItem) ?
+                                        new MyTreeItemList(selectedItems) : new MyTreeItemList([activeItem]);
                                     itemsList.display();
                                     treeElement.activeItem?.focus();
                                 }
@@ -286,7 +287,8 @@ export async function TreeMain() {
                             children: "Delete",
                             listeners: {
                                 click: () => {
-                                    const itemsList = new MyTreeItemList(selectedItems);
+                                    const itemsList = selectedItems.includes(activeItem) ?
+                                        new MyTreeItemList(selectedItems) : new MyTreeItemList([activeItem]);
                                     const {count} = itemsList;
                                     const doRemove = confirm(`Remove ${count} items?`);
                                     if (doRemove) {
@@ -309,7 +311,8 @@ export async function TreeMain() {
                             children: activeItem.visibility ? "Hide" : "Show",
                             listeners: {
                                 click: () => {
-                                    const itemsList = new MyTreeItemList(selectedItems);
+                                    const itemsList = selectedItems.includes(activeItem) ?
+                                        new MyTreeItemList(selectedItems) : new MyTreeItemList([activeItem]);
                                     activeItem.visibility ?
                                         itemsList.hide() :
                                         itemsList.show();

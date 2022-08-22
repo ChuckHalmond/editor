@@ -308,11 +308,12 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
             case "Escape": {
                 if (activeItem) {
                     activeItem.focus({preventScroll: true});
+                    event.stopPropagation();
                 }
                 else {
                     this.focus({preventScroll: true});
                 }
-                event.stopPropagation();
+                // TODO: event.stopPropagation();
                 break;
             }
         }
