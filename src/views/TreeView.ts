@@ -481,6 +481,7 @@ class TreeViewBase extends View implements TreeView {
         const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
         const {model} = this;
         if (targetItem) {
+            targetItem.focus({preventScroll: true});
             const targetItemModel = model.getItemByUri(targetItem.dataset.uri!)!;
             const contextMenu = element("e-menu", {
                 attributes: {
@@ -488,19 +489,13 @@ class TreeViewBase extends View implements TreeView {
                 },
                 children: this.itemContextMenuDelegate(targetItemModel, this.selectedItems()),
                 listeners: {
-                    close: (event) => {
-                        // TODO: close case !== click case
-                        //const {currentTarget} = event;
-                        //const menuTarget = <HTMLEMenuElement>currentTarget;
-                        //if (menuTarget.matches(":focus-within")) {
-                            targetItem.focus({preventScroll: true});
-                        //}
+                    close: () => {
+                        targetItem.focus({preventScroll: true});
                     }
                 }
             });
             targetTree.append(contextMenu);
             contextMenu.positionContextual(clientX, clientY);
-            targetItem.focus({preventScroll: true});
             contextMenu.focus({preventScroll: true});
         }
         event.preventDefault();
@@ -509,8 +504,8 @@ class TreeViewBase extends View implements TreeView {
     #handleFocusEvent(event: FocusEvent): void {
         const {currentTarget, relatedTarget} = event;
         const targetTree = <HTMLETreeElement>currentTarget;
-        if (relatedTarget !== null && (<Node>relatedTarget).isConnected && !this.contains(<Node>relatedTarget)) {
-            const relatedPosition = (<Node>relatedTarget).compareDocumentPosition(this);
+        if (relatedTarget instanceof Node && relatedTarget.isConnected && !this.contains(relatedTarget)) {
+            const relatedPosition = relatedTarget.compareDocumentPosition(this);
             if (relatedPosition & Node.DOCUMENT_POSITION_PRECEDING) {
                 const {activeItem} = targetTree;
                 if (activeItem) {
