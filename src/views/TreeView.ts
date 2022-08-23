@@ -1,3 +1,5 @@
+import { HTMLEMenuElement } from "../elements/containers/menus/Menu";
+import { HTMLEToolBarElement } from "../elements/containers/toolbars/ToolBar";
 import { HTMLETreeElement } from "../elements/containers/trees/Tree";
 import { HTMLETreeItemElement } from "../elements/containers/trees/TreeItem";
 import { AttributeProperty, CustomElement, element, fragment, reactiveChildElements, reactiveElement } from "../elements/Element";
@@ -191,7 +193,6 @@ class TreeItemModel extends ModelObject {
 interface TreeViewConstructor {
     prototype: TreeView;
     new(): TreeView;
-    new(model: TreeModel): TreeView;
 }
 
 interface TreeView extends View {
@@ -203,7 +204,8 @@ interface TreeView extends View {
     get treeElement(): HTMLETreeElement;
     treeItemElement(item: TreeItemModel): HTMLETreeItemElement;
     itemContentDelegate: <Item extends TreeItemModel>(this: TreeView, item: Item) => string | Node;
-    itemContextMenuDelegate: (this: TreeView) => string | Node;
+    itemToolbarDelegate: <Item extends TreeItemModel>(this: TreeView, item: Item) => HTMLEToolBarElement | null;
+    itemMenuDelegate: (this: TreeView) => HTMLEMenuElement | null;
 }
 
 declare global {
@@ -225,11 +227,10 @@ class TreeViewBase extends View implements TreeView {
     draggable!: boolean;
 
     itemContentDelegate: <Item extends TreeItemModel>(this: TreeView, item: Item) => string | Node;
-    itemContextMenuDelegate: (this: TreeView) => string | Node;
+    itemToolbarDelegate: <Item extends TreeItemModel>(this: TreeView, item: Item) => HTMLEToolBarElement | null;
+    itemMenuDelegate: (this: TreeView) => HTMLEMenuElement | null;
     
-    constructor()
-    constructor(model: TreeModel)
-    constructor(model?: TreeModel) {
+    constructor() {
         super();
         this.attachShadow({mode: "open"});
         this.#dragImages = new WeakMap();
@@ -243,33 +244,13 @@ class TreeViewBase extends View implements TreeView {
                 }
             );
         };
-        this.itemContextMenuDelegate = function(this: TreeView) {
-            const {treeElement} = this;
-            const selectedItems = this.selectedItems();
-            return fragment(
-                element("e-menuitemgroup", {
-                    children: [
-                        element("e-menuitem", {
-                            attributes: {
-                                label: "Delete"
-                            },
-                            listeners: {
-                                click: () => {
-                                    const itemModelList = new TreeItemModelList(selectedItems);
-                                    const {count} = itemModelList;
-                                    const doRemove = confirm(`Remove ${count} items?`);
-                                    if (doRemove) {
-                                        itemModelList.remove();
-                                    }
-                                    treeElement.focus();
-                                }
-                            }
-                        })
-                    ]
-                })
-            );
+        this.itemMenuDelegate = function(this: TreeView) {
+            return null;
         };
-        this.setModel(model ?? new TreeModel());
+        this.itemToolbarDelegate = function(this: TreeView) {
+            return null;
+        };
+        //this.setModel(model ?? new TreeModel());
     }
 
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
@@ -304,7 +285,6 @@ class TreeViewBase extends View implements TreeView {
                 dragstart: <EventListener>this.#handleDragStartEvent.bind(this),
                 drop: <EventListener>this.#handleDropEvent.bind(this),
                 contextmenu: <EventListener>this.#handleContextMenuEvent.bind(this),
-                keydown: <EventListener>this.#handleKeyDownEvent.bind(this),
                 focus: <EventListener>this.#handleFocusEvent.bind(this),
                 focusin: <EventListener>this.#handleFocusInEvent.bind(this),
                 focusout: <EventListener>this.#handleFocusOutEvent.bind(this),
@@ -358,6 +338,8 @@ class TreeViewBase extends View implements TreeView {
     #renderTreeItem(item: TreeItemModel): HTMLETreeItemElement {
         const {draggable} = this;
         const {type, index, level, uri} = item;
+        const toolbar = this.itemToolbarDelegate(item);
+        const content = this.itemContentDelegate(item);
         const treeItemElement = reactiveElement(
             item,
             element("e-treeitem", {
@@ -371,19 +353,19 @@ class TreeViewBase extends View implements TreeView {
                     uri: uri
                 },
                 children: [
-                        this.itemContentDelegate(item)
-                    ].concat(
-                        (type === "parent") ? [
-                            element("e-treeitemgroup", {
-                                attributes: {
-                                    slot: "group"
-                                },
-                                children: reactiveChildElements(item.childItems,
-                                    item => this.#renderTreeItem(item)
-                                )
-                            })
-                        ] : []
-                    )
+                    ...(content ? [content] : []),
+                    ...(toolbar ? [toolbar] : []),
+                    ...(type === "parent") ? [
+                        element("e-treeitemgroup", {
+                            attributes: {
+                                slot: "group"
+                            },
+                            children: reactiveChildElements(item.childItems,
+                                item => this.#renderTreeItem(item)
+                            )
+                        })
+                    ] : []
+                ]
             }),
             ["index"],
             (treeitem, propertyName, oldValue, newValue) => {
@@ -507,20 +489,16 @@ class TreeViewBase extends View implements TreeView {
         const targetTree = <HTMLETreeElement>currentTarget;
         const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
         if (targetItem) {
-            const contextMenu = element("e-menu", {
-                attributes: {
-                    contextual: true
-                },
-                children: this.itemContextMenuDelegate(),
-                listeners: {
-                    close: () => {
-                        targetItem.focus({preventScroll: true});
-                    }
-                }
-            });
-            targetTree.append(contextMenu);
-            contextMenu.positionContextual(clientX, clientY);
-            contextMenu.focus({preventScroll: true});
+            const contextMenu = this.itemMenuDelegate();
+            if (contextMenu !== null) {
+                contextMenu.contextual = true;
+                contextMenu.addEventListener("close", () => {
+                    targetItem.focus({preventScroll: true});
+                });
+                targetTree.append(contextMenu);
+                contextMenu.positionContextual(clientX, clientY);
+                contextMenu.focus({preventScroll: true});
+            }
         }
         event.preventDefault();
     }
@@ -561,29 +539,6 @@ class TreeViewBase extends View implements TreeView {
             const toolbar = targetItem.querySelector("e-toolbar");
             if (toolbar) {
                 toolbar.tabIndex = toolbar.contains(<Node | null>target) ? 0 : -1;
-            }
-        }
-    }
-
-    #handleKeyDownEvent(event: KeyboardEvent) {
-        const {currentTarget, target, key} = event;
-        const targetTree = <HTMLETreeElement>currentTarget;
-        const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
-        const selectedItems = this.selectedItems();
-        const {model} = this;
-        const targetItemModel = model.getItemByUri(targetItem.dataset.uri!)!;
-        switch (key) {
-            case "Delete": {
-                const selectedItemsList = selectedItems.includes(targetItemModel) ?
-                    new TreeItemModelList(selectedItems) : new TreeItemModelList([targetItemModel]);
-                const {count} = selectedItemsList;
-                const doRemove = confirm(`Remove ${count} items?`);
-                if (doRemove) {
-                    selectedItemsList.remove();
-                }
-                targetTree.focus();
-                event.preventDefault();
-                break;
             }
         }
     }

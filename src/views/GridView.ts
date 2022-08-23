@@ -188,7 +188,7 @@ class GridViewBase extends View implements GridView {
         switch (name) {
             case "resizable":
             case "sortable": {
-                this.refresh();
+                this.render();
                 break;
             }
         }

@@ -1,6 +1,8 @@
 import { EMenuItem } from "./src/elements/containers/menus/MenuItem";
 import { HTMLEToolBarItemElement } from "./src/elements/containers/toolbars/ToolBarItem";
-import { element, fragment, reactiveElement } from "./src/elements/Element";
+import { HTMLETreeElement } from "./src/elements/containers/trees/Tree";
+import { HTMLETreeItemElement } from "./src/elements/containers/trees/TreeItem";
+import { CustomElement, element, fragment, reactiveElement } from "./src/elements/Element";
 import { ModelEvent, ModelProperty } from "./src/models/Model";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
 import { MenuItemModel, MenuModel, MenuView } from "./src/views/MenuView";
@@ -196,7 +198,43 @@ export async function TreeMain() {
             })
         )
     );
-    const treeView = new TreeView(treeModel);
+
+    @CustomElement({
+        name: "e-mytreeview"
+    })
+    class MyTreeView extends TreeView {
+
+        render(): void {
+            super.render();
+            const {treeElement} = this;
+            treeElement.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
+        }
+
+        #handleKeyDownEvent(event: KeyboardEvent) {
+            const {currentTarget, target, key} = event;
+            const targetTree = <HTMLETreeElement>currentTarget;
+            const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
+            const selectedItems = this.selectedItems();
+            const {model} = this;
+            const targetItemModel = model.getItemByUri(targetItem.dataset.uri!)!;
+            switch (key) {
+                case "Delete": {
+                    const selectedItemsList = selectedItems.includes(targetItemModel) ?
+                        new TreeItemModelList(selectedItems) : new TreeItemModelList([targetItemModel]);
+                    const {count} = selectedItemsList;
+                    const doRemove = confirm(`Remove ${count} items?`);
+                    if (doRemove) {
+                        selectedItemsList.remove();
+                    }
+                    targetTree.focus();
+                    event.preventDefault();
+                    break;
+                }
+            }
+        }
+    };
+    const treeView = new MyTreeView();
+    treeView.setModel(treeModel);
     treeView.itemContentDelegate = <typeof treeView.itemContentDelegate>(
         function(this: TreeView, item: MyTreeItemModel) {
             return fragment(
@@ -228,134 +266,140 @@ export async function TreeMain() {
                             }
                         )
                     ] : []
-                ).concat([
-                    reactiveElement(
-                        item,
-                        element("e-toolbar", {
-                            children: [
-                                element("e-toolbaritem", {
-                                    attributes: {
-                                        name: "visibility",
-                                        type: "checkbox",
-                                        label: "Visibility"
-                                    },
-                                    listeners: {
-                                        click: () => {
-                                            item.visibility ?
-                                                item.hide() :
-                                                item.show();
-                                        }
-                                    }
-                                })
-                            ]
-                        }),
-                        ["visibility"],
-                        (toolbar, property, oldValue, newValue) => {
-                            switch (property) {
-                                case "visibility": {
-                                    const visibilityItem = toolbar
-                                        .querySelector<HTMLEToolBarItemElement>("e-toolbaritem[name=visibility]");
-                                    if (visibilityItem) {
-                                        const label = newValue ? "Hide" : "Show";
-                                        visibilityItem.label = label;
-                                        visibilityItem.title = label;
-                                        visibilityItem.pressed = newValue;
-                                    }
-                                }
-                            }
-                        }
-                    )
-                ])
+                )
             );
         }
     );
-    treeView.itemContextMenuDelegate = (
+    treeView.itemToolbarDelegate = <typeof treeView.itemToolbarDelegate>(function(this: TreeView, item: MyTreeItemModel) {
+        return reactiveElement(
+            item,
+            element("e-toolbar", {
+                children: [
+                    element("e-toolbaritem", {
+                        attributes: {
+                            name: "visibility",
+                            type: "checkbox",
+                            label: "Visibility"
+                        },
+                        listeners: {
+                            click: () => {
+                                item.visibility ?
+                                    item.hide() :
+                                    item.show();
+                            }
+                        }
+                    })
+                ]
+            }),
+            ["visibility"],
+            (toolbar, property, oldValue, newValue) => {
+                switch (property) {
+                    case "visibility": {
+                        const visibilityItem = toolbar
+                            .querySelector<HTMLEToolBarItemElement>("e-toolbaritem[name=visibility]");
+                        if (visibilityItem) {
+                            const label = newValue ? "Hide" : "Show";
+                            visibilityItem.label = label;
+                            visibilityItem.title = label;
+                            visibilityItem.pressed = newValue;
+                        }
+                    }
+                }
+            }
+        )
+    });
+    treeView.itemMenuDelegate = (
         function(this: TreeView) {
             const {treeElement} = this;
             const {activeItem: activeItemElement} = treeElement;
             const selectedItems = <MyTreeItemModel[]>this.selectedItems();
             const activeItem = <MyTreeItemModel>this.activeItem();
-            return fragment(
-                element("e-menuitemgroup", {
-                    children: [
-                        element("e-menuitem", {
-                            attributes: {
-                                label: "Display"
-                            },
-                            children: "Display",
-                            listeners: {
-                                click: () => {
-                                    const selectedItemsList = selectedItems.includes(activeItem) ?
-                                        new MyTreeItemModelList(selectedItems) : new MyTreeItemModelList([activeItem]);
-                                        selectedItemsList.display();
-                                    activeItemElement!.focus();
-                                }
-                            }
-                        }),
-                        element("e-menuitem", {
-                            attributes: {
-                                type: "checkbox",
-                                label: activeItem.visibility ? "Hide" : "Show"
-                            },
-                            children: activeItem.visibility ? "Hide" : "Show",
-                            listeners: {
-                                click: () => {
-                                    const selectedItemsList = selectedItems.includes(activeItem) ?
-                                        new MyTreeItemModelList(selectedItems) : new MyTreeItemModelList([activeItem]);
-                                    activeItem.visibility ?
-                                        selectedItemsList.hide() :
-                                        selectedItemsList.show();
-                                    activeItemElement!.focus();
-                                }
-                            }
-                        })
-                    ]
-                }),
-                element("e-separator"),
-                element("e-menuitemgroup", {
-                    children: [
-                        element("e-menuitem", {
-                            attributes: {
-                                label: "Delete"
-                            },
-                            children: "Delete",
-                            listeners: {
-                                click: () => {
-                                    const selectedItemsList = selectedItems.includes(activeItem) ?
-                                        new MyTreeItemModelList(selectedItems) : new MyTreeItemModelList([activeItem]);
-                                    const {count} = selectedItemsList;
-                                    const doRemove = confirm(`Remove ${count} items?`);
-                                    if (doRemove) {
-                                        selectedItemsList.remove();
+            return element("e-menu", {
+                attributes: {
+                    contextual: true
+                },
+                children: [
+                    element("e-menuitemgroup", {
+                        children: [
+                            element("e-menuitem", {
+                                attributes: {
+                                    label: "Display"
+                                },
+                                children: "Display",
+                                listeners: {
+                                    click: () => {
+                                        const selectedItemsList = selectedItems.includes(activeItem) ?
+                                            new MyTreeItemModelList(selectedItems) : new MyTreeItemModelList([activeItem]);
+                                            selectedItemsList.display();
+                                        activeItemElement!.focus();
                                     }
-                                    treeElement.focus();
                                 }
-                            }
-                        })
-                    ]
-                }),
-                element("e-separator"),
-                element("e-menuitemgroup", {
-                    children: [
-                        element("e-menuitem", {
-                            attributes: {
-                                type: "button",
-                                label: "Click me!"
-                            },
-                            children: "Click me!",
-                            listeners: {
-                                click: () => {
-                                    activeItem.display();
-                                    activeItemElement!.focus();
+                            }),
+                            element("e-menuitem", {
+                                attributes: {
+                                    type: "checkbox",
+                                    label: activeItem.visibility ? "Hide" : "Show"
+                                },
+                                children: activeItem.visibility ? "Hide" : "Show",
+                                listeners: {
+                                    click: () => {
+                                        const selectedItemsList = selectedItems.includes(activeItem) ?
+                                            new MyTreeItemModelList(selectedItems) : new MyTreeItemModelList([activeItem]);
+                                        activeItem.visibility ?
+                                            selectedItemsList.hide() :
+                                            selectedItemsList.show();
+                                        activeItemElement!.focus();
+                                    }
                                 }
-                            }
-                        })
-                    ]
-                })
-            )
+                            })
+                        ]
+                    }),
+                    element("e-separator"),
+                    element("e-menuitemgroup", {
+                        children: [
+                            element("e-menuitem", {
+                                attributes: {
+                                    label: "Delete"
+                                },
+                                children: "Delete",
+                                listeners: {
+                                    click: () => {
+                                        const selectedItemsList = selectedItems.includes(activeItem) ?
+                                            new MyTreeItemModelList(selectedItems) : new MyTreeItemModelList([activeItem]);
+                                        const {count} = selectedItemsList;
+                                        const doRemove = confirm(`Remove ${count} items?`);
+                                        if (doRemove) {
+                                            selectedItemsList.remove();
+                                        }
+                                        treeElement.focus();
+                                    }
+                                }
+                            })
+                        ]
+                    }),
+                    element("e-separator"),
+                    element("e-menuitemgroup", {
+                        children: [
+                            element("e-menuitem", {
+                                attributes: {
+                                    type: "button",
+                                    label: "Click me!"
+                                },
+                                children: "Click me!",
+                                listeners: {
+                                    click: () => {
+                                        activeItem.display();
+                                        activeItemElement!.focus();
+                                    }
+                                }
+                            })
+                        ]
+                    })
+                ]
+            });
         }
     );
-    treeView.refresh();
+    treeView.render();
     document.body.append(treeView);
 
     document.body.append(

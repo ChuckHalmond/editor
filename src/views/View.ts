@@ -7,7 +7,7 @@ interface View extends HTMLElement {
     setModel(model: ModelObject): void;
     renderShadow(): Node | undefined;
     renderLight(): Node | undefined;
-    refresh(): void;
+    render(): void;
 }
 
 interface ViewConstructor {
@@ -30,7 +30,7 @@ class ViewBase extends HTMLElement implements View {
     setModel(model: ModelObject): void {
         if (model !== this.#model) {
             this.#model = model;
-            this.#render();
+            this.render();
         }
     }
 
@@ -42,11 +42,7 @@ class ViewBase extends HTMLElement implements View {
         return;
     }
 
-    refresh(): void {
-        this.#render();
-    }
-
-    #render(): void {
+    render(): void {
         const {shadowRoot} = this;
         if (shadowRoot !== null) {
             const shadow = this.renderShadow();

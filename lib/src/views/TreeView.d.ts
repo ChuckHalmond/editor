@@ -1,3 +1,5 @@
+import { HTMLEMenuElement } from "../elements/containers/menus/Menu";
+import { HTMLEToolBarElement } from "../elements/containers/toolbars/ToolBar";
 import { HTMLETreeElement } from "../elements/containers/trees/Tree";
 import { HTMLETreeItemElement } from "../elements/containers/trees/TreeItem";
 import { ModelList, ModelObject } from "../models/Model";
@@ -45,7 +47,6 @@ declare class TreeItemModel extends ModelObject {
 interface TreeViewConstructor {
     prototype: TreeView;
     new (): TreeView;
-    new (model: TreeModel): TreeView;
 }
 interface TreeView extends View {
     readonly shadowRoot: ShadowRoot;
@@ -56,7 +57,8 @@ interface TreeView extends View {
     get treeElement(): HTMLETreeElement;
     treeItemElement(item: TreeItemModel): HTMLETreeItemElement;
     itemContentDelegate: <Item extends TreeItemModel>(this: TreeView, item: Item) => string | Node;
-    itemContextMenuDelegate: (this: TreeView) => string | Node;
+    itemToolbarDelegate: <Item extends TreeItemModel>(this: TreeView, item: Item) => HTMLEToolBarElement | null;
+    itemMenuDelegate: (this: TreeView) => HTMLEMenuElement | null;
 }
 declare global {
     interface HTMLElementTagNameMap {

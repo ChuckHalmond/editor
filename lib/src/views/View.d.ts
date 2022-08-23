@@ -5,7 +5,7 @@ interface View extends HTMLElement {
     setModel(model: ModelObject): void;
     renderShadow(): Node | undefined;
     renderLight(): Node | undefined;
-    refresh(): void;
+    render(): void;
 }
 interface ViewConstructor {
     prototype: View;
