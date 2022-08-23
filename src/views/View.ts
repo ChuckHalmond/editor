@@ -30,7 +30,6 @@ class ViewBase extends HTMLElement implements View {
     setModel(model: ModelObject): void {
         if (model !== this.#model) {
             this.#model = model;
-            this.render();
         }
     }
 

@@ -193,6 +193,7 @@ class TreeItemModel extends ModelObject {
 interface TreeViewConstructor {
     prototype: TreeView;
     new(): TreeView;
+    new(model: TreeModel): TreeView;
 }
 
 interface TreeView extends View {
@@ -203,9 +204,9 @@ interface TreeView extends View {
     activeItem(): TreeItemModel | null;
     get treeElement(): HTMLETreeElement;
     treeItemElement(item: TreeItemModel): HTMLETreeItemElement;
-    itemContentDelegate: <Item extends TreeItemModel>(this: TreeView, item: Item) => string | Node;
-    itemToolbarDelegate: <Item extends TreeItemModel>(this: TreeView, item: Item) => HTMLEToolBarElement | null;
-    itemMenuDelegate: (this: TreeView) => HTMLEMenuElement | null;
+    itemContentDelegate/*<Item extends TreeItemModel>*/(this: TreeView, item: TreeItemModel): string | Node;
+    itemToolbarDelegate/*<Item extends TreeItemModel>*/(this: TreeView, item: TreeItemModel): HTMLEToolBarElement | null;
+    itemMenuDelegate(this: TreeView): HTMLEMenuElement | null;
 }
 
 declare global {
@@ -225,32 +226,14 @@ class TreeViewBase extends View implements TreeView {
 
     @AttributeProperty({type: Boolean, observed: true})
     draggable!: boolean;
-
-    itemContentDelegate: <Item extends TreeItemModel>(this: TreeView, item: Item) => string | Node;
-    itemToolbarDelegate: <Item extends TreeItemModel>(this: TreeView, item: Item) => HTMLEToolBarElement | null;
-    itemMenuDelegate: (this: TreeView) => HTMLEMenuElement | null;
     
-    constructor() {
+    constructor()
+    constructor(model: TreeModel)
+    constructor(model?: TreeModel) {
         super();
         this.attachShadow({mode: "open"});
         this.#dragImages = new WeakMap();
-        this.itemContentDelegate = function(this: TreeView, item: TreeItemModel) {
-            return reactiveElement(
-                item,
-                element("span"),
-                ["label"],
-                (label, property, oldValue, newValue) => {
-                    label.textContent = newValue;
-                }
-            );
-        };
-        this.itemMenuDelegate = function(this: TreeView) {
-            return null;
-        };
-        this.itemToolbarDelegate = function(this: TreeView) {
-            return null;
-        };
-        //this.setModel(model ?? new TreeModel());
+        this.setModel(model ?? new TreeModel());
     }
 
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
@@ -314,6 +297,25 @@ class TreeViewBase extends View implements TreeView {
                 )
             })
         );
+    }
+
+    itemContentDelegate(item: TreeItemModel): string | Node {
+        return reactiveElement(
+            item,
+            element("span"),
+            ["name"],
+            (label, property, oldValue, newValue) => {
+                label.textContent = newValue;
+            }
+        );
+    }
+
+    itemToolbarDelegate(item: TreeItemModel): HTMLEToolBarElement | null {
+        return null;
+    }
+    
+    itemMenuDelegate(this: TreeView): HTMLEMenuElement | null {
+        return null;
     }
 
     selectedItems(): TreeItemModel[] {

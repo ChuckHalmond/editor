@@ -47,6 +47,7 @@ declare class TreeItemModel extends ModelObject {
 interface TreeViewConstructor {
     prototype: TreeView;
     new (): TreeView;
+    new (model: TreeModel): TreeView;
 }
 interface TreeView extends View {
     readonly shadowRoot: ShadowRoot;
@@ -56,9 +57,9 @@ interface TreeView extends View {
     activeItem(): TreeItemModel | null;
     get treeElement(): HTMLETreeElement;
     treeItemElement(item: TreeItemModel): HTMLETreeItemElement;
-    itemContentDelegate: <Item extends TreeItemModel>(this: TreeView, item: Item) => string | Node;
-    itemToolbarDelegate: <Item extends TreeItemModel>(this: TreeView, item: Item) => HTMLEToolBarElement | null;
-    itemMenuDelegate: (this: TreeView) => HTMLEMenuElement | null;
+    itemContentDelegate(this: TreeView, item: TreeItemModel): string | Node;
+    itemToolbarDelegate(this: TreeView, item: TreeItemModel): HTMLEToolBarElement | null;
+    itemMenuDelegate(this: TreeView): HTMLEMenuElement | null;
 }
 declare global {
     interface HTMLElementTagNameMap {
