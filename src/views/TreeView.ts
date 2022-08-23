@@ -371,7 +371,7 @@ class TreeViewBase extends View implements TreeView {
                     uri: uri
                 },
                 children: [
-                    this.itemContentDelegate(item),
+                        this.itemContentDelegate(item)
                     ].concat(
                         (type === "parent") ? [
                             element("e-treeitemgroup", {

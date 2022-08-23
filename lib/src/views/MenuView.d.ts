@@ -3,26 +3,27 @@ import { View } from "./View";
 export { MenuModel };
 export { MenuItemModel };
 export { MenuView };
+interface MenuInit {
+    name?: string;
+    items: MenuItemModel[];
+}
 declare class MenuModel extends ModelObject {
     readonly items: ModelList<MenuItemModel>;
     name?: string;
-    constructor();
-    constructor(init: {
-        name?: string;
-        items?: MenuItemModel[];
-    });
+    constructor(init: MenuInit);
+}
+interface MenuItemInit {
+    label: string;
+    name?: string;
+    type?: "button" | "radio" | "checkbox" | "menu" | "submenu";
+    menu?: MenuModel;
 }
 declare class MenuItemModel extends ModelObject {
-    name: string;
+    name?: string;
     label: string;
-    type: "button" | "radio" | "checkbox" | "menu" | "submenu";
+    type?: "button" | "radio" | "checkbox" | "menu" | "submenu";
     menu?: MenuModel;
-    constructor(init: {
-        name: string;
-        label: string;
-        type: "button" | "radio" | "checkbox" | "menu" | "submenu";
-        menu?: MenuModel;
-    });
+    constructor(init: MenuItemInit);
 }
 interface MenuViewConstructor {
     prototype: MenuView;

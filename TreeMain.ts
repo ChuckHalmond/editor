@@ -3,6 +3,7 @@ import { HTMLEToolBarItemElement } from "./src/elements/containers/toolbars/Tool
 import { element, fragment, reactiveElement } from "./src/elements/Element";
 import { ModelEvent, ModelProperty } from "./src/models/Model";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
+import { MenuItemModel, MenuModel, MenuView } from "./src/views/MenuView";
 import { TreeItemModelList, TreeItemModel, TreeModel, TreeView } from "./src/views/TreeView";
 import { widget } from "./src/views/widgets/Widget";
 
@@ -183,6 +184,18 @@ export async function TreeMain() {
         }*/
     });
     (<any>window)["model"] = treeModel;
+    document.body.append(
+        new MenuView(
+            new MenuModel({
+                items: [
+                    new MenuItemModel({
+                        label: "Menuitem 1",
+                        type: "checkbox"
+                    })
+                ]
+            })
+        )
+    );
     const treeView = new TreeView(treeModel);
     treeView.itemContentDelegate = <typeof treeView.itemContentDelegate>(
         function(this: TreeView, item: MyTreeItemModel) {
@@ -281,6 +294,28 @@ export async function TreeMain() {
                         }),
                         element("e-menuitem", {
                             attributes: {
+                                type: "checkbox",
+                                label: activeItem.visibility ? "Hide" : "Show"
+                            },
+                            children: activeItem.visibility ? "Hide" : "Show",
+                            listeners: {
+                                click: () => {
+                                    const selectedItemsList = selectedItems.includes(activeItem) ?
+                                        new MyTreeItemModelList(selectedItems) : new MyTreeItemModelList([activeItem]);
+                                    activeItem.visibility ?
+                                        selectedItemsList.hide() :
+                                        selectedItemsList.show();
+                                    activeItemElement!.focus();
+                                }
+                            }
+                        })
+                    ]
+                }),
+                element("e-separator"),
+                element("e-menuitemgroup", {
+                    children: [
+                        element("e-menuitem", {
+                            attributes: {
                                 label: "Delete"
                             },
                             children: "Delete",
@@ -294,28 +329,6 @@ export async function TreeMain() {
                                         selectedItemsList.remove();
                                     }
                                     treeElement.focus();
-                                }
-                            }
-                        })
-                    ]
-                }),
-                element("e-separator"),
-                element("e-menuitemgroup", {
-                    children: [
-                        element("e-menuitem", {
-                            attributes: {
-                                type: "checkbox",
-                                label: activeItem.visibility ? "Hide" : "Show"
-                            },
-                            children: activeItem.visibility ? "Hide" : "Show",
-                            listeners: {
-                                click: () => {
-                                    const selectedItemsList = selectedItems.includes(activeItem) ?
-                                        new MyTreeItemModelList(selectedItems) : new MyTreeItemModelList([activeItem]);
-                                    activeItem.visibility ?
-                                        selectedItemsList.hide() :
-                                        selectedItemsList.show();
-                                    activeItemElement!.focus();
                                 }
                             }
                         })

@@ -1,43 +1,51 @@
-import { CustomElement, reactiveChildElements, reactiveElement } from "../elements/Element";
+import { HTMLEMenuItemElement } from "../elements/containers/menus/MenuItem";
+import { CustomElement, element, reactiveChildElements, reactiveElement } from "../elements/Element";
 import { ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { View } from "./View";
-import { menuItemWidget } from "./widgets/menu/MenuItemWidget";
-import { widget } from "./widgets/Widget";
 
 export { MenuModel };
 export { MenuItemModel };
 export { MenuView };
 
+interface MenuInit {
+    name?: string;
+    items: MenuItemModel[];
+}
+
 class MenuModel extends ModelObject {
-    @ModelProperty()
     readonly items: ModelList<MenuItemModel>;
     
     @ModelProperty()
     name?: string;
     
-    constructor()
-    constructor(init: {name?: string, items?: MenuItemModel[]})
-    constructor(init?: {name?: string, items?: MenuItemModel[]}) {
+    constructor(init: MenuInit) {
         super();
         this.name = init?.name;
-        this.items = new ModelList(init?.items ?? [])
+        this.items = new ModelList(init?.items ?? []);
     }
+}
+
+interface MenuItemInit {
+    label: string;
+    name?: string;
+    type?: "button" | "radio" | "checkbox" | "menu" | "submenu";
+    menu?: MenuModel;
 }
 
 class MenuItemModel extends ModelObject {
     @ModelProperty()
-    name: string;
+    name?: string;
 
     @ModelProperty()
     label: string;
 
     @ModelProperty()
-    type: "button" | "radio" | "checkbox" | "menu" | "submenu";
+    type?: "button" | "radio" | "checkbox" | "menu" | "submenu";
 
     @ModelProperty()
     menu?: MenuModel;
     
-    constructor(init: {name: string, label: string, type: "button" | "radio" | "checkbox" | "menu" | "submenu"; menu?: MenuModel;}) {
+    constructor(init: MenuItemInit) {
         super();
         const {name, label, type, menu} = init;
         this.name = name;
@@ -73,7 +81,9 @@ class MenuViewBase extends View {
     constructor(model: MenuModel)
     constructor(model?: MenuModel) {
         super();
-        this.setModel(model ?? new MenuModel());
+        this.setModel(model ?? new MenuModel({
+            items: []
+        }));
     }
 
     renderLight() {
@@ -82,34 +92,35 @@ class MenuViewBase extends View {
     }
 
     #renderMenu(menu: MenuModel) {
-        return widget("menu", {
-            properties: {
-                
-            },
-            slotted: reactiveChildElements(
+        return element("e-menu", {
+            children: reactiveChildElements(
                 menu.items,
                 item_i => this.#renderMenuItem(item_i)
             )
         });
     }
 
-    #renderMenuItem(item: MenuItemModel): Element {
-        const {type, menu} = item;
+    #renderMenuItem(item: MenuItemModel): HTMLEMenuItemElement {
+        const {label, type, menu} = item;
         return reactiveElement(
             item,
-            widget("menuitem", {
-                properties: {
+            element("e-menuitem", {
+                attributes: {
                     type: type
                 },
-                slotted: menu !== undefined ? [
-                    this.#renderMenu(menu)
-                ] : []
+                children: [
+                    <string | Node>label
+                ].concat(
+                    (menu !== undefined) ? [
+                        this.#renderMenu(menu)
+                    ] : []
+                )
             }),
             ["label", "name"],
             (menuitem, property, oldValue, newValue) => {
                 switch (property) {
                     case "label": {
-                        menuItemWidget.setLabel(menuitem, newValue);
+                        menuitem.label = newValue;
                         break;
                     }
                 }
