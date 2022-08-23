@@ -437,7 +437,9 @@ function reactiveElement<M extends ModelNode, E extends Element>(
         observerOptions.propertiesFilter = propertiesFilter ?
             propertiesFilter.concat(properties.filter(
                 property_i => !propertiesFilter.includes(property_i)
-            )) : Array.from(new Set(properties));
+            )) : properties.filter(
+                (property_i, i, properties) => properties.indexOf(property_i) === i
+            )
     }
     properties.forEach((property_i) => {
         if (property_i in model) {

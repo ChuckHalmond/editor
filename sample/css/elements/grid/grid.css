@@ -35,6 +35,11 @@ e-grid e-gridheader:hover {
     background-color: var(--hovered-item-color);
 }
 
+e-gridcell[type="columnheader"][active] {
+    outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;
+}
+
 e-grid:focus-within:is(:not([selectby]), [selectby]) e-gridcell[active],
 e-grid:focus-within:is([selectby="row"]) e-gridrow[active] {
     outline: 1px solid var(--focused-item-outline-color);

@@ -11,13 +11,18 @@ export { GridRowModel };
 export { GridColumnModel };
 export { GridView };
 
+interface GridInit {
+    rows: GridRowModel[];
+    columns: GridColumnModel[];
+}
+
 class GridModel extends ModelObject {
     readonly rows: ModelList<GridRowModel>;
     readonly columns: ModelList<GridColumnModel>;
 
     constructor()
-    constructor(init: {rows: GridRowModel[], columns: GridColumnModel[]})
-    constructor(init?: {rows: GridRowModel[], columns: GridColumnModel[]}) {
+    constructor(init: GridInit)
+    constructor(init?: GridInit) {
         super();
         const {rows: initRows = [], columns: initColumns = []} = init ?? {};
         const rows = new ModelList(initRows);
@@ -61,32 +66,30 @@ class GridModel extends ModelObject {
     }
 }
 
-type Constructor = {
-    new(...args: any): any;
-    prototype: any;
-}
 
 type GridRowFilter = {
     filter: (row: GridRowModel) => boolean;
 }
 
-class GridColumnModel<T extends Constructor = Constructor> extends ModelObject {
+interface GridColumnInit {
+    name: string,
+    type: NumberConstructor | StringConstructor | DateConstructor,
+    label: string,
+    extract: (row: GridRowModel) => string,
+    filters?: (GridRowFilter & {name: string})[]
+}
+
+class GridColumnModel extends ModelObject {
     readonly name: string
     readonly type: NumberConstructor | StringConstructor | DateConstructor;
     readonly label: string;
-    readonly extract: (row: GridRowModel) => InstanceType<T>;
+    readonly extract: (row: GridRowModel) => string;
     readonly filters: (GridRowFilter & {name: string})[];
 
     @ModelProperty()
     sortorder: number | undefined;
 
-    constructor(init: {
-        name: string,
-        type: NumberConstructor | StringConstructor | DateConstructor,
-        label: string,
-        extract: (row: GridRowModel) => InstanceType<T>,
-        filters?: (GridRowFilter & {name: string})[]
-    }) {
+    constructor(init: GridColumnInit) {
         super();
         const {name, type, label, extract, filters = []} = init;
         this.name = name;
@@ -408,6 +411,7 @@ class GridViewBase extends View implements GridView {
 
     #handleHeadContextMenuEvent(event: MouseEvent): void {
         const {clientX, clientY, currentTarget, target} = event;
+        const {gridElement} = this;
         const targetHead = <HTMLElement>currentTarget;
         const targetHeader = <HTMLEGridCellElement>(<HTMLElement>target).closest("e-gridcell");
         const {model} = this;
@@ -436,6 +440,7 @@ class GridViewBase extends View implements GridView {
                                     );
                                     style.setProperty("width", `${maxWidth}px`);
                                 }
+                                gridElement.focus();
                             }
                         }
                     }),
@@ -451,6 +456,7 @@ class GridViewBase extends View implements GridView {
                                     const {style} = columnHeaderElement;
                                     style.removeProperty("width");
                                 }
+                                gridElement.focus();
                             }
                         }
                     }),
@@ -492,6 +498,7 @@ class GridViewBase extends View implements GridView {
                                         if (targetItem) {
                                             model.sortByColumn(column, Number(targetItem.value));
                                         }
+                                        gridElement.focus();
                                     }
                                 }
                             })
@@ -527,6 +534,7 @@ class GridViewBase extends View implements GridView {
                                                 else {
                                                     this.removeDisplayFilter(filter_i);
                                                 }
+                                                gridElement.focus();
                                             }
                                         }
                                     })

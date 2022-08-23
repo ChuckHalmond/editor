@@ -488,7 +488,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
     #handleFocusEvent(event: FocusEvent): void {
         const {relatedTarget} = event;
         const {activeItem} = this;
-        if (!this.contains(<Node>relatedTarget)) {
+        if (!this.contains(<Node | null>relatedTarget)) {
             (activeItem ?? this.firstItem())?.focus();
         }
     }
@@ -504,7 +504,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
 
     #handleFocusOutEvent(event: FocusEvent): void {
         const {relatedTarget} = event;
-        const lostFocusWithin = !this.contains(<Node>relatedTarget);
+        const lostFocusWithin = !this.contains(<Node | null>relatedTarget);
         if (lostFocusWithin) {
             this.tabIndex = 0;
         }

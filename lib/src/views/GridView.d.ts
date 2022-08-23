@@ -4,42 +4,40 @@ export { GridModel };
 export { GridRowModel };
 export { GridColumnModel };
 export { GridView };
+interface GridInit {
+    rows: GridRowModel[];
+    columns: GridColumnModel[];
+}
 declare class GridModel extends ModelObject {
     readonly rows: ModelList<GridRowModel>;
     readonly columns: ModelList<GridColumnModel>;
     constructor();
-    constructor(init: {
-        rows: GridRowModel[];
-        columns: GridColumnModel[];
-    });
+    constructor(init: GridInit);
     getColumnByName(name: string): GridColumnModel | null;
     sortByColumn(column: GridColumnModel, sortOrder: number): void;
 }
-declare type Constructor = {
-    new (...args: any): any;
-    prototype: any;
-};
 declare type GridRowFilter = {
     filter: (row: GridRowModel) => boolean;
 };
-declare class GridColumnModel<T extends Constructor = Constructor> extends ModelObject {
+interface GridColumnInit {
+    name: string;
+    type: NumberConstructor | StringConstructor | DateConstructor;
+    label: string;
+    extract: (row: GridRowModel) => string;
+    filters?: (GridRowFilter & {
+        name: string;
+    })[];
+}
+declare class GridColumnModel extends ModelObject {
     readonly name: string;
     readonly type: NumberConstructor | StringConstructor | DateConstructor;
     readonly label: string;
-    readonly extract: (row: GridRowModel) => InstanceType<T>;
+    readonly extract: (row: GridRowModel) => string;
     readonly filters: (GridRowFilter & {
         name: string;
     })[];
     sortorder: number | undefined;
-    constructor(init: {
-        name: string;
-        type: NumberConstructor | StringConstructor | DateConstructor;
-        label: string;
-        extract: (row: GridRowModel) => InstanceType<T>;
-        filters?: (GridRowFilter & {
-            name: string;
-        })[];
-    });
+    constructor(init: GridColumnInit);
 }
 declare class GridRowModel extends ModelObject {
     id: number;

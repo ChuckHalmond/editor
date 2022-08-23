@@ -2,24 +2,25 @@ import { HTMLETreeElement } from "../elements/containers/trees/Tree";
 import { HTMLETreeItemElement } from "../elements/containers/trees/TreeItem";
 import { ModelList, ModelObject } from "../models/Model";
 import { View } from "./View";
-export { TreeItemList };
+export { TreeItemModelList };
 export { TreeModel };
 export { TreeItemModel };
 export { TreeView };
+interface TreeModelInit {
+    items: TreeItemModel[];
+    sortFunction?: (item_a: TreeItemModel, item_b: TreeItemModel) => number;
+}
 declare class TreeModel extends ModelObject {
     #private;
     readonly items: ModelList<TreeItemModel>;
     readonly childItems: ModelList<TreeItemModel>;
     sortFunction: ((item_a: TreeItemModel, item_b: TreeItemModel) => number) | null;
     constructor();
-    constructor(init: {
-        items: TreeItemModel[];
-        sortFunction?: (item_a: TreeItemModel, item_b: TreeItemModel) => number;
-    });
+    constructor(init: TreeModelInit);
     flattenItems(): TreeItemModel[];
     getItemByUri(this: TreeModel | TreeItemModel, uri: string): TreeItemModel | null;
 }
-declare class TreeItemList {
+declare class TreeItemModelList {
     readonly items: TreeItemModel[];
     constructor(items: TreeItemModel[]);
     get count(): number;
@@ -49,10 +50,13 @@ interface TreeViewConstructor {
 interface TreeView extends View {
     readonly shadowRoot: ShadowRoot;
     readonly model: TreeModel;
-    treeElement(): HTMLETreeElement;
+    draggable: boolean;
+    selectedItems(): TreeItemModel[];
+    activeItem(): TreeItemModel | null;
+    get treeElement(): HTMLETreeElement;
     treeItemElement(item: TreeItemModel): HTMLETreeItemElement;
-    itemContentDelegate: <Item extends TreeItemModel>(item: Item) => string | Node;
-    itemContextMenuDelegate: <Item extends TreeItemModel>(activeItem: Item, selectedItems: Item[]) => string | Node;
+    itemContentDelegate: <Item extends TreeItemModel>(this: TreeView, item: Item) => string | Node;
+    itemContextMenuDelegate: (this: TreeView) => string | Node;
 }
 declare global {
     interface HTMLElementTagNameMap {

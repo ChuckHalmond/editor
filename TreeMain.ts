@@ -1,14 +1,12 @@
 import { EMenuItem } from "./src/elements/containers/menus/MenuItem";
 import { HTMLEToolBarItemElement } from "./src/elements/containers/toolbars/ToolBarItem";
 import { element, fragment, reactiveElement } from "./src/elements/Element";
-import { ModelEvent, ModelList, ModelObject, ModelProperty } from "./src/models/Model";
+import { ModelEvent, ModelProperty } from "./src/models/Model";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
-import { TreeItemList, TreeItemModel, TreeModel, TreeView } from "./src/views/TreeView";
-import { toolbarItemWidget } from "./src/views/widgets/toolbar/ToolBarItemWidget";
-import { toolbarWidget } from "./src/views/widgets/toolbar/ToolBarWidget";
+import { TreeItemModelList, TreeItemModel, TreeModel, TreeView } from "./src/views/TreeView";
 import { widget } from "./src/views/widgets/Widget";
 
-class MyTreeItemList extends TreeItemList {
+class MyTreeItemModelList extends TreeItemModelList {
     readonly items!: MyTreeItemModel[];
 
     constructor(items: MyTreeItemModel[]) {
@@ -28,9 +26,7 @@ class MyTreeItemList extends TreeItemList {
     }
 
     display(): void {
-        const result = this.items.reduce(
-            (result, item_i) => `${result} ${item_i.name}`, ""
-        );
+        const result = this.items.map(item_i => item_i.name).join(" ");
         console.log(result);
     }
 }
@@ -87,7 +83,7 @@ export async function TreeMain() {
                     name: "age",
                     type: Number,
                     label: "Age",
-                    extract: (row) => row.age,
+                    extract: (row) => String(row.age),
                     filters: [{
                         name: "Minors",
                         filter: (row) => row.age < 18
@@ -100,7 +96,7 @@ export async function TreeMain() {
                     name: "birthyear",
                     type: String,
                     label: "Brith Year",
-                    extract: (row) => new Date().getFullYear() - row.age
+                    extract: (row) => String(new Date().getFullYear() - row.age)
                 }),
             ],
             rows: [
@@ -260,9 +256,12 @@ export async function TreeMain() {
             );
         }
     );
-    treeView.itemContextMenuDelegate = <typeof treeView.itemContextMenuDelegate>(
-        function(this: TreeView, activeItem: MyTreeItemModel, selectedItems: MyTreeItemModel[]) {
-            const treeElement = this.treeElement();
+    treeView.itemContextMenuDelegate = (
+        function(this: TreeView) {
+            const {treeElement} = this;
+            const {activeItem: activeItemElement} = treeElement;
+            const selectedItems = <MyTreeItemModel[]>this.selectedItems();
+            const activeItem = <MyTreeItemModel>this.activeItem();
             return fragment(
                 element("e-menuitemgroup", {
                     children: [
@@ -273,10 +272,10 @@ export async function TreeMain() {
                             children: "Display",
                             listeners: {
                                 click: () => {
-                                    const itemsList = selectedItems.includes(activeItem) ?
-                                        new MyTreeItemList(selectedItems) : new MyTreeItemList([activeItem]);
-                                    itemsList.display();
-                                    treeElement.activeItem?.focus();
+                                    const selectedItemsList = selectedItems.includes(activeItem) ?
+                                        new MyTreeItemModelList(selectedItems) : new MyTreeItemModelList([activeItem]);
+                                        selectedItemsList.display();
+                                    activeItemElement!.focus();
                                 }
                             }
                         }),
@@ -287,12 +286,12 @@ export async function TreeMain() {
                             children: "Delete",
                             listeners: {
                                 click: () => {
-                                    const itemsList = selectedItems.includes(activeItem) ?
-                                        new MyTreeItemList(selectedItems) : new MyTreeItemList([activeItem]);
-                                    const {count} = itemsList;
+                                    const selectedItemsList = selectedItems.includes(activeItem) ?
+                                        new MyTreeItemModelList(selectedItems) : new MyTreeItemModelList([activeItem]);
+                                    const {count} = selectedItemsList;
                                     const doRemove = confirm(`Remove ${count} items?`);
                                     if (doRemove) {
-                                        itemsList.remove();
+                                        selectedItemsList.remove();
                                     }
                                     treeElement.focus();
                                 }
@@ -311,12 +310,30 @@ export async function TreeMain() {
                             children: activeItem.visibility ? "Hide" : "Show",
                             listeners: {
                                 click: () => {
-                                    const itemsList = selectedItems.includes(activeItem) ?
-                                        new MyTreeItemList(selectedItems) : new MyTreeItemList([activeItem]);
+                                    const selectedItemsList = selectedItems.includes(activeItem) ?
+                                        new MyTreeItemModelList(selectedItems) : new MyTreeItemModelList([activeItem]);
                                     activeItem.visibility ?
-                                        itemsList.hide() :
-                                        itemsList.show();
-                                    treeElement.activeItem?.focus();
+                                        selectedItemsList.hide() :
+                                        selectedItemsList.show();
+                                    activeItemElement!.focus();
+                                }
+                            }
+                        })
+                    ]
+                }),
+                element("e-separator"),
+                element("e-menuitemgroup", {
+                    children: [
+                        element("e-menuitem", {
+                            attributes: {
+                                type: "button",
+                                label: "Click me!"
+                            },
+                            children: "Click me!",
+                            listeners: {
+                                click: () => {
+                                    activeItem.display();
+                                    activeItemElement!.focus();
                                 }
                             }
                         })
