@@ -1,4 +1,6 @@
+import { HTMLEMenuElement } from "./src/elements/containers/menus/Menu";
 import { EMenuItem } from "./src/elements/containers/menus/MenuItem";
+import { HTMLEToolBarElement } from "./src/elements/containers/toolbars/ToolBar";
 import { HTMLEToolBarItemElement } from "./src/elements/containers/toolbars/ToolBarItem";
 import { HTMLETreeElement } from "./src/elements/containers/trees/Tree";
 import { HTMLETreeItemElement } from "./src/elements/containers/trees/TreeItem";
@@ -206,27 +208,34 @@ export async function TreeMain() {
 
         render(): void {
             super.render();
-            const {treeElement} = this;
-            treeElement.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
+            const {shadowRoot, treeElement} = this;
+            shadowRoot.prepend(
+                element("link", {
+                    attributes: {
+                        rel: "stylesheet",
+                        href: "css/views/mytreeview.css"
+                    }
+                })
+            );
+            treeElement!.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         }
 
         itemContentDelegate(item: MyTreeItemModel) {
             return fragment(
-                ...([
-                    reactiveElement(
-                        item,
-                        element("span", {
-                            attributes: {
-                                class: "label"
-                            }
-                        }),
-                        ["name"],
-                        (label, property, oldValue, newValue) => {
-                            label.textContent = `${item.name}`;
+                reactiveElement(
+                    item,
+                    element("span", {
+                        attributes: {
+                            class: "label"
                         }
-                    )
-                ]).concat(
-                    (item.type == "parent") ? [
+                    }),
+                    ["name"],
+                    (label, property, oldValue, newValue) => {
+                        label.textContent = `${item.name}`;
+                    }
+                ),
+                ...(
+                    item.type == "parent" ? [
                         reactiveElement(
                             item,
                             element("span", {
@@ -244,7 +253,7 @@ export async function TreeMain() {
             );
         }
 
-        itemToolbarDelegate(this: TreeView, item: MyTreeItemModel) {
+        itemToolbarDelegate(this: TreeView, item: MyTreeItemModel): HTMLEToolBarElement {
             return reactiveElement(
                 item,
                 element("e-toolbar", {
@@ -283,9 +292,9 @@ export async function TreeMain() {
             )
         }
 
-        itemMenuDelegate(this: TreeView) {
+        itemMenuDelegate(this: TreeView): HTMLEMenuElement {
             const {treeElement} = this;
-            const {activeItem: activeItemElement} = treeElement;
+            const {activeItem: activeItemElement} = treeElement!;
             const selectedItems = <MyTreeItemModel[]>this.selectedItems();
             const activeItem = <MyTreeItemModel>this.activeItem();
             return element("e-menu", {
@@ -295,20 +304,6 @@ export async function TreeMain() {
                 children: [
                     element("e-menuitemgroup", {
                         children: [
-                            element("e-menuitem", {
-                                attributes: {
-                                    label: "Display"
-                                },
-                                children: "Display",
-                                listeners: {
-                                    click: () => {
-                                        const selectedItemsList = selectedItems.includes(activeItem) ?
-                                            new MyTreeItemModelList(selectedItems) : new MyTreeItemModelList([activeItem]);
-                                            selectedItemsList.display();
-                                        activeItemElement!.focus();
-                                    }
-                                }
-                            }),
                             element("e-menuitem", {
                                 attributes: {
                                     type: "checkbox",
@@ -345,25 +340,7 @@ export async function TreeMain() {
                                         if (doRemove) {
                                             selectedItemsList.remove();
                                         }
-                                        treeElement.focus();
-                                    }
-                                }
-                            })
-                        ]
-                    }),
-                    element("e-separator"),
-                    element("e-menuitemgroup", {
-                        children: [
-                            element("e-menuitem", {
-                                attributes: {
-                                    type: "button",
-                                    label: "Click me!"
-                                },
-                                children: "Click me!",
-                                listeners: {
-                                    click: () => {
-                                        activeItem.display();
-                                        activeItemElement!.focus();
+                                        treeElement!.focus();
                                     }
                                 }
                             })
@@ -396,7 +373,9 @@ export async function TreeMain() {
             }
         }
     };
-    const treeView = new /*My*/TreeView();
+
+    const treeView = new MyTreeView();
+    treeView.draggable = true;
     treeView.setModel(treeModel);
     treeView.render();
     document.body.append(treeView);

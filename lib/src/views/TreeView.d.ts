@@ -52,11 +52,13 @@ interface TreeViewConstructor {
 interface TreeView extends View {
     readonly shadowRoot: ShadowRoot;
     readonly model: TreeModel;
+    setModel(model: TreeModel): void;
+    renderShadow(): Node;
     draggable: boolean;
     selectedItems(): TreeItemModel[];
     activeItem(): TreeItemModel | null;
-    get treeElement(): HTMLETreeElement;
-    treeItemElement(item: TreeItemModel): HTMLETreeItemElement;
+    get treeElement(): HTMLETreeElement | null;
+    treeItemElement(item: TreeItemModel): HTMLETreeItemElement | null;
     itemContentDelegate(this: TreeView, item: TreeItemModel): string | Node;
     itemToolbarDelegate(this: TreeView, item: TreeItemModel): HTMLEToolBarElement | null;
     itemMenuDelegate(this: TreeView): HTMLEMenuElement | null;

@@ -1,0 +1,19 @@
+.badge {
+    margin-left: 4px;
+    font-weight: bold;
+    order: 2;
+}
+
+.label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: auto;
+}
+
+e-treeitem:is(
+    :not(:is(:hover, [selected], [active])),
+    :not(:is([selected], [active])):hover:has(> e-treeitemgroup:hover),
+) > e-toolbar {
+    display: none;
+}

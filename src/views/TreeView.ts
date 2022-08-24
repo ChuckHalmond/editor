@@ -199,11 +199,13 @@ interface TreeViewConstructor {
 interface TreeView extends View {
     readonly shadowRoot: ShadowRoot;
     readonly model: TreeModel;
+    setModel(model: TreeModel): void;
+    renderShadow(): Node;
     draggable: boolean;
     selectedItems(): TreeItemModel[];
     activeItem(): TreeItemModel | null;
-    get treeElement(): HTMLETreeElement;
-    treeItemElement(item: TreeItemModel): HTMLETreeItemElement;
+    get treeElement(): HTMLETreeElement | null ;
+    treeItemElement(item: TreeItemModel): HTMLETreeItemElement | null ;
     itemContentDelegate/*<Item extends TreeItemModel>*/(this: TreeView, item: TreeItemModel): string | Node;
     itemToolbarDelegate/*<Item extends TreeItemModel>*/(this: TreeView, item: TreeItemModel): HTMLEToolBarElement | null;
     itemMenuDelegate(this: TreeView): HTMLEMenuElement | null;
@@ -239,19 +241,22 @@ class TreeViewBase extends View implements TreeView {
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
         switch (name) {
             case "draggable": {
-                Array.from(this.treeElement.items).forEach(
-                    item_i => item_i.draggable = newValue !== null
-                );
+                const {treeElement} = this;
+                if (treeElement) {
+                    Array.from(treeElement.items).forEach(
+                        item_i => item_i.draggable = newValue !== null
+                    );
+                }
                 break;
             }
         }
     }
 
-    get treeElement(): HTMLETreeElement {
+    get treeElement(): HTMLETreeElement | null {
         return this.shadowRoot.querySelector<HTMLETreeElement>("e-tree")!;
     }
 
-    treeItemElement(item: TreeItemModel): HTMLETreeItemElement {
+    treeItemElement(item: TreeItemModel): HTMLETreeItemElement | null  {
         return this.shadowRoot.querySelector<HTMLETreeItemElement>(`e-treeitem[uri=${item.uri}]`)!;
     }
 
@@ -283,7 +288,7 @@ class TreeViewBase extends View implements TreeView {
             element("link", {
                 attributes: {
                     rel: "stylesheet",
-                    href: "css/views/gridview.css"
+                    href: "css/views/treeview.css"
                 }
             }),
             treeElement,
@@ -320,17 +325,23 @@ class TreeViewBase extends View implements TreeView {
 
     selectedItems(): TreeItemModel[] {
         const {model, treeElement} = this;
-        const selectedElements = treeElement.selectedItems();
-        return selectedElements.map(
-            item_i => <TreeItemModel>model.getItemByUri(item_i.dataset.uri!)
-        );
+        if (treeElement) {
+            const selectedElements = treeElement.selectedItems();
+            return selectedElements.map(
+                item_i => <TreeItemModel>model.getItemByUri(item_i.dataset.uri!)
+            );
+        }
+        return [];
     }
 
     activeItem(): TreeItemModel | null {
         const {model, treeElement} = this;
+        if (treeElement) {
         const {activeItem} = treeElement;
-        return activeItem ?
-            model.getItemByUri(activeItem?.dataset.uri!) : null;
+            return activeItem ?
+                model.getItemByUri(activeItem?.dataset.uri!) : null;
+        }
+        return null;
     }
 
     #getDragImage(model: TreeItemModel): Element | null {

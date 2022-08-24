@@ -1,4 +1,4 @@
-e-treeview {
+:host {
     display: block;
 }
 
@@ -20,7 +20,7 @@ e-treeview {
     border-radius: 3px; 
     padding: 2px 4px;
 }
-
+/*
 .treeitem > .content > .toolbar {
     margin-left: 4px;
-}
+}*/
