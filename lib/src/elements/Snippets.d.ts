@@ -1,11 +1,7 @@
-export { getPropertyFromPath };
-export { setPropertyFromPath };
 export { snakeToCamel };
 export { camelToSnake };
 export { trainToCamel };
 export { camelToTrain };
-declare function getPropertyFromPath(src: object, path: string): any;
-declare function setPropertyFromPath(src: object, path: string, value: any): object;
 declare function snakeToCamel(str: string): string;
 declare function camelToSnake(str: string): string;
 declare function trainToCamel(str: string): string;

@@ -1,6 +1,4 @@
 import { ModelList, ModelNode } from "../models/Model";
-export { subtreeNodes };
-export { ancestorNodes };
 export { CustomElement };
 export { ReactiveChildElements };
 export { QueryProperty };
@@ -48,8 +46,6 @@ interface CustomElementDecorator {
     }): <C extends CustomElementConstructor>(elementCtor: C) => C;
 }
 declare const CustomElement: CustomElementDecorator;
-declare function subtreeNodes(node: Node): Generator<Node>;
-declare function ancestorNodes(node: Node): Generator<Node>;
 interface QueryPropertyDecorator {
     (init: {
         selector: string;

@@ -1,5 +1,5 @@
 import { ActionType, HTMLEActionElement } from "./elements/containers/actions/Action";
-import { subtreeNodes } from "./elements/Element";
+//import { subtreeNodes } from "./elements/Element";
 import { HotKey } from "./Input";
 
 export { Editor };
@@ -108,7 +108,7 @@ class EditorBase implements Editor {
     }
 
     private _actionsObserverCallback(mutationsList: MutationRecord[]) {
-        mutationsList.forEach((mutation: MutationRecord) => {
+        /*mutationsList.forEach((mutation: MutationRecord) => {
             mutation.addedNodes.forEach((node: Node) => {
                 Array.from(subtreeNodes(node)).forEach((node) => {
                     if (node instanceof HTMLEActionElement) {
@@ -123,7 +123,7 @@ class EditorBase implements Editor {
                     }
                 });
             });
-        });
+        });*/
     }
     
     public setup(): void {

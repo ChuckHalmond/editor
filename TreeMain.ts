@@ -187,7 +187,6 @@ export async function TreeMain() {
             return bLabel.localeCompare(aLabel);
         }*/
     });
-    (<any>window)["model"] = treeModel;
     document.body.append(
         new MenuView(
             new MenuModel({
@@ -206,7 +205,7 @@ export async function TreeMain() {
     })
     class MyTreeView extends TreeView {
 
-        render(): void {
+        override render(): void {
             super.render();
             const {shadowRoot, treeElement} = this;
             shadowRoot.prepend(
@@ -220,7 +219,7 @@ export async function TreeMain() {
             treeElement!.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         }
 
-        itemContentDelegate(item: MyTreeItemModel) {
+        override itemContentDelegate(item: MyTreeItemModel) {
             return fragment(
                 reactiveElement(
                     item,
@@ -253,7 +252,7 @@ export async function TreeMain() {
             );
         }
 
-        itemToolbarDelegate(this: TreeView, item: MyTreeItemModel): HTMLEToolBarElement {
+        override itemToolbarDelegate(this: TreeView, item: MyTreeItemModel): HTMLEToolBarElement {
             return reactiveElement(
                 item,
                 element("e-toolbar", {
@@ -292,7 +291,7 @@ export async function TreeMain() {
             )
         }
 
-        itemMenuDelegate(this: TreeView): HTMLEMenuElement {
+        override itemMenuDelegate(this: TreeView): HTMLEMenuElement {
             const {treeElement} = this;
             const {activeItem: activeItemElement} = treeElement!;
             const selectedItems = <MyTreeItemModel[]>this.selectedItems();

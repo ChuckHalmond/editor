@@ -206,8 +206,8 @@ interface TreeView extends View {
     activeItem(): TreeItemModel | null;
     get treeElement(): HTMLETreeElement | null ;
     treeItemElement(item: TreeItemModel): HTMLETreeItemElement | null ;
-    itemContentDelegate/*<Item extends TreeItemModel>*/(this: TreeView, item: TreeItemModel): string | Node;
-    itemToolbarDelegate/*<Item extends TreeItemModel>*/(this: TreeView, item: TreeItemModel): HTMLEToolBarElement | null;
+    itemContentDelegate(this: TreeView, item: TreeItemModel): string | Node;
+    itemToolbarDelegate(this: TreeView, item: TreeItemModel): HTMLEToolBarElement | null;
     itemMenuDelegate(this: TreeView): HTMLEMenuElement | null;
 }
 
@@ -260,7 +260,7 @@ class TreeViewBase extends View implements TreeView {
         return this.shadowRoot.querySelector<HTMLETreeItemElement>(`e-treeitem[uri=${item.uri}]`)!;
     }
 
-    renderShadow(): Node {
+    override renderShadow(): Node {
         const {model} = this;
         const treeElement = element("e-tree", {
             attributes: {

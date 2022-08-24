@@ -1,8 +1,8 @@
 import { ModelList, ModelNode, ModelChangeRecord, ModelChangeObserver, ModelChangeObserverOptions } from "../models/Model";
 import { camelToTrain } from "./Snippets";
-
+/*
 export { subtreeNodes };
-export { ancestorNodes };
+export { ancestorNodes };*/
 export { CustomElement };
 export { ReactiveChildElements };
 export { QueryProperty };
@@ -196,7 +196,7 @@ const CustomElement: CustomElementDecorator = function(init: {
         return elementCtor;
     }
 }
-
+/*
 function *subtreeNodes(node: Node): Generator<Node> {
     yield node;
     const childNodes = node.childNodes;
@@ -218,7 +218,7 @@ function *ancestorNodes(node: Node): Generator<Node> {
         yield *ancestorNodes(parentNode);
     }
 }
-
+*/
 interface QueryPropertyDecorator {
     (
         init: {
