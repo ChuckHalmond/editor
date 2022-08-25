@@ -6,7 +6,6 @@ interface HTMLEToolBarItemGroupElementConstructor {
 interface HTMLEToolBarItemGroupElement extends HTMLElement {
     name: string;
     label: string;
-    disabled: boolean;
 }
 declare global {
     interface HTMLElementTagNameMap {

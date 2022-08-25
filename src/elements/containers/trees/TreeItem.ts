@@ -1,4 +1,4 @@
-import { CustomElement, element, AttributeProperty } from "../../Element";
+import { CustomElement, element, AttributeProperty, QueryProperty } from "../../Element";
 import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
 
 export { HTMLETreeItemElement };
@@ -39,10 +39,6 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
 
     readonly shadowRoot!: ShadowRoot;
 
-    get group(): HTMLETreeItemGroupElement | null {
-        return this.#group;
-    }
-
     @AttributeProperty({type: String})
     name!: string;
 
@@ -70,7 +66,8 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
     @AttributeProperty({type: String, defaultValue: "leaf"})
     type!: "leaf" | "parent";
 
-    #group: HTMLETreeItemGroupElement | null;
+    @QueryProperty({selector: ":scope > e-treeitemgroup[slot=group]"})
+    group!: HTMLETreeItemGroupElement | null;
     
     static {
         shadowTemplate = element("template");
@@ -102,9 +99,6 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
-        shadowRoot.addEventListener("slotchange", this.#handleSlotChangeEvent.bind(this));
-        this.addEventListener("click", this.#handleClickEvent.bind(this));
-        this.#group = null;
     }
     
     connectedCallback(): void {
@@ -137,27 +131,8 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
     }
 
     toggle(force?: boolean): void {
-        this.expanded = force ?? !this.expanded;
-    }
-
-    #handleClickEvent(event: MouseEvent): void {
-        const {target, shiftKey, ctrlKey} = event;
-        const {type} = this;
-        if (this == target && type == "parent" && !(shiftKey || ctrlKey)) {
-            this.toggle();
-        }
-    }
-
-    #handleSlotChangeEvent(event: Event): void {
-        const {target} = event;
-        const {name: slotName} = <HTMLSlotElement>target;
-        switch (slotName) {
-            case "group": {
-                const element = (<HTMLSlotElement>target).assignedElements()[0];
-                this.#group = element instanceof HTMLETreeItemGroupElement ? element : null;
-                break;
-            }
-        }
+        const {expanded} = this;
+        this.expanded = force ?? !expanded;
     }
 }
 

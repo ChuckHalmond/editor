@@ -66,6 +66,9 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         this.#onSelection = false;
         this.#hasSelectionChanged = false;
         this.items = this.getElementsByTagName("e-treeitem");
+        this.addEventListener("click", this.#handleClickEvent.bind(this));
+        this.addEventListener("contextmenu", this.#handleContextMenuEvent.bind(this));
+        this.addEventListener("dblclick", this.#handleDblClickEvent.bind(this));
         this.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
         this.addEventListener("dragend", this.#handleDragEndEvent.bind(this));
         this.addEventListener("dragenter", this.#handleDragEnterEvent.bind(this));
@@ -270,47 +273,24 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         return item;
     }
 
-    #handleMouseDownEvent(event: MouseEvent): void {
-        const {target, ctrlKey, shiftKey, button} = event;
-        if (target instanceof HTMLETreeItemElement) {
-            const {selected} = target;
-            switch (button) {
-                case 0: {
-                    if (!shiftKey && !ctrlKey) {
-                        this.#setSelection(target);
-                    }
-                    else if (ctrlKey) {
-                        if (selected) {
-                            target.blur();
-                        }
-                        (!selected) ?
-                            this.#addToSelection(target) :
-                            this.#removeFromSelection(target);
-                        event.stopPropagation();
-                    }
-                    else if (shiftKey) {
-                        const {activeItem} = this
-                        if (activeItem) {
-                            const range = this.#getItemsRange(
-                                activeItem,
-                                target
-                            );
-                            if (range) {
-                                this.#setSelection(...range);
-                            }
-                        }
-                        event.stopPropagation();
-                    }
-                }
-                break;
-                case 2: {
-                    if (!selected) {
-                        this.#setSelection(target);
-                    }
-                    break;
-                }
+    #handleClickEvent(event: MouseEvent): void {
+        const {target, shiftKey, ctrlKey} = event;
+        const targetItem = <HTMLETreeItemElement | null>(<HTMLElement>target).closest("e-treeitem");
+        if (targetItem) {
+            const {type} = targetItem;
+            if (type == "parent" && !(shiftKey || ctrlKey)) {
+                targetItem.toggle();
             }
         }
+        event.stopPropagation();
+    }
+
+    #handleContextMenuEvent(event: MouseEvent): void {
+        event.stopPropagation();
+    }
+
+    #handleDblClickEvent(event: MouseEvent): void {
+        event.stopPropagation();
     }
 
     #handleDragEndEvent(): void {
@@ -319,12 +299,13 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
 
     #handleDragEnterEvent(event: DragEvent): void {
         const {target} = event;
-        if (target instanceof HTMLETreeItemElement) {
-            const {type} = target;
+        const targetItem = <HTMLETreeItemElement | null>(<HTMLElement>target).closest("e-treeitem");
+        if (targetItem) {
+            const {type} = targetItem;
             if (type == "parent") {
-                target.toggle(true);
+                targetItem.toggle(true);
             }
-            this.#setDropTargetItem(target);
+            this.#setDropTargetItem(targetItem);
         }
         event.preventDefault();
     }
@@ -507,6 +488,49 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         const lostFocusWithin = !this.contains(<Node | null>relatedTarget);
         if (lostFocusWithin) {
             this.tabIndex = 0;
+        }
+    }
+
+    #handleMouseDownEvent(event: MouseEvent): void {
+        const {target, ctrlKey, shiftKey, button} = event;
+        if (target instanceof HTMLETreeItemElement) {
+            const {selected} = target;
+            switch (button) {
+                case 0: {
+                    if (!shiftKey && !ctrlKey && !selected) {
+                        this.#setSelection(target);
+                    }
+                    else if (ctrlKey) {
+                        if (selected) {
+                            target.blur();
+                        }
+                        (!selected) ?
+                            this.#addToSelection(target) :
+                            this.#removeFromSelection(target);
+                        event.stopPropagation();
+                    }
+                    else if (shiftKey) {
+                        const {activeItem} = this
+                        if (activeItem) {
+                            const range = this.#getItemsRange(
+                                activeItem,
+                                target
+                            );
+                            if (range) {
+                                this.#setSelection(...range);
+                            }
+                        }
+                        event.stopPropagation();
+                    }
+                }
+                break;
+                case 2: {
+                    if (!selected) {
+                        this.#setSelection(target);
+                    }
+                    break;
+                }
+            }
         }
     }
 

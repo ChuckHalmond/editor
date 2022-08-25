@@ -142,7 +142,6 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
-        this.addEventListener("click", this.#handleClickEvent.bind(this));
     }
     
     connectedCallback(): void {
@@ -236,29 +235,6 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                         itemBottom - menuHeight - closestMenuTop + menuPaddingBottom :
                         itemTop - closestMenuTop - menuPaddingTop
                     }px`);
-                }
-            }
-        }
-    }
-
-    #handleClickEvent(event: MouseEvent): void {
-        const {target} = event;
-        const targetMenuItem = (<HTMLElement>target).closest("e-menuitem");
-        if (targetMenuItem === this) {
-            const {type} = this;
-            switch (type) {
-                case "checkbox": {
-                    this.checked = !this.checked;
-                    break;
-                }
-                case "radio": {
-                    this.checked = true;
-                    break;
-                }
-                case "menu":
-                case "submenu": {
-                    this.toggle();
-                    break;
                 }
             }
         }

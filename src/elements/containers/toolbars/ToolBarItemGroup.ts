@@ -13,7 +13,6 @@ type ToolBarOrientation = "horizontal" | "vertical";
 interface HTMLEToolBarItemGroupElement extends HTMLElement {
     name: string;
     label: string;
-    disabled: boolean;
 }
 
 declare global {
@@ -36,9 +35,6 @@ class HTMLEToolBarItemGroupElementBase extends HTMLElement implements HTMLEToolB
 
     @AttributeProperty({type: String, observed: true})
     label!: string;
-
-    @AttributeProperty({type: Boolean, observed: true})
-    disabled!: boolean;
 
     static {
         shadowTemplate = element("template");
@@ -81,12 +77,6 @@ class HTMLEToolBarItemGroupElementBase extends HTMLElement implements HTMLEToolB
                 if (label) {
                     label.textContent = newValue;
                 }
-                break;
-            }
-            case "disabled": {
-                /*this.items.forEach((item) => {
-                    item.disabled = newValue !== null;
-                });*/
                 break;
             }
         }

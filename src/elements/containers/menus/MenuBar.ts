@@ -60,6 +60,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
             shadowTemplate.content.cloneNode(true)
         );
         this.addEventListener("click", this.#handleClickEvent.bind(this));
+        this.addEventListener("focus", this.#handleFocusEvent.bind(this));
         this.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
         this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         this.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
@@ -84,7 +85,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
     }
 
     #walkerNodeFilter(node: Node): number {
-        if (node instanceof HTMLEMenuItemElement) {
+        if (node instanceof HTMLEMenuItemElement && !(node.disabled || node.hidden)) {
             return NodeFilter.FILTER_ACCEPT;
         }
         if (node instanceof HTMLEMenuItemGroupElement) {
@@ -93,7 +94,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
         return NodeFilter.FILTER_REJECT;
     }
 
-    #firstItem(): HTMLEMenuItemElement | null {
+    firstItem(): HTMLEMenuItemElement | null {
         const walker = this.#walker;
         walker.currentNode = walker.root;
         return <HTMLEMenuItemElement | null>walker.firstChild();
@@ -157,6 +158,14 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
         return this.#items.find(item_i => item_i.contains(target)) ?? null;
     }
     
+    #handleFocusEvent(event: FocusEvent): void {
+        const {relatedTarget} = event;
+        const {activeItem} = this;
+        if (!this.contains(<Node | null>relatedTarget)) {
+            (activeItem ?? this.firstItem())?.focus();
+        }
+    }
+
     #handleFocusInEvent(event: FocusEvent): void {
         const {target} = event;
         if (target instanceof Element) {
@@ -224,7 +233,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
             case "ArrowLeft": {
                 const previousItem = activeItem ?
                     this.#previousItem(activeItem) ?? this.#lastItem() :
-                    this.#firstItem();
+                    this.firstItem();
                 previousItem?.focus({preventScroll: true});
                 ({activeItem} = this);
                 if (expanded && activeItem) {
@@ -235,7 +244,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
             }
             case "ArrowRight": {
                 const nextItem = activeItem ?
-                    this.#nextItem(activeItem) ?? this.#firstItem() : 
+                    this.#nextItem(activeItem) ?? this.firstItem() : 
                     this.#lastItem();
                 nextItem?.focus({preventScroll: true});
                 ({activeItem} = this);
@@ -272,15 +281,6 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
             }
         }
     }
-
-    /*#handleTriggerEvent(): void {
-        const {activeItem} = this;
-        if (activeItem?.expanded) {
-            activeItem.collapse();
-        }
-        this.expanded = false;
-        this.focus({preventScroll: true});
-    }*/
 }
 
 var HTMLEMenuBarElement: HTMLEMenuBarElementConstructor = HTMLEMenuBarElementBase;

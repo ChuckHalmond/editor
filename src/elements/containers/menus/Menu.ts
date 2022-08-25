@@ -198,29 +198,31 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
 
     #handleClickEvent(event: MouseEvent): void {
         const {target} = event;
-        const targetItem = <HTMLEMenuItemElement>(<Element>target).closest("e-menuitem");
+        const targetItem = (<HTMLElement>target).closest("e-menuitem");
         if (targetItem) {
-            /*const {contextual} = this;
-            if (contextual) {
-                try {
-                    this.remove();
+            const {type, checked} = targetItem;
+            switch (type) {
+                case "checkbox": {
+                    targetItem.checked = !checked;
+                    break;
                 }
-                catch (error) {};
+                case "radio": {
+                    const {name, value} = targetItem;
+                    targetItem.checked = true;
+                    this.querySelectorAll<HTMLEMenuItemElement>(
+                        `:is(:scope, :scope > e-menuitemgroup) > e-menuitem[type=radio][name=${name}]`
+                    )
+                    .forEach((radio_i) => {
+                        radio_i.checked = radio_i.value == value;
+                    });
+                    break;
+                }
+                case "menu":
+                case "submenu": {
+                    targetItem.toggle();
+                    break;
+                }
             }
-            else {*/
-                const isClosestMenu = this.#isClosestMenu(targetItem);
-                if (isClosestMenu) {
-                    const {type, name, value} = targetItem;
-                    if (type == "radio") {
-                        this.querySelectorAll<HTMLEMenuItemElement>(
-                            `:is(:scope, :scope > e-menuitemgroup) > e-menuitem[type=radio][name=${name}]`
-                        )
-                        .forEach((radio_i) => {
-                            radio_i.checked = radio_i.value == value;
-                        });
-                    }
-                }
-            //}
         }
     }
 

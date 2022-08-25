@@ -263,19 +263,17 @@ export async function TreeMain() {
                                 name: "visibility",
                                 type: "checkbox",
                                 label: "Visibility"
-                            },
-                            listeners: {
-                                click: () => {
-                                    item.visibility ?
-                                        item.hide() :
-                                        item.show();
-                                }
                             }
                         })
                     ],
                     listeners: {
-                        dblclick: (event) => {
-                            event.stopPropagation();
+                        click: (event) => {
+                            const {target} = event;
+                            if ((<Element>target).matches("e-toolbaritem[name=visibility]")) {
+                                item.visibility ?
+                                    item.hide() :
+                                    item.show();
+                            }
                         }
                     }
                 }),
@@ -395,56 +393,90 @@ export async function TreeMain() {
 
     document.body.append(
         element("e-menubar", {
-            children: element("e-menuitem", {
-                attributes: {
-                    type: "menu",
-                    label: "Menu 1"
-                },
-                children: [
-                    "Menu 1",
-                    element("e-menu", {
-                        attributes: {
-                            slot: "menu"
-                        },
-                        children: [
-                            element("e-menuitem", {
-                                attributes: {
-                                    type: "checkbox"
-                                },
-                                children: "Hey"
-                            }),
-                            element("e-menuitem", {
-                                attributes: {
-                                    type: "submenu"
-                                },
-                                children: [
-                                    "Submenu 1",
-                                    element("e-menu", {
-                                        attributes: {
-                                            slot: "menu"
-                                        },
-                                        children: [
-                                            /*element("e-menuitem", {
-                                                attributes: {
-                                                    type: "checkbox"
-                                                },
-                                                children: "Yo"
-                                            })*/
-                                            new EMenuItem({
-                                                label: "Yo"
-                                            })
-                                        ]
-                                    })
-                                ]
-                            })
-                        ]
-                    })
-                ]
-            })
+            children: [
+                element("e-menuitem", {
+                    attributes: {
+                        type: "menu",
+                        label: "Menu 1",
+                        disabled: true
+                    },
+                    children: [
+                        "Menu 1"
+                    ]
+                }),
+                element("e-menuitem", {
+                    attributes: {
+                        type: "menu",
+                        label: "Menu 1"
+                    },
+                    children: [
+                        "Menu 1",
+                        element("e-menu", {
+                            attributes: {
+                                slot: "menu"
+                            },
+                            children: [
+                                element("e-menuitem", {
+                                    attributes: {
+                                        type: "checkbox"
+                                    },
+                                    children: "Hey"
+                                }),
+                                element("e-menuitem", {
+                                    attributes: {
+                                        type: "submenu"
+                                    },
+                                    children: [
+                                        "Submenu 1",
+                                        element("e-menu", {
+                                            attributes: {
+                                                slot: "menu"
+                                            },
+                                            children: [
+                                                /*element("e-menuitem", {
+                                                    attributes: {
+                                                        type: "checkbox"
+                                                    },
+                                                    children: "Yo"
+                                                })*/
+                                                new EMenuItem({
+                                                    label: "Yo"
+                                                })
+                                            ]
+                                        })
+                                    ]
+                                })
+                            ]
+                        })
+                    ]
+                }),
+                element("e-menuitem", {
+                    attributes: {
+                        type: "menu",
+                        label: "Menu 1"
+                    },
+                    children: [
+                        "Menu 1",
+                        element("e-menu", {
+                            attributes: {
+                                slot: "menu"
+                            },
+                            children: [
+                                element("e-menuitem", {
+                                    attributes: {
+                                        type: "checkbox"
+                                    },
+                                    children: "Hey"
+                                })
+                            ]
+                        })
+                    ]
+                })
+            ]
         })
     );
         
-    const menuView = widget("menubar", {
+    /*const menuView = widget("menubar", {
         slotted: [
             widget("menuitem", {
                 properties: {
@@ -582,9 +614,9 @@ export async function TreeMain() {
                 })
             ]
         })
-    );
+    );*/
 
-    document.body.append(
+    /*document.body.append(
         widget("toolbar", {
             slotted: [
                 widget("toolbaritem",  {
@@ -625,5 +657,5 @@ export async function TreeMain() {
                 })
             ]
         })
-    );
+    );*/
 }

@@ -16,15 +16,14 @@ body {
     /*accent-color: var(--accent-color);*/
 }
 
-
 e-toolbaritem[name="visibility"] {
     --icon-color: black;
-    --icon-image: url("/sample/assets/visibility_off_FILL1_wght400_GRAD0_opsz48.svg");
+    --icon-image: url("/sample/assets/visibility_FILL1_wght400_GRAD0_opsz48.svg");
 }
 
 e-toolbaritem[name="visibility"][pressed] {
     --icon-color: black;
-    --icon-image: url("/sample/assets/visibility_FILL1_wght400_GRAD0_opsz48.svg");
+    --icon-image: url("/sample/assets/visibility_off_FILL1_wght400_GRAD0_opsz48.svg");
     background-color: revert;
 }
 

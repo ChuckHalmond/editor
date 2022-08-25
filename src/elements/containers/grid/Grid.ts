@@ -103,6 +103,8 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
             shadowTemplate.content.cloneNode(true)
         );
         this.addEventListener("click", this.#handleClickEvent.bind(this));
+        this.addEventListener("contextmenu", this.#handleContextMenuEvent.bind(this));
+        this.addEventListener("dblclick", this.#handleDblClickEvent.bind(this));
         this.addEventListener("focus", this.#handleFocusEvent.bind(this));
         this.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
@@ -144,10 +146,7 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
         if (node instanceof HTMLEGridCellElement && !node.hidden) {
             return NodeFilter.FILTER_ACCEPT;
         }
-        if (node instanceof HTMLEGridBodyElement || node instanceof HTMLEGridRowGroupElement) {
-            return NodeFilter.FILTER_SKIP;
-        }
-        if (node instanceof HTMLEGridRowElement) {
+        if (node instanceof HTMLEGridBodyElement || node instanceof HTMLEGridRowGroupElement || node instanceof HTMLEGridRowElement) {
             return NodeFilter.FILTER_SKIP;
         }
         return NodeFilter.FILTER_REJECT;
@@ -419,6 +418,8 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
         return null;
     }
 
+
+
     #handleClickEvent(event: MouseEvent): void {
         const {ctrlKey, shiftKey} = event;
         const {selectby} = this;
@@ -439,7 +440,6 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
                         !targetCell.selected ?
                             this.#addCellsToSelection(targetCell) :
                             this.#removeCellsFromSelection(targetCell);
-                        event.stopPropagation();
                     }
                     else if (shiftKey) {
                         const lastSelectedCell = selectedCells[selectedCells.length - 1];
@@ -457,7 +457,6 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
                         else {
                             this.#setCellsSelection(targetCell);
                         }
-                        event.stopPropagation();
                     }
                 }
                 break;
@@ -478,7 +477,6 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
                         !targetRow.selected ?
                             this.#addRowsToSelection(targetRow) :
                             this.#removeRowsFromSelection(targetRow);
-                        event.stopPropagation();
                     }
                     else if (shiftKey) {
                         const lastSelectedRow = selectedRows[selectedRows.length - 1];
@@ -496,12 +494,20 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
                         else {
                             this.#setRowsSelection(targetRow);
                         }
-                        event.stopPropagation();
                     }
                 }
                 break;
             }
         }
+        event.stopPropagation();
+    }
+
+    #handleContextMenuEvent(event: MouseEvent): void {
+        event.stopPropagation();
+    }
+
+    #handleDblClickEvent(event: MouseEvent): void {
+        event.stopPropagation();
     }
 
     #handleKeyDownEvent(event: KeyboardEvent) {

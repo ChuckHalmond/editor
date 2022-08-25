@@ -64,8 +64,6 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
     @AttributeProperty({type: String})
     type!: "button" | "checkbox" | "radio" | "menubutton" | "select";
 
-    #wasExpandedOnMouseDown?: boolean;
-
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
@@ -94,8 +92,6 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
-        this.addEventListener("click", this.#handleClickEvent.bind(this));
-        this.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
     }
 
     connectedCallback(): void {
@@ -112,85 +108,6 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
                     labelPart.textContent = newValue;
                 }
                 break;
-            }
-            case "value": {
-                const {type} = this;
-                if (type == "select") {
-                    this.#updateSelectValue();
-                }
-                break;
-            }
-        }
-    }
-
-    #updateSelectValue(): void {
-        const {select} = this;
-        if (select) {
-            const {value} = this;
-            const {value: selectValue} = select;
-            if (selectValue !== value) {
-                select.value = value;
-            }
-        }
-    }
-
-    #handleClickEvent(event: MouseEvent): void {
-        const {target} = event;
-        const targetItem = (<HTMLElement>target).closest("e-toolbaritem");
-        if (targetItem === this) {
-            const {type} = this;
-            switch (type) {
-                case "checkbox": {
-                    this.pressed = !this.pressed;
-                    break;
-                }
-                case "radio": {
-                    this.pressed = true;
-                    break;
-                }
-                case "menubutton": {
-                    const {menubutton} = this;
-                    if (menubutton && !menubutton.contains(<Node>target)) {
-                        const force = !this.#wasExpandedOnMouseDown ?? true;
-                        menubutton.toggle(force);
-                        if (force) {
-                            menubutton.firstItem?.focus({preventScroll: true});
-                        }
-                    }
-                    break;
-                }
-                case "select": {
-                    const {select} = this;
-                    if (select && !select.contains(<Node>target)) {
-                        const force = !this.#wasExpandedOnMouseDown ?? true;
-                        select.toggle(force);
-                    }
-                    break;
-                }
-            }
-        }
-    }
-
-    #handleMouseDownEvent(event: MouseEvent): void {
-        const {target} = event;
-        const targetToolbarItem = (<HTMLElement>target).closest("e-toolbaritem");
-        if (targetToolbarItem === this) {
-            const {type} = this;
-            switch (type) {
-                case "menubutton": {
-                    const {menubutton} = this;
-                    if (menubutton && !menubutton.contains(<Node>target)) {
-                        this.#wasExpandedOnMouseDown = menubutton.expanded;
-                    }
-                    break;
-                }
-                case "select": {
-                    const {select} = this;
-                    if (select && !select.contains(<Node>target)) {
-                        this.#wasExpandedOnMouseDown = select.expanded;
-                    }
-                    break;
-                }
             }
         }
     }
