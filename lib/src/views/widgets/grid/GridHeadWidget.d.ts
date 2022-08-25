@@ -9,7 +9,7 @@ interface GridHeadWidgetFactory extends WidgetFactory {
     create(): HTMLElement;
 }
 declare var gridHeadWidget: {
-    "__#66@#template": HTMLElement;
+    "__#67@#template": HTMLElement;
     create(): HTMLElement;
     slot(head: HTMLElement): HTMLElement;
 };

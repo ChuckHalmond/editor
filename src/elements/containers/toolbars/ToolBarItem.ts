@@ -136,8 +136,8 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
 
     #handleClickEvent(event: MouseEvent): void {
         const {target} = event;
-        const targetToolbarItem = (<HTMLElement>target).closest("e-toolbaritem");
-        if (targetToolbarItem === this) {
+        const targetItem = (<HTMLElement>target).closest("e-toolbaritem");
+        if (targetItem === this) {
             const {type} = this;
             switch (type) {
                 case "checkbox": {

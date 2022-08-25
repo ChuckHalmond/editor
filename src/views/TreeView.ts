@@ -452,10 +452,12 @@ class TreeViewBase extends View implements TreeView {
                 const transferedUris = dataTransfer.getData("text/plain").split("\n");
                 const targetIsWithin = transferedUris.some(uri_i => targetUri.startsWith(`${uri_i}/`) || uri_i === targetUri);
                 if (!targetIsWithin) {
-                    const transferedItems = <TreeItemModel[]>transferedUris.map(
-                        uri_i => model.getItemByUri(uri_i)
-                    ).filter(
-                        item_i => item_i !== null
+                    const transferedItems = <TreeItemModel[]>(
+                        transferedUris.map(
+                            uri_i => model.getItemByUri(uri_i)
+                        ).filter(
+                            item_i => item_i !== null
+                        )
                     );
                     const {type: targetType, parentItem: targetParentItem} = targetItemModel;
                     const {childItems: targetList} =
@@ -524,10 +526,10 @@ class TreeViewBase extends View implements TreeView {
             if (!(relatedPosition & Node.DOCUMENT_POSITION_DISCONNECTED) && (relatedPosition & Node.DOCUMENT_POSITION_PRECEDING)) {
                 const {activeItem} = targetTree;
                 if (activeItem) {
-                    const toolbar = activeItem.querySelector("e-toolbar");
-                    if (toolbar) {
+                    const itemToolbar = activeItem.querySelector("e-toolbar");
+                    if (itemToolbar) {
                         event.preventDefault();
-                        toolbar.focus();
+                        itemToolbar.focus();
                     }
                 }
             }
@@ -538,9 +540,9 @@ class TreeViewBase extends View implements TreeView {
         const {target} = event;
         const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
         if (targetItem) {
-            const toolbar = targetItem.querySelector("e-toolbar");
-            if (toolbar) {
-                toolbar.tabIndex = toolbar.contains(<Node | null>target) ? -1 : 0;
+            const itemToolbar = targetItem.querySelector("e-toolbar");
+            if (itemToolbar) {
+                itemToolbar.tabIndex = itemToolbar.contains(<Node | null>target) ? -1 : 0;
             }
         }
     }
@@ -549,9 +551,9 @@ class TreeViewBase extends View implements TreeView {
         const {target} = event;
         const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
         if (targetItem) {
-            const toolbar = targetItem.querySelector("e-toolbar");
-            if (toolbar) {
-                toolbar.tabIndex = toolbar.contains(<Node | null>target) ? 0 : -1;
+            const itemToolbar = targetItem.querySelector("e-toolbar");
+            if (itemToolbar) {
+                itemToolbar.tabIndex = itemToolbar.contains(<Node | null>target) ? 0 : -1;
             }
         }
     }

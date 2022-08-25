@@ -156,37 +156,6 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         }
     }*/
 
-    /*#handleClickEvent(event: MouseEvent): void {
-        const {target} = event;
-        if (target instanceof HTMLEToolBarItemElement) {
-            const {type} = target;
-            switch (type) {
-                case "menubutton": {
-                    const {menubutton} = target;
-                    if (menubutton) {
-                        const {expanded} = menubutton;
-                        if (!expanded) {
-                            menubutton.expand();
-                            menubutton.menu?.focus({preventScroll: true});
-                        }
-                    }
-                    break;
-                }
-                case "select": {
-                    const {select} = target;
-                    if (select) {
-                        select.toggle();
-                    }
-                    break;
-                }
-                default: {
-                    target.trigger();
-                    break;
-                }
-            }
-        }
-    }*/
-
     #handleFocusEvent(event: FocusEvent): void {
         const {relatedTarget} = event;
         const {activeItem} = this;

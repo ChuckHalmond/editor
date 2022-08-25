@@ -22,7 +22,7 @@ declare global {
     }
 }
 declare var gridRowWidget: {
-    "__#63@#template": HTMLElement;
+    "__#64@#template": HTMLElement;
     create(init?: {
         disabled?: boolean;
     }): HTMLElement;

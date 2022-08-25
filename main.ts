@@ -1,16 +1,5 @@
 //import { MenuItemGroupWidget, MenuItemWidget, MenuWidget, MenuBarWidget } from "./src/views/MenuBarWidget";
-import { TreeItemModel, TreeModel, TreeItemModelList } from "./src/views/TreeView";
 
-import { ListItemModel, ListModel, ListView } from "./src/views/ListView";
-import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
-import { element, fragment, reactiveElement } from "./src/elements/Element";
-import { treeItemWidget } from "./src/views/widgets/tree/TreeItemWidget";
-import { widget } from "./src/views/widgets/Widget";
-import { Editor } from "./src/Editor";
-import { toolbarWidget } from "./src/views/widgets/toolbar/ToolBarWidget";
-import { toolbarItemWidget } from "./src/views/widgets/toolbar/ToolBarItemWidget";
-import { comboBoxWidget } from "./src/views/widgets/combobox/ComboBoxWidget";
-import { optionWidget } from "./src/views/widgets/combobox/OptionWidget";
 import { TreeMain } from "./TreeMain";
 
 import "./index";

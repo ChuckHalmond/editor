@@ -217,6 +217,7 @@ export async function TreeMain() {
                 })
             );
             treeElement!.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
+            treeElement!.addEventListener("dblclick", this.#handleDoubleClickEvent.bind(this));
         }
 
         override itemContentDelegate(item: MyTreeItemModel) {
@@ -271,7 +272,12 @@ export async function TreeMain() {
                                 }
                             }
                         })
-                    ]
+                    ],
+                    listeners: {
+                        dblclick: (event) => {
+                            event.stopPropagation();
+                        }
+                    }
                 }),
                 ["visibility"],
                 (toolbar, property, oldValue, newValue) => {
@@ -370,6 +376,14 @@ export async function TreeMain() {
                     break;
                 }
             }
+        }
+
+        #handleDoubleClickEvent(event: MouseEvent): void {
+            const {target} = event;
+            const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
+            const {model} = this;
+            const targetItemModel = <MyTreeItemModel>model.getItemByUri(targetItem.dataset.uri!)!;
+            alert(targetItemModel.name);
         }
     };
 
