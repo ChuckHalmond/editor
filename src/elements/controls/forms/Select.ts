@@ -37,6 +37,11 @@ var shadowTemplate: HTMLTemplateElement;
 class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
     
     readonly shadowRoot!: ShadowRoot;
+    readonly #internals: ElementInternals;
+
+    static get formAssociated(): boolean {
+        return true;
+    }
 
     get options(): HTMLEOptionElement[] {
         return Array.from(this.querySelectorAll<HTMLEOptionElement>(
@@ -100,6 +105,7 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
 
     constructor() {
         super();
+        this.#internals = this.attachInternals();
         const shadowRoot = this.attachShadow({mode: "open"});
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
@@ -212,8 +218,8 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
         const {style: optionsStyle} = box;  
         const {bottom, left} = this.getBoundingClientRect();
         const {scrollX, scrollY} = window;
-        optionsStyle.setProperty("top", `${bottom + scrollY}px`);
-        optionsStyle.setProperty("left", `${left + scrollX}px`);
+        optionsStyle.setProperty("top", `${bottom/* + scrollY*/}px`);
+        optionsStyle.setProperty("left", `${left/* + scrollX*/}px`);
     }
 
     #handleClickEvent(event: MouseEvent): void {
@@ -360,17 +366,18 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
         }
     }
     
-    #handleSelectEvent(event: Event) {
-        const {target} = event;
-        const targetOption = <HTMLEOptionElement>target;
-        if (targetOption.selected) {
+    #handleSelectEvent() {
+        let {selectedOption} = this
+        selectedOption = selectedOption ?? this.#firstOption();
+        if (selectedOption) {
             const {options} = this;
             options.forEach((option_i) => {
-                if (option_i !== targetOption && option_i.selected) {
+                if (option_i !== selectedOption && option_i.selected) {
                     option_i.selected = false;
                 }
             });
-            this.#setSelectedOption(targetOption);
+            this.#internals.setFormValue(selectedOption.value);
+            this.#setSelectedOption(selectedOption);
         }
     }
 }

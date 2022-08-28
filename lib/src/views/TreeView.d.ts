@@ -30,8 +30,8 @@ declare class TreeItemModelList {
 }
 declare class TreeItemModel extends ModelObject {
     readonly childItems: ModelList<TreeItemModel>;
-    readonly type: "leaf" | "parent";
     readonly name: string;
+    type: "leaf" | "parent";
     index: number;
     get level(): number;
     get uri(): string;

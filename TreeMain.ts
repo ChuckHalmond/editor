@@ -430,6 +430,59 @@ export async function TreeMain() {
                                                     name: "name",
                                                     value: item.name
                                                 }
+                                            }),
+                                            element("label", {
+                                                attributes: {
+                                                    for: "type"
+                                                },
+                                                children: "Type"
+                                            }),
+                                            /*element("select", {
+                                                attributes: {
+                                                    id: "type",
+                                                    name: "type",
+                                                    //value: item.type
+                                                },
+                                                children: [
+                                                    element("option", {
+                                                        attributes: {
+                                                            label: "parent",
+                                                            value: "parent",
+                                                            selected: item.type === "parent"
+                                                        }
+                                                    }),
+                                                    element("option", {
+                                                        attributes: {
+                                                            label: "leaf",
+                                                            value: "leaf",
+                                                            selected: item.type === "leaf"
+                                                        }
+                                                    })
+                                                ]
+                                            })*/
+                                            element("e-select", {
+                                                attributes: {
+                                                    id: "type",
+                                                    type: "text",
+                                                    name: "type",
+                                                    //value: item.type
+                                                },
+                                                children: [
+                                                    element("e-option", {
+                                                        attributes: {
+                                                            label: "parent",
+                                                            value: "parent",
+                                                            selected: item.type === "parent"
+                                                        }
+                                                    }),
+                                                    element("e-option", {
+                                                        attributes: {
+                                                            label: "leaf",
+                                                            value: "leaf",
+                                                            selected: item.type === "leaf"
+                                                        }
+                                                    })
+                                                ]
                                             })
                                         ]
                                     })
@@ -465,6 +518,7 @@ export async function TreeMain() {
                                 const form = <HTMLFormElement>currentTarget;
                                 const formData = new FormData(form);
                                 item.visibility = Boolean(formData.get("visibility"));
+                                item.type = <"leaf" | "parent">formData.get("type");
                             }
                         }
                     })

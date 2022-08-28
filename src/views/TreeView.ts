@@ -128,9 +128,11 @@ class TreeItemModelList {
 
 class TreeItemModel extends ModelObject {
     readonly childItems: ModelList<TreeItemModel>;
-    readonly type: "leaf" | "parent";
     readonly name: string;
     
+    @ModelProperty()
+    type: "leaf" | "parent";
+
     @ModelProperty()
     index: number;
 
@@ -350,14 +352,13 @@ class TreeViewBase extends View implements TreeView {
 
     #renderTreeItem(item: TreeItemModel): HTMLETreeItemElement {
         const {draggable} = this;
-        const {type, index, level, uri} = item;
+        const {index, level, uri} = item;
         const toolbar = this.itemToolbarDelegate(item);
         const content = this.itemContentDelegate(item);
         const treeItemElement = reactiveElement(
             item,
             element("e-treeitem", {
                 attributes: {
-                    type: type,
                     draggable: String(draggable),
                     posinset: index,
                     level: level
@@ -367,22 +368,43 @@ class TreeViewBase extends View implements TreeView {
                 },
                 children: [
                     ...(content ? [content] : []),
-                    ...(toolbar ? [toolbar] : []),
-                    ...(type === "parent") ? [
-                        element("e-treeitemgroup", {
-                            attributes: {
-                                slot: "group"
-                            },
-                            children: reactiveChildElements(item.childItems,
-                                item => this.#renderTreeItem(item)
-                            )
-                        })
-                    ] : []
+                    ...(toolbar ? [toolbar] : [])
                 ]
             }),
-            ["index"],
+            ["index", "type"],
             (treeitem, propertyName, oldValue, newValue) => {
-                treeitem.posinset = newValue;
+                switch (propertyName) {
+                    case "index": {
+                        treeitem.posinset = newValue;
+                        break;
+                    }
+                    case "type": {
+                        treeitem.type = newValue;
+                        switch (newValue) {
+                            case "parent": {
+                                treeitem.append(
+                                    element("e-treeitemgroup", {
+                                        attributes: {
+                                            slot: "group"
+                                        },
+                                        children: reactiveChildElements(item.childItems,
+                                            item => this.#renderTreeItem(item)
+                                        )
+                                    })
+                                );
+                                break;
+                            }
+                            case "leaf": {
+                                const {group} = treeitem;
+                                if (group) {
+                                    group.remove();
+                                }
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
             }
         );
         return treeItemElement;
