@@ -15,6 +15,7 @@ interface HTMLEToolBarItemElement extends HTMLElement {
     label: string;
     active: boolean;
     pressed: boolean;
+    iconed: boolean;
     type: "button" | "checkbox" | "radio" | "menubutton" | "select";
 }
 declare global {

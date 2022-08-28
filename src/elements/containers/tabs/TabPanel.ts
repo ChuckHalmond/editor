@@ -1,4 +1,4 @@
-import { CustomElement, AttributeProperty, element } from "../../Element";
+import { CustomElement } from "../../Element";
 
 export { HTMLETabPanelElement };
 
@@ -8,7 +8,12 @@ interface HTMLETabPanelElementConstructor {
 }
 
 interface HTMLETabPanelElement extends HTMLElement {
-    name: string;
+}
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "e-tabpanel": HTMLETabPanelElement,
+    }
 }
 
 @CustomElement({
@@ -16,35 +21,13 @@ interface HTMLETabPanelElement extends HTMLElement {
 })
 class HTMLETabPanelElementBase extends HTMLElement implements HTMLETabPanelElement {
 
-    @AttributeProperty({type: String})
-    name!: string;
-
     constructor() {
         super();
-        
-        this.attachShadow({mode: "open"}).append(
-            element("style", {
-                children: [
-                    /*css*/`
-                        :host {
-                            display: block;
-                        }
-        
-                        :host([hidden]) {
-                            display: none;
-                        }
-                    `
-                ]
-            }),
-            element("slot")
-        );
+    }
+
+    connectedCallback() {
+        this.hidden = true;
     }
 }
 
 var HTMLETabPanelElement: HTMLETabPanelElementConstructor = HTMLETabPanelElementBase;
-
-declare global {
-    interface HTMLElementTagNameMap {
-        "e-tabpanel": HTMLETabPanelElement,
-    }
-}

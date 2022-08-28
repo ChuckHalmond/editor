@@ -4,11 +4,10 @@ interface HTMLETabPanelElementConstructor {
     new (): HTMLETabPanelElement;
 }
 interface HTMLETabPanelElement extends HTMLElement {
-    name: string;
 }
-declare var HTMLETabPanelElement: HTMLETabPanelElementConstructor;
 declare global {
     interface HTMLElementTagNameMap {
         "e-tabpanel": HTMLETabPanelElement;
     }
 }
+declare var HTMLETabPanelElement: HTMLETabPanelElementConstructor;

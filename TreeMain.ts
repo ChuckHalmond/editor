@@ -262,7 +262,8 @@ export async function TreeMain() {
                             attributes: {
                                 name: "visibility",
                                 type: "checkbox",
-                                label: "Visibility"
+                                label: "Visibility",
+                                iconed: true
                             }
                         })
                     ],

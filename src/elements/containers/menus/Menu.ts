@@ -114,11 +114,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
             item_i.collapse();
         });
     }
-
-    #isClosestMenu(target: Element): boolean {
-        return target.closest(":is(e-menu)") == this;
-    }
-
+    
     #nearestItem(target: Element): HTMLEMenuItemElement | null {
         return Array.from(this.querySelectorAll<HTMLEMenuItemElement>(
             ":is(:scope, :scope > e-menuitemgroup) > e-menuitem"

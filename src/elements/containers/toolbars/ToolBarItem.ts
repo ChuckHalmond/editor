@@ -19,6 +19,7 @@ interface HTMLEToolBarItemElement extends HTMLElement {
     label: string;
     active: boolean;
     pressed: boolean;
+    iconed: boolean;
     type: "button" | "checkbox" | "radio" | "menubutton" | "select";
 }
 
@@ -29,6 +30,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var iconPart: HTMLElement;
 
 @CustomElement({
     name: "e-toolbaritem"
@@ -52,6 +54,9 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
     @AttributeProperty({type: Boolean})
     expanded!: boolean;
 
+    @AttributeProperty({type: Boolean, observed: true})
+    iconed!: boolean;
+
     @AttributeProperty({type: String, observed: true})
     value!: string;
 
@@ -67,11 +72,6 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
-            element("span", {
-                attributes: {
-                    part: "icon"
-                }
-            }),
             element("slot"),
             element("slot", {
                 attributes: {
@@ -84,6 +84,11 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
                 }
             })
         );
+        iconPart = element("span", {
+            attributes: {
+                part: "icon"
+            }
+        });
     }
 
     constructor() {
@@ -102,10 +107,19 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
         switch (name) {
             case "label": {
+                //...
+                break;
+            }
+            case "iconed": {
                 const {shadowRoot} = this;
-                const labelPart = shadowRoot.querySelector<HTMLSpanElement>("[part=label]");
-                if (labelPart) {
-                    labelPart.textContent = newValue;
+                if (newValue !== null) {
+                    shadowRoot.prepend(iconPart.cloneNode(true));
+                }
+                else {
+                    const iconPart = shadowRoot.querySelector<HTMLElement>("[part=icon]");
+                    if (iconPart) {
+                        iconPart.remove();
+                    }
                 }
                 break;
             }

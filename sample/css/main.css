@@ -5,6 +5,7 @@
 @import "client.css" layer(client);
 
 
+@import "elements/tabs/tab.css" layer(base);
 @import "elements/separator.css" layer(base);
 @import "elements/sash.css" layer(base);
 @import "elements/menu/menu.css" layer(base);

@@ -9,11 +9,11 @@ type ToolBarOrientation = "horizontal" | "vertical";
 
 interface HTMLEToolBarElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
+    readonly activeItem: HTMLEToolBarItemElement | null;
     items(): HTMLEToolBarItemElement[];
     firstItem(): HTMLEToolBarItemElement | null;
-    readonly activeItem: HTMLEToolBarItemElement | null;
-    readonly activeIndex: number;
     name: string;
+    orientation: ToolBarOrientation;
 }
 
 interface HTMLEToolbarElementConstructor {
@@ -49,10 +49,6 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         ));
     }
 
-    get activeIndex(): number {
-        return this.#activeIndex;
-    }
-
     @AttributeProperty({type: String})
     name!: string;
 
@@ -60,7 +56,6 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
     orientation!: ToolBarOrientation;
 
     #walker: TreeWalker;
-    #activeIndex: number;
 
     static {
         shadowTemplate = element("template");
@@ -72,7 +67,6 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
 
     constructor() {
         super();
-        this.#activeIndex = -1;
         this.#walker = document.createTreeWalker(
             this, NodeFilter.SHOW_ELEMENT, this.#nodeFilter.bind(this)
         );
@@ -137,10 +131,6 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         }
         if (item !== null) {
             item.active = true;
-            this.#activeIndex = this.items().indexOf(item);
-        }
-        else {
-            this.#activeIndex = -1;
         }
     }
 

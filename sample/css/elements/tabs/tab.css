@@ -1,0 +1,40 @@
+e-tablist {
+    display: block;
+    position: relative;
+}
+
+e-tab {
+    display: inline-block;
+    
+    user-select: none;
+    white-space: nowrap;
+
+    padding: 2px 6px;
+    cursor: pointer;
+}
+
+e-tab[disabled] {
+    opacity: 0.38;
+    pointer-events: none;
+}
+
+e-tab:hover {
+    background-color: var(--hovered-item-color);
+}
+
+e-tab[selected] {
+    background-color: var(--activated-item-color);
+}
+
+e-tablist:focus-within e-tab:focus-within {
+    outline: 1px solid var(--focused-item-outline-color);
+    outline-offset: -1px;
+}
+
+e-tabpanel {
+    display: block;
+}
+
+e-tabpanel[hidden] {
+    display: none;
+}

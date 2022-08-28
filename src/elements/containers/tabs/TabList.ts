@@ -1,4 +1,4 @@
-import { CustomElement, element } from "../../Element";
+import { CustomElement } from "../../Element";
 import { HTMLETabElement } from "./Tab";
 
 export { HTMLETabListElement };
@@ -9,8 +9,11 @@ interface HTMLETabListElementConstructor {
 }
 
 interface HTMLETabListElement extends HTMLElement {
-    readonly activeTab: HTMLETabElement | null;
-    tabs: HTMLETabElement[];
+    get activeTab(): HTMLETabElement | null;
+    get selectedTab(): HTMLETabElement | null;
+    get tabs(): HTMLETabElement[];
+    firstItem(): HTMLETabElement | null;
+    connectedCallback(): void;
 }
 
 declare global {
@@ -24,100 +27,181 @@ declare global {
 })
 class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement {
 
-    tabs: HTMLETabElement[];
-
-    #activeIndex: number;
-
-    constructor() {
-        super();
-        
-        this.attachShadow({mode: "open"}).append(
-            element("style", {
-                children: [
-                    /*css*/`
-                        :host {
-                            display: block;
-                            position: relative;
-                        }
-                    `
-                ]
-            }),
-            element("slot")
+    #walker: TreeWalker;
+    
+    get tabs(): HTMLETabElement[] {
+        return Array.from(
+            this.querySelectorAll("e-tab")
         );
-        
-        this.tabs = [];
-        this.#activeIndex = 1;
-    }
-
-    get activeIndex(): number {
-        return this.#activeIndex;
     }
 
     get activeTab(): HTMLETabElement | null {
-        return this.tabs[this.#activeIndex] || null;
+        return this.querySelector(
+            "e-tab[active]"
+        );
+    }
+
+    get selectedTab(): HTMLETabElement | null {
+        return this.querySelector(
+            "e-tab[selected]"
+        );
+    }
+
+    constructor() {
+        super();
+        this.#walker = document.createTreeWalker(
+            this, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
+        );
+        this.addEventListener("click", this.#handleClickEvent.bind(this));
+        this.addEventListener("focus", this.#handleFocusEvent.bind(this));
+        this.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
+        this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
+        this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
+        this.addEventListener("select", this.#handleSelectEvent.bind(this));
     }
 
     connectedCallback(): void {
         this.tabIndex = this.tabIndex;
-        const slot = this.shadowRoot!.querySelector("slot");
-        if (slot) {
-            slot.addEventListener("slotchange", (event) => {
+    }
 
-                const tabs = <HTMLETabElement[]>(<HTMLSlotElement>event.target)
-                    .assignedElements()
-                    .filter(tab => tab instanceof HTMLETabElement);
-                this.tabs = tabs;
-                this.#activeIndex = this.tabs.findIndex(tab => tab.active);
-            });
+    #walkerNodeFilter(node: Node): number {
+        if (node instanceof HTMLETabElement) {
+            return NodeFilter.FILTER_ACCEPT;
         }
+        return NodeFilter.FILTER_REJECT;
+    }
 
-        this.addEventListener("keydown", (event) => {
-            switch (event.key) {
-                case "ArrowUp":
-                    this.focusTabAt((this.activeIndex <= 0) ? this.tabs.length - 1 : this.activeIndex - 1);
-                    event.stopPropagation();
-                    break;
-                case "ArrowDown":
-                    this.focusTabAt((this.activeIndex >= this.tabs.length - 1) ? 0 : this.activeIndex + 1);
-                    event.stopPropagation();
-                    break;
-                case "Enter":
-                    if (this.activeTab) {
-                        this.activateTab(this.activeTab);
+    firstItem(): HTMLETabElement | null {
+        const walker = this.#walker;
+        walker.currentNode = walker.root;
+        return <HTMLETabElement | null>walker.firstChild();
+    }
+
+    #lastItem(): HTMLETabElement | null {
+        const walker = this.#walker;
+        walker.currentNode = walker.root;
+        return <HTMLETabElement | null>walker.lastChild();
+    }
+    
+    #previousItem(item: HTMLETabElement): HTMLETabElement | null {
+        const walker = this.#walker;
+        walker.currentNode = item;
+        return <HTMLETabElement | null>walker.previousNode();
+    }
+
+    #nextItem(item: HTMLETabElement): HTMLETabElement | null {
+        const walker = this.#walker;
+        walker.currentNode = item;
+        return <HTMLETabElement | null>walker.nextNode();
+    }
+
+    #setActiveTab(item: HTMLETabElement | null): void {
+        const {activeTab} = this;
+        if (activeTab !== null && activeTab !== item) {
+            activeTab.active = false;
+        }
+        if (item !== null) {
+            item.active = true;
+        }
+    }
+
+    #handleClickEvent(event: MouseEvent): void {
+        const {target} = event;
+        const targetTab = (<Element>target).closest("e-tab");
+        if (targetTab) {
+            targetTab.select();
+        }
+    }
+
+    #handleFocusEvent(event: FocusEvent): void {
+        const {relatedTarget} = event;
+        const {activeTab} = this;
+        if (!this.contains(<Node>relatedTarget)) {
+            (activeTab ?? this.firstItem())?.focus();
+        }
+    }
+
+    #handleFocusInEvent(event: FocusEvent): void {
+        const {target} = event;
+        const targetTab = <HTMLETabElement | null>(<HTMLElement>target).closest("e-tab");
+        if (targetTab) {
+            this.#setActiveTab(targetTab);
+            this.tabIndex = -1;
+        }
+    }
+
+    #handleFocusOutEvent(event: FocusEvent): void {
+        const {relatedTarget} = event;
+        const lostFocusWithin = !this.contains(<Node>relatedTarget);
+        if (lostFocusWithin) {
+            this.tabIndex = 0;
+        }
+    }
+
+    #handleKeyDownEvent(event: KeyboardEvent): void {
+        const {key} = event;
+        const {activeTab} = this;
+        switch (key) {
+            case "ArrowLeft": {
+                const previousTab = activeTab ?
+                    this.#previousItem(activeTab) ?? this.#lastItem() :
+                    this.firstItem();
+                previousTab?.focus({preventScroll: true});
+                event.stopPropagation();
+                break;
+            }
+            case "ArrowRight": {
+                const nextTab = activeTab ?
+                    this.#nextItem(activeTab) ?? this.firstItem() :
+                    this.#lastItem();
+                nextTab?.focus({preventScroll: true});
+                event.stopPropagation();
+                break;
+            }
+            case "Home": {
+                const firstItem = this.firstItem();
+                if (firstItem) {
+                    firstItem.focus({preventScroll: true});
+                }
+                event.stopPropagation();
+                break;
+            }
+            case "End": {
+                const lastItem = this.#lastItem();
+                if (lastItem) {
+                    lastItem.focus({preventScroll: true});
+                }
+                event.stopPropagation();
+                break;
+            }
+            case "Enter": {
+                activeTab?.click();
+                event.stopPropagation();
+                break;
+            }
+        }
+    }
+
+    #handleSelectEvent(event: Event) {
+        const {target} = event;
+        const targetTab = <HTMLETabElement>target;
+        if (targetTab.selected) {
+            const {tabs} = this;
+            tabs.forEach((tab_i) => {
+                if (tab_i !== targetTab) {
+                    if (tab_i.selected) {
+                        tab_i.selected = false;
+                        const {panel} = tab_i;
+                        if (panel) {
+                            panel.hidden = true;
+                        }
                     }
-                    break;
-            }
-        });
-        
-        this.addEventListener("click", (event) => {
-            const target = event.target;
-            if (target instanceof HTMLETabElement) {
-                target.active = true;
-            }
-        });
-
-        this.addEventListener("e_tabchange", (event) => {
-            const targetIndex = this.tabs.indexOf(event.detail.tab);
-            this.#activeIndex = targetIndex;
-            this.tabs.forEach((thisTab, thisTabIndex) => {
-                if (thisTabIndex !== targetIndex) {
-                    thisTab.active = false;
                 }
             });
-        });
-    }
-
-    focusTabAt(index: number): void {
-        const tab = this.tabs[index];
-        if (tab) {
-            this.#activeIndex = index;
-            tab.focus();
-        }
-    }
-
-    activateTab(tab: HTMLETabElement) {
-        if (this.tabs.includes(tab)) {
-            tab.active = true;
+            const {panel} = targetTab;
+            if (panel) {
+                panel.hidden = false;
+            }
         }
     }
 }

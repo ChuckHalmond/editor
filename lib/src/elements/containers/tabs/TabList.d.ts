@@ -5,8 +5,11 @@ interface HTMLETabListElementConstructor {
     new (): HTMLETabListElement;
 }
 interface HTMLETabListElement extends HTMLElement {
-    readonly activeTab: HTMLETabElement | null;
-    tabs: HTMLETabElement[];
+    get activeTab(): HTMLETabElement | null;
+    get selectedTab(): HTMLETabElement | null;
+    get tabs(): HTMLETabElement[];
+    firstItem(): HTMLETabElement | null;
+    connectedCallback(): void;
 }
 declare global {
     interface HTMLElementTagNameMap {

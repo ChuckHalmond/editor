@@ -52,6 +52,10 @@ e-toolbaritem[pressed] {
     background-color: var(--activated-item-color);
 }
 
+e-toolbaritem:not([iconed])::part(icon) {
+    display: none;
+}
+
 e-toolbar:focus-within e-toolbaritem:focus-within {
     outline: 1px solid var(--focused-item-outline-color);
     outline-offset: -1px;
