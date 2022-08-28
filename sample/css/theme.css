@@ -19,6 +19,9 @@
     --background-darker-color: white;
     --background-lighter-color: white;
     
+    --border-color: rgb(120, 120, 120);
+    --backdrop-color: rgba(120, 120, 120, 0.5);
+
     --accent-color: hsl(212, 100%, 50%);
     --hovered-item-color: hsl(203, 92%, 80%, 50%);
     --focused-item-color: hsl(203, 92%, 50%, 50%);

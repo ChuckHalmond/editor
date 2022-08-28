@@ -176,7 +176,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
 
     #handleFocusOutEvent(event: FocusEvent): void {
         const {target, relatedTarget} = event;
-        if (target instanceof HTMLElement && !target.contains(<Element>relatedTarget)) {
+        if (target instanceof HTMLElement) {
             const nearestItem = this.#nearestItem(target);
             if (nearestItem) {
                 nearestItem.collapse();
@@ -219,7 +219,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
                     menu?.focus({preventScroll: true});
                 }
                 else {
-                    this.focus({preventScroll: true})
+                    document.body.focus();
                 }
             }
         }

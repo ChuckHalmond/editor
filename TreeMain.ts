@@ -200,11 +200,16 @@ export async function TreeMain() {
         )
     );
 
+    var editDialog: HTMLDialogElement;
+
     @CustomElement({
         name: "e-mytreeview"
     })
     class MyTreeView extends TreeView {
 
+        static {
+
+        }
         override render(): void {
             super.render();
             const {shadowRoot, treeElement} = this;
@@ -264,19 +269,17 @@ export async function TreeMain() {
                                 type: "checkbox",
                                 label: "Visibility",
                                 iconed: true
+                            },
+                            listeners: {
+                                click: (event) => {
+                                    item.visibility ?
+                                        item.hide() :
+                                        item.show();
+                                    event.stopPropagation();
+                                }
                             }
                         })
-                    ],
-                    listeners: {
-                        click: (event) => {
-                            const {target} = event;
-                            if ((<Element>target).matches("e-toolbaritem[name=visibility]")) {
-                                item.visibility ?
-                                    item.hide() :
-                                    item.show();
-                            }
-                        }
-                    }
+                    ]
                 }),
                 ["visibility"],
                 (toolbar, property, oldValue, newValue) => {
@@ -360,7 +363,7 @@ export async function TreeMain() {
             const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
             const selectedItems = this.selectedItems();
             const {model} = this;
-            const targetItemModel = model.getItemByUri(targetItem.dataset.uri!)!;
+            const targetItemModel = <MyTreeItemModel>model.getItemByUri(targetItem.dataset.uri!)!;
             switch (key) {
                 case "Delete": {
                     const selectedItemsList = selectedItems.includes(targetItemModel) ?
@@ -374,15 +377,118 @@ export async function TreeMain() {
                     event.preventDefault();
                     break;
                 }
+                case "Enter": {
+                    this.editItem(targetItemModel);
+                    event.preventDefault();
+                }
             }
+        }
+
+        editItem(item: MyTreeItemModel): void {
+            const {shadowRoot} = this;
+            const dialog = element("dialog", {
+                children: [
+                    element("form", {
+                        attributes: {
+                            method: "dialog"
+                        },
+                        children: [
+                            element("fieldset", {
+                                children: [
+                                    element("legend", {
+                                        children: "Info"
+                                    }),
+                                    element("div", {
+                                        attributes: {
+                                            class: "form-content"
+                                        },
+                                        children: [
+                                            element("label", {
+                                                attributes: {
+                                                    for: "visibility"
+                                                },
+                                                children: "Visibility"
+                                            }),
+                                            element("input", {
+                                                attributes: {
+                                                    id: "visibility",
+                                                    type: "checkbox",
+                                                    name: "visibility",
+                                                    checked: item.visibility
+                                                }
+                                            }),
+                                            element("label", {
+                                                attributes: {
+                                                    for: "name"
+                                                },
+                                                children: "Name"
+                                            }),
+                                            element("input", {
+                                                attributes: {
+                                                    id: "name",
+                                                    type: "text",
+                                                    name: "name",
+                                                    value: item.name
+                                                }
+                                            })
+                                        ]
+                                    })
+                                ]
+                            }),
+                            element("footer", {
+                                attributes: {
+                                    class: "form-actions"
+                                },
+                                children: [
+                                    element("button", {
+                                        attributes: {
+                                            type: "submit"
+                                        },
+                                        children: [
+                                            "Confirm"
+                                        ]
+                                    }),
+                                    element("button", {
+                                        attributes: {
+                                            type: "close"
+                                        },
+                                        children: [
+                                            "Cancel"
+                                        ]
+                                    })
+                                ]
+                            })
+                        ],
+                        listeners: {
+                            submit: (event) => {
+                                const {currentTarget} = event;
+                                const form = <HTMLFormElement>currentTarget;
+                                const formData = new FormData(form);
+                                item.visibility = Boolean(formData.get("visibility"));
+                            }
+                        }
+                    })
+                ],
+                listeners: {
+                    close: (event) => {
+                        const {currentTarget} = event;
+                        const dialog = <Element>currentTarget;
+                        dialog.remove();
+                    }
+                }
+            });
+            shadowRoot.append(dialog);
+            dialog.showModal();
         }
 
         #handleDoubleClickEvent(event: MouseEvent): void {
             const {target} = event;
             const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
             const {model} = this;
-            const targetItemModel = <MyTreeItemModel>model.getItemByUri(targetItem.dataset.uri!)!;
-            alert(targetItemModel.name);
+            const targetItemModel = <MyTreeItemModel>model.getItemByUri(targetItem.dataset.uri!);
+            if (targetItemModel) {
+                this.editItem(targetItemModel);
+            }
         }
     };
 

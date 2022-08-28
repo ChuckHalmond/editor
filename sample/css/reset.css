@@ -6,6 +6,10 @@ html {
     accent-color: var(--accent-color);
 }
 
+* {
+    box-sizing: border-box;
+}
+
 :focus-visible {
     outline: none;
 }
@@ -24,6 +28,8 @@ button,
 select,
 textarea {
     font-family: inherit;
+    font-size: inherit;
+    box-sizing: content-box;
 }
 
 select {
@@ -62,13 +68,28 @@ input[type="color" i] {
     appearance: none;
 }
 
+dialog,
+fieldset {
+    border: 1px solid var(--border-color);
+    padding: 8px;
+}
+
+::backdrop {
+    background-color: var(--backdrop-color);
+}
+
+button[type="submit"] {
+    outline: 1px solid var(--accent-color);
+    outline-offset: -2px;
+}
+
 button {
+    padding: 2px 4px;
+    height: var(--line-height);
     appearance: none;
     background: none;
-    border: none;
-    padding: 0;
     margin: 0;
-    height: var(--padded-line-height);
+    border: 1px solid var(--accent-color);
 }
 
 table {

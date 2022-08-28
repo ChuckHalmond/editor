@@ -497,7 +497,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
             const {selected} = target;
             switch (button) {
                 case 0: {
-                    if (!shiftKey && !ctrlKey && !selected) {
+                    if (!shiftKey && !ctrlKey) {
                         this.#setSelection(target);
                     }
                     else if (ctrlKey) {

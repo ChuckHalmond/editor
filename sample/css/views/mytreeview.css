@@ -1,9 +1,9 @@
-.badge {
+e-treeitem .badge {
     margin-left: 4px;
     order: 2;
 }
 
-.label {
+e-treeitem .label {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -15,4 +15,25 @@ e-treeitem:is(
     :not(:is([selected], [active])):hover:has(> e-treeitemgroup:hover),
 ) > e-toolbar {
     display: none;
+}
+
+.form-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 2rem;
+}
+
+.form-actions {
+    display: flex;
+    flex-direction: row;
+    padding-left: auto;
+    margin-top: 8px;
+}
+
+.form-actions button:first-child {
+    margin-left: auto;
+}
+
+.form-actions button:not(:first-child) {
+    margin-left: 8px;
 }

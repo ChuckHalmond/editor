@@ -4,7 +4,6 @@
 @import "theme.css" layer(theme);
 @import "client.css" layer(client);
 
-
 @import "elements/tabs/tab.css" layer(base);
 @import "elements/separator.css" layer(base);
 @import "elements/sash.css" layer(base);
@@ -16,8 +15,6 @@
 @import "elements/list/list.css" layer(base);
 @import "elements/select/select.css" layer(base);
 @import "elements/grid/grid.css" layer(base);
-
-@import "builtins.css" layer(base);
 
 @import "widgets/sashes.css" layer(base);
 @import "widgets/menu.css" layer(base);

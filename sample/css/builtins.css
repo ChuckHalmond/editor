@@ -1,8 +1,0 @@
-:is(
-    input,
-    select,
-    summary
-):focus-within {
-    outline: 1px solid var(--focused-item-outline-color);
-    outline-offset: -1px;
-}
