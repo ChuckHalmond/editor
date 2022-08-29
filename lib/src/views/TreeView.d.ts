@@ -19,7 +19,7 @@ declare class TreeModel extends ModelObject {
     sortFunction: ((item_a: TreeItemModel, item_b: TreeItemModel) => number) | null;
     constructor();
     constructor(init: TreeModelInit);
-    flattenItems(): TreeItemModel[];
+    subtreeItems(): TreeItemModel[];
     getItemByUri(this: TreeModel | TreeItemModel, uri: string): TreeItemModel | null;
 }
 declare class TreeItemModelList {
@@ -30,7 +30,7 @@ declare class TreeItemModelList {
 }
 declare class TreeItemModel extends ModelObject {
     readonly childItems: ModelList<TreeItemModel>;
-    readonly name: string;
+    name: string;
     type: "leaf" | "parent";
     index: number;
     get level(): number;
@@ -41,7 +41,7 @@ declare class TreeItemModel extends ModelObject {
         type: "leaf" | "parent";
         items?: TreeItemModel[];
     });
-    flattenItems(): TreeItemModel[];
+    subtreeItems(): TreeItemModel[];
     remove(): void;
 }
 interface TreeViewConstructor {

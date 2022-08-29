@@ -24,10 +24,6 @@ class HTMLETabPanelElementBase extends HTMLElement implements HTMLETabPanelEleme
     constructor() {
         super();
     }
-
-    connectedCallback() {
-        this.hidden = true;
-    }
 }
 
 var HTMLETabPanelElement: HTMLETabPanelElementConstructor = HTMLETabPanelElementBase;

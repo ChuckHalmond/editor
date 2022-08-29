@@ -23,17 +23,16 @@ e-treeitem:is(
     column-gap: 2rem;
 }
 
-.form-actions {
+.dialog-footer {
     display: flex;
     flex-direction: row;
-    padding-left: auto;
     margin-top: 8px;
 }
 
-.form-actions button {
+.dialog-footer button {
     margin: auto 0 auto 8px;
 }
 
-.form-actions button:first-child {
+.dialog-footer button:first-child {
     margin-left: auto;
 }

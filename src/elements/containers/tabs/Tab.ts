@@ -48,7 +48,7 @@ class HTMLETabElementBase extends HTMLElement implements HTMLETabElement {
     
     get panel(): HTMLETabPanelElement | null {
         const {controls} = this;
-        return document.querySelector<HTMLETabPanelElement>(`e-tabpanel#${controls}`);
+        return (<Document | ShadowRoot>this.getRootNode()).querySelector<HTMLETabPanelElement>(`e-tabpanel#${controls}`);
     }
 
     constructor() {
@@ -56,7 +56,8 @@ class HTMLETabElementBase extends HTMLElement implements HTMLETabElement {
     }
 
     connectedCallback(): void {
-        this.tabIndex = this.tabIndex;
+        const {tabIndex} = this;
+        this.tabIndex = tabIndex;
     }
     
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {

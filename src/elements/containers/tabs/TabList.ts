@@ -58,10 +58,16 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
         this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         this.addEventListener("select", this.#handleSelectEvent.bind(this));
+        this.addEventListener("select", this.#handleSelectEvent.bind(this));
     }
 
     connectedCallback(): void {
-        this.tabIndex = this.tabIndex;
+        const {tabIndex, selectedTab} = this;
+        this.tabIndex = tabIndex;
+        const tabToSelect = selectedTab ?? this.firstItem();
+        if (tabToSelect) {
+            this.#selectTab(tabToSelect);
+        }
     }
 
     #walkerNodeFilter(node: Node): number {
@@ -102,6 +108,13 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
         }
         if (item !== null) {
             item.active = true;
+        }
+    }
+
+    #selectTab(tab: HTMLETabElement) {
+        const {selectedTab} = this;
+        if (tab !== selectedTab) {
+            tab.selected = true;
         }
     }
 
@@ -189,12 +202,13 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
             const {tabs} = this;
             tabs.forEach((tab_i) => {
                 if (tab_i !== targetTab) {
-                    if (tab_i.selected) {
+                    //const {selected} = tab_i;
+                    //if (selected) {
                         tab_i.selected = false;
-                        const {panel} = tab_i;
-                        if (panel) {
-                            panel.hidden = true;
-                        }
+                    //}
+                    const {panel} = tab_i;
+                    if (panel) {
+                        panel.hidden = true;
                     }
                 }
             });

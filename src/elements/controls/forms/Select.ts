@@ -151,7 +151,7 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
         const expand = force ?? !expanded;
         expand ? this.expand() : this.collapse();
     }
-
+    
     #value(): HTMLElement {
         return this.shadowRoot.querySelector<HTMLElement>("[part=value]")!;
     }
@@ -198,7 +198,6 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
         const {selectedOption} = this;
         if (option !== selectedOption) {
             option.selected = true;
-            this.dispatchEvent(new Event("change", {bubbles: true}));
         }
     }
     

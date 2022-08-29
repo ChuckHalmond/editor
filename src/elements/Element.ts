@@ -196,29 +196,7 @@ const CustomElement: CustomElementDecorator = function(init: {
         return elementCtor;
     }
 }
-/*
-function *subtreeNodes(node: Node): Generator<Node> {
-    yield node;
-    const childNodes = node.childNodes;
-    const childNodesCount = childNodes.length;
-    let childIndex = 0;
-    while (childIndex < childNodesCount) {
-        const child = childNodes.item(childIndex);
-        if (child !== null) {
-            yield * subtreeNodes(child);
-        }
-        childIndex++;
-    }
-}
 
-function *ancestorNodes(node: Node): Generator<Node> {
-    const {parentNode} = node;
-    if (parentNode) {
-        yield parentNode;
-        yield *ancestorNodes(parentNode);
-    }
-}
-*/
 interface QueryPropertyDecorator {
     (
         init: {

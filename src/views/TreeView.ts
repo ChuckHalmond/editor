@@ -30,7 +30,7 @@ class TreeModel extends ModelObject {
         const childItems = new ModelList(items);
         childItems.setParent(this);
         this.childItems = childItems;
-        this.items = new ModelList(this.flattenItems());
+        this.items = new ModelList(this.subtreeItems());
         this.sortFunction = sortFunction ??
             function(item_a: TreeItemModel, item_b: TreeItemModel) {
                 return item_a.name.localeCompare(item_b.name);
@@ -40,16 +40,16 @@ class TreeModel extends ModelObject {
     
     #handleModelChangeEvent(event: ModelEvent): void {
         const {target} = event;
-        const {items, sortFunction, flattenItems} = this;
+        const {items, sortFunction, subtreeItems} = this;
         if (target instanceof ModelList) {
             const records = target.getRecords();
             records.forEach((record_i) => {
                 const {insertedItems, removedItems} = record_i;
                 const flattenedInsertedItems = (<TreeItemModel[]>Array.from(insertedItems.values())).flatMap(
-                    insertedItem_i => Array.of(insertedItem_i, ...flattenItems.call(insertedItem_i))
+                    insertedItem_i => Array.of(insertedItem_i, ...subtreeItems.call(insertedItem_i))
                 );
                 const flattenedRemovedItems = (<TreeItemModel[]>Array.from(removedItems.values())).flatMap(
-                    removedItem_i => Array.of(removedItem_i, ...flattenItems.call(removedItem_i))
+                    removedItem_i => Array.of(removedItem_i, ...subtreeItems.call(removedItem_i))
                 );
                 items.beginChanges();
                 items.append(...flattenedInsertedItems);
@@ -63,10 +63,10 @@ class TreeModel extends ModelObject {
         }
     }
 
-    flattenItems(): TreeItemModel[] {
+    subtreeItems(): TreeItemModel[] {
         const {childItems} = this;
         return Array.from(childItems.values()).flatMap(
-            treeItem_i => Array.of(treeItem_i, ...treeItem_i.flattenItems())
+            treeItem_i => Array.of(treeItem_i, ...treeItem_i.subtreeItems())
         );
     }
 
@@ -79,12 +79,10 @@ class TreeModel extends ModelObject {
             const {uri: itemUri} = item_i;
             const {length: itemUriLength} = itemUri;
             if (uri.startsWith(itemUri)) {
-                if (uri.charAt(itemUriLength) === "/") {
-                    return TreeModel.prototype.getItemByUri.call(item_i, uri);
-                }
-                else if (itemUriLength === uriLength) {
+                if (itemUriLength === uriLength) {
                     return <TreeItemModel>item_i;
                 }
+                return TreeModel.prototype.getItemByUri.call(item_i, uri);
             }
         }
         return null;
@@ -128,7 +126,9 @@ class TreeItemModelList {
 
 class TreeItemModel extends ModelObject {
     readonly childItems: ModelList<TreeItemModel>;
-    readonly name: string;
+
+    @ModelProperty()
+    name: string;
     
     @ModelProperty()
     type: "leaf" | "parent";
@@ -147,11 +147,11 @@ class TreeItemModel extends ModelObject {
     }
 
     get uri(): string {
-        const {parentNode} = this;
+        const {parentNode, name} = this;
         if (parentNode instanceof TreeItemModel) {
-            return `${parentNode.uri}/${this.name}`;
+            return `${parentNode.uri}${name}/`;
         }
-        return this.name;
+        return `${name}/`;
     }
 
     get parentItem(): TreeItemModel | null {
@@ -174,10 +174,10 @@ class TreeItemModel extends ModelObject {
         this.index = -1;
     }
 
-    flattenItems(): TreeItemModel[] {
+    subtreeItems(): TreeItemModel[] {
         const {childItems} = this;
         return Array.from(childItems.values()).flatMap(
-            treeItem_i => Array.of(treeItem_i, ...treeItem_i.flattenItems())
+            treeItem_i => Array.of(treeItem_i, ...treeItem_i.subtreeItems())
         );
     }
 
@@ -294,6 +294,7 @@ class TreeViewBase extends View implements TreeView {
                 }
             }),
             treeElement,
+            element("slot"),
             element("div", {
                 attributes: {
                     class: "offscreen",
@@ -371,11 +372,25 @@ class TreeViewBase extends View implements TreeView {
                     ...(toolbar ? [toolbar] : [])
                 ]
             }),
-            ["index", "type"],
+            ["index", "name", "type"],
             (treeitem, propertyName, oldValue, newValue) => {
                 switch (propertyName) {
                     case "index": {
                         treeitem.posinset = newValue;
+                        break;
+                    }
+                    case "name": {
+                        const {dataset} = treeitem;
+                        const {uri} = item;
+                        dataset.uri = uri;
+                        const oldUri = uri.replace(`${newValue}/`, `${oldValue}/`);
+                        const subtreeItems = treeitem.querySelectorAll("e-treeitem");
+                        subtreeItems.forEach(
+                            (item_i) => {
+                                const {dataset} = item_i;
+                                dataset.uri = dataset.uri!.replace(oldUri, uri);
+                            }
+                        );
                         break;
                     }
                     case "type": {

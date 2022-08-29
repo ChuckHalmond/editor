@@ -393,76 +393,79 @@ export async function TreeMain() {
                             method: "dialog"
                         },
                         children: [
-                            element("fieldset", {
+                            element("e-tablist", {
                                 children: [
-                                    element("legend", {
-                                        children: "Info"
-                                    }),
-                                    element("div", {
+                                    element("e-tab", {
                                         attributes: {
-                                            class: "form-content"
+                                            controls: "properties"
                                         },
+                                        children: "Properties"
+                                    })
+                                ]
+                            }),
+                            element("e-tabpanel", {
+                                attributes: {
+                                    id: "properties"
+                                },
+                                children: [
+                                    element("fieldset", {
                                         children: [
-                                            element("label", {
-                                                attributes: {
-                                                    for: "visibility"
-                                                },
-                                                children: "Visibility"
+                                            element("legend", {
+                                                children: "Item information"
                                             }),
-                                            element("input", {
+                                            element("div", {
                                                 attributes: {
-                                                    id: "visibility",
-                                                    type: "checkbox",
-                                                    name: "visibility",
-                                                    checked: item.visibility
-                                                }
-                                            }),
-                                            element("label", {
-                                                attributes: {
-                                                    for: "name"
-                                                },
-                                                children: "Name"
-                                            }),
-                                            element("input", {
-                                                attributes: {
-                                                    id: "name",
-                                                    type: "text",
-                                                    name: "name",
-                                                    value: item.name
-                                                }
-                                            }),
-                                            element("label", {
-                                                attributes: {
-                                                    for: "type"
-                                                },
-                                                children: "Type"
-                                            }),
-                                            element("e-select", {
-                                                attributes: {
-                                                    id: "type",
-                                                    type: "text",
-                                                    name: "type",
-                                                    value: item.type,
-                                                    tabindex: 0
+                                                    class: "form-content"
                                                 },
                                                 children: [
-                                                    element("e-option", {
+                                                    element("label", {
                                                         attributes: {
-                                                            label: "parent",
-                                                            value: "parent"
+                                                            for: "visibility"
+                                                        },
+                                                        children: "Visibility"
+                                                    }),
+                                                    element("input", {
+                                                        attributes: {
+                                                            id: "visibility",
+                                                            type: "checkbox",
+                                                            name: "visibility",
+                                                            checked: item.visibility
                                                         }
                                                     }),
-                                                    element("e-option", {
+                                                    element("label", {
                                                         attributes: {
-                                                            label: "leaf",
-                                                            value: "leaf"
+                                                            for: "name"
+                                                        },
+                                                        children: "Name"
+                                                    }),
+                                                    element("input", {
+                                                        attributes: {
+                                                            id: "name",
+                                                            type: "text",
+                                                            name: "name",
+                                                            value: item.name
                                                         }
                                                     }),
-                                                    element("e-option", {
+                                                    element("label", {
                                                         attributes: {
-                                                            label: "lol",
-                                                            value: "lol"
-                                                        }
+                                                            for: "type"
+                                                        },
+                                                        children: "Type"
+                                                    }),
+                                                    element("select", {
+                                                        attributes: {
+                                                            id: "type",
+                                                            name: "type"
+                                                        },
+                                                        children: ["parent", "leaf"].map(
+                                                            type_i => element("option", {
+                                                                attributes: {
+                                                                    label: type_i,
+                                                                    value: type_i,
+                                                                    selected: item.type === type_i
+                                                                }
+                                                            })
+                                                        )
                                                     })
                                                 ]
                                             })
@@ -470,9 +473,14 @@ export async function TreeMain() {
                                     })
                                 ]
                             }),
+                            element("e-tabpanel", {
+                                attributes: {
+                                    id: "two"
+                                },
+                            }),
                             element("footer", {
                                 attributes: {
-                                    class: "form-actions"
+                                    class: "dialog-footer"
                                 },
                                 children: [
                                     element("button", {
@@ -480,17 +488,13 @@ export async function TreeMain() {
                                             type: "submit",
                                             value: "confirm"
                                         },
-                                        children: [
-                                            "Confirm"
-                                        ]
+                                        children: "Confirm"
                                     }),
                                     element("button", {
                                         attributes: {
                                             value: "cancel"
                                         },
-                                        children: [
-                                            "Cancel"
-                                        ]
+                                        children: "Cancel"
                                     })
                                 ]
                             })
@@ -498,14 +502,17 @@ export async function TreeMain() {
                     })
                 ],
                 listeners: {
-                    close: () => {
-                        if (dialog.returnValue === "confirm") {
-                            const form = dialog.querySelector("form")!;
+                    close: (event) => {
+                        const {currentTarget} = event;
+                        const targetDialog = <HTMLDialogElement>currentTarget;
+                        if (targetDialog.returnValue === "confirm") {
+                            const form = targetDialog.querySelector("form")!;
                             const formData = new FormData(form);
                             item.visibility = Boolean(formData.get("visibility"));
-                            item.type = <"leaf" | "parent">formData.get("type");
+                            item.type = <"leaf" | "parent">String(formData.get("type"));
+                            item.name = String(formData.get("name"));
                         }
-                        dialog.remove();
+                        targetDialog.remove();
                     }
                 }
             });
