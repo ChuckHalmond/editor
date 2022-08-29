@@ -7,6 +7,7 @@ interface HTMLEMenuItemElementConstructor {
 }
 interface HTMLEMenuItemElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
+    readonly internals: ElementInternals;
     get menu(): HTMLEMenuElement | null;
     name: string;
     label: string | null;

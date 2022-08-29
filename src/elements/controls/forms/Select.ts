@@ -6,11 +6,11 @@ export { HTMLESelectElement };
 
 interface HTMLESelectElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
+    readonly internals: ElementInternals;
     get options(): HTMLEOptionElement[];
     get activeOption(): HTMLEOptionElement | null;
     get selectedOption(): HTMLEOptionElement | null;
     name: string;
-    label: string;
     value: string;
     expanded: boolean;
     expand(): void;
@@ -37,7 +37,7 @@ var shadowTemplate: HTMLTemplateElement;
 class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
     
     readonly shadowRoot!: ShadowRoot;
-    readonly #internals: ElementInternals;
+    readonly internals: ElementInternals;
 
     static get formAssociated(): boolean {
         return true;
@@ -61,9 +61,6 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
     name!: string;
 
     @AttributeProperty({type: String, observed: true})
-    label!: string;
-
-    @AttributeProperty({type: String, observed: true})
     value!: string;
 
     @AttributeProperty({type: String, defaultValue: "select", observed: true})
@@ -73,6 +70,7 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
     expanded!: boolean;
 
     #walker: TreeWalker;
+    #wasExpandedOnMouseDown: boolean;
 
     static {
         shadowTemplate = element("template");
@@ -82,11 +80,6 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
                     part: "content"
                 },
                 children: [
-                    element("label", {
-                        attributes: {
-                            part: "label"
-                        }
-                    }),
                     element("output", {
                         attributes: {
                             part: "value"
@@ -105,7 +98,8 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
 
     constructor() {
         super();
-        this.#internals = this.attachInternals();
+        this.internals = this.attachInternals();
+        this.#wasExpandedOnMouseDown = false;
         const shadowRoot = this.attachShadow({mode: "open"});
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
@@ -113,23 +107,22 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
         this.#walker = document.createTreeWalker(
             document, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
         );
-        this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
-        this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         this.addEventListener("click", this.#handleClickEvent.bind(this));
+        this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
+        this.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
         this.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
+        this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         this.addEventListener("select", this.#handleSelectEvent.bind(this));
     }
 
-    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
-        switch (name) {
-            case "label": {
-                const {shadowRoot} = this;
-                const labelPart = shadowRoot.querySelector<HTMLElement>("[part=label]");
-                if (labelPart) {
-                    labelPart.textContent = newValue;
-                }
-                break;
-            }
+    connectedCallback(): void {
+        const {tabIndex, options, selectedOption, value} = this;
+        this.tabIndex = tabIndex;
+        const optionToSelect = selectedOption ?? options.find(
+            option_i => option_i.value === value
+        ) ?? this.#firstOption();
+        if (optionToSelect) {
+            this.#selectOption(optionToSelect);
         }
     }
 
@@ -210,27 +203,31 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
     }
     
     #setSelectedOption(option: HTMLEOptionElement) {
-        this.#value().textContent = option.label;
+        const {label, value} = option;
+        const {internals} = this;
+        this.#value().textContent = label;
+        internals.setFormValue(value);
     }
 
     #positionBox(): void {
         const box = this.#box()
-        const {style: optionsStyle} = box;  
+        const {style: optionsStyle} = box;
         const {bottom, left} = this.getBoundingClientRect();
         const {scrollX, scrollY} = window;
-        optionsStyle.setProperty("top", `${bottom/* + scrollY*/}px`);
-        optionsStyle.setProperty("left", `${left/* + scrollX*/}px`);
+        optionsStyle.setProperty("top", `${bottom + scrollY}px`);
+        optionsStyle.setProperty("left", `${left + scrollX}px`);
     }
 
     #handleClickEvent(event: MouseEvent): void {
         const {target} = event;
-        this.toggle();
-        const {expanded} = this;
-        if (expanded) {
+        const wasExpandedOnMouseDown = this.#wasExpandedOnMouseDown;
+        if (!wasExpandedOnMouseDown) {
             const {selectedOption} = this;
-            (selectedOption ?? this.options[0])?.focus({preventScroll: true});
+            this.expand();
+            (selectedOption ?? this.#firstOption())?.focus({preventScroll: true});
         }
         else {
+            this.collapse();
             const targetOption = (<HTMLElement>target).closest<HTMLEOptionElement>("e-option");
             if (targetOption) {
                 this.#selectOption(targetOption);
@@ -241,8 +238,21 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
     #handleFocusOutEvent(event: FocusEvent): void {
         const {relatedTarget} = event;
         const lostFocusWithin = !this.contains(<Node>relatedTarget);
-        if (lostFocusWithin) {
+        if (lostFocusWithin || this === relatedTarget) {
             this.collapse();
+        }
+    }
+
+    #handleMouseDownEvent(): void {
+        const {expanded} = this;
+        this.#wasExpandedOnMouseDown = expanded;
+    }
+
+    #handleMouseOverEvent(event: MouseEvent): void {
+        const {target} = event;
+        const targetOption = (<Element>target).closest<HTMLEOptionElement>("e-option");
+        if (targetOption) {
+            targetOption.focus({preventScroll: true});
         }
     }
 
@@ -317,15 +327,16 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
                 break;
             }
             case "Enter": {
+                this.toggle();
+                const {expanded} = this;
                 if (expanded) {
-                    this.collapse();
+                    const {selectedOption} = this;
+                    (selectedOption ?? this.#firstOption())?.focus({preventScroll: true});
+                }
+                else {
                     if (activeOption) {
                         this.#selectOption(activeOption);
                     }
-                }
-                else {
-                    this.expand();
-                    selectedOption?.focus({preventScroll: true});
                 }
                 event.stopPropagation();
                 break;
@@ -333,8 +344,9 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
             case "Escape": {
                 if (expanded) {
                     this.collapse();
+                    event.stopPropagation();
+                    event.preventDefault();
                 }
-                event.stopPropagation();
                 break;
             }
             default: {
@@ -357,27 +369,30 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
             }
         }
     }
-
-    #handleMouseOverEvent(event: MouseEvent): void {
+    
+    #handleSelectEvent(event: Event): void {
         const {target} = event;
         const targetOption = (<Element>target).closest<HTMLEOptionElement>("e-option");
         if (targetOption) {
-            targetOption.focus({preventScroll: true});
-        }
-    }
-    
-    #handleSelectEvent() {
-        let {selectedOption} = this
-        selectedOption = selectedOption ?? this.#firstOption();
-        if (selectedOption) {
-            const {options} = this;
-            options.forEach((option_i) => {
-                if (option_i !== selectedOption && option_i.selected) {
-                    option_i.selected = false;
+            const {selected} = targetOption;
+            if (selected) {
+                const {options} = this;
+                options.forEach((option_i) => {
+                    if (option_i !== targetOption && option_i.selected) {
+                        option_i.selected = false;
+                    }
+                });
+                this.#setSelectedOption(targetOption);
+            }
+            else {
+                const {selectedOption} = this;
+                if (selectedOption === null) {
+                    const firstOption = this.#firstOption();
+                    if (firstOption !== null) {
+                        this.#setSelectedOption(firstOption);
+                    }
                 }
-            });
-            this.#internals.setFormValue(selectedOption.value);
-            this.#setSelectedOption(selectedOption);
+            }
         }
     }
 }

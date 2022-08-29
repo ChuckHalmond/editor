@@ -277,9 +277,12 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         const {target, shiftKey, ctrlKey} = event;
         const targetItem = <HTMLETreeItemElement | null>(<HTMLElement>target).closest("e-treeitem");
         if (targetItem) {
-            const {type} = targetItem;
-            if (type == "parent" && !(shiftKey || ctrlKey)) {
-                targetItem.toggle();
+            if (!shiftKey && !ctrlKey) {
+                this.#setSelection(targetItem);
+                const {type} = targetItem;
+                if (type == "parent") {
+                    targetItem.toggle();
+                }
             }
         }
         event.stopPropagation();
@@ -497,7 +500,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
             const {selected} = target;
             switch (button) {
                 case 0: {
-                    if (!shiftKey && !ctrlKey) {
+                    if (!shiftKey && !ctrlKey && !selected) {
                         this.#setSelection(target);
                     }
                     else if (ctrlKey) {

@@ -66,6 +66,11 @@ class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
         );
     }
 
+    connectedCallback(): void {
+        const {tabIndex} = this;
+        this.tabIndex = tabIndex;
+    }
+    
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
         switch (name) {
             case "label": {

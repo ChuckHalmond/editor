@@ -15,12 +15,10 @@
     --text-darker-color: white;
     --text-lighter-color: white;
 
-    --background-color: white;
-    --background-darker-color: white;
-    --background-lighter-color: white;
-    
-    --border-color: rgb(120, 120, 120);
-    --backdrop-color: rgba(120, 120, 120, 0.5);
+    --content-background-color: white;
+    --item-border-color: grey;
+    --section-border-color: lightgrey;
+    --padding-background-color: gainsboro;
 
     --accent-color: hsl(212, 100%, 50%);
     --hovered-item-color: hsl(203, 92%, 80%, 50%);

@@ -2,16 +2,17 @@
     accent-color: var(--accent-color);
 }
 
+
+::backdrop {
+    background-color: rgba(120, 120, 120, 0.2);
+}
+
 * {
     box-sizing: border-box;
 }
 
 :focus-visible {
     outline: 2px solid var(--focused-item-outline-color);
-    outline-offset: -2px;
-}
-
-input:focus-visible {
     outline-offset: 1px;
 }
 
@@ -32,6 +33,14 @@ textarea {
     font-family: inherit;
     font-size: inherit;
     box-sizing: content-box;
+}
+
+input {
+    border: 1px solid var(--item-border-color);
+}
+
+legend {
+    padding: 0 6px;
 }
 
 select {
@@ -66,17 +75,12 @@ input[type="color" i] {
 
 dialog,
 fieldset {
-    border: 1px solid var(--border-color);
     padding: 8px;
-}
-
-::backdrop {
-    background-color: var(--backdrop-color);
+    border: 1px solid var(--section-border-color);
 }
 
 button[type="submit"] {
-    outline: 1px solid var(--focused-item-outline-color);
-    outline-offset: -2px;
+    border-width: 2px;
 }
 
 button:hover {

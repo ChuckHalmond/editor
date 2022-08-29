@@ -437,49 +437,31 @@ export async function TreeMain() {
                                                 },
                                                 children: "Type"
                                             }),
-                                            /*element("select", {
-                                                attributes: {
-                                                    id: "type",
-                                                    name: "type",
-                                                    //value: item.type
-                                                },
-                                                children: [
-                                                    element("option", {
-                                                        attributes: {
-                                                            label: "parent",
-                                                            value: "parent",
-                                                            selected: item.type === "parent"
-                                                        }
-                                                    }),
-                                                    element("option", {
-                                                        attributes: {
-                                                            label: "leaf",
-                                                            value: "leaf",
-                                                            selected: item.type === "leaf"
-                                                        }
-                                                    })
-                                                ]
-                                            })*/
                                             element("e-select", {
                                                 attributes: {
                                                     id: "type",
                                                     type: "text",
                                                     name: "type",
-                                                    //value: item.type
+                                                    value: item.type,
+                                                    tabindex: 0
                                                 },
                                                 children: [
                                                     element("e-option", {
                                                         attributes: {
                                                             label: "parent",
-                                                            value: "parent",
-                                                            selected: item.type === "parent"
+                                                            value: "parent"
                                                         }
                                                     }),
                                                     element("e-option", {
                                                         attributes: {
                                                             label: "leaf",
-                                                            value: "leaf",
-                                                            selected: item.type === "leaf"
+                                                            value: "leaf"
+                                                        }
+                                                    }),
+                                                    element("e-option", {
+                                                        attributes: {
+                                                            label: "lol",
+                                                            value: "lol"
                                                         }
                                                     })
                                                 ]
@@ -495,7 +477,8 @@ export async function TreeMain() {
                                 children: [
                                     element("button", {
                                         attributes: {
-                                            type: "submit"
+                                            type: "submit",
+                                            value: "confirm"
                                         },
                                         children: [
                                             "Confirm"
@@ -503,7 +486,7 @@ export async function TreeMain() {
                                     }),
                                     element("button", {
                                         attributes: {
-                                            type: "close"
+                                            value: "cancel"
                                         },
                                         children: [
                                             "Cancel"
@@ -511,22 +494,17 @@ export async function TreeMain() {
                                     })
                                 ]
                             })
-                        ],
-                        listeners: {
-                            submit: (event) => {
-                                const {currentTarget} = event;
-                                const form = <HTMLFormElement>currentTarget;
-                                const formData = new FormData(form);
-                                item.visibility = Boolean(formData.get("visibility"));
-                                item.type = <"leaf" | "parent">formData.get("type");
-                            }
-                        }
+                        ]
                     })
                 ],
                 listeners: {
-                    close: (event) => {
-                        const {currentTarget} = event;
-                        const dialog = <Element>currentTarget;
+                    close: () => {
+                        if (dialog.returnValue === "confirm") {
+                            const form = dialog.querySelector("form")!;
+                            const formData = new FormData(form);
+                            item.visibility = Boolean(formData.get("visibility"));
+                            item.type = <"leaf" | "parent">formData.get("type");
+                        }
                         dialog.remove();
                     }
                 }
