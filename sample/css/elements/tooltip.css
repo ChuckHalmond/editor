@@ -1,0 +1,13 @@
+e-tooltip {
+    position: fixed;
+    padding: 4px;
+}
+
+e-tooltip {
+    background-color: var(--hovered-item-color);
+    border-radius: 4px;
+}
+
+e-tooltip:not([visible]) {
+    display: none;
+}

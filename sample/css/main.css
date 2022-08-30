@@ -4,6 +4,7 @@
 @import "theme.css" layer(theme);
 @import "client.css" layer(client);
 
+@import "elements/tooltip.css" layer(base);
 @import "elements/tabs/tab.css" layer(base);
 @import "elements/separator.css" layer(base);
 @import "elements/sash.css" layer(base);

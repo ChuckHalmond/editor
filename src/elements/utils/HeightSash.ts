@@ -56,10 +56,21 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
         this.addEventListener("pointerup", this.#handlePointerUpEvent.bind(this));
     }
 
-    #handlePointerUpEvent(event: PointerEvent): void {
-        const {pointerId} = event;
-        this.releasePointerCapture(pointerId);
-        this.#onCapture = false;
+    #pointerMoveCallback(): void {
+        const target = this.#target;
+        if (target !== null) {
+            const targetComputedStyle = window.getComputedStyle(target);
+            const {style} = target;
+            const {growdir} = this;
+            const movementY = this.#pointerMovement;
+            const height = parseFloat(targetComputedStyle.getPropertyValue("height"));
+            const newHeight = Math.trunc(height + (growdir == "top" ? -1 : 1) * movementY);
+            style.setProperty("height", `${newHeight}px`);
+            const computedNewHeight = parseFloat(targetComputedStyle.getPropertyValue("height"));
+            style.setProperty("height", `${computedNewHeight}px`);
+            this.dispatchEvent(new Event("resize"));
+        }
+        this.#queuedPointerCallback = null;
     }
 
     #handlePointerDownEvent(event: PointerEvent): void {
@@ -84,20 +95,10 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
         }
     }
 
-    #pointerMoveCallback(): void {
-        const target = this.#target;
-        if (target !== null) {
-            const targetComputedStyle = window.getComputedStyle(target);
-            const {growdir} = this;
-            const movementY = this.#pointerMovement;
-            const height = parseFloat(targetComputedStyle.getPropertyValue("height"));
-            const newHeight = Math.trunc(height + (growdir == "top" ? -1 : 1) * movementY);
-            target.style.setProperty("height", `${newHeight}px`);
-            const computedNewHeight = parseFloat(targetComputedStyle.getPropertyValue("height"));
-            target.style.setProperty("height", `${computedNewHeight}px`);
-            this.dispatchEvent(new Event("resize"));
-        }
-        this.#queuedPointerCallback = null;
+    #handlePointerUpEvent(event: PointerEvent): void {
+        const {pointerId} = event;
+        this.releasePointerCapture(pointerId);
+        this.#onCapture = false;
     }
 }
 

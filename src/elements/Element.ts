@@ -26,6 +26,7 @@ interface AttributePropertyDecorator {
             type: typeof String;
             observed?: boolean;
             defaultValue?: string | null;
+            name?: string;
         }
     ): <E extends HTMLElement>(target: E, property: keyof E) => void;
     (
@@ -33,12 +34,14 @@ interface AttributePropertyDecorator {
             type: typeof Number;
             observed?: boolean;
             defaultValue?: number | null;
+            name?: string;
         }
     ): <E extends HTMLElement>(target: E, property: keyof E) => void;
     (
         init: {
             type: typeof Boolean;
             observed?: boolean;
+            name?: string;
         }
     ): <E extends HTMLElement>(target: E, property: keyof E) => void;
     (
@@ -46,6 +49,7 @@ interface AttributePropertyDecorator {
             type: typeof Object;
             observed?: boolean;
             defaultValue?: any | null;
+            name?: string;
         }
     ): <E extends HTMLElement>(target: E, property: keyof E) => void;
 }
@@ -55,6 +59,7 @@ const AttributeProperty: AttributePropertyDecorator = function(
         type: typeof String | typeof Number | typeof Boolean | typeof Object;
         observed?: boolean;
         defaultValue?: string | number | any | null;
+        name?: string;
     }
 ) {
     return <E extends HTMLElement>(
@@ -63,18 +68,16 @@ const AttributeProperty: AttributePropertyDecorator = function(
         const {constructor} = target;
         const {prototype} = constructor;
         const propertyName = String(property);
-        const attributeName = camelToTrain(propertyName);
-        const defaultValue = init.defaultValue ?? null;
-        const observed = init.observed ?? false;
+        const {defaultValue = null, observed = false, name = camelToTrain(propertyName)} = init;
         if (observed) {
             const observedAttributes = Reflect.get(constructor, "observedAttributes", constructor);
             if (Array.isArray(observedAttributes)) {
-                observedAttributes.push(attributeName);
+                observedAttributes.push(name);
             }
             else {
                 Object.defineProperty(
                     constructor, "observedAttributes", {
-                        value: [attributeName],
+                        value: [name],
                         writable: false
                     }
                 );
@@ -85,14 +88,14 @@ const AttributeProperty: AttributePropertyDecorator = function(
             case Boolean: {
                 Object.defineProperty(prototype, propertyName, {
                     get: function(this: HTMLElement) {
-                        return this.hasAttribute(attributeName);
+                        return this.hasAttribute(name);
                     },
                     set: function(this: HTMLElement, value) {
                         if (value) {
-                            this.setAttribute(attributeName, "");
+                            this.setAttribute(name, "");
                         }
                         else {
-                            this.removeAttribute(attributeName);
+                            this.removeAttribute(name);
                         }
                     }
                 });
@@ -101,15 +104,15 @@ const AttributeProperty: AttributePropertyDecorator = function(
             case Object: {
                 Object.defineProperty(prototype, propertyName, {
                     get: function(this: HTMLElement) {
-                        const val = this.getAttribute(attributeName);
+                        const val = this.getAttribute(name);
                         return (val !== null) ? JSON.parse(val) : defaultValue;
                     },
                     set: function(this: HTMLElement, value) {
                         if (value !== null) {
-                            this.setAttribute(attributeName, JSON.stringify(value));
+                            this.setAttribute(name, JSON.stringify(value));
                         }
                         else {
-                            this.removeAttribute(attributeName);
+                            this.removeAttribute(name);
                         }
                     }
                 });
@@ -118,15 +121,15 @@ const AttributeProperty: AttributePropertyDecorator = function(
             case Number: {
                 Object.defineProperty(prototype, propertyName, {
                     get: function(this: HTMLElement) {
-                        const val = this.getAttribute(attributeName);
+                        const val = this.getAttribute(name);
                         return (val !== null) ? parseFloat(val) : defaultValue;
                     },
                     set: function(this: HTMLElement, value) {
                         if (value !== null) {
-                            this.setAttribute(attributeName, value);
+                            this.setAttribute(name, value);
                         }
                         else {
-                            this.removeAttribute(attributeName);
+                            this.removeAttribute(name);
                         }
                     }
                 });
@@ -136,15 +139,15 @@ const AttributeProperty: AttributePropertyDecorator = function(
             default: {
                 Object.defineProperty(prototype, propertyName, {
                     get: function(this: HTMLElement) {
-                        const val = this.getAttribute(attributeName);
+                        const val = this.getAttribute(name);
                         return (val !== null) ? val : defaultValue;
                     },
                     set: function(this: HTMLElement, value) {
                         if (value !== null) {
-                            this.setAttribute(attributeName, value);
+                            this.setAttribute(name, value);
                         }
                         else {
-                            this.removeAttribute(attributeName);
+                            this.removeAttribute(name);
                         }
                     }
                 });

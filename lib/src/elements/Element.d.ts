@@ -20,20 +20,24 @@ interface AttributePropertyDecorator {
         type: typeof String;
         observed?: boolean;
         defaultValue?: string | null;
+        name?: string;
     }): <E extends HTMLElement>(target: E, property: keyof E) => void;
     (init: {
         type: typeof Number;
         observed?: boolean;
         defaultValue?: number | null;
+        name?: string;
     }): <E extends HTMLElement>(target: E, property: keyof E) => void;
     (init: {
         type: typeof Boolean;
         observed?: boolean;
+        name?: string;
     }): <E extends HTMLElement>(target: E, property: keyof E) => void;
     (init: {
         type: typeof Object;
         observed?: boolean;
         defaultValue?: any | null;
+        name?: string;
     }): <E extends HTMLElement>(target: E, property: keyof E) => void;
 }
 declare const AttributeProperty: AttributePropertyDecorator;

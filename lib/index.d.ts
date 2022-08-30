@@ -35,6 +35,7 @@ export * from "./src/elements/controls/forms/OptionGroup";
 export * from "./src/elements/controls/forms/Select";
 export * from "./src/elements/forms/Snippets";
 export * from "./src/elements/utils/Separator";
+export * from "./src/elements/utils/ToolTip";
 export * from "./src/elements/utils/Handle";
 export * from "./src/elements/utils/HeightSash";
 export * from "./src/elements/utils/Import";

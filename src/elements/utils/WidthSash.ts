@@ -65,17 +65,27 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
         const target = this.#target;
         if (target !== null) {
             const {max} = this;
-            target.style.setProperty("width", `${width}px`);
+            const {style} = target;
+            style.setProperty("width", `${width}px`);
             if (max) {
-                target.style.setProperty("max-width", `${width}px`);
+                style.setProperty("max-width", `${width}px`);
             }
         }
     }
 
-    #handlePointerUpEvent(event: PointerEvent): void {
-        const {pointerId} = event;
-        this.releasePointerCapture(pointerId);
-        this.#onCapture = false;
+    #pointerMoveCallback(): void {
+        const target = this.#target;
+        if (target !== null) {
+            const targetComputedStyle = window.getComputedStyle(target);
+            const {growdir} = this;
+            const movementX = this.#pointerMovement;
+            const width = parseFloat(targetComputedStyle.getPropertyValue("width"));
+            const newWidth = width + (growdir == "right" ? 1 : -1) * movementX;
+            this.setWidth(newWidth);
+            this.dispatchEvent(new Event("resize"));
+        }
+        this.#pointerMovement = 0;
+        this.#queuedPointerCallback = null;
     }
 
     #handlePointerDownEvent(event: PointerEvent): void {
@@ -97,19 +107,10 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
         }
     }
 
-    #pointerMoveCallback(): void {
-        const target = this.#target;
-        if (target !== null) {
-            const targetComputedStyle = window.getComputedStyle(target);
-            const {growdir} = this;
-            const movementX = this.#pointerMovement;
-            const width = parseFloat(targetComputedStyle.getPropertyValue("width"));
-            const newWidth = width + (growdir == "right" ? 1 : -1) * movementX;
-            this.setWidth(newWidth);
-            this.dispatchEvent(new Event("resize"));
-        }
-        this.#pointerMovement = 0;
-        this.#queuedPointerCallback = null;
+    #handlePointerUpEvent(event: PointerEvent): void {
+        const {pointerId} = event;
+        this.releasePointerCapture(pointerId);
+        this.#onCapture = false;
     }
 }
 

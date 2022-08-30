@@ -811,4 +811,47 @@ export async function TreeMain() {
             ]
         })
     );*/
+
+    document.body.append(
+        element("e-toolbar", {
+            children: [
+                element("e-toolbaritem", {
+                    attributes: {
+                        id: "one"
+                    },
+                    children: "Item 1"
+                }),
+                element("e-toolbaritem", {
+                    attributes: {
+                        id: "two"
+                    },
+                    children: "Item 2"
+                }),
+                element("e-toolbaritem", {
+                    attributes: {
+                        id: "three"
+                    },
+                    children: "Item 3"
+                })
+            ]
+        }),
+        element("e-tooltip", {
+            attributes: {
+                for: "one"
+            },
+            children: "One"
+        }),
+        element("e-tooltip", {
+            attributes: {
+                for: "two"
+            },
+            children: "Two"
+        }),
+        element("e-tooltip", {
+            attributes: {
+                for: "three"
+            },
+            children: "Three"
+        })
+    );
 }
