@@ -6,12 +6,8 @@ e-select {
     border: 1px solid var(--item-border-color);
 }
 
-e-select:focus-within:not(:focus) {
+e-select:focus-within {
     background-color: var(--focused-item-color);
-}
-
-e-select:hover:not(:focus-within) {
-    background-color: var(--hovered-item-color);
 }
 
 e-select[disabled] {

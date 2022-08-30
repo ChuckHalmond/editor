@@ -400,6 +400,12 @@ export async function TreeMain() {
                                             controls: "properties"
                                         },
                                         children: "Properties"
+                                    }),
+                                    element("e-tab", {
+                                        attributes: {
+                                            controls: "other"
+                                        },
+                                        children: "Other"
                                     })
                                 ]
                             }),
@@ -429,7 +435,8 @@ export async function TreeMain() {
                                                             id: "visibility",
                                                             type: "checkbox",
                                                             name: "visibility",
-                                                            checked: item.visibility
+                                                            checked: item.visibility,
+                                                            //autofocus: true
                                                         }
                                                     }),
                                                     element("label", {
@@ -475,7 +482,7 @@ export async function TreeMain() {
                             }),
                             element("e-tabpanel", {
                                 attributes: {
-                                    id: "two"
+                                    id: "other"
                                 },
                             }),
                             element("footer", {

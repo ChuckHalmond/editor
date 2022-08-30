@@ -36,3 +36,35 @@ e-treeitem:is(
 .dialog-footer button:first-child {
     margin-left: auto;
 }
+
+e-tablist {
+    transform: translateY(1px);
+}
+
+e-tab {
+    border: 1px solid var(--section-border-color);
+}
+
+e-tab:not([selected]) {
+    background-color: lightgrey;
+}
+
+e-tabpanel {
+    padding: 8px;
+    border: 1px solid var(--section-border-color);
+}
+
+e-tab[selected] {
+    background-color: white;
+    z-index: 1;
+    padding: 3px 6px;
+    border-bottom: none;
+}
+
+e-tab:has(+ e-tab[selected]) {
+    border-right: none;
+}
+
+e-tab[selected] + e-tab {
+    border-left: none;
+}

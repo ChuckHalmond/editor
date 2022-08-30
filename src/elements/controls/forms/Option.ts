@@ -9,6 +9,7 @@ interface HTMLEOptionElementConstructor {
 
 interface HTMLEOptionElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
+    readonly internals: ElementInternals;
     name: string;
     value: string;
     label: string;
@@ -31,6 +32,7 @@ var shadowTemplate: HTMLTemplateElement;
 class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
 
     readonly shadowRoot!: ShadowRoot;
+    readonly internals: ElementInternals;
 
     @AttributeProperty({type: String})
     name!: string;
@@ -60,6 +62,9 @@ class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
 
     constructor() {
         super();
+        const internals = this.attachInternals();
+        internals.role = "option";
+        this.internals = internals;
         const shadowRoot = this.attachShadow({mode: "open"});
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
@@ -82,6 +87,8 @@ class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
                 break;
             }
             case "selected": {
+                const {internals, selected} = this;
+                internals.ariaSelected = String(selected);
                 this.dispatchEvent(new Event("select", {bubbles: true}));
                 break;
             }

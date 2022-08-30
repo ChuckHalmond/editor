@@ -64,6 +64,7 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
     connectedCallback(): void {
         const {tabIndex, selectedTab} = this;
         this.tabIndex = tabIndex;
+        customElements.upgrade(this);
         const tabToSelect = selectedTab ?? this.firstItem();
         if (tabToSelect) {
             this.#selectTab(tabToSelect);
@@ -128,9 +129,9 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
 
     #handleFocusEvent(event: FocusEvent): void {
         const {relatedTarget} = event;
-        const {activeTab} = this;
+        const {selectedTab} = this;
         if (!this.contains(<Node>relatedTarget)) {
-            (activeTab ?? this.firstItem())?.focus();
+            (selectedTab ?? this.firstItem())?.focus();
         }
     }
 

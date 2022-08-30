@@ -30,6 +30,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var mutationObserver: MutationObserver;
 
 @CustomElement({
     name: "e-select"
@@ -94,18 +95,40 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
                 children: element("slot")
             })
         );
+        mutationObserver = new MutationObserver(
+            (mutationsList: MutationRecord[]) => {
+                mutationsList.forEach((mutation: MutationRecord) => {
+                    const {target} = mutation;
+                    const select = <HTMLESelectElementBase>target;
+                    const {selectedOption, value, options} = select;
+                    if (!selectedOption) {
+                        const optionToSelect = value ? options.find(
+                            option_i => option_i.value === value
+                        ) : select.#firstOption();
+                        if (optionToSelect) {
+                            optionToSelect.selected = true;
+                        }
+                        else {
+                            select.#setSelectedOption(null);
+                        }
+                    }
+                });
+            }
+        )
     }
 
     constructor() {
         super();
-        this.internals = this.attachInternals();
+        const internals = this.attachInternals();
+        internals.role = "combobox";
+        this.internals = internals;
         this.#wasExpandedOnMouseDown = false;
         const shadowRoot = this.attachShadow({mode: "open"});
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
         this.#walker = document.createTreeWalker(
-            document, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
+            this, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
         );
         this.addEventListener("click", this.#handleClickEvent.bind(this));
         this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
@@ -113,13 +136,22 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
         this.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         this.addEventListener("select", this.#handleSelectEvent.bind(this));
+        mutationObserver.observe(
+            this, {
+                childList: true,
+                subtree: true
+            }
+        );
     }
 
     connectedCallback(): void {
         const {tabIndex, options, selectedOption, value} = this;
         this.tabIndex = tabIndex;
-        const optionToSelect = selectedOption ?? options.find(
-            option_i => option_i.value === value
+        customElements.upgrade(this);
+        const optionToSelect = selectedOption ?? (
+            value ? options.find(
+                option_i => option_i.value === value
+            ) : null
         ) ?? this.#firstOption();
         if (optionToSelect) {
             this.#selectOption(optionToSelect);
@@ -172,13 +204,13 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
 
     #firstOption(): HTMLEOptionElement | null {
         const walker = this.#walker;
-        walker.currentNode = this;
+        walker.currentNode = walker.root;
         return <HTMLEOptionElement | null>walker.firstChild();
     }
 
     #lastOption(): HTMLEOptionElement | null {
         const walker = this.#walker;
-        walker.currentNode = this;
+        walker.currentNode = walker.root;
         return <HTMLEOptionElement | null>walker.lastChild();
     }
     
@@ -201,8 +233,11 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
         }
     }
     
-    #setSelectedOption(option: HTMLEOptionElement) {
-        const {label, value} = option;
+    #setSelectedOption(option: HTMLEOptionElement | null) {
+        const {label, value} = option ?? {
+            label: "",
+            value: ""
+        };
         const {internals} = this;
         this.#value().textContent = label;
         internals.setFormValue(value);
@@ -223,7 +258,7 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
         if (!wasExpandedOnMouseDown) {
             const {selectedOption} = this;
             this.expand();
-            (selectedOption ?? this.#firstOption())?.focus({preventScroll: true});
+            (selectedOption ?? this.#firstOption() ?? this).focus({preventScroll: true});
         }
         else {
             this.collapse();

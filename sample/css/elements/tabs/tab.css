@@ -5,12 +5,9 @@ e-tablist {
 
 e-tab {
     display: inline-block;
-    
     user-select: none;
     white-space: nowrap;
-
     padding: 2px 6px;
-    cursor: pointer;
 }
 
 e-tab[disabled] {
@@ -26,7 +23,7 @@ e-tab[selected] {
     background-color: var(--activated-item-color);
 }
 
-e-tablist:focus-within e-tab:focus-within {
+e-tablist:focus-within e-tab:focus-visible {
     outline: 1px solid var(--focused-item-outline-color);
     outline-offset: -1px;
 }

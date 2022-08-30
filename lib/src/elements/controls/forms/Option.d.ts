@@ -5,6 +5,7 @@ interface HTMLEOptionElementConstructor {
 }
 interface HTMLEOptionElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
+    readonly internals: ElementInternals;
     name: string;
     value: string;
     label: string;
