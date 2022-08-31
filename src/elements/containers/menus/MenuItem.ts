@@ -66,6 +66,9 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
     @AttributeProperty({type: Boolean, observed: true})
     expanded!: boolean;
 
+    @AttributeProperty({type: Boolean})
+    overflown!: boolean;
+
     @AttributeProperty({type: String, defaultValue: "button", observed: true})
     type!: "button" | "checkbox" | "radio" | "menu" | "submenu";
 
@@ -207,7 +210,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                 const overflowY = itemTop + menuHeight - clientHeight;
                 menuStyle.setProperty("left", `${
                     overflowX > 0 ?
-                    scrollX + itemLeft - menuWidth :
+                    scrollX + itemRight - menuWidth :
                     scrollX + itemLeft
                 }px`);
                 menuStyle.setProperty("top", `${
@@ -227,14 +230,10 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                         itemLeft - menuWidth - closestMenuLeft :
                         itemRight - closestMenuLeft
                     }px`);
-                    const menuComputedStyle = window.getComputedStyle(menu);
-                    const {paddingTop, paddingBottom} = menuComputedStyle;
-                    const menuPaddingTop = parseFloat(paddingTop);
-                    const menuPaddingBottom = parseFloat(paddingBottom);
                     menuStyle.setProperty("top", `${
                         overflowY > 0 ?
-                        itemBottom - menuHeight - closestMenuTop + menuPaddingBottom :
-                        itemTop - closestMenuTop - menuPaddingTop
+                        itemBottom  - menuHeight - closestMenuTop :
+                        itemTop - closestMenuTop
                     }px`);
                 }
             }

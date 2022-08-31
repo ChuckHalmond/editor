@@ -159,21 +159,38 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
             const arrow = this.#arrow();
             const {style: arrowStyle} = arrow;
             const {width: arrowWidth, height: arrowHeight} = arrow.getBoundingClientRect();
-            const arrowHalfWidth = arrowWidth / 2;
-            const arrowHalfHeight = arrowHeight / 2;
+            const {clientWidth} = document.body;
             switch (position) {
                 case "top": {
                     tooltipStyle.setProperty("top", `${targetTop - tooltipHeight - arrowHeight}px`);
-                    tooltipStyle.setProperty("left", `${targetCenter - tooltipHalfWidth}px`);
+                    tooltipStyle.setProperty("left", `${
+                        Math.max(0, Math.min(targetCenter - tooltipHalfWidth, clientWidth - tooltipWidth))
+                    }px`);
                     arrowStyle.setProperty("top", `${targetTop - arrowHeight}px`);
-                    arrowStyle.setProperty("left", `${targetCenter - arrowHalfWidth}px`);
+                    arrowStyle.setProperty("left", `${targetCenter}px`);
                     break;
                 }
                 case "bottom": {
                     tooltipStyle.setProperty("top", `${targetBottom + arrowHeight}px`);
-                    tooltipStyle.setProperty("left", `${targetCenter - tooltipHalfWidth}px`);
+                    tooltipStyle.setProperty("left", `${
+                        Math.max(0, Math.min(targetCenter - tooltipHalfWidth, clientWidth - tooltipWidth))
+                    }px`);
                     arrowStyle.setProperty("top", `${targetBottom + arrowHeight}px`);
-                    arrowStyle.setProperty("left", `${targetCenter - arrowHalfWidth}px`);
+                    arrowStyle.setProperty("left", `${targetCenter}px`);
+                    break;
+                }
+                case "left": {
+                    tooltipStyle.setProperty("top", `${targetMiddle - tooltipHalfHeight}px`);
+                    tooltipStyle.setProperty("left", `${targetLeft - tooltipWidth - arrowWidth}px`);
+                    arrowStyle.setProperty("top", `${targetMiddle}px`);
+                    arrowStyle.setProperty("left", `${targetLeft - arrowWidth}px`);
+                    break;
+                }
+                case "right": {
+                    tooltipStyle.setProperty("top", `${targetMiddle - tooltipHalfHeight}px`);
+                    tooltipStyle.setProperty("left", `${targetRight + arrowWidth}px`);
+                    arrowStyle.setProperty("top", `${targetMiddle}px`);
+                    arrowStyle.setProperty("left", `${targetRight + arrowWidth}px`);
                     break;
                 }
             }

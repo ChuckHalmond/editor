@@ -1,4 +1,5 @@
 e-tooltip {
+    display: inline-block;
     position: fixed;
     padding: 4px;
     border: var(--tooltip-border-size, 1px) solid var(--focused-item-outline-color);
@@ -58,7 +59,7 @@ e-tooltip:is(:not([position]), [position="top"])::part(arrow)::after {
 }
 
 e-tooltip:is([position="bottom"])::part(arrow) {
-    transform: translateY(calc(var(--tooltip-border-size, 1px)));
+    transform: translateY(calc(1 * var(--tooltip-border-size, 1px)));
 }
 
 e-tooltip:is([position="bottom"])::part(arrow)::before {
@@ -67,4 +68,28 @@ e-tooltip:is([position="bottom"])::part(arrow)::before {
 
 e-tooltip:is([position="bottom"])::part(arrow)::after {
     transform: translate(-50%, -50%) rotate(225deg);
+}
+
+e-tooltip:is([position="left"])::part(arrow) {
+    transform: translateX(calc(-1 * var(--tooltip-border-size, 1px)));
+}
+
+e-tooltip:is([position="left"])::part(arrow)::before {
+    transform: translate(calc(-50% + 1px), -50%) rotate(45deg);
+}
+
+e-tooltip:is([position="left"])::part(arrow)::after {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+e-tooltip:is([position="right"])::part(arrow) {
+    transform: translateX(calc(1 * var(--tooltip-border-size, 1px)));
+}
+
+e-tooltip:is([position="right"])::part(arrow)::before {
+    transform: translate(calc(-50% - 1px), -50%) rotate(45deg);
+}
+
+e-tooltip:is([position="right"])::part(arrow)::after {
+    transform: translate(-50%, -50%) rotate(45deg);
 }

@@ -594,6 +594,9 @@ export async function TreeMain() {
                                                 })*/
                                                 new EMenuItem({
                                                     label: "Yo"
+                                                }),
+                                                new EMenuItem({
+                                                    label: "Plop"
                                                 })
                                             ]
                                         })
@@ -823,15 +826,24 @@ export async function TreeMain() {
                 }),
                 element("e-toolbaritem", {
                     attributes: {
-                        id: "two"
+                        id: "three",
                     },
-                    children: "Item 2"
+                    children: "Item 3"
                 }),
                 element("e-toolbaritem", {
                     attributes: {
-                        id: "three"
+                        id: "four"
                     },
-                    children: "Item 3"
+                    children: "Item 4"
+                }),
+                element("e-toolbaritem", {
+                    children: "Item 5"
+                }),
+                element("e-toolbaritem", {
+                    attributes: {
+                        id: "two"
+                    },
+                    children: "Item 2"
                 })
             ]
         }),
@@ -840,19 +852,28 @@ export async function TreeMain() {
                 for: "one",
                 position: "bottom"
             },
-            children: "One"
+            children: "One One One One One One One One"
         }),
         element("e-tooltip", {
             attributes: {
-                for: "two"
+                for: "two",
+                position: "top"
             },
-            children: "Two"
+            children: "Two Two Two Two Two Two Two Two"
         }),
         element("e-tooltip", {
             attributes: {
-                for: "three"
+                for: "three",
+                position: "right",
             },
-            children: "Three haha, lol, right?"
+            children: "Three"
+        }),
+        element("e-tooltip", {
+            attributes: {
+                for: "four",
+                position: "left"
+            },
+            children: "Four"
         })
     );
 }
