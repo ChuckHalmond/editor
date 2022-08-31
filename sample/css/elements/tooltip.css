@@ -1,13 +1,70 @@
 e-tooltip {
     position: fixed;
     padding: 4px;
+    border: var(--tooltip-border-size, 1px) solid var(--focused-item-outline-color);
+    box-sizing: border-box;
 }
 
 e-tooltip {
-    background-color: var(--hovered-item-color);
+    background-color: white;
     border-radius: 4px;
 }
 
 e-tooltip:not([visible]) {
     display: none;
+}
+
+e-tooltip::part(arrow) {
+    position: fixed;
+    height: var(--tooltip-arrow-size, 4px);
+    width: var(--tooltip-arrow-size, 4px);
+    box-sizing: border-box;
+}
+
+e-tooltip::part(arrow) {
+    display: inline-block;
+}
+
+e-tooltip::part(arrow)::before {
+    content: "";
+    position: absolute;
+    display: inline-block;
+    border-width: var(--tooltip-arrow-size, 4px);
+    border-style: solid;
+    border-color: var(--focused-item-outline-color);
+    z-index: 0;
+}
+
+e-tooltip::part(arrow)::after {
+    content: "";
+    position: absolute;
+    display: inline-block;
+    border-width: var(--tooltip-arrow-size, 4px);
+    border-style: solid;
+    border-color: white;
+    z-index: 1;
+}
+
+e-tooltip:is(:not([position]), [position="top"])::part(arrow) {
+    transform: translateY(calc(-1 * var(--tooltip-border-size, 1px)));
+}
+
+e-tooltip:is(:not([position]), [position="top"])::part(arrow)::before {
+    transform: translate(-50%, calc(-50% + 1px)) rotate(45deg);
+}
+
+e-tooltip:is(:not([position]), [position="top"])::part(arrow)::after {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+e-tooltip:is([position="bottom"])::part(arrow) {
+    transform: translateY(calc(var(--tooltip-border-size, 1px)));
+}
+
+e-tooltip:is([position="bottom"])::part(arrow)::before {
+    transform: translate(-50%, calc(-50% - 1px)) rotate(225deg);
+}
+
+e-tooltip:is([position="bottom"])::part(arrow)::after {
+    transform: translate(-50%, -50%) rotate(225deg);
 }

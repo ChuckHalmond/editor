@@ -837,7 +837,8 @@ export async function TreeMain() {
         }),
         element("e-tooltip", {
             attributes: {
-                for: "one"
+                for: "one",
+                position: "bottom"
             },
             children: "One"
         }),
@@ -851,7 +852,7 @@ export async function TreeMain() {
             attributes: {
                 for: "three"
             },
-            children: "Three"
+            children: "Three haha, lol, right?"
         })
     );
 }
