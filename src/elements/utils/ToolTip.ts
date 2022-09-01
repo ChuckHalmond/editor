@@ -159,38 +159,40 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
             const arrow = this.#arrow();
             const {style: arrowStyle} = arrow;
             const {width: arrowWidth, height: arrowHeight} = arrow.getBoundingClientRect();
+            const arrowHalfWidth = arrowWidth / 2;
+            const arrowHalfHeight = arrowHeight / 2;
             const {clientWidth} = document.body;
             switch (position) {
                 case "top": {
-                    tooltipStyle.setProperty("top", `${targetTop - tooltipHeight - arrowHeight}px`);
+                    tooltipStyle.setProperty("top", `${targetTop - tooltipHeight - arrowHalfHeight}px`);
                     tooltipStyle.setProperty("left", `${
                         Math.max(0, Math.min(targetCenter - tooltipHalfWidth, clientWidth - tooltipWidth))
                     }px`);
-                    arrowStyle.setProperty("top", `${targetTop - arrowHeight}px`);
+                    arrowStyle.setProperty("top", `${targetTop - arrowHalfHeight}px`);
                     arrowStyle.setProperty("left", `${targetCenter}px`);
                     break;
                 }
                 case "bottom": {
-                    tooltipStyle.setProperty("top", `${targetBottom + arrowHeight}px`);
+                    tooltipStyle.setProperty("top", `${targetBottom + arrowHalfHeight}px`);
                     tooltipStyle.setProperty("left", `${
                         Math.max(0, Math.min(targetCenter - tooltipHalfWidth, clientWidth - tooltipWidth))
                     }px`);
-                    arrowStyle.setProperty("top", `${targetBottom + arrowHeight}px`);
+                    arrowStyle.setProperty("top", `${targetBottom + arrowHalfHeight}px`);
                     arrowStyle.setProperty("left", `${targetCenter}px`);
                     break;
                 }
                 case "left": {
                     tooltipStyle.setProperty("top", `${targetMiddle - tooltipHalfHeight}px`);
-                    tooltipStyle.setProperty("left", `${targetLeft - tooltipWidth - arrowWidth}px`);
+                    tooltipStyle.setProperty("left", `${targetLeft - tooltipWidth - arrowHalfWidth}px`);
                     arrowStyle.setProperty("top", `${targetMiddle}px`);
-                    arrowStyle.setProperty("left", `${targetLeft - arrowWidth}px`);
+                    arrowStyle.setProperty("left", `${targetLeft - arrowHalfWidth}px`);
                     break;
                 }
                 case "right": {
                     tooltipStyle.setProperty("top", `${targetMiddle - tooltipHalfHeight}px`);
-                    tooltipStyle.setProperty("left", `${targetRight + arrowWidth}px`);
+                    tooltipStyle.setProperty("left", `${targetRight + arrowHalfWidth}px`);
                     arrowStyle.setProperty("top", `${targetMiddle}px`);
-                    arrowStyle.setProperty("left", `${targetRight + arrowWidth}px`);
+                    arrowStyle.setProperty("left", `${targetRight + arrowHalfWidth}px`);
                     break;
                 }
             }
