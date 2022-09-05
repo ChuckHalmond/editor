@@ -22,6 +22,8 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var HIDE_DELAY_MS = 200;
+var SHOW_DELAY_MS = 200;
 
 @CustomElement({
     name: "e-tooltip"
@@ -46,6 +48,7 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
     #target: HTMLElement | null;
     #targetListenerObject: EventListenerObject;
     #documentListenerObject: EventListenerObject;
+    #toggleAnimation: Animation | null;
 
     static {
         shadowTemplate = element("template");
@@ -65,8 +68,6 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
             })
         );
     }
-
-    #toggleAnimation: Animation | null;
 
     constructor() {
         super();
@@ -126,13 +127,17 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
         this.visible = true;
         let toggleAnimation = this.#toggleAnimation;
         if (toggleAnimation !== null) {
-            toggleAnimation.cancel();
+            const {id} = toggleAnimation;
+            if (id === "hide") {
+                toggleAnimation.cancel();
+            }
         }
         toggleAnimation = this.animate([
-            { opacity: "0" },
-            { opacity: "1" }
+            { opacity: 0 },
+            { opacity: 1 }
         ], {
-            duration: 200
+            id: "show",
+            duration: SHOW_DELAY_MS
         })
         const {finished} = toggleAnimation;
         finished.then(
@@ -150,13 +155,17 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
     hide(): void {
         let toggleAnimation = this.#toggleAnimation;
         if (toggleAnimation !== null) {
-            toggleAnimation.cancel();
+            const {id} = toggleAnimation;
+            if (id === "show") {
+                toggleAnimation.cancel();
+            }
         }
         toggleAnimation = this.animate([
-            { opacity: "1" },
-            { opacity: "0" }
+            { opacity: 1 },
+            { opacity: 0 }
         ], {
-            duration: 200
+            id: "hide",
+            duration: HIDE_DELAY_MS
         });
         const {finished} = toggleAnimation;
         finished.then(

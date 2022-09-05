@@ -27,7 +27,9 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
-var toggleTimeouts: WeakMap<HTMLEMenuItemElement, {clear(): void;}>;
+var toggleAnimations: WeakMap<HTMLEMenuItemElement, Animation>;
+var HIDE_DELAY_MS = 200;
+var SHOW_DELAY_MS = 400;
 
 @CustomElement({
     name: "e-menu"
@@ -67,7 +69,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         shadowTemplate.content.append(
             element("slot")
         );
-        toggleTimeouts = new WeakMap();
+        toggleAnimations = new WeakMap();
     }
 
     constructor() {
@@ -168,7 +170,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         }
     }
 
-    async #setItemTimeout(item: HTMLEMenuItemElement, delay?: number): Promise<void> {
+    /*async #setItemTimeout(item: HTMLEMenuItemElement, delay?: number): Promise<void> {
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
                 resolve(undefined);
@@ -190,7 +192,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
             toggleTimeouts.delete(item);
             timeout.clear();
         }
-    }
+    }*/
 
     #handleClickEvent(event: MouseEvent): void {
         const {target} = event;
@@ -369,7 +371,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
             if (nearestItem !== null) {
                 if (nearestItem.type == "submenu" &&
                     !nearestItem.expanded) {
-                    this.#clearItemTimeout(nearestItem);
+                    toggleAnimations.get(nearestItem)?.cancel();
                 }
                 const isTargetClosestMenu = event.composedPath().find(
                     target_i => target_i instanceof HTMLEMenuElement
@@ -378,12 +380,23 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                     const {activeItem} = this;
                     if (activeItem?.type == "submenu" &&
                         activeItem.expanded) {
-                        this.#clearItemTimeout(activeItem);
-                        this.#setItemTimeout(activeItem, 400)
+                        let toggleAnimation = toggleAnimations.get(activeItem);
+                        if (toggleAnimation) {
+                            toggleAnimation.cancel();
+                        }
+                        toggleAnimation = activeItem.animate(null, {
+                            duration: HIDE_DELAY_MS
+                        });
+                        toggleAnimations.set(activeItem, toggleAnimation);
+                        const {finished} = toggleAnimation;
+                        finished
                             .then(() => {
                                 activeItem.collapse();
                             })
-                            .catch(() => undefined);
+                            .catch(() => undefined)
+                            .finally(() => {
+                                toggleAnimations.delete(activeItem);
+                            });
                     }
                     const {clientX, clientY} = event;
                     const {left, right, top, bottom} = this.getBoundingClientRect();
@@ -414,40 +427,62 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         if (target instanceof HTMLEMenuItemElement) {
             const nearestItem = this.#nearestItem(target);
             if (nearestItem !== null) {
-                if (nearestItem.type == "submenu" && nearestItem.expanded) {
-                    this.#clearItemTimeout(nearestItem);
+                if (nearestItem.type === "submenu" && nearestItem.expanded) {
+                    toggleAnimations.get(nearestItem)?.cancel();
                 }
                 const isTargetClosestMenu = event.composedPath().find(
                     target_i => target_i instanceof HTMLEMenuElement
                 ) == this;
                 if (isTargetClosestMenu) {
                     const {activeItem} = this;
-                    if (activeItem?.type == "submenu" &&
+                    if (activeItem?.type === "submenu" &&
                         activeItem.expanded && 
                         !activeItem.contains(<Node>target)) {
-                        this.#clearItemTimeout(activeItem);
-                        this.#setItemTimeout(activeItem, 400)
+                        let toggleAnimation = toggleAnimations.get(activeItem);
+                        if (toggleAnimation) {
+                            toggleAnimation.cancel();
+                        }
+                        toggleAnimation = activeItem.animate(null, {
+                            duration: SHOW_DELAY_MS
+                        });
+                        toggleAnimations.set(activeItem, toggleAnimation);
+                        const {finished} = toggleAnimation;
+                        finished
                             .then(() => {
                                 activeItem.collapse();
                             })
-                            .catch(() => undefined);
+                            .catch(() => undefined)
+                            .finally(() => {
+                                toggleAnimations.delete(activeItem);
+                            });
                     }
                     this.#setActiveItem(nearestItem);
                     nearestItem.focus({preventScroll: true});
-                    if (nearestItem.type == "submenu") {
+                    if (nearestItem.type === "submenu") {
                         if (!nearestItem.expanded) {
-                            this.#clearItemTimeout(nearestItem);
-                            this.#setItemTimeout(nearestItem, 200)
+                            let toggleAnimation = toggleAnimations.get(nearestItem);
+                            if (toggleAnimation) {
+                                toggleAnimation.cancel();
+                            }
+                            toggleAnimation = nearestItem.animate(null, {
+                                duration: HIDE_DELAY_MS
+                            });
+                            toggleAnimations.set(nearestItem, toggleAnimation);
+                            const {finished} = toggleAnimation;
+                            finished
                                 .then(() => {
                                     const {activeItem} = this;
                                     this.#collapseSubmenus();
                                     if (activeItem) {
-                                        this.#clearItemTimeout(activeItem);
+                                        toggleAnimations.get(activeItem)?.cancel();
                                         activeItem.expand();
                                         activeItem.menu?.focus({preventScroll: true});
                                     }
                                 })
-                                .catch(() => undefined);
+                                .catch(() => undefined)
+                                .finally(() => {
+                                    toggleAnimations.delete(nearestItem);
+                                });
                         }
                         else {
                             nearestItem.menu?.focus({preventScroll: true});
