@@ -21,20 +21,21 @@ e-tooltip::part(arrow) {
     background-color: white;
     border: 1px solid black;
     clip-path: polygon(100% 100%, 0 100%, 100% 0);
+    transform: translate(-50%, -50%) rotate(var(--arrow-rotation));
 }
 
 e-tooltip:is(:not([position]), [position="top"])::part(arrow) {
-    transform: translate(-50%, -50%) rotate(45deg);
+    --arrow-rotation: 45deg;
 }
 
 e-tooltip:is([position="bottom"])::part(arrow) {
-    transform: translate(-50%, -50%) rotate(225deg);
+    --arrow-rotation: 225deg;
 }
 
 e-tooltip:is([position="left"])::part(arrow) {
-    transform: translate(-50%, -50%) rotate(315deg);
+    --arrow-rotation: 315deg;
 }
 
 e-tooltip:is([position="right"])::part(arrow) {
-    transform: translate(-50%, -50%) rotate(135deg);
+    --arrow-rotation: 135deg;
 }

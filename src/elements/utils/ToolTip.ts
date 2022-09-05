@@ -66,6 +66,8 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
         );
     }
 
+    #toggleAnimation: Animation | null;
+
     constructor() {
         super();
         const shadowRoot = this.attachShadow({mode: "open"});
@@ -73,6 +75,7 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
             shadowTemplate.content.cloneNode(true)
         );
         this.#target = null;
+        this.#toggleAnimation = null;
         this.#targetListenerObject = (function(tooltip) {
             return {
                 handleEvent(event: Event) {
@@ -121,11 +124,50 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
 
     show(): void {
         this.visible = true;
+        let toggleAnimation = this.#toggleAnimation;
+        if (toggleAnimation !== null) {
+            toggleAnimation.cancel();
+        }
+        toggleAnimation = this.animate([
+            { opacity: "0" },
+            { opacity: "1" }
+        ], {
+            duration: 200
+        })
+        const {finished} = toggleAnimation;
+        finished.then(
+            () => {
+                this.#toggleAnimation = null;
+            },
+            () => {
+                this.visible = false;
+            }
+        );
+        this.#toggleAnimation = toggleAnimation;
         this.#position();
     }
 
     hide(): void {
-        this.visible = false;
+        let toggleAnimation = this.#toggleAnimation;
+        if (toggleAnimation !== null) {
+            toggleAnimation.cancel();
+        }
+        toggleAnimation = this.animate([
+            { opacity: "1" },
+            { opacity: "0" }
+        ], {
+            duration: 200
+        });
+        const {finished} = toggleAnimation;
+        finished.then(
+            () => {
+                this.visible = false;
+            },
+            () => {
+                this.visible = true;
+            }
+        );
+        this.#toggleAnimation = toggleAnimation;
     }
 
     #arrow(): HTMLElement {
