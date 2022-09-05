@@ -9,6 +9,7 @@ interface HTMLEMenuElement extends HTMLElement {
     items(): HTMLEMenuItemElement[];
     name: string;
     contextual: boolean;
+    connectedCallback(): void;
     positionContextual(x: number, y: number): void;
 }
 interface HTMLEMenuElementConstructor {

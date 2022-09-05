@@ -36,19 +36,15 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
     label!: string;
 
     readonly shadowRoot!: ShadowRoot;
+    readonly internals: ElementInternals;
 
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
-            element("style", {
-                children: [
-                    /*css*/`
-                        :host {
-                            display: flex;
-                            flex-direction: column;
-                        }
-                    `
-                ]
+            element("span", {
+                attributes: {
+                    part: "label"
+                }
             }),
             element("slot")
         );
@@ -60,31 +56,17 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
-        shadowRoot.addEventListener(
-            "slotchange", this.#handleSlotChangeEvent.bind(this)
-        );
-    }
-
-    #handleSlotChangeEvent(event: Event): void {
-        const {target} = event;
-        const assignedItems = <HTMLEMenuItemElement[]>(<HTMLSlotElement>target)
-            .assignedElements()
-            .filter(
-                element_i => element_i instanceof HTMLEMenuItemElement
-            );
-        assignedItems.forEach((item_i, i) => {
-            //item_i.index = i;
-        });
+        const internals = this.attachInternals();
+        internals.role = "group";
+        this.internals = internals;
     }
 
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
+        const {internals} = this;
         switch (name) {
             case "label":
-                const label = this.shadowRoot.querySelector("[part=label]");
-                if (label) {
-                    label.textContent = newValue;
-                }
-            break;
+                internals.ariaLabel = newValue;
+                break;
         }
     }
 }

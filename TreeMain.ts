@@ -200,16 +200,19 @@ export async function TreeMain() {
         )
     );
 
-    var editDialog: HTMLDialogElement;
 
+    /*
+            template("treeview-dialog", {
+                slotted: [
+
+                ]
+            })
+    */
     @CustomElement({
         name: "e-mytreeview"
     })
     class MyTreeView extends TreeView {
 
-        static {
-
-        }
         override render(): void {
             super.render();
             const {shadowRoot, treeElement} = this;
@@ -378,13 +381,13 @@ export async function TreeMain() {
                     break;
                 }
                 case "Enter": {
-                    this.editItem(targetItemModel);
+                    this.showEditItemDialog(targetItemModel);
                     event.preventDefault();
                 }
             }
         }
 
-        editItem(item: MyTreeItemModel): void {
+        showEditItemDialog(item: MyTreeItemModel): void {
             const {shadowRoot} = this;
             const dialog = element("dialog", {
                 children: [
@@ -452,13 +455,13 @@ export async function TreeMain() {
                                                         },
                                                         children: "Type"
                                                     }),
-                                                    element("select", {
+                                                    element("e-select", {
                                                         attributes: {
                                                             id: "type",
                                                             name: "type"
                                                         },
                                                         children: ["parent", "leaf"].map(
-                                                            type_i => element("option", {
+                                                            type_i => element("e-option", {
                                                                 attributes: {
                                                                     label: type_i,
                                                                     value: type_i,
@@ -521,7 +524,7 @@ export async function TreeMain() {
             const {model} = this;
             const targetItemModel = <MyTreeItemModel>model.getItemByUri(targetItem.dataset.uri!);
             if (targetItemModel) {
-                this.editItem(targetItemModel);
+                this.showEditItemDialog(targetItemModel);
             }
         }
     };

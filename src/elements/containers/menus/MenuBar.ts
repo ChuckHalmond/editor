@@ -16,6 +16,7 @@ interface HTMLEMenuBarElement extends HTMLElement {
     readonly activeIndex: number;
     name: string;
     expanded: boolean;
+    connectedCallback(): void;
 }
 
 declare global {
@@ -65,6 +66,11 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
         this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
         this.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
+    }
+
+    connectedCallback(): void {
+        const tabindex = this.getAttribute("tabindex");
+        this.tabIndex = tabindex !== null ? parseInt(tabindex) : -1;
     }
 
     items(): HTMLEMenuItemElement[] {

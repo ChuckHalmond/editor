@@ -13,6 +13,7 @@ interface HTMLEMenuButtonElement extends HTMLElement {
     name: string;
     disabled: boolean;
     expanded: boolean;
+    connectedCallback(): void;
     toggle(force?: boolean): void;
     expand(): void;
     collapse(): void;

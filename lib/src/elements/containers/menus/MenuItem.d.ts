@@ -17,6 +17,8 @@ interface HTMLEMenuItemElement extends HTMLElement {
     checked: boolean;
     expanded: boolean;
     type: "button" | "checkbox" | "radio" | "menu" | "submenu";
+    connectedCallback(): void;
+    attributeChangedCallback(attributeName: string, oldValue: string | null, newValue: string | null): void;
     toggle(force?: boolean): void;
     expand(): void;
     collapse(): void;

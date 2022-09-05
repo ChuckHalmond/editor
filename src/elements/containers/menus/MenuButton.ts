@@ -17,6 +17,7 @@ interface HTMLEMenuButtonElement extends HTMLElement {
     name: string;
     disabled: boolean;
     expanded: boolean;
+    connectedCallback(): void;
     toggle(force?: boolean): void;
     expand(): void;
     collapse(): void;
@@ -59,6 +60,10 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
         this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
     }
 
+    connectedCallback(): void {
+        const tabindex = this.getAttribute("tabindex");
+        this.tabIndex = tabindex !== null ? parseInt(tabindex) : -1;
+    }
 
     toggle(force?: boolean): void {
         const {expanded} = this;

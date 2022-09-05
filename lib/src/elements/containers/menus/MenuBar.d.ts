@@ -11,6 +11,7 @@ interface HTMLEMenuBarElement extends HTMLElement {
     readonly activeIndex: number;
     name: string;
     expanded: boolean;
+    connectedCallback(): void;
 }
 declare global {
     interface HTMLElementTagNameMap {

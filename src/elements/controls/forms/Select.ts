@@ -145,8 +145,9 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
     }
 
     connectedCallback(): void {
-        const {tabIndex, options, selectedOption, value} = this;
-        this.tabIndex = tabIndex;
+        const {options, selectedOption, value} = this;
+        const tabindex = this.getAttribute("tabindex");
+        this.tabIndex = tabindex !== null ? parseInt(tabindex) : 0;
         customElements.upgrade(this);
         const optionToSelect = selectedOption ?? (
             value ? options.find(
@@ -154,7 +155,12 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
             ) : null
         ) ?? this.#firstOption();
         if (optionToSelect) {
-            this.#selectOption(optionToSelect);
+            if (optionToSelect === selectedOption) {
+                this.#setSelectedOption(selectedOption);
+            }
+            else {
+                this.#selectOption(optionToSelect);
+            }
         }
     }
 

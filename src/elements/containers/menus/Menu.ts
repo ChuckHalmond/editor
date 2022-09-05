@@ -12,6 +12,7 @@ interface HTMLEMenuElement extends HTMLElement {
     items(): HTMLEMenuItemElement[];
     name: string;
     contextual: boolean;
+    connectedCallback(): void;
     positionContextual(x: number, y: number): void;
 }
 
@@ -91,8 +92,8 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     }
 
     connectedCallback(): void {
-        const {tabIndex} = this;
-        this.tabIndex = tabIndex;
+        const tabindex = this.getAttribute("tabindex");
+        this.tabIndex = tabindex !== null ? parseInt(tabindex) : -1;
     }
 
     positionContextual(x: number, y: number): void {

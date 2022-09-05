@@ -24,6 +24,19 @@ e-menu[contextual]:focus-within {
     opacity: 1;
 }
 
+e-menuitemgroup {
+    display: flex;
+    flex-direction: column;
+}
+
+e-menuitemgroup::part(label) {
+    font-weight: bold;
+}
+
+e-menuitemgroup[label]::part(label) {
+    padding-bottom: 6px;
+}
+
 e-menuitem {
     display: flex;
     user-select: none;
