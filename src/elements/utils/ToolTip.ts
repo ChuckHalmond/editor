@@ -13,6 +13,8 @@ interface HTMLEToolTipElement extends HTMLElement {
     htmlFor: string;
     position: "top" | "bottom" | "right" | "left";
     visible: boolean;
+    show(): void;
+    hide(): void;
 }
 
 declare global {
