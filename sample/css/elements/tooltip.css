@@ -6,6 +6,7 @@ e-tooltip {
     box-sizing: border-box;
     background-color: white;
     border: 1px solid black;
+    pointer-events: none;
 }
 
 e-tooltip:not([visible]) {
@@ -15,27 +16,27 @@ e-tooltip:not([visible]) {
 e-tooltip::part(arrow) {
     display: inline-block;
     position: fixed;
+    z-index: 1;
     width: 6px;
     height: 6px;
     box-sizing: border-box;
     background-color: white;
     border: 1px solid black;
-    clip-path: polygon(100% 100%, 0 100%, 100% 0);
-    transform: translate(-50%, -50%) rotate(var(--arrow-rotation));
+    border-width: 0 1px 1px 0;
 }
 
 e-tooltip:is(:not([position]), [position="top"])::part(arrow) {
-    --arrow-rotation: 45deg;
+    transform: translate(-3px, -3px) rotate(45deg);
 }
 
 e-tooltip:is([position="bottom"])::part(arrow) {
-    --arrow-rotation: 225deg;
+    transform: translate(-3px, -3px) rotate(225deg);
 }
 
 e-tooltip:is([position="left"])::part(arrow) {
-    --arrow-rotation: 315deg;
+    transform: translate(-3px, -3px) rotate(315deg);
 }
 
 e-tooltip:is([position="right"])::part(arrow) {
-    --arrow-rotation: 135deg;
+    transform: translate(-3px, -3px) rotate(135deg);
 }
