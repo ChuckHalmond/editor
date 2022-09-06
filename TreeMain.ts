@@ -522,7 +522,7 @@ export async function TreeMain() {
             const {target} = event;
             const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
             const {model} = this;
-            const targetItemModel = <MyTreeItemModel>model.getItemByUri(targetItem.dataset.uri!);
+            const targetItemModel = <MyTreeItemModel>model.getItemByUri(this.getTreeItemElementUri(targetItem));
             if (targetItemModel) {
                 this.showEditItemDialog(targetItemModel);
             }

@@ -207,7 +207,8 @@ interface TreeView extends View {
     selectedItems(): TreeItemModel[];
     activeItem(): TreeItemModel | null;
     get treeElement(): HTMLETreeElement | null ;
-    treeItemElement(item: TreeItemModel): HTMLETreeItemElement | null ;
+    treeItemElement(item: TreeItemModel): HTMLETreeItemElement | null;
+    getTreeItemElementUri(item: HTMLETreeItemElement): string;
     itemContentDelegate(this: TreeView, item: TreeItemModel): string | Node;
     itemToolbarDelegate(this: TreeView, item: TreeItemModel): HTMLEToolBarElement | null;
     itemMenuDelegate(this: TreeView): HTMLEMenuElement | null;
@@ -260,6 +261,18 @@ class TreeViewBase extends View implements TreeView {
 
     treeItemElement(item: TreeItemModel): HTMLETreeItemElement | null  {
         return this.shadowRoot.querySelector<HTMLETreeItemElement>(`e-treeitem[uri=${item.uri}]`)!;
+    }
+
+    getTreeItemElementUri(item: HTMLETreeItemElement): string {
+        let uri = "";
+        let closestItem = <HTMLETreeItemElement | null>item;
+        while (closestItem !== null) {
+            const {dataset, parentElement} = closestItem;
+            const {name} = dataset;
+            uri = `${name}/` + uri;
+            closestItem = parentElement?.closest("e-treeitem") ?? null;
+        }
+        return uri;
     }
 
     override renderShadow(): Node {
@@ -331,7 +344,7 @@ class TreeViewBase extends View implements TreeView {
         if (treeElement) {
             const selectedElements = treeElement.selectedItems();
             return selectedElements.map(
-                item_i => <TreeItemModel>model.getItemByUri(item_i.dataset.uri!)
+                item_i => <TreeItemModel>model.getItemByUri(this.getTreeItemElementUri(item_i))
             );
         }
         return [];
@@ -342,7 +355,7 @@ class TreeViewBase extends View implements TreeView {
         if (treeElement) {
         const {activeItem} = treeElement;
             return activeItem ?
-                model.getItemByUri(activeItem?.dataset.uri!) : null;
+                model.getItemByUri(this.getTreeItemElementUri(activeItem)) : null;
         }
         return null;
     }
@@ -353,7 +366,7 @@ class TreeViewBase extends View implements TreeView {
 
     #renderTreeItem(item: TreeItemModel): HTMLETreeItemElement {
         const {draggable} = this;
-        const {index, level, uri} = item;
+        const {index, level, name} = item;
         const toolbar = this.itemToolbarDelegate(item);
         const content = this.itemContentDelegate(item);
         const treeItemElement = reactiveElement(
@@ -365,7 +378,7 @@ class TreeViewBase extends View implements TreeView {
                     level: level
                 },
                 dataset: {
-                    uri: uri
+                    name: name
                 },
                 children: [
                     ...(content ? [content] : []),
@@ -381,16 +394,7 @@ class TreeViewBase extends View implements TreeView {
                     }
                     case "name": {
                         const {dataset} = treeitem;
-                        const {uri} = item;
-                        dataset.uri = uri;
-                        const oldUri = uri.replace(`${newValue}/`, `${oldValue}/`);
-                        const subtreeItems = treeitem.querySelectorAll("e-treeitem");
-                        subtreeItems.forEach(
-                            (item_i) => {
-                                const {dataset} = item_i;
-                                dataset.uri = dataset.uri!.replace(oldUri, uri);
-                            }
-                        );
+                        dataset.name = newValue;
                         break;
                     }
                     case "type": {
@@ -454,7 +458,7 @@ class TreeViewBase extends View implements TreeView {
             if (selectedCount > 0) {
                 const selectedUris = 
                     selectedElements
-                    .map(element_i => element_i.dataset.uri!)
+                    .map(element_i => this.getTreeItemElementUri(element_i))
                     .filter(
                         (uri_i, _, uris) => !uris.some(
                             uri_j => uri_i.startsWith(`${uri_j}/`)
@@ -484,7 +488,7 @@ class TreeViewBase extends View implements TreeView {
         if (targetItem) {
             const {dataTransfer} = event;
             if (dataTransfer) {
-                const targetUri = targetItem.dataset.uri!;
+                const targetUri = this.getTreeItemElementUri(targetItem);
                 const targetItemModel = model.getItemByUri(targetUri)!;
                 const transferedUris = dataTransfer.getData("text/plain").split("\n");
                 const targetIsWithin = transferedUris.some(uri_i => targetUri.startsWith(`${uri_i}/`) || uri_i === targetUri);

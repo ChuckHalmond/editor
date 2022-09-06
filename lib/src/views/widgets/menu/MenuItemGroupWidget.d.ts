@@ -9,7 +9,7 @@ interface MenuItemGroupWidgetFactory extends WidgetFactory {
     create(): HTMLElement;
 }
 declare var menuItemGroupWidget: {
-    "__#49@#template": HTMLElement;
+    "__#48@#template": HTMLElement;
     create(): HTMLElement;
     slot(group: HTMLElement): HTMLElement | null;
 };
