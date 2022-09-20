@@ -313,7 +313,7 @@ var EMenuItem = <EMenuItemConstructor>Object.assign(
                 label
             ],
             listeners: {
-                trigger: trigger
+                click: trigger
             }
         });
     }, {

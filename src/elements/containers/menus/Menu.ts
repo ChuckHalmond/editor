@@ -170,31 +170,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
             this.#activeIndex = this.items().indexOf(item);
         }
     }
-
-    /*async #setItemTimeout(item: HTMLEMenuItemElement, delay?: number): Promise<void> {
-        return new Promise((resolve, reject) => {
-            const timeout = setTimeout(() => {
-                resolve(undefined);
-            }, delay ?? 0);
-            toggleTimeouts.set(item, {
-                clear: () => {
-                    clearTimeout(timeout);
-                    reject();
-                }
-            });
-        }).then(() => {
-            toggleTimeouts.delete(item);
-        });
-    }
-
-    #clearItemTimeout(item: HTMLEMenuItemElement): void {
-        const timeout = toggleTimeouts.get(item);
-        if (typeof timeout !== "undefined") {
-            toggleTimeouts.delete(item);
-            timeout.clear();
-        }
-    }*/
-
+    
     #handleClickEvent(event: MouseEvent): void {
         const {target} = event;
         const targetItem = (<HTMLElement>target).closest("e-menuitem");

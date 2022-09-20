@@ -197,7 +197,7 @@ var EToolBarItem = <EToolBarItemConstructor>Object.assign(
             },
             children: menubutton ? [menubutton] : select ? [select] : undefined,
             listeners: {
-                trigger: trigger
+                click: trigger
             }
         });
     }, {

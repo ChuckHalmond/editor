@@ -7,9 +7,7 @@ import { HTMLETreeItemElement } from "./src/elements/containers/trees/TreeItem";
 import { CustomElement, element, fragment, reactiveElement } from "./src/elements/Element";
 import { ModelEvent, ModelProperty } from "./src/models/Model";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
-import { MenuItemModel, MenuModel, MenuView } from "./src/views/MenuView";
 import { TreeItemModelList, TreeItemModel, TreeModel, TreeView } from "./src/views/TreeView";
-import { widget } from "./src/views/widgets/Widget";
 
 class MyTreeItemModelList extends TreeItemModelList {
     readonly items!: MyTreeItemModel[];
@@ -129,6 +127,7 @@ export async function TreeMain() {
         })
     );
     document.body.append(gridView);
+    gridView.render();
 
     const treeModel = new TreeModel({
         items: [
@@ -180,34 +179,9 @@ export async function TreeMain() {
                 type: "leaf",
                 name: "TI 3"
             })
-        ],
-        /*sortFunction: (item_a: TreeItemModel, item_b: TreeItemModel) => {
-            const {name: aLabel} = item_a;
-            const {name: bLabel} = item_b;
-            return bLabel.localeCompare(aLabel);
-        }*/
+        ]
     });
-    document.body.append(
-        new MenuView(
-            new MenuModel({
-                items: [
-                    new MenuItemModel({
-                        label: "Menuitem 1",
-                        type: "checkbox"
-                    })
-                ]
-            })
-        )
-    );
-
-
-    /*
-            template("treeview-dialog", {
-                slotted: [
-
-                ]
-            })
-    */
+    
     @CustomElement({
         name: "e-mytreeview"
     })
@@ -361,34 +335,36 @@ export async function TreeMain() {
         }
 
         #handleKeyDownEvent(event: KeyboardEvent) {
-            const {currentTarget, target, key} = event;
+            const {currentTarget, key} = event;
             const targetTree = <HTMLETreeElement>currentTarget;
-            const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
-            const selectedItems = this.selectedItems();
-            const {model} = this;
-            const targetItemModel = <MyTreeItemModel>model.getItemByUri(targetItem.dataset.uri!)!;
-            switch (key) {
-                case "Delete": {
-                    const selectedItemsList = selectedItems.includes(targetItemModel) ?
-                        new TreeItemModelList(selectedItems) : new TreeItemModelList([targetItemModel]);
-                    const {count} = selectedItemsList;
-                    const doRemove = confirm(`Remove ${count} items?`);
-                    if (doRemove) {
-                        selectedItemsList.remove();
+            const {activeItem} = targetTree;
+            if (activeItem) {
+                const activeItemModel = <MyTreeItemModel>this.treeItem(activeItem!)!;
+                switch (key) {
+                    case "Delete": {
+                        const selectedItems = this.selectedItems();
+                        const selectedItemsList = selectedItems.includes(activeItemModel) ?
+                            new TreeItemModelList(selectedItems) : new TreeItemModelList([activeItemModel]);
+                        const {count} = selectedItemsList;
+                        const doRemove = confirm(`Remove ${count} items?`);
+                        if (doRemove) {
+                            selectedItemsList.remove();
+                        }
+                        targetTree.focus();
+                        event.preventDefault();
+                        break;
                     }
-                    targetTree.focus();
-                    event.preventDefault();
-                    break;
-                }
-                case "Enter": {
-                    this.showEditItemDialog(targetItemModel);
-                    event.preventDefault();
+                    case "Enter": {
+                        this.showEditItemDialog(activeItemModel);
+                        event.preventDefault();
+                    }
                 }
             }
         }
 
         showEditItemDialog(item: MyTreeItemModel): void {
             const {shadowRoot} = this;
+            const {visibility, name, type} = item;
             const dialog = element("dialog", {
                 children: [
                     element("form", {
@@ -432,7 +408,7 @@ export async function TreeMain() {
                                                             id: "visibility",
                                                             type: "checkbox",
                                                             name: "visibility",
-                                                            checked: item.visibility
+                                                            checked: visibility
                                                         }
                                                     }),
                                                     element("label", {
@@ -446,7 +422,7 @@ export async function TreeMain() {
                                                             id: "name",
                                                             type: "text",
                                                             name: "name",
-                                                            value: item.name
+                                                            value: name
                                                         }
                                                     }),
                                                     element("label", {
@@ -465,7 +441,7 @@ export async function TreeMain() {
                                                                 attributes: {
                                                                     label: type_i,
                                                                     value: type_i,
-                                                                    selected: item.type === type_i
+                                                                    selected: type === type_i
                                                                 }
                                                             })
                                                         )
@@ -521,8 +497,7 @@ export async function TreeMain() {
         #handleDoubleClickEvent(event: MouseEvent): void {
             const {target} = event;
             const targetItem = <HTMLETreeItemElement>(<Element>target).closest("e-treeitem");
-            const {model} = this;
-            const targetItemModel = <MyTreeItemModel>model.getItemByUri(this.getTreeItemElementUri(targetItem));
+            const targetItemModel = <MyTreeItemModel>this.treeItem(targetItem);
             if (targetItemModel) {
                 this.showEditItemDialog(targetItemModel);
             }
@@ -564,7 +539,7 @@ export async function TreeMain() {
                                     attributes: {
                                         type: "checkbox"
                                     },
-                                    children: "Hey"
+                                    children: "Menuitem 1"
                                 }),
                                 element("e-menuitem", {
                                     attributes: {
@@ -577,17 +552,15 @@ export async function TreeMain() {
                                                 slot: "menu"
                                             },
                                             children: [
-                                                /*element("e-menuitem", {
-                                                    attributes: {
-                                                        type: "checkbox"
-                                                    },
-                                                    children: "Yo"
-                                                })*/
-                                                new EMenuItem({
-                                                    label: "Yo"
+                                                EMenuItem.radio({
+                                                    label: "SubmenuItem 1",
+                                                    name: "radio",
+                                                    value: String(0)
                                                 }),
-                                                new EMenuItem({
-                                                    label: "Plop"
+                                                EMenuItem.radio({
+                                                    label: "SubmenuItem 2",
+                                                    name: "radio",
+                                                    value: String(1)
                                                 })
                                             ]
                                         })
@@ -613,7 +586,7 @@ export async function TreeMain() {
                                     attributes: {
                                         type: "checkbox"
                                     },
-                                    children: "Hey"
+                                    children: "Checkbox"
                                 })
                             ]
                         })
@@ -622,189 +595,6 @@ export async function TreeMain() {
             ]
         })
     );
-        
-    /*const menuView = widget("menubar", {
-        slotted: [
-            widget("menuitem", {
-                properties: {
-                    label: "MenuItem 0",
-                    name: "MenuItem 0",
-                    type: "menu",
-                    disabled: true
-                },
-                slotted: [
-                    widget("menu", {
-                        slotted: [
-                            widget("menuitem", {
-                                properties: {
-                                    label: "MenuItem 1",
-                                    name: "MenuItem 1",
-                                    type: "checkbox"
-                                }
-                            })
-                        ]
-                    })
-                ]
-            }),
-            widget("menuitem", {
-                properties: {
-                    label: "MenuItem 0",
-                    name: "MenuItem 0",
-                    type: "menu"
-                },
-                slotted: [
-                    widget("menu", {
-                        slotted: [
-                            widget("menuitem", {
-                                properties: {
-                                    label: "MenuItem 1",
-                                    name: "MenuItem 1",
-                                    type: "checkbox"
-                                }
-                            })
-                        ]
-                    })
-                ]
-            }),
-            widget("menuitem", {
-                properties: {
-                    label: "MenuItem 1",
-                    name: "MenuItem 1",
-                    type: "menu"
-                },
-                slotted: [
-                    widget("menu", {
-                        slotted: [
-                            widget("menuitemgroup", {
-                                slotted: [
-                                    widget("menuitem", {
-                                        properties: {
-                                            label: "MenuItem 1",
-                                            type: "checkbox",
-                                            keyshortcut: "Ctrl+B",
-                                            disabled: true,
-                                            checked: true
-                                        }
-                                    }),
-                                    widget("menuitem", {
-                                        properties: {
-                                            type: "button",
-                                            label: "MenuItem 2",
-                                            keyshortcut: "Ctrl+A"
-                                        }
-                                    })
-                                ]
-                            }),
-                            widget("separator"),
-                            widget("menuitem", {
-                                properties: {
-                                    label: "Submenu",
-                                    type: "submenu"
-                                },
-                                slotted: [
-                                    widget("menu", {
-                                        slotted: [
-                                            widget("menuitem", {
-                                                properties: {
-                                                    label: "MenuItem 1",
-                                                    type: "radio",
-                                                    name: "radio",
-                                                    value: "1"
-                                                }
-                                            }),
-                                            widget("menuitem", {
-                                                properties: {
-                                                    type: "radio",
-                                                    label: "MenuItem 2",
-                                                    name: "radio",
-                                                    value: "2"
-                                                }
-                                            }),
-                                            widget("menuitem", {
-                                                properties: {
-                                                    type: "radio",
-                                                    label: "MenuItem 3",
-                                                    name: "radio",
-                                                    value: "3"
-                                                }
-                                            })
-                                        ]
-                                    })
-                                ]
-                            })
-                        ]
-                    })
-                ]
-            })
-        ]
-    })
-    document.body.append(menuView);
-
-    document.body.append(
-        widget("combobox", {
-            slotted: [
-                widget("option",  {
-                    properties: {
-                        label: "First option"
-                    }
-                }),
-                widget("option",  {
-                    properties: {
-                        label: "Second option"
-                    }
-                }),
-                widget("option",  {
-                    properties: {
-                        label: "Third option",
-                        selected: true
-                    }
-                })
-            ]
-        })
-    );*/
-
-    /*document.body.append(
-        widget("toolbar", {
-            slotted: [
-                widget("toolbaritem",  {
-                    properties: {
-                        type: "menubutton"
-                    },
-                    slotted: [
-                        "Yo!",
-                        widget("menu", {
-                            slotted: [
-                                widget("menuitem", {
-                                    properties: {
-                                        label: "MenuItem 1",
-                                        type: "radio",
-                                        name: "radio",
-                                        value: "1"
-                                    }
-                                }),
-                                widget("menuitem", {
-                                    properties: {
-                                        type: "radio",
-                                        label: "MenuItem 2",
-                                        name: "radio",
-                                        value: "2"
-                                    }
-                                }),
-                                widget("menuitem", {
-                                    properties: {
-                                        type: "radio",
-                                        label: "MenuItem 3",
-                                        name: "radio",
-                                        value: "3"
-                                    }
-                                })
-                            ]
-                        })
-                    ]
-                })
-            ]
-        })
-    );*/
 
     document.body.append(
         element("e-toolbar", {
@@ -843,28 +633,28 @@ export async function TreeMain() {
                 for: "one",
                 position: "bottom"
             },
-            children: "One One One One One One One One"
+            children: "First tooltip"
         }),
         element("e-tooltip", {
             attributes: {
                 for: "two",
                 position: "top"
             },
-            children: "Two Two Two Two Two Two Two Two"
+            children: "Second tooltip!"
         }),
         element("e-tooltip", {
             attributes: {
                 for: "three",
                 position: "right",
             },
-            children: "Three"
+            children: "Third tooltip ?"
         }),
         element("e-tooltip", {
             attributes: {
                 for: "four",
                 position: "left"
             },
-            children: "Four"
+            children: "Fourth."
         })
     );
 }

@@ -297,7 +297,6 @@ class GridViewBase extends View implements GridView {
             displayFilters.push(filter);
             Array.from(rows.values()).forEach((row_i) => {
                 const rowElement = this.getRowElement(row_i);
-                console.log(rowElement);
                 if (rowElement) {
                     rowElement.hidden = !this.#filter(row_i);
                 }
@@ -417,6 +416,7 @@ class GridViewBase extends View implements GridView {
         const {model} = this;
         if (targetHeader) {
             const column = model.getColumnByName(targetHeader.id)!;
+            const {sortorder, filters} = column;
             const contextMenu = element("e-menu",  {
                 attributes: {
                     contextual: true,
@@ -477,7 +477,8 @@ class GridViewBase extends View implements GridView {
                                             type: "radio",
                                             name: "sort",
                                             value: "1",
-                                            label: "Ascending"
+                                            label: "Ascending",
+                                            checked: sortorder === 1
                                         },
                                         children: "Ascending"
                                     }),
@@ -486,7 +487,8 @@ class GridViewBase extends View implements GridView {
                                             type: "radio",
                                             name: "sort",
                                             value: "-1",
-                                            label: "Descending"
+                                            label: "Descending",
+                                            checked: sortorder === -1
                                         },
                                         children: "Descending"
                                     })
@@ -515,30 +517,36 @@ class GridViewBase extends View implements GridView {
                                 attributes: {
                                     slot: "menu"
                                 },
-                                children: column.filters.map((filter_i, i) =>
-                                    element("e-menuitem", {
+                                children: filters.map(filter => {
+                                    const {name} = filter;
+                                    return element("e-menuitem", {
                                         attributes: {
                                             type: "checkbox",
-                                            checked: this.#displayFilters.includes(filter_i),
-                                            label: filter_i.name
+                                            checked: this.#displayFilters.includes(filter),
+                                            label: name
                                         },
-                                        children: filter_i.name,
-                                        listeners: {
-                                            click: (event) => {
-                                                const {currentTarget} = event;
-                                                const targetItem = <HTMLEMenuItemElement>currentTarget;
-                                                const {checked} = targetItem;
+                                        children: name
+                                    })
+                                }),
+                                listeners: {
+                                    click: (event) => {
+                                        const {target} = event;
+                                        const targetItem = (<HTMLElement>target).closest("e-menuitem");
+                                        if (targetItem) {
+                                            const {checked, label} = targetItem;
+                                            const filter = filters.find(filter => filter.name === label);
+                                            if (filter) {
                                                 if (checked) {
-                                                    this.addDisplayFilter(filter_i);
+                                                    this.addDisplayFilter(filter);
                                                 }
                                                 else {
-                                                    this.removeDisplayFilter(filter_i);
+                                                    this.removeDisplayFilter(filter);
                                                 }
-                                                gridElement.focus();
                                             }
                                         }
-                                    })
-                                )
+                                        gridElement.focus();
+                                    }
+                                }
                             })
                         ]
                     })

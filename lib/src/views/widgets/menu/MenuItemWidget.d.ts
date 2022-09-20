@@ -48,17 +48,7 @@ declare var menuItemWidget: {
     "__#45@#template": HTMLElement;
     "__#45@#types": MenuItemType[];
     "__#45@#typesFeatures": {
-        checkbox: {
-            role: string;
-            hasIcon: boolean;
-            hasArrow: boolean;
-        };
         button: {
-            role: string;
-            hasIcon: boolean;
-            hasArrow: boolean;
-        };
-        radio: {
             role: string;
             hasIcon: boolean;
             hasArrow: boolean;
@@ -68,7 +58,17 @@ declare var menuItemWidget: {
             hasIcon: boolean;
             hasArrow: boolean;
         };
+        checkbox: {
+            role: string;
+            hasIcon: boolean;
+            hasArrow: boolean;
+        };
         submenu: {
+            role: string;
+            hasIcon: boolean;
+            hasArrow: boolean;
+        };
+        radio: {
             role: string;
             hasIcon: boolean;
             hasArrow: boolean;

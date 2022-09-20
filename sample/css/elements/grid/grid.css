@@ -50,3 +50,8 @@ e-grid:is(:not([selectby]), [selectby="cell"]) e-gridcell[selected],
 e-grid:is([selectby="row"]) e-gridrow[selected] {
     background-color: var(--selected-item-color);
 }
+
+e-grid:is(:not([selectby]), [selectby="cell"]) e-gridrow:focus-visible,
+e-grid:is([selectby="row"]) e-gridcell:focus-visible {
+    outline: none;
+}

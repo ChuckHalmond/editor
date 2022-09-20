@@ -1,4 +1,3 @@
-export * from "./src/Editor";
 export * from "./src/Input";
 export * from "./src/elements/Element";
 export * from "./src/elements/Snippets";

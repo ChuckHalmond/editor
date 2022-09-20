@@ -208,7 +208,7 @@ interface TreeView extends View {
     activeItem(): TreeItemModel | null;
     get treeElement(): HTMLETreeElement | null ;
     treeItemElement(item: TreeItemModel): HTMLETreeItemElement | null;
-    getTreeItemElementUri(item: HTMLETreeItemElement): string;
+    treeItem(element: HTMLETreeItemElement): TreeItemModel | null;
     itemContentDelegate(this: TreeView, item: TreeItemModel): string | Node;
     itemToolbarDelegate(this: TreeView, item: TreeItemModel): HTMLEToolBarElement | null;
     itemMenuDelegate(this: TreeView): HTMLEMenuElement | null;
@@ -263,7 +263,7 @@ class TreeViewBase extends View implements TreeView {
         return this.shadowRoot.querySelector<HTMLETreeItemElement>(`e-treeitem[uri=${item.uri}]`)!;
     }
 
-    getTreeItemElementUri(item: HTMLETreeItemElement): string {
+    #getTreeItemElementUri(item: HTMLETreeItemElement): string {
         let uri = "";
         let closestItem = <HTMLETreeItemElement | null>item;
         while (closestItem !== null) {
@@ -273,6 +273,10 @@ class TreeViewBase extends View implements TreeView {
             closestItem = parentElement?.closest("e-treeitem") ?? null;
         }
         return uri;
+    }
+
+    treeItem(element: HTMLETreeItemElement): TreeItemModel | null  {
+        return this.model.getItemByUri(this.#getTreeItemElementUri(element));
     }
 
     override renderShadow(): Node {
@@ -340,22 +344,23 @@ class TreeViewBase extends View implements TreeView {
     }
 
     selectedItems(): TreeItemModel[] {
-        const {model, treeElement} = this;
+        const {treeElement} = this;
         if (treeElement) {
             const selectedElements = treeElement.selectedItems();
             return selectedElements.map(
-                item_i => <TreeItemModel>model.getItemByUri(this.getTreeItemElementUri(item_i))
+                item_i => <TreeItemModel>this.treeItem(item_i)
             );
         }
         return [];
     }
 
     activeItem(): TreeItemModel | null {
-        const {model, treeElement} = this;
+        const {treeElement} = this;
         if (treeElement) {
-        const {activeItem} = treeElement;
+            const {activeItem} = treeElement;
             return activeItem ?
-                model.getItemByUri(this.getTreeItemElementUri(activeItem)) : null;
+                this.treeItem(activeItem) :
+                null;
         }
         return null;
     }
@@ -458,7 +463,7 @@ class TreeViewBase extends View implements TreeView {
             if (selectedCount > 0) {
                 const selectedUris = 
                     selectedElements
-                    .map(element_i => this.getTreeItemElementUri(element_i))
+                    .map(element_i => this.#getTreeItemElementUri(element_i))
                     .filter(
                         (uri_i, _, uris) => !uris.some(
                             uri_j => uri_i.startsWith(`${uri_j}/`)
@@ -488,7 +493,7 @@ class TreeViewBase extends View implements TreeView {
         if (targetItem) {
             const {dataTransfer} = event;
             if (dataTransfer) {
-                const targetUri = this.getTreeItemElementUri(targetItem);
+                const targetUri = this.#getTreeItemElementUri(targetItem);
                 const targetItemModel = model.getItemByUri(targetUri)!;
                 const transferedUris = dataTransfer.getData("text/plain").split("\n");
                 const targetIsWithin = transferedUris.some(uri_i => targetUri.startsWith(`${uri_i}/`) || uri_i === targetUri);

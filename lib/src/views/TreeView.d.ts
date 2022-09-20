@@ -59,7 +59,7 @@ interface TreeView extends View {
     activeItem(): TreeItemModel | null;
     get treeElement(): HTMLETreeElement | null;
     treeItemElement(item: TreeItemModel): HTMLETreeItemElement | null;
-    getTreeItemElementUri(item: HTMLETreeItemElement): string;
+    treeItem(element: HTMLETreeItemElement): TreeItemModel | null;
     itemContentDelegate(this: TreeView, item: TreeItemModel): string | Node;
     itemToolbarDelegate(this: TreeView, item: TreeItemModel): HTMLEToolBarElement | null;
     itemMenuDelegate(this: TreeView): HTMLEMenuElement | null;
