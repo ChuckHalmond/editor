@@ -213,24 +213,34 @@ export async function TreeMain() {
                     }),
                     ["name"],
                     (label, property, oldValue, newValue) => {
-                        label.textContent = `${item.name}`;
+                        label.textContent = newValue;
                     }
                 ),
-                ...(
-                    item.type == "parent" ? [
-                        reactiveElement(
-                            item,
-                            element("span", {
-                                attributes: {
-                                    class: "badge"
+                reactiveElement(
+                    item,
+                    element("span", {
+                        attributes: {
+                            class: "badge"
+                        }
+                    }),
+                    ["childCount", "type"],
+                    (badge, property, oldValue, newValue) => {
+                        switch (property) {
+                            case "type": {
+                                if (newValue === "leaf") {
+                                    badge.textContent = null;
                                 }
-                            }),
-                            ["childCount"],
-                            (badge, property, oldValue, newValue) => {
-                                badge.textContent = `(${newValue})`;
+                                else {
+                                    badge.textContent = `(${item.childCount})`;
+                                }
+                                break;
                             }
-                        )
-                    ] : []
+                            case "childCount": {
+                                badge.textContent = `(${newValue})`;
+                                break;
+                            }
+                        }
+                    }
                 )
             );
         }
