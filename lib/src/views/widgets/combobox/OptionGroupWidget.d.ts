@@ -9,7 +9,7 @@ interface OptionGroupWidgetFactory extends WidgetFactory {
     create(): HTMLElement;
 }
 declare var optionGroupWidget: {
-    "__#68@#template": HTMLElement;
+    "__#67@#template": HTMLElement;
     create(): HTMLElement;
     slot(group: HTMLElement): HTMLElement;
 };

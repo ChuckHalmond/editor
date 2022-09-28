@@ -97,7 +97,6 @@ class GridColumnModel extends ModelObject {
         this.label = label;
         this.extract = extract;
         this.filters = filters;
-        this.sortorder = 1;
     }
 }
 
@@ -341,6 +340,11 @@ class GridViewBase extends View implements GridView {
                                     class: "gridheader-label"
                                 },
                                 children: this.#columnDelegate(column)
+                            }),
+                            element("span", {
+                                attributes: {
+                                    class: "gridheader-sort-indicator"
+                                }
                             })
                         ]).concat(
                             this.resizable ? [

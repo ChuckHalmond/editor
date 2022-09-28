@@ -31,4 +31,8 @@
     --arrow-color: var(--font-color);
     --arrow-icon-collapsed: url("/sample/assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg");
     --arrow-icon-expanded: url("/sample/assets/arrow_drop_down_FILL0_wght400_GRAD0_opsz48.svg");
+
+    --sortorder-indicator-color: var(--font-color);
+    --sortorder-indicator-ascending: url("/sample/assets/arrow_drop_up_FILL0_wght400_GRAD0_opsz48.svg");
+    --sortorder-indicator-descending: url("/sample/assets/arrow_drop_down_FILL0_wght400_GRAD0_opsz48.svg");
 }

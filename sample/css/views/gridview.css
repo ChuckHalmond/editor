@@ -37,6 +37,44 @@ e-gridcell[type="columnheader"] {
     white-space: nowrap;
 }
 
+e-treeitem::part(arrow) {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin: 1px 4px 1px 1px;
+}
+
+.gridheader-sort-indicator {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+}
+
+.gridheader-sort-indicator::before {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin: 1px;
+    content: "";
+    mask-size: 18px 18px;
+    -webkit-mask-size: 18px 18px;
+    background-color: var(--sortorder-indicator-color, none);
+}
+
+e-gridcell[type="columnheader"]:not([data-sortorder]) .gridheader-sort-indicator::before {
+    background-color: unset;
+}
+
+e-gridcell[type="columnheader"][data-sortorder="1"] .gridheader-sort-indicator::before {
+    -webkit-mask-image: var(--sortorder-indicator-ascending, none);
+    mask-image: var(--sortorder-indicator-ascending, none);
+}
+
+e-gridcell[type="columnheader"][data-sortorder="-1"] .gridheader-sort-indicator::before {
+    -webkit-mask-image: var(--sortorder-indicator-descending, none);
+    mask-image: var(--sortorder-indicator-descending, none);
+}
+
 e-gridhead e-wsash {
     opacity: 1;
 }

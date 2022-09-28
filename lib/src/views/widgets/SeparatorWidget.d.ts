@@ -9,7 +9,7 @@ interface SeparatorWidgetFactory extends WidgetFactory {
     create(): HTMLElement;
 }
 declare var separatorWidget: {
-    "__#44@#template": HTMLElement;
+    "__#43@#template": HTMLElement;
     create(): HTMLElement;
     slot(root: HTMLElement, name: string | null): HTMLElement | null;
 };
