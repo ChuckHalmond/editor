@@ -575,8 +575,8 @@ class GridViewBase extends View implements GridView {
 
     #handleHeadClickEvent(event: MouseEvent): void {
         const {target} = event;
-        const targetIsHeaderLabel = (<HTMLElement>target).matches(":is(.gridheader-label, .gridheader-label :scope)");
-        if (targetIsHeaderLabel) {
+        const targetIsHeaderContent = (<HTMLElement>target).matches("e-gridcell[type=columnheader] :scope:not(e-wsash)");
+        if (targetIsHeaderContent) {
             const targetHeader = <HTMLEGridCellElement>(<HTMLElement>target).closest("e-gridcell");
             const {model} = this;
             const {columns} = model;
