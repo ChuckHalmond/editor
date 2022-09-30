@@ -25,10 +25,6 @@ exports.default = {
   },
   output: {
     filename: "editor.js",
-    path: path.resolve(__dirname, "./sample/dist"),
-    library: {
-      name: "editor",
-      type: "var"
-    }
+    path: path.resolve(__dirname, "./sample/dist")
   }
 };
