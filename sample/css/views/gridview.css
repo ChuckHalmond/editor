@@ -18,7 +18,8 @@ e-gridcell[type="columnheader"] {
     width: 120px;
 }
 
-.gridcell-label {
+.gridcell-label,
+.gridheader-label {
     padding-left: 4px;
 }
 
@@ -81,8 +82,6 @@ e-gridhead e-wsash {
 
 e-gridhead e-wsash:not(:hover) {
     flex: 0 0 auto;
-    background-color: lightgrey;
     width: 2px;
-    margin-right: 1px;
     margin-left: 1px;
 }

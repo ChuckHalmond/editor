@@ -1,6 +1,7 @@
 e-grid {
     display: table;
     user-select: none;
+    line-height: 22px;
 }
 
 e-gridrow {
