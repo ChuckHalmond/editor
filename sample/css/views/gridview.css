@@ -83,5 +83,6 @@ e-gridhead e-wsash {
 e-gridhead e-wsash:not(:hover) {
     flex: 0 0 auto;
     width: 2px;
+    margin-right: 1px;
     margin-left: 1px;
 }

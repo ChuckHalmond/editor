@@ -4,7 +4,6 @@ import { View } from "./View";
 import { HTMLEGridCellElement } from "../elements/containers/grid/GridCell";
 import { HTMLEGridElement } from "../elements/containers/grid/Grid";
 import { HTMLEGridRowElement } from "../elements/containers/grid/GridRow";
-import { HTMLEMenuItemElement } from "../elements/containers/menus/MenuItem";
 
 export { GridModel };
 export { GridRowModel };
@@ -223,7 +222,7 @@ class GridViewBase extends View implements GridView {
             element("link", {
                 attributes: {
                     rel: "stylesheet",
-                    href: "css/main.css"
+                    href: "css/editor.css"
                 }
             }),
             element("link", {

@@ -301,7 +301,7 @@ class TreeViewBase extends View implements TreeView {
             element("link", {
                 attributes: {
                     rel: "stylesheet",
-                    href: "css/main.css"
+                    href: "css/editor.css"
                 }
             }),
             element("link", {

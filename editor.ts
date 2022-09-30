@@ -1,3 +1,9 @@
+declare global {
+    interface ElementInternals {
+        role: string;
+    }
+}
+
 export * from "./src/Input";
 export * from "./src/elements/Element";
 export * from "./src/elements/Snippets";
@@ -66,4 +72,3 @@ export * from "./src/views/widgets/grid/GridRowWidget";
 export * from "./src/views/widgets/combobox/ComboBoxWidget";
 export * from "./src/views/widgets/combobox/OptionWidget";
 export * from "./src/views/widgets/combobox/OptionGroupWidget";
-export * from "./index";

@@ -1,13 +1,7 @@
-import "./index";
+import * as editor from "./index";
+export default editor;
 declare global {
     interface ElementInternals {
         role: string;
     }
-    interface ShadowRoot {
-        adoptedStyleSheets: StyleSheet[];
-    }
-    interface CSSStyleSheet {
-        replace(css: string): void;
-    }
 }
-export declare function main(): Promise<void>;

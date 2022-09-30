@@ -1,8 +1,8 @@
 {
     "name": "editor",
     "version": "1.0.0",
-    "main": "./lib/index.js",
-    "types": "./lib/index.js",
+    "main": "./lib/editor.js",
+    "types": "./lib/editor.js",
     "files": [
         "lib"
     ],

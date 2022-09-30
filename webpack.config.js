@@ -2,7 +2,7 @@ const path = require("path");
 const webpack = require('webpack');
 
 exports.default = {
-  entry: "./main.ts",
+  entry: "./editor.ts",
   devtool: "source-map",
   module: {
     rules: [
@@ -24,9 +24,11 @@ exports.default = {
     ]
   },
   output: {
-    filename: "main.js",
+    filename: "editor.js",
     path: path.resolve(__dirname, "./sample/dist"),
-    libraryTarget: "var",
-    library: "main"
+    library: {
+      name: "editor",
+      type: "var"
+    }
   }
 };
