@@ -48,7 +48,7 @@ class HTMLETabElementBase extends HTMLElement implements HTMLETabElement {
     
     get panel(): HTMLETabPanelElement | null {
         const {controls} = this;
-        return (<Document | ShadowRoot>this.getRootNode()).querySelector<HTMLETabPanelElement>(`e-tabpanel#${controls}`);
+        return (<Document | ShadowRoot>this.getRootNode()).querySelector<HTMLETabPanelElement>(`e-tabpanel[id='${controls}']`);
     }
 
     constructor() {

@@ -27,7 +27,7 @@ declare global {
     }
 }
 declare var gridCellWidget: {
-    "__#59@#template": HTMLElement;
+    "__#53@#template": HTMLElement;
     create(init?: {
         id?: string;
         classList?: string[];
@@ -50,5 +50,5 @@ declare var gridCellWidget: {
     getDisabled(item: HTMLElement): boolean;
     setSelected(item: HTMLElement, value: boolean): void;
     getSelected(item: HTMLElement): boolean;
-    "__#59@#label"(item: HTMLElement): HTMLElement;
+    "__#53@#label"(item: HTMLElement): HTMLElement;
 };

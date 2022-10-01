@@ -51,8 +51,8 @@ class HTMLEHandleElementBase extends HTMLElement implements HTMLEHandleElement {
                             
                             background-color: rgb(0, 128, 255);
 
-                            -webkit-mask-image: url("assets/dots.png");
-                            mask-image: url("assets/dots.png");
+                            -webkit-mask-image: url("/assets/dots.png");
+                            mask-image: url("/assets/dots.png");
 
                             -webkit-mask-repeat: repeat;
                             mask-repeat: repeat;

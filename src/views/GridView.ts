@@ -222,13 +222,13 @@ class GridViewBase extends View implements GridView {
             element("link", {
                 attributes: {
                     rel: "stylesheet",
-                    href: "css/editor.css"
+                    href: "/css/main.css"
                 }
             }),
             element("link", {
                 attributes: {
                     rel: "stylesheet",
-                    href: "css/views/gridview.css"
+                    href: "/css/views/gridview.css"
                 }
             }),
             element("div", {

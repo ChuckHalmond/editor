@@ -1,13 +1,13 @@
 :root {
     --collapsed-symbol: "►";
     --expanded-symbol: "▼";
-    --default-icon-mask-image: url("assets/blank.png");
+    --default-icon-mask-image: url("/assets/blank.png");
     accent-color: var(--accent-color);
 }
 
 @font-face {
     font-family: "Open Sans";
-    src: url("/sample/assets/fonts/Open_Sans/OpenSans-VariableFont_wdth,wght.ttf") format("truetype")
+    src: url("/assets/fonts/Open_Sans/OpenSans-VariableFont_wdth,wght.ttf") format("truetype")
 }
 
 body {
@@ -18,29 +18,29 @@ body {
 
 e-toolbaritem[name="visibility"] {
     --icon-color: black;
-    --icon-image: url("/sample/assets/visibility_FILL1_wght400_GRAD0_opsz48.svg");
+    --icon-image: url("/assets/visibility_FILL1_wght400_GRAD0_opsz48.svg");
 }
 
 e-toolbaritem[name="visibility"][pressed] {
     --icon-color: black;
-    --icon-image: url("/sample/assets/visibility_off_FILL1_wght400_GRAD0_opsz48.svg");
+    --icon-image: url("/assets/visibility_off_FILL1_wght400_GRAD0_opsz48.svg");
     background-color: revert;
 }
 
 e-menubutton::part(content) {
     --icon-color: black;
-    --icon-image: url("/sample/assets/more_horiz_FILL0_wght700_GRAD0_opsz48.svg");
+    --icon-image: url("/assets/more_horiz_FILL0_wght700_GRAD0_opsz48.svg");
 }
 
 e-menuitem[type="submenu"],
 .menuitem:is(.menuitem-submenu) {
     --arrow-color: black;
-    --arrow-image: url("/sample/assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg");
+    --arrow-image: url("/assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg");
 }
 
 e-menuitem[id="file-import-menu-button"] {
     --icon-color: black;
-    --icon-image: url("/sample/assets/sharp_file_upload_black_18dp.png");
+    --icon-image: url("/assets/sharp_file_upload_black_18dp.png");
 }
 
 e-menuitem[id="file-export-menu-button"] {
@@ -76,22 +76,22 @@ e-treeitem:not([active]):not([selected]) > e-toolbar {
 */
 e-menuitem:is([type="checkbox"], [type="radio"])[checked] {
     --icon-color: black;
-    --icon-image: url("/sample/assets/done_FILL0_wght400_GRAD0_opsz48.svg");
+    --icon-image: url("/assets/done_FILL0_wght400_GRAD0_opsz48.svg");
 }
 
 e-menuitem[name="A1"]::part(icon) {
     --icon-color: black;
-    --icon-image: url("/sample/assets/topic_FILL0_wght400_GRAD0_opsz48.svg");
+    --icon-image: url("/assets/topic_FILL0_wght400_GRAD0_opsz48.svg");
 }
 
 e-menuitem[name="A2"]::part(icon) {
     --icon-color: black;
-    --icon-image: url("/sample/assets/add_a_photo_FILL0_wght400_GRAD0_opsz48.svg");
+    --icon-image: url("/assets/add_a_photo_FILL0_wght400_GRAD0_opsz48.svg");
 }
 
 e-menuitem[name="toggleAdvancedUser"]::part(icon) {
     --icon-color: black;
-    --icon-image: url("/sample/assets/add_a_photo_FILL0_wght400_GRAD0_opsz48.svg");
+    --icon-image: url("/assets/add_a_photo_FILL0_wght400_GRAD0_opsz48.svg");
 }
 
 e-menuitem[disabled] {

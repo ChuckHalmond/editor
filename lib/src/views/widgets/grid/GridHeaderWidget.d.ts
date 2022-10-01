@@ -15,7 +15,7 @@ declare global {
     }
 }
 declare var gridHeaderWidget: {
-    "__#64@#template": HTMLElement;
+    "__#58@#template": HTMLElement;
     create(init?: {
         id?: string;
         classList?: string[];

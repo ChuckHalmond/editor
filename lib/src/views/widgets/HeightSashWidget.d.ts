@@ -15,11 +15,11 @@ interface HeightSashWidgetFactory extends WidgetFactory {
     }): HTMLElement;
 }
 declare var heightSashWidget: {
-    "__#58@#template": HTMLElement;
-    "__#58@#targets": WeakMap<HTMLElement, HTMLElement | null>;
-    "__#58@#onCaptureFlags": WeakMap<HTMLElement, boolean>;
-    "__#58@#queuedPointerCallbacks": WeakMap<HTMLElement, FrameRequestCallback | null>;
-    "__#58@#pointerMovements": WeakMap<HTMLElement, number>;
+    "__#52@#template": HTMLElement;
+    "__#52@#targets": WeakMap<HTMLElement, HTMLElement | null>;
+    "__#52@#onCaptureFlags": WeakMap<HTMLElement, boolean>;
+    "__#52@#queuedPointerCallbacks": WeakMap<HTMLElement, FrameRequestCallback | null>;
+    "__#52@#pointerMovements": WeakMap<HTMLElement, number>;
     create(properties?: {
         id?: string;
         classList?: string[];
@@ -32,9 +32,9 @@ declare var heightSashWidget: {
     getControls(sash: HTMLElement): string | null;
     setControls(sash: HTMLElement, value: string): void;
     setHeight(sash: HTMLElement, height: number): void;
-    "__#58@#handlePointerUpEvent"(event: PointerEvent): void;
-    "__#58@#handlePointerDownEvent"(event: PointerEvent): void;
-    "__#58@#handlePointerMoveEvent"(event: PointerEvent): void;
-    "__#58@#pointerMoveCallback"(sash: HTMLElement): void;
+    "__#52@#handlePointerUpEvent"(event: PointerEvent): void;
+    "__#52@#handlePointerDownEvent"(event: PointerEvent): void;
+    "__#52@#handlePointerMoveEvent"(event: PointerEvent): void;
+    "__#52@#pointerMoveCallback"(sash: HTMLElement): void;
     slot(root: HTMLElement, name: string | null): HTMLElement | null;
 };

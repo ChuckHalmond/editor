@@ -29,10 +29,10 @@
     --droptarget-item-color: hsl(203, 92%, 50%, 50%);
 
     --arrow-color: var(--font-color);
-    --arrow-icon-collapsed: url("/sample/assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg");
-    --arrow-icon-expanded: url("/sample/assets/arrow_drop_down_FILL0_wght400_GRAD0_opsz48.svg");
+    --arrow-icon-collapsed: url("/assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg");
+    --arrow-icon-expanded: url("/assets/arrow_drop_down_FILL0_wght400_GRAD0_opsz48.svg");
 
     --sortorder-indicator-color: var(--font-color);
-    --sortorder-indicator-ascending: url("/sample/assets/arrow_drop_up_FILL0_wght400_GRAD0_opsz48.svg");
-    --sortorder-indicator-descending: url("/sample/assets/arrow_drop_down_FILL0_wght400_GRAD0_opsz48.svg");
+    --sortorder-indicator-ascending: url("/assets/arrow_drop_up_FILL0_wght400_GRAD0_opsz48.svg");
+    --sortorder-indicator-descending: url("/assets/arrow_drop_down_FILL0_wght400_GRAD0_opsz48.svg");
 }

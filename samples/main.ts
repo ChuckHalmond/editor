@@ -1,13 +1,17 @@
-import { HTMLEMenuElement } from "./src/elements/containers/menus/Menu";
-import { EMenuItem } from "./src/elements/containers/menus/MenuItem";
-import { HTMLEToolBarElement } from "./src/elements/containers/toolbars/ToolBar";
-import { HTMLEToolBarItemElement } from "./src/elements/containers/toolbars/ToolBarItem";
-import { HTMLETreeElement } from "./src/elements/containers/trees/Tree";
-import { HTMLETreeItemElement } from "./src/elements/containers/trees/TreeItem";
-import { CustomElement, element, fragment, reactiveElement } from "./src/elements/Element";
-import { ModelEvent, ModelProperty } from "./src/models/Model";
-import { GridColumnModel, GridModel, GridRowModel, GridView } from "./src/views/GridView";
-import { TreeItemModelList, TreeItemModel, TreeModel, TreeView } from "./src/views/TreeView";
+import { HTMLEMenuElement } from "../src/elements/containers/menus/Menu";
+import { EMenuItem } from "../src/elements/containers/menus/MenuItem";
+import { HTMLEToolBarElement } from "../src/elements/containers/toolbars/ToolBar";
+import { HTMLEToolBarItemElement } from "../src/elements/containers/toolbars/ToolBarItem";
+import { HTMLETreeElement } from "../src/elements/containers/trees/Tree";
+import { HTMLETreeItemElement } from "../src/elements/containers/trees/TreeItem";
+import { CustomElement, element, fragment, reactiveElement } from "../src/elements/Element";
+import { ModelEvent, ModelProperty } from "../src/models/Model";
+import { GridColumnModel, GridModel, GridRowModel, GridView } from "../src/views/GridView";
+import { TreeItemModelList, TreeItemModel, TreeModel, TreeView } from "../src/views/TreeView";
+
+import * as editor from "../lib/index";
+
+editor;
 
 class MyTreeItemModelList extends TreeItemModelList {
     readonly items!: MyTreeItemModel[];
@@ -27,7 +31,7 @@ class MyTreeItemModelList extends TreeItemModelList {
     hide(): void {
         this.items.forEach(item_i => item_i.hide());
     }
-
+    
     display(): void {
         const result = this.items.map(item_i => item_i.name).join(" ");
         console.log(result);
@@ -70,7 +74,7 @@ class MyTreeItemModel extends TreeItemModel {
     }
 }
 
-export async function TreeMain() {
+export async function main() {
     const gridView = new GridView();
     gridView.resizable = true;
     gridView.setModel(
@@ -194,7 +198,7 @@ export async function TreeMain() {
                 element("link", {
                     attributes: {
                         rel: "stylesheet",
-                        href: "css/views/mytreeview.css"
+                        href: "/css/views/mytreeview.css"
                     }
                 })
             );

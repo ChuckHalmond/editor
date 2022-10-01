@@ -301,13 +301,13 @@ class TreeViewBase extends View implements TreeView {
             element("link", {
                 attributes: {
                     rel: "stylesheet",
-                    href: "css/editor.css"
+                    href: "/css/main.css"
                 }
             }),
             element("link", {
                 attributes: {
                     rel: "stylesheet",
-                    href: "css/views/treeview.css"
+                    href: "/css/views/treeview.css"
                 }
             }),
             treeElement,
