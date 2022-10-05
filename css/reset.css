@@ -87,16 +87,15 @@ button:hover {
     background-color: var(--hovered-item-color);
 }
 
-button:focus {
+button:focus,
+button[aria-pressed="true"] {
     background-color: var(--focused-item-color);
 }
 
 button {
-    padding: 2px 4px;
     height: var(--line-height);
     appearance: none;
     background: none;
-    margin: 0;
     border: 1px solid var(--focused-item-outline-color);
 }
 

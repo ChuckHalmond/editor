@@ -151,8 +151,8 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
     }
     
     connectedCallback(): void {
-        const tabindex = this.getAttribute("tabindex");
-        this.tabIndex = tabindex !== null ? parseInt(tabindex) : -1;
+        const {tabIndex} = this;
+        this.tabIndex = tabIndex;
     }
 
     toggle(force?: boolean): void {

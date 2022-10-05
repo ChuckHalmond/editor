@@ -6,11 +6,11 @@ interface HTMLEListElementConstructor {
 }
 interface HTMLEListElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly items: HTMLCollectionOf<HTMLEListItemElement>;
     readonly activeItem: HTMLEListItemElement | null;
-    readonly activeIndex: number;
+    readonly dropTargetItem: HTMLEListItemElement | null;
     name: string;
     droptarget: boolean;
+    items(): HTMLEListItemElement[];
     beginSelection(): void;
     endSelection(): void;
     selectedItems(): HTMLEListItemElement[];

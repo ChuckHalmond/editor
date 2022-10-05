@@ -9,7 +9,7 @@ import { ModelEvent, ModelProperty } from "../src/models/Model";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "../src/views/GridView";
 import { TreeItemModelList, TreeItemModel, TreeModel, TreeView } from "../src/views/TreeView";
 
-import * as editor from "../lib/index";
+import * as editor from "../index";
 
 editor;
 
@@ -198,7 +198,7 @@ export async function main() {
                 element("link", {
                     attributes: {
                         rel: "stylesheet",
-                        href: "/css/views/mytreeview.css"
+                        href: "/sample/css/mytreeview.css"
                     }
                 })
             );

@@ -11,11 +11,11 @@ interface HTMLEListElementConstructor {
 
 interface HTMLEListElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly items: HTMLCollectionOf<HTMLEListItemElement>;
     readonly activeItem: HTMLEListItemElement | null;
-    readonly activeIndex: number;
+    readonly dropTargetItem: HTMLEListItemElement | null;
     name: string;
     droptarget: boolean;
+    items(): HTMLEListItemElement[];
     beginSelection(): void;
     endSelection(): void;
     selectedItems(): HTMLEListItemElement[];
@@ -35,10 +35,17 @@ var shadowTemplate: HTMLTemplateElement;
 class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
 
     readonly shadowRoot!: ShadowRoot;
-    readonly items: HTMLCollectionOf<HTMLEListItemElement>;
+
+    get activeItem(): HTMLEListItemElement | null {
+        return this.querySelector<HTMLEListItemElement>(
+            "e-listitem[active]"
+        );
+    }
 
     get dropTargetItem(): HTMLEListItemElement | null {
-        return this.items[this.#dropTargetIndex] ?? null;
+        return this.querySelector<HTMLEListItemElement>(
+            "e-listitem[droptarget]"
+        );
     }
 
     @AttributeProperty({type: String})
@@ -47,8 +54,6 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
     @AttributeProperty({type: Boolean})
     droptarget!: boolean;
 
-    #dropTargetIndex: number;
-    #activeIndex: number;
     #onSelection: boolean;
     #hasSelectionChanged: boolean;
     #walker: TreeWalker;
@@ -70,17 +75,20 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
             })
         );
     }
+
+    items(): HTMLEListItemElement[] {
+        return Array.from(this.querySelectorAll<HTMLEListItemElement>(
+            ":is(:scope, :scope > e-listitemgroup) > e-listitem"
+        ));
+    }
     
     constructor() {
         super();
         this.#walker = document.createTreeWalker(
             this, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
         );
-        this.#activeIndex = -1;
-        this.#dropTargetIndex = -1;
         this.#onSelection = false;
         this.#hasSelectionChanged = false;
-        this.items = this.getElementsByTagName("e-listitem");
         const shadowRoot = this.attachShadow({mode: "open"});
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
@@ -100,12 +108,9 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
         shadowRoot.addEventListener("slotchange", this.#handleSlotChangeEvent.bind(this));
     }
 
-    get activeIndex(): number {
-        return this.#activeIndex;
-    }
-
-    get activeItem(): HTMLEListItemElement | null {
-        return this.items[this.activeIndex] ?? null;
+    connectedCallback(): void {
+        const {tabIndex} = this;
+        this.tabIndex = tabIndex;
     }
 
     beginSelection(): void {
@@ -145,7 +150,7 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
     }
 
     #getItemsRange(from: HTMLEListItemElement, to: HTMLEListItemElement): HTMLEListItemElement[] {
-        const items = Array.from(this.items);
+        const items = this.items();
         const fromIndex = items.indexOf(from);
         const toIndex = items.indexOf(to);
         if (fromIndex > -1 && toIndex > -1) {
@@ -217,23 +222,20 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
         if (item !== null) {
             item.active = true;
             item.tabIndex = 0;
-            this.#activeIndex = Array.from(items).indexOf(item);
         }
     }
 
     #setDropTargetItem(item: HTMLEListItemElement | null): void {
-        const {dropTargetItem, items} = this;
+        const {dropTargetItem} = this;
         if (dropTargetItem !== null && dropTargetItem !== item) {
             dropTargetItem.droptarget = false;
         }
         if (item !== null) {
             this.droptarget = true;
             item.droptarget = true;
-            this.#dropTargetIndex = Array.from(items).indexOf(item);
         }
         else {
             this.droptarget = false;
-            this.#dropTargetIndex = -1;
         }
     }
 

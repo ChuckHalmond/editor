@@ -30,6 +30,7 @@ e-tablist:focus-within e-tab:focus-visible {
 
 e-tabpanel {
     display: block;
+    padding: 6px;
 }
 
 e-tabpanel[hidden] {
