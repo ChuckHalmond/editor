@@ -8,6 +8,7 @@ e-tab {
     user-select: none;
     white-space: nowrap;
     padding: 2px 6px;
+    border: 1px solid var(--section-border-color);
 }
 
 e-tab[disabled] {
@@ -20,7 +21,15 @@ e-tab:hover {
 }
 
 e-tab[selected] {
-    background-color: var(--activated-item-color);
+    background-color: white;
+    z-index: 1;
+    padding: 4px 6px;
+    border-bottom: none;
+}
+
+e-tab:not([selected]) {
+    transform: translateY(1px);
+    background-color: whitesmoke;
 }
 
 e-tablist:focus-within e-tab:focus-visible {
@@ -35,4 +44,21 @@ e-tabpanel {
 
 e-tabpanel[hidden] {
     display: none;
+}
+
+e-tablist {
+    transform: translateY(1px);
+}
+
+e-tabpanel {
+    padding: 4px;
+    border: 1px solid var(--section-border-color);
+}
+
+e-tab:has(+ e-tab[selected]) {
+    border-right: none;
+}
+
+e-tab[selected] + e-tab {
+    border-left: none;
 }

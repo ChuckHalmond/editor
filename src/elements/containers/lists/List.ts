@@ -94,7 +94,6 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
             shadowTemplate.content.cloneNode(true)
         );
         this.addEventListener("contextmenu", this.#handleContextMenuEvent.bind(this));
-        this.addEventListener("click", this.#handleClickEvent.bind(this));
         this.addEventListener("dragend", this.#handleDragEndEvent.bind(this));
         this.addEventListener("dragenter", this.#handleDragEnterEvent.bind(this));
         this.addEventListener("dragover", this.#handleDragOverEvent.bind(this));
@@ -104,13 +103,14 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
         this.addEventListener("focus", this.#handleFocusEvent.bind(this));
         this.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
+        this.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
         this.addEventListener("select", this.#handleSelectEvent.bind(this));
         shadowRoot.addEventListener("slotchange", this.#handleSlotChangeEvent.bind(this));
     }
 
     connectedCallback(): void {
-        const {tabIndex} = this;
-        this.tabIndex = tabIndex;
+        const tabIndex = this.getAttribute("tabindex");
+        this.tabIndex = tabIndex === null ? 0 : parseInt(tabIndex);
     }
 
     beginSelection(): void {
@@ -279,43 +279,6 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
         }
     }
 
-    #handleClickEvent(event: MouseEvent): void {
-        const {target, ctrlKey, shiftKey} = event;
-        const selectedItems = this.selectedItems();
-        if (target instanceof HTMLEListItemElement) {
-            if (!shiftKey && !ctrlKey) {
-                this.#setSelection(target);
-            }
-            else if (ctrlKey) {
-                (!target.selected) ?
-                    this.#addToSelection(target) :
-                    this.#removeFromSelection(target);
-                event.stopPropagation();
-            }
-            else if (shiftKey) {
-                const lastSelectedItem = selectedItems[selectedItems.length - 1];
-                if (lastSelectedItem) {
-                    const range = this.#getItemsRange(
-                        lastSelectedItem,
-                        target
-                    );
-                    if (range) {
-                        if (selectedItems.includes(target)) {
-                            this.#removeFromSelection(...range);
-                        }
-                        else {
-                            this.#addToSelection(...range);
-                        }
-                    }
-                }
-                else {
-                    this.#setSelection(target);
-                }
-                event.stopPropagation();
-            }
-        }
-    }
-
     #handleDragEndEvent(): void {
         this.#setDropTargetItem(null);
     }
@@ -356,6 +319,21 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
 
     #handleDropEvent(): void {
         this.#setDropTargetItem(null);
+    }
+
+    #handleFocusEvent(event: FocusEvent): void {
+        const {relatedTarget} = event;
+        const {activeItem} = this;
+        if (activeItem && relatedTarget !== activeItem) {
+            activeItem.focus();
+        }
+    }
+
+    #handleFocusInEvent(event: FocusEvent): void {
+        const {target} = event;
+        if (target instanceof HTMLEListItemElement) {
+            this.#setActiveItem(target);
+        }
     }
 
     #handleKeyDownEvent(event: KeyboardEvent) {
@@ -463,18 +441,40 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
         }
     }
 
-    #handleFocusEvent(event: FocusEvent): void {
-        const {relatedTarget} = event;
-        const {activeItem} = this;
-        if (activeItem && relatedTarget !== activeItem) {
-            activeItem.focus();
-        }
-    }
-
-    #handleFocusInEvent(event: FocusEvent): void {
-        const {target} = event;
+    #handleMouseDownEvent(event: MouseEvent): void {
+        const {target, ctrlKey, shiftKey} = event;
+        const selectedItems = this.selectedItems();
         if (target instanceof HTMLEListItemElement) {
-            this.#setActiveItem(target);
+            if (!shiftKey && !ctrlKey) {
+                this.#setSelection(target);
+            }
+            else if (ctrlKey) {
+                (!target.selected) ?
+                    this.#addToSelection(target) :
+                    this.#removeFromSelection(target);
+                event.stopPropagation();
+            }
+            else if (shiftKey) {
+                const lastSelectedItem = selectedItems[selectedItems.length - 1];
+                if (lastSelectedItem) {
+                    const range = this.#getItemsRange(
+                        lastSelectedItem,
+                        target
+                    );
+                    if (range) {
+                        if (selectedItems.includes(target)) {
+                            this.#removeFromSelection(...range);
+                        }
+                        else {
+                            this.#addToSelection(...range);
+                        }
+                    }
+                }
+                else {
+                    this.#setSelection(target);
+                }
+                event.stopPropagation();
+            }
         }
     }
 
