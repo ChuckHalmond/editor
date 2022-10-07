@@ -2,7 +2,7 @@
 
 @import "reset.css" layer(reset);
 @import "theme.css" layer(theme);
-@import "client.css" layer(client);
+/*@import "client.css" layer(client);*/
 
 @import "elements/misc/tooltip.css" layer(base);
 @import "elements/misc/separator.css" layer(base);

@@ -1,4 +1,11 @@
+@font-face {
+    font-family: "Open Sans";
+    src: url("/assets/fonts/Open_Sans/OpenSans-VariableFont_wdth,wght.ttf") format("truetype")
+}
+
 :root {
+    font-family: "Open Sans";
+    font-size: 13px;
     accent-color: var(--accent-color);
 }
 

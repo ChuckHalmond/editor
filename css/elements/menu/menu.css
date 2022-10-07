@@ -44,6 +44,11 @@ e-menuitem {
     box-sizing: border-box;
 }
 
+e-menuitem[disabled] {
+    opacity: 0.38;
+    pointer-events: none;
+}
+
 e-menuitem:focus-within {
     background-color: var(--focused-item-color);
 }
@@ -65,6 +70,16 @@ e-menuitem[type="submenu"]::part(icon) {
 e-menuitem[type="menu"]::part(icon),
 e-menuitem:not([type="submenu"])::part(arrow) {
     display: none;
+}
+
+e-menuitem:is([type="checkbox"], [type="radio"])[checked] {
+    --icon-color: black;
+    --icon-image: url("/assets/done_FILL0_wght400_GRAD0_opsz48.svg");
+}
+
+e-menuitem[type="submenu"] {
+    --arrow-color: black;
+    --arrow-image: url("/assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg");
 }
 
 e-menuitem::part(icon),

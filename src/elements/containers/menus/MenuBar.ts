@@ -225,7 +225,10 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
                     menu?.focus({preventScroll: true});
                 }
                 else {
-                    document.body.focus();
+                    if (activeItem) {
+                        activeItem.collapse();
+                        activeItem.blur();
+                    }
                 }
             }
         }
