@@ -189,7 +189,7 @@ function widget<K extends keyof WidgetNameMap>(
                     const slot = widget.slot(element, null);
                     if (slot) {
                         if (typeof slotted === "function") {
-                            slot.append(...slotted(slot));
+                            slotted(slot);
                         }
                         else if (typeof slotted === "object" && "length" in slotted) {
                             slot.append(...Array.from(slotted));
@@ -204,7 +204,7 @@ function widget<K extends keyof WidgetNameMap>(
                         const slot = widget.slot(element, slot_i);
                         if (slot) {
                             if (typeof slotted === "function") {
-                                slot.append(...slotted(slot));
+                                slotted(slot);
                             }
                             else if (typeof slotted === "object" && "length" in slotted) {
                                 slot.append(...Array.from(slotted));

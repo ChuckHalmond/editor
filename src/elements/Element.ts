@@ -547,7 +547,7 @@ function reactiveChildElements<Model extends ModelNode>(
         }
         const children = list.length == 0 && placeholder ?
             [placeholder] : Array.from(list.values()).map(mapping);
-        parent.append(...children);
+        parent.replaceChildren(...children);
     }
 }
 
