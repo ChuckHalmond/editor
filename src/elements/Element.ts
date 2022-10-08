@@ -321,7 +321,7 @@ function element<K extends keyof HTMLElementTagNameMap>(
         }
         if (children) {
             if (typeof children === "function") {
-                element.append(...children(element));
+                children(element);
             }
             else if (typeof children === "object" && "length" in children) {
                 element.append(...Array.from(children));
@@ -434,7 +434,7 @@ function reactiveElement<M extends ModelNode, E extends Element>(
 }
 
 interface ReactiveChildElements {
-    (parent: Node & ParentNode): (Node | string)[]
+    (parent: Node & ParentNode): void;
 }
 
 const reactiveChildElementsMap = new WeakMap<ModelList, {
@@ -545,8 +545,9 @@ function reactiveChildElements<Model extends ModelNode>(
             const {reactiveChildElementsArray} = reactiveChildElementsMapEntry;
             reactiveChildElementsArray.push(reactiveChildElement);
         }
-        return list.length == 0 && placeholder ?
+        const children = list.length == 0 && placeholder ?
             [placeholder] : Array.from(list.values()).map(mapping);
+        parent.append(...children);
     }
 }
 

@@ -83,7 +83,7 @@ declare function element<E extends HTMLElementTagNameMap[K], K extends keyof HTM
 declare function element(tagName: string, init?: HTMLElementInit): HTMLElement;
 declare function reactiveElement<M extends ModelNode, E extends Element, K extends string>(model: M, element: E, properties: K[], react: (object: E, property: K, oldValue: any, newValue: any) => void): E;
 interface ReactiveChildElements {
-    (parent: Node & ParentNode): (Node | string)[];
+    (parent: Node & ParentNode): void;
 }
 declare function reactiveChildElements<Model extends ModelNode>(list: ModelList<Model>, mapping: (item: Model) => Element, placeholder?: Element): ReactiveChildElements;
 interface AttributeMutationMixin {
