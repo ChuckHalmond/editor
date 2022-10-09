@@ -93,7 +93,7 @@ button:hover {
     background-color: var(--hovered-item-color);
 }
 
-button:focus,
+button:not([aria-pressed]):focus,
 button[aria-pressed="true"] {
     background-color: var(--focused-item-color);
 }
