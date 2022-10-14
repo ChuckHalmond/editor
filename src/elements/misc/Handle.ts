@@ -22,7 +22,7 @@ declare global {
     }
 }
 
-var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-handle"
@@ -38,38 +38,31 @@ class HTMLEHandleElementBase extends HTMLElement implements HTMLEHandleElement {
     #onCapture: boolean;
 
     static {
-        shadowTemplate = element("template");
-        shadowTemplate.content.append(
-            element("style", {
-                children: [
-                    /*css*/`
-                        :host {
-                            display: block;
+        style = /*css*/`
+            :host {
+                display: block;
                             
-                            width: 24px;
-                            height: 12px;
-                            
-                            background-color: rgb(0, 128, 255);
+                width: 24px;
+                height: 12px;
+                
+                background-color: var(--selected-item-color);
 
-                            -webkit-mask-image: url("/assets/dots.png");
-                            mask-image: url("/assets/dots.png");
+                -webkit-mask-image: url("/assets/dots.png");
+                mask-image: url("/assets/dots.png");
 
-                            -webkit-mask-repeat: repeat;
-                            mask-repeat: repeat;
-                            cursor: move;
-                        }
-                    `
-                ]
-            })
-        );
+                -webkit-mask-repeat: repeat;
+                mask-repeat: repeat;
+                cursor: move;
+            }
+        `;
     }
 
     constructor() {
         super();
         const shadowRoot = this.attachShadow({mode: "open"});
-        shadowRoot.append(
-            shadowTemplate.content.cloneNode(true)
-        );
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         this.#target = null;
         this.#onCapture = false;
         this.addEventListener("pointerdown", this.#handlePointerDownEvent.bind(this));

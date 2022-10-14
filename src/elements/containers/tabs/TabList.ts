@@ -57,8 +57,12 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
         );
         style = /*css*/`
             :host {
-                display: inline-table;
-                border-collapse: collapse;
+                display: flex;
+                border-bottom: 1px solid var(--section-border-color);
+            }
+
+            ::slotted(e-tab) {
+                transform: translateY(1px);
             }
         `;
     }

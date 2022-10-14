@@ -41,7 +41,8 @@ class HTMLETabPanelElementBase extends HTMLElement implements HTMLETabPanelEleme
             :host {
                 display: block;
                 padding: 4px;
-                border: 1px solid transparent;
+                border: 1px solid var(--section-border-color);
+                border-top: none;
             }
             
             :host([hidden]) {

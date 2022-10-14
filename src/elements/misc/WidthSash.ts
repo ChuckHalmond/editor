@@ -56,7 +56,7 @@ class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashEle
         style = /*css*/`
             :host {
                 display: block;
-                background-color: rgb(135, 206, 250);
+                background-color: var(--selected-item-color);
                 transition-property: opacity;
                 transition-delay: 0.2s;
                 transition-duration: 0.2s;
