@@ -142,6 +142,8 @@ declare global {
     }
 }
 
+var style: string;
+
 @CustomElement({
     name: "e-gridview"
 })
@@ -161,6 +163,95 @@ class GridViewBase extends View implements GridView {
 
     #displayFilters: (GridRowFilter & {name: string})[];
     #searchFilter: GridRowFilter | null;
+
+    static {
+        style = /*css*/`
+            :host {
+                display: block;
+            }
+            
+            e-gridrow[hidden] {
+                display: none;
+            }
+            
+            e-gridcell[type="gridcell"] {
+                max-width: 0;
+            
+                overflow: clip;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            
+            e-gridcell[type="columnheader"] {
+                width: 120px;
+            }
+            
+            .gridcell-label,
+            .gridheader-label {
+                padding-left: 4px;
+            }
+            
+            .gridcell-content {
+                overflow: clip;
+            }
+            
+            .gridheader-content {
+                display: flex;
+            }
+            
+            .gridheader-label {
+                flex: 1 1 0;
+                overflow: clip;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            
+            e-treeitem::part(arrow) {
+                display: inline-block;
+                width: 18px;
+                height: 18px;
+                margin: 1px 4px 1px 1px;
+            }
+            
+            .gridheader-sort-indicator {
+                display: inline-block;
+                width: 18px;
+                height: 18px;
+            }
+            
+            .gridheader-sort-indicator::before {
+                display: inline-block;
+                width: 18px;
+                height: 18px;
+                margin: 1px;
+                content: "";
+                mask-size: 18px 18px;
+                -webkit-mask-size: 18px 18px;
+                background-color: var(--sortorder-indicator-color, none);
+            }
+            
+            e-gridcell[type="columnheader"]:not([data-sortorder]) .gridheader-sort-indicator::before {
+                background-color: unset;
+            }
+            
+            e-gridcell[type="columnheader"][data-sortorder="1"] .gridheader-sort-indicator::before {
+                -webkit-mask-image: var(--sortorder-indicator-ascending, none);
+                mask-image: var(--sortorder-indicator-ascending, none);
+            }
+            
+            e-gridcell[type="columnheader"][data-sortorder="-1"] .gridheader-sort-indicator::before {
+                -webkit-mask-image: var(--sortorder-indicator-descending, none);
+                mask-image: var(--sortorder-indicator-descending, none);
+            }
+            
+            e-gridhead e-wsash:not(:hover) {
+                flex: 0 0 auto;
+                width: 2px;
+                margin-right: 1px;
+                margin-left: 1px;
+            }
+        `;
+    }
     
     constructor()
     constructor(model: GridModel)
@@ -168,7 +259,6 @@ class GridViewBase extends View implements GridView {
         super();
         this.#displayFilters = [];
         this.#searchFilter = null;
-        this.attachShadow({mode: "open"});
         this.#cellDelegate =
             (row: GridRowModel, column: GridColumnModel) =>
                 element("label", {
@@ -179,6 +269,10 @@ class GridViewBase extends View implements GridView {
                 element("label", {
                     children: column.label
                 });
+        const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         this.setModel(model ?? new GridModel());
     }
 

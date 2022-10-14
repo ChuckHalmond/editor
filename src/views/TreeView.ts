@@ -220,6 +220,8 @@ declare global {
     }
 }
 
+var style: string;
+
 @CustomElement({
     name: "e-treeview"
 })
@@ -231,13 +233,43 @@ class TreeViewBase extends View implements TreeView {
 
     @AttributeProperty({type: Boolean, observed: true})
     draggable!: boolean;
+
+    static {
+        style = /*css*/`
+            :host {
+                display: block;
+            }
+            
+            .offscreen {
+                position: absolute;
+                top: 0;
+                left: 0;
+                transform: translateY(-100%);
+                display: block;
+                pointer-events: none;
+            }
+            
+            .dragimage {
+                white-space: nowrap;
+                margin: 1px;
+                display: inline-block;
+                outline: 1px solid var(--focused-item-outline-color);
+                outline-offset: -1px;
+                border-radius: 3px; 
+                padding: 2px 4px;
+            }
+        `;
+    }
     
     constructor()
     constructor(model: TreeModel)
     constructor(model?: TreeModel) {
         super();
-        this.attachShadow({mode: "open"});
         this.#dragImages = new WeakMap();
+        const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         this.setModel(model ?? new TreeModel());
     }
 
