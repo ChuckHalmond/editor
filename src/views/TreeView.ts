@@ -336,12 +336,6 @@ class TreeViewBase extends View implements TreeView {
                     href: "/css/main.css"
                 }
             }),
-            element("link", {
-                attributes: {
-                    rel: "stylesheet",
-                    href: "/css/views/treeview.css"
-                }
-            }),
             treeElement,
             element("slot"),
             element("div", {

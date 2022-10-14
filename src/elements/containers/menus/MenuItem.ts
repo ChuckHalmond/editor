@@ -234,6 +234,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
         const adoptedStylesheet = new CSSStyleSheet();
         adoptedStylesheet.replace(style);
         shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
+        console.log(shadowRoot.adoptedStyleSheets[0]);
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
