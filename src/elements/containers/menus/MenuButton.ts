@@ -51,6 +51,7 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
+            element("slot"),
             element("slot", {
                 attributes: {
                     name: "menu"
@@ -60,8 +61,8 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
         style = /*css*/`
             :host {
                 display: inline-block;
-                min-width: 18px;
-                min-height: 18px;
+                padding: 2px;
+                line-height: 18px;
                 user-select: none;
                 white-space: nowrap;
                 cursor: pointer;

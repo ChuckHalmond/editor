@@ -393,12 +393,6 @@ export async function main() {
                                             controls: "properties"
                                         },
                                         children: "Properties"
-                                    }),
-                                    element("e-tab", {
-                                        attributes: {
-                                            controls: "other"
-                                        },
-                                        children: "Other"
                                     })
                                 ]
                             }),
@@ -471,11 +465,6 @@ export async function main() {
                                         ]
                                     })
                                 ]
-                            }),
-                            element("e-tabpanel", {
-                                attributes: {
-                                    id: "other"
-                                }
                             }),
                             element("footer", {
                                 attributes: {
@@ -693,6 +682,30 @@ export async function main() {
                     }
                 })
             )
+        })
+    );
+
+    document.body.prepend(
+        ...[
+            "tablist.html",
+            "sash.html",
+            "loaders.html",
+            "tree.html",
+            "menubar.html",
+            "list.html"
+        ].map(example => {
+            return element("details", {
+                children: [
+                    element("summary", {
+                        children: example
+                    }),
+                    element("e-import", {
+                        attributes: {
+                            src: `example/${example}`
+                        }
+                    })
+                ]
+            })
         })
     );
 }

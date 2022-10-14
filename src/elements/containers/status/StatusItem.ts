@@ -2,15 +2,14 @@ import { HTMLESelectElement } from "../../controls/forms/Select";
 import { CustomElement, AttributeProperty, element, QueryProperty } from "../../Element";
 import { HTMLEMenuButtonElement } from "../menus/MenuButton";
 
-export { HTMLEToolBarItemElement };
-export { EToolBarItem };
+export { HTMLEStatusItemElement };
 
-interface HTMLEToolBarItemElementConstructor {
-    prototype: HTMLEToolBarItemElement;
-    new(): HTMLEToolBarItemElement;
+interface HTMLEStatusItemElementConstructor {
+    prototype: HTMLEStatusItemElement;
+    new(): HTMLEStatusItemElement;
 }
 
-interface HTMLEToolBarItemElement extends HTMLElement {
+interface HTMLEStatusItemElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     readonly menubutton: HTMLEMenuButtonElement | null;
     readonly select: HTMLESelectElement | null;
@@ -25,7 +24,7 @@ interface HTMLEToolBarItemElement extends HTMLElement {
 
 declare global {
     interface HTMLElementTagNameMap {
-        "e-toolbaritem": HTMLEToolBarItemElement,
+        "e-statusitem": HTMLEStatusItemElement,
     }
 }
 
@@ -34,9 +33,9 @@ var style: string;
 var iconPart: HTMLElement;
 
 @CustomElement({
-    name: "e-toolbaritem"
+    name: "e-statusitem"
 })
-class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarItemElement {
+class HTMLEStatusItemElementBase extends HTMLElement implements HTMLEStatusItemElement {
     
     readonly shadowRoot!: ShadowRoot;
 
@@ -190,10 +189,10 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
     }
 }
 
-var HTMLEToolBarItemElement: HTMLEToolBarItemElementConstructor = HTMLEToolBarItemElementBase;
+var HTMLEStatusItemElement: HTMLEStatusItemElementConstructor = HTMLEStatusItemElementBase;
 
 interface EToolBarItemConstructor {
-    prototype: HTMLEToolBarItemElement;
+    prototype: HTMLEStatusItemElement;
     new(init: {
         name: string;
         label: string;
@@ -202,35 +201,35 @@ interface EToolBarItemConstructor {
         trigger?: () => void;
         menubutton?: HTMLEMenuButtonElement;
         select?: HTMLESelectElement;
-    }): HTMLEToolBarItemElement;
+    }): HTMLEStatusItemElement;
     button(init: {
         name: string;
         label: string;
         value?: string;
         trigger?: () => void;
-    }): HTMLEToolBarItemElement;
+    }): HTMLEStatusItemElement;
     checkbox(init: {
         name: string;
         label: string;
         value?: string;
         trigger?: () => void;
-    }): HTMLEToolBarItemElement;
+    }): HTMLEStatusItemElement;
     radio(init: {
         name: string;
         label: string;
         value?: string;
         trigger?: () => void;
-    }): HTMLEToolBarItemElement;
+    }): HTMLEStatusItemElement;
     menubutton(init: {
         name: string;
         label: string;
         menubutton: HTMLEMenuButtonElement;
-    }): HTMLEToolBarItemElement;
+    }): HTMLEStatusItemElement;
     select(init: {
         name: string;
         label: string;
         select: HTMLESelectElement;
-    }): HTMLEToolBarItemElement;
+    }): HTMLEStatusItemElement;
 }
 
 var EToolBarItem = <EToolBarItemConstructor>Object.assign(
@@ -264,7 +263,7 @@ var EToolBarItem = <EToolBarItemConstructor>Object.assign(
             }
         });
     }, {
-        prototype: HTMLEToolBarItemElement.prototype,
+        prototype: HTMLEStatusItemElement.prototype,
         button(init: {
             name: string,
             label: string,

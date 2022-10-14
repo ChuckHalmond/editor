@@ -158,16 +158,12 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                 pointer-events: none;
             }
             
-            [part="icon"],
-            [part="label"] {
-                padding: 2px;
-            }
-            
             [part="icon"] {
                 flex: none;
                 display: inline-block;
                 width: 18px;
                 height: 18px;
+                padding: 2px;
                 overflow: hidden;
                 margin-right: 4px;
             }
@@ -175,6 +171,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
             [part="label"] {
                 flex: auto;
                 line-height: 18px;
+                padding: 2px;
                 margin-left: 8px;
                 margin-right: 8px;
             }
