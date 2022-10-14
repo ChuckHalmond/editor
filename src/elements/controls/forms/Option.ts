@@ -25,12 +25,12 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-option"
 })
 class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
-
     readonly shadowRoot!: ShadowRoot;
     readonly internals: ElementInternals;
 
@@ -58,6 +58,47 @@ class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
                 }
             })
         );
+        style = /*css*/`
+            :host {
+                display: flex;
+                user-select: none;
+                white-space: nowrap;
+                line-height: 22px;
+                padding: 0 12px;
+            }
+            
+            :host(:hover) {
+                background-color: var(--hovered-item-color);
+            }
+            
+            :host(:focus-within) {
+                outline: 1px solid var(--focused-item-outline-color);
+                outline-offset: -1px;
+            }
+            
+            :host([selected]) {
+                background-color: var(--selected-item-color);
+            }
+            
+            :host([disabled]) {
+                opacity: 0.38;
+                pointer-events: none;
+            }
+            
+            :host(::before) {
+                display: flex;
+                content: "";
+                width: 18px;
+                height: 18px;
+                margin-right: 6px;
+            
+                mask-size: 18px 18px;
+                -webkit-mask-size: 18px 18px;
+                background-color: var(--icon-color, none);
+                -webkit-mask-image: var(--icon-image, none);
+                mask-image: var(--icon-image, none);
+            }
+        `;
     }
 
     constructor() {
@@ -66,6 +107,9 @@ class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
         internals.role = "option";
         this.internals = internals;
         const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );

@@ -9,7 +9,7 @@ interface TreeItemGroupWidgetFactory extends WidgetFactory {
     create(): HTMLElement;
 }
 declare var treeItemGroupWidget: {
-    "__#44@#template": HTMLElement;
+    "__#42@#template": HTMLElement;
     create(): HTMLElement;
     slot(group: HTMLElement): HTMLElement;
     slottedCallback(group: HTMLElement, slot: HTMLElement): void;

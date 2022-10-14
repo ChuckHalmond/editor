@@ -19,6 +19,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-gridrowgroup"
@@ -30,24 +31,21 @@ class HTMLEGridRowGroupElementBase extends HTMLElement implements HTMLEGridRowGr
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
-            element("style", {
-                children: [
-                    /*css*/`
-                        :host {
-                            display: table-row-group;
-                            /*display: flex;
-                            flex-direction: column;*/
-                        }
-                    `
-                ]
-            }),
             element("slot")
         );
+        style = /*css*/`
+            :host {
+                display: table-row-group;
+            }
+        `;
     }
     
     constructor() {
         super();
         const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );

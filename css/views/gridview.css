@@ -76,10 +76,6 @@ e-gridcell[type="columnheader"][data-sortorder="-1"] .gridheader-sort-indicator:
     mask-image: var(--sortorder-indicator-descending, none);
 }
 
-e-gridhead e-wsash {
-    opacity: 1;
-}
-
 e-gridhead e-wsash:not(:hover) {
     flex: 0 0 auto;
     width: 2px;

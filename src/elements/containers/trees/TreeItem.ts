@@ -31,6 +31,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-treeitem"
@@ -91,11 +92,89 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                 }
             })
         );
+        style = /*css*/`
+            :host {
+                display: block;
+                user-select: none;
+            }
+            
+            :host([droptarget]) {
+                background-color: var(--droptarget-item-color);
+            }
+            
+            :host([active]:focus-visible) {
+                outline: none;
+            }
+            
+            :host([active]:is(:focus, :not(:focus-within))):host-context(e-tree:focus-within) [part="content"] {
+                outline: 1px solid var(--focused-item-outline-color);
+                outline-offset: -1px;
+            }
+            
+            :host(:focus) [part="content"] {
+                background-color: var(--focus-background-color);
+            }
+            
+            [part="content"]:hover {
+                background-color: var(--hovered-item-color);
+            }
+            
+            :host([selected]) [part="content"] {
+                background-color: var(--selected-item-color);
+            }
+            
+            [part="content"] {
+                display: flex;
+                line-height: 22px;
+                padding-left: calc(var(--level) * var(--indent-width, 12px));
+            }
+            
+            :host(:not([type="parent"])) ::slotted([slot="group"]),
+            :host(:not([expanded])) ::slotted([slot="group"]) {
+                display: none;
+            }
+            
+            :host(:not([type="parent"])) [part="arrow"]::before {
+                visibility: hidden;
+            }
+            
+            [part="arrow"] {
+                display: inline-block;
+                width: 18px;
+                height: 18px;
+                margin: 1px 4px 1px 1px;
+            }
+            
+            [part="arrow"]::before {
+                display: inline-block;
+                width: 18px;
+                height: 18px;
+                margin: 1px;
+                content: "";
+                mask-size: 18px 18px;
+                -webkit-mask-size: 18px 18px;
+                background-color: var(--arrow-color, none);
+                filter: var(--arrow-filter, none);
+            }
+            
+            :host(:not([expanded])) [part="arrow"]::before {
+                -webkit-mask-image: var(--arrow-icon-collapsed, none);
+                mask-image: var(--arrow-icon-collapsed, none);
+            }
+            
+            :host([expanded]) [part="arrow"]::before {
+                -webkit-mask-image: var(--arrow-icon-expanded, none);
+                mask-image: var(--arrow-icon-expanded, none);
+            }
+        `;
     }
     
     constructor() {
         super();
         const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );

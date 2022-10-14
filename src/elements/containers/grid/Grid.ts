@@ -1,10 +1,8 @@
 import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEGridBodyElement } from "./GridBody";
 import { HTMLEGridCellElement } from "./GridCell";
-import { HTMLEGridCellCollection } from "./GridCellCollection";
 import { HTMLEGridHeadElement } from "./GridHead";
 import { HTMLEGridRowElement } from "./GridRow";
-import { HTMLEGridRowCollection } from "./GridRowCollection";
 import { HTMLEGridRowGroupElement } from "./GridRowGroup";
 
 export { HTMLEGridElement };
@@ -18,13 +16,13 @@ interface HTMLEGridElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     readonly body: HTMLEGridBodyElement | null;
     readonly head: HTMLEGridHeadElement | null
-    readonly cells: HTMLEGridCellCollection;
-    readonly rows: HTMLEGridRowCollection;
     readonly activeCell: HTMLEGridCellElement | null;
     readonly activeRow: HTMLEGridRowElement | null;
     selectby: "cell" | "row";
     name: string;
     multiselectable: boolean;
+    cells(): HTMLEGridCellElement[];
+    rows(): HTMLEGridRowElement[];
     beginSelection(): void;
     endSelection(): void;
     clearSelection(): void;
@@ -39,22 +37,26 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-grid"
 })
 class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
 
-    static {
-        shadowTemplate = element("template");
-        shadowTemplate.content.append(
-            element("slot")
-        );
+    readonly shadowRoot!: ShadowRoot;
+
+    cells(): HTMLEGridCellElement[] {
+        return Array.from(this.querySelectorAll<HTMLEGridCellElement>(
+            "e-gridcell"
+        ));
     }
 
-    readonly shadowRoot!: ShadowRoot;
-    readonly cells: HTMLEGridCellCollection;
-    readonly rows: HTMLEGridRowCollection;
+    rows(): HTMLEGridRowElement[] {
+        return Array.from(this.querySelectorAll<HTMLEGridRowElement>(
+            "e-gridrow"
+        ));
+    }
 
     get activeCell(): HTMLEGridCellElement | null {
         return this.querySelector<HTMLEGridCellElement>("e-gridcell[active]");
@@ -85,6 +87,25 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
     #hasSelectionChanged: boolean;
     #cellsWalker: TreeWalker;
     #rowsWalker: TreeWalker;
+
+    static {
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
+            element("slot")
+        );
+        style = /*css*/`
+            :host {
+                display: table;
+                user-select: none;
+                line-height: 22px;
+            }
+            
+            :host(:focus) {
+                outline: 1px solid var(--focused-item-outline-color);
+                outline-offset: -1px;
+            }
+        `;
+    }
     
     constructor() {
         super();
@@ -96,9 +117,10 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
         );
         this.#onSelection = false;
         this.#hasSelectionChanged = false;
-        this.cells = new HTMLEGridCellCollection(this);
-        this.rows = new HTMLEGridRowCollection(this);
         const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
@@ -163,7 +185,7 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
     }
 
     #getCellsRange(from: HTMLEGridCellElement, to: HTMLEGridCellElement): HTMLEGridCellElement[] {
-        const cells = Array.from(this.cells.values());
+        const cells = Array.from(this.cells());
         const fromIndex = cells.indexOf(from);
         const toIndex = cells.indexOf(to);
         if (fromIndex > -1 && toIndex > -1) {
@@ -389,14 +411,14 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
     #topCell(cell: HTMLEGridCellElement): HTMLEGridCellElement | null {
         const closestRow = this.#closestRow(cell);
         if (closestRow) {
-            const {cells: closestRowCells} = closestRow;
-            const cellIndex = Array.from(closestRowCells.values()).indexOf(cell);
+            const closestRowCells = closestRow.cells();
+            const cellIndex = closestRowCells.indexOf(cell);
             const previousRow = this.#previousRow(closestRow);
             if (previousRow) {
-                const {cells: previousRowCells} = previousRow;
-                return previousRowCells.item(
+                const previousRowCells = previousRow.cells();
+                return previousRowCells[
                     Math.min(cellIndex, previousRowCells.length)
-                );
+                ];
             }
         }
         return null;
@@ -405,14 +427,14 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
     #bottomCell(cell: HTMLEGridCellElement): HTMLEGridCellElement | null {
         const closestRow = this.#closestRow(cell);
         if (closestRow) {
-            const {cells: closestRowCells} = closestRow;
-            const cellIndex = Array.from(closestRowCells.values()).indexOf(cell);
+            const closestRowCells = closestRow.cells();
+            const cellIndex = closestRowCells.indexOf(cell);
             const nextRow = this.#nextRow(closestRow);
             if (nextRow) {
-                const {cells: nextRowCells} = nextRow;
-                return nextRowCells.item(
+                const nextRowCells = nextRow.cells();
+                return nextRowCells[
                     Math.min(cellIndex, nextRowCells.length)
-                );
+                ];
             }
         }
         return null;

@@ -1,4 +1,4 @@
-import { CustomElement } from "../../Element";
+import { CustomElement, element } from "../../Element";
 import { HTMLETabElement } from "./Tab";
 
 export { HTMLETabPanelElement };
@@ -19,6 +19,9 @@ declare global {
     }
 }
 
+var shadowTemplate: HTMLTemplateElement;
+var style: string;
+
 @CustomElement({
     name: "e-tabpanel"
 })
@@ -29,8 +32,33 @@ class HTMLETabPanelElementBase extends HTMLElement implements HTMLETabPanelEleme
         return (<Document | ShadowRoot>this.getRootNode()).querySelector<HTMLETabElement>(`e-tab[controls=${id}]`);
     }
 
+    static {
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
+            element("slot")
+        );
+        style = /*css*/`
+            :host {
+                display: block;
+                padding: 4px;
+                border: 1px solid transparent;
+            }
+            
+            :host([hidden]) {
+                display: none;
+            }
+        `;
+    }
+
     constructor() {
         super();
+        const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
+        shadowRoot.append(
+            shadowTemplate.content.cloneNode(true)
+        );
     }
 
     connectedCallback(): void {

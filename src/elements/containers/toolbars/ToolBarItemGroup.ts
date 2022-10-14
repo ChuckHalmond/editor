@@ -8,8 +8,6 @@ interface HTMLEToolBarItemGroupElementConstructor {
     new(): HTMLEToolBarItemGroupElement;
 }
 
-type ToolBarOrientation = "horizontal" | "vertical";
-
 interface HTMLEToolBarItemGroupElement extends HTMLElement {
     name: string;
     label: string;
@@ -22,6 +20,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-toolbaritemgroup"
@@ -39,32 +38,23 @@ class HTMLEToolBarItemGroupElementBase extends HTMLElement implements HTMLEToolB
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
-            element("style", {
-                children: [
-                    /*css*/`
-                        :host {
-                            display: flex;
-                            width: max-content;
-                            flex-direction: row;
-                        }
-
-                        /*:host([orientation="vertical"]) {
-                            flex-direction: column;
-                        }
-
-                        :host([orientation="horizontal"]) {
-                            flex-direction: row;
-                        }*/
-                    `
-                ]
-            }),
             element("slot")
         );
+        style = /*css*/`
+            :host {
+                display: flex;
+                width: max-content;
+                flex-direction: row;
+            }
+        `;
     }
 
     constructor() {
         super();
         const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );

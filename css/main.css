@@ -1,21 +1,7 @@
-@layer reset, base, view, theme, client;
+@layer reset, base, view, theme;
 
 @import "reset.css" layer(reset);
 @import "theme.css" layer(theme);
-/*@import "client.css" layer(client);*/
-
-@import "elements/misc/tooltip.css" layer(base);
-@import "elements/misc/separator.css" layer(base);
-@import "elements/misc/sash.css" layer(base);
-@import "elements/menu/menu.css" layer(base);
-@import "elements/menu/menubar.css" layer(base);
-@import "elements/menu/menubutton.css" layer(base);
-@import "elements/tabs/tab.css" layer(base);
-@import "elements/toolbar/toolbar.css" layer(base);
-@import "elements/tree/tree.css" layer(base);
-@import "elements/list/list.css" layer(base);
-@import "elements/select/select.css" layer(base);
-@import "elements/grid/grid.css" layer(base);
 
 @import "widgets/sashes.css" layer(base);
 @import "widgets/menu.css" layer(base);

@@ -1,4 +1,4 @@
-import { CustomElement } from "../../Element";
+import { CustomElement, element } from "../../Element";
 import { HTMLETabElement } from "./Tab";
 
 export { HTMLETabListElement };
@@ -21,6 +21,9 @@ declare global {
         "e-tablist": HTMLETabListElement,
     }
 }
+
+var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-tablist"
@@ -47,10 +50,30 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
         );
     }
 
+    static {
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
+            element("slot")
+        );
+        style = /*css*/`
+            :host {
+                display: inline-table;
+                border-collapse: collapse;
+            }
+        `;
+    }
+
     constructor() {
         super();
         this.#walker = document.createTreeWalker(
             this, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
+        );
+        const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
+        shadowRoot.append(
+            shadowTemplate.content.cloneNode(true)
         );
         this.addEventListener("click", this.#handleClickEvent.bind(this));
         this.addEventListener("focus", this.#handleFocusEvent.bind(this));

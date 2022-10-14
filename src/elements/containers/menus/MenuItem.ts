@@ -35,6 +35,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-menuitem"
@@ -74,6 +75,175 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
     @AttributeProperty({type: String, defaultValue: "button", observed: true})
     type!: "button" | "checkbox" | "radio" | "menu" | "submenu";
 
+    static {
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
+            element("span", {
+                attributes: {
+                    part: "icon"
+                }
+            }),
+            element("span", {
+                attributes: {
+                    part: "label"
+                },
+                children: [
+                    element("slot")
+                ]
+            }),
+            element("span", {
+                attributes: {
+                    part: "arrow"
+                }
+            }),
+            element("slot", {
+                attributes: {
+                    name: "menu"
+                }
+            })
+        );
+        style = /*css*/`
+            :host {
+                display: flex;
+                user-select: none;
+                white-space: nowrap;
+                box-sizing: border-box;
+            }
+            
+            :host([disabled]) {
+                opacity: 0.38;
+                pointer-events: none;
+            }
+            
+            :host(:focus-within) {
+                background-color: var(--focused-item-color);
+            }
+
+            :host(:focus-visible) {
+                outline: none;
+            }
+            
+            :host(:is([type="menu"], [type="submenu"])) ::slotted([slot="menu"]) {
+                z-index: 1;
+                position: absolute;
+            }
+            
+            :host(:is([type="menu"], [type="submenu"]):not([expanded])) ::slotted([slot="menu"]) {
+                opacity: 0;
+                pointer-events: none;
+            }
+            
+            :host([type="submenu"]) [part="icon"] {
+                visibility: hidden;
+            }
+            
+            :host([type="menu"]) [part="icon"],
+            :host(:not([type="submenu"])) [part="arrow"] {
+                display: none;
+            }
+            
+            :host(:is([type="checkbox"], [type="radio"])[checked]) {
+                --icon-color: black;
+                --icon-image: url("/assets/done_FILL0_wght400_GRAD0_opsz48.svg");
+            }
+            
+            :host([type="submenu"]) {
+                --arrow-color: black;
+                --arrow-image: url("/assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg");
+            }
+            
+            [part="icon"],
+            [part="label"],
+            [part="arrow"] {
+                pointer-events: none;
+            }
+            
+            [part="icon"],
+            [part="label"] {
+                padding: 2px;
+            }
+            
+            [part="icon"] {
+                flex: none;
+                display: inline-block;
+                width: 18px;
+                height: 18px;
+                overflow: hidden;
+                margin-right: 4px;
+            }
+            
+            [part="label"] {
+                flex: auto;
+                line-height: 18px;
+                margin-left: 8px;
+                margin-right: 8px;
+            }
+            
+            :host(:is(:not([type]), [type="button"], [type="radio"], [type="checkbox"])[checked]) [part="icon"] {
+                background-color: var(--activated-item-color);
+            }
+            
+            :host(:is(:not([type]), [type="button"], [type="radio"], [type="checkbox"])) [part="icon"]::before {
+                display: inline-block;
+                width: 18px;
+                height: 18px;
+                content: "";
+                mask-size: 18px 18px;
+                -webkit-mask-size: 18px 18px;
+                background-color: var(--icon-color, none);
+                -webkit-mask-image: var(--icon-image, none);
+                mask-image: var(--icon-image, none);
+                filter: var(--icon-filter, none);
+            }
+            
+            [part="arrow"] {
+                flex: none;
+                display: inline-block;
+                width: 18px;
+                height: 18px;
+                margin: 1px 4px 1px 1px;
+            }
+            
+            [part="arrow"]::after {
+                display: inline-block;
+                width: 18px;
+                height: 18px;
+                margin: 1px;
+                content: "";
+                mask-size: 18px 18px;
+                -webkit-mask-size: 18px 18px;
+                background-color: var(--arrow-color, none);
+                -webkit-mask-image: var(--arrow-image, none);
+                mask-image: var(--arrow-image, none);
+                filter: var(--arrow-filter, none);
+            }
+
+            :host(:hover):host-context(e-menubar:focus),
+            :host(:hover):host-context(e-menubar:not(:focus-within)) {
+                background-color: var(--hovered-item-color);
+            }
+        `;
+    }
+
+    constructor() {
+        super();
+        const internals = this.attachInternals();
+        this.internals = internals;
+        internals.role = "menuitem";
+        const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
+        shadowRoot.append(
+            shadowTemplate.content.cloneNode(true)
+        );
+    }
+    
+    connectedCallback(): void {
+        const {tabIndex} = this;
+        this.tabIndex = tabIndex;
+    }
+
     attributeChangedCallback(attributeName: string, oldValue: string | null, newValue: string | null): void {
         const {internals} = this;
         switch (attributeName) {
@@ -108,51 +278,6 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                 break;
             }
         }
-    }
-
-    static {
-        shadowTemplate = element("template");
-        shadowTemplate.content.append(
-            element("span", {
-                attributes: {
-                    part: "icon"
-                }
-            }),
-            element("span", {
-                attributes: {
-                    part: "label"
-                },
-                children: [
-                    element("slot")
-                ]
-            }),
-            element("span", {
-                attributes: {
-                    part: "arrow"
-                }
-            }),
-            element("slot", {
-                attributes: {
-                    name: "menu"
-                }
-            })
-        );
-    }
-
-    constructor() {
-        super();
-        const shadowRoot = this.attachShadow({mode: "open"});
-        const internals = this.attachInternals();
-        this.internals = internals;
-        internals.role = "menuitem";
-        shadowRoot.append(
-            shadowTemplate.content.cloneNode(true)
-        );
-    }
-    
-    connectedCallback(): void {
-        const {tabIndex} = this;
-        this.tabIndex = tabIndex;
     }
 
     toggle(force?: boolean): void {

@@ -26,6 +26,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-menubar"
@@ -48,6 +49,18 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
         shadowTemplate.content.append(
             element("slot")
         );
+        style = /*css*/`
+            :host {
+                display: flex;
+                flex-direction: row;
+                width: max-content;
+            }
+            
+            :host(:focus) {
+                outline: 1px solid var(--focused-item-outline-color);
+                outline-offset: -1px;
+            }
+        `;
     }
 
     constructor() {
@@ -57,6 +70,9 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
         );
         this.#activeIndex = -1;
         const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
@@ -177,6 +193,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
         if (target instanceof Element) {
             const nearestItem = this.#nearestItem(target);
             this.#setActiveItem(nearestItem);
+            this.tabIndex = -1;
         }
     }
 
@@ -191,6 +208,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
         const lostFocusWithin = !this.contains(<Node>relatedTarget);
         if (lostFocusWithin) {
             this.expanded = false;
+            this.tabIndex = 0;
         }
     }
 

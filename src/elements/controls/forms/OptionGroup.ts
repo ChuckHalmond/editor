@@ -18,6 +18,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-optiongroup"
@@ -31,6 +32,11 @@ class HTMLEOptionGroupElementBase extends HTMLElement implements HTMLEOptionGrou
         shadowTemplate.content.append(
             element("slot")
         );
+        style = /*css*/`
+            :host {
+                display: block;
+            }
+        `;
     }
 
     constructor() {

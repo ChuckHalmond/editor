@@ -24,6 +24,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 var HIDE_DELAY_MS = 200;
 var SHOW_DELAY_MS = 200;
 
@@ -69,11 +70,58 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
                 ]
             })
         );
+        style = /*css*/`
+            :host {
+                display: inline-block;
+                position: fixed;
+                padding: 4px;
+                border-radius: 4px;
+                box-sizing: border-box;
+                background-color: white;
+                border: 1px solid black;
+                pointer-events: none;
+            }
+            
+            :host(:not([visible])) {
+                display: none;
+            }
+            
+            [part="arrow"] {
+                display: inline-block;
+                position: fixed;
+                z-index: 1;
+                width: 6px;
+                height: 6px;
+                box-sizing: border-box;
+                background-color: white;
+                border: 1px solid black;
+                border-width: 0 1px 1px 0;
+            }
+            
+            :host(:is(:not([position]), [position="top"])) [part="arrow"] {
+                transform: translate(-3px, -3px) rotate(45deg);
+            }
+            
+            :host(:is([position="bottom"])) [part="arrow"] {
+                transform: translate(-3px, -3px) rotate(225deg);
+            }
+            
+            :host(:is([position="left"])) [part="arrow"] {
+                transform: translate(-3px, -3px) rotate(315deg);
+            }
+            
+            :host(:is([position="right"])) [part="arrow"] {
+                transform: translate(-3px, -3px) rotate(135deg);
+            }        
+        `;
     }
 
     constructor() {
         super();
         const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );

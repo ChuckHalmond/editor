@@ -393,6 +393,12 @@ export async function main() {
                                             controls: "properties"
                                         },
                                         children: "Properties"
+                                    }),
+                                    element("e-tab", {
+                                        attributes: {
+                                            controls: "other"
+                                        },
+                                        children: "Other"
                                     })
                                 ]
                             }),
@@ -466,6 +472,11 @@ export async function main() {
                                     })
                                 ]
                             }),
+                            element("e-tabpanel", {
+                                attributes: {
+                                    id: "other"
+                                }
+                            }),
                             element("footer", {
                                 attributes: {
                                     class: "dialog-footer"
@@ -526,6 +537,9 @@ export async function main() {
 
     document.body.append(
         element("e-menubar", {
+            attributes: {
+                tabindex: 0
+            },
             children: [
                 element("e-menuitem", {
                     attributes: {
@@ -632,9 +646,6 @@ export async function main() {
                     children: "Item 4"
                 }),
                 element("e-toolbaritem", {
-                    children: "Item 5"
-                }),
-                element("e-toolbaritem", {
                     attributes: {
                         id: "two"
                     },
@@ -669,6 +680,19 @@ export async function main() {
                 position: "left"
             },
             children: "Fourth."
+        })
+    );
+
+    document.body.append(
+        element("e-select", {
+            children: ["Hello", "World", "Innocents"].map(
+                option => element("e-option", {
+                    attributes: {
+                        value: option,
+                        label: option
+                    }
+                })
+            )
         })
     );
 }

@@ -19,6 +19,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-listitemgroup"
@@ -32,11 +33,19 @@ class HTMLEListItemGroupElementBase extends HTMLElement implements HTMLEListItem
         shadowTemplate.content.append(
             element("slot")
         );
+        style = /*css*/`
+            :host {
+                display: block;
+            }
+        `;
     }
     
     constructor() {
         super();
         const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );

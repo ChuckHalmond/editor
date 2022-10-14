@@ -1,7 +1,6 @@
 import { CustomElement, element } from "../../Element";
 import { HTMLEGridCellElement } from "./GridCell";
-import { HTMLEGridCellCollection } from "./GridCellCollection";
-import { HTMLEGridRowCollection } from "./GridRowCollection";
+import { HTMLEGridRowElement } from "./GridRow";
 
 export { HTMLEGridBodyElement };
 
@@ -12,8 +11,8 @@ interface HTMLEGridBodyElementConstructor {
 
 interface HTMLEGridBodyElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly cells: HTMLEGridCellCollection;
-    readonly rows: HTMLEGridRowCollection;
+    cells(): HTMLEGridCellElement[];
+    rows(): HTMLEGridRowElement[];
 }
 
 declare global {
@@ -23,37 +22,44 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-gridbody"
 })
 class HTMLEGridBodyElementBase extends HTMLElement implements HTMLEGridBodyElement {
-
     readonly shadowRoot!: ShadowRoot;
-    readonly cells: HTMLEGridCellCollection;
-    readonly rows: HTMLEGridRowCollection;
+
+    cells(): HTMLEGridCellElement[] {
+        return Array.from(this.querySelectorAll<HTMLEGridCellElement>(
+            "e-gridcell"
+        ));
+    }
+
+    rows(): HTMLEGridRowElement[] {
+        return Array.from(this.querySelectorAll<HTMLEGridRowElement>(
+            "e-gridrow"
+        ));
+    }
 
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
-            element("style", {
-                children: [
-                    /*css*/`
-                        :host {
-                            display: table-row-group;
-                        }
-                    `
-                ]
-            }),
             element("slot")
         );
+        style = /*css*/`
+            :host {
+                display: table-row-group;
+            }
+        `;
     }
     
     constructor() {
         super();
-        this.cells = new HTMLEGridCellCollection(this);
-        this.rows = new HTMLEGridRowCollection(this);
         const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );

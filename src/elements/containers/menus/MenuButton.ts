@@ -23,6 +23,9 @@ interface HTMLEMenuButtonElement extends HTMLElement {
     collapse(): void;
 }
 
+var shadowTemplate: HTMLTemplateElement;
+var style: string;
+
 @CustomElement({
     name: "e-menubutton"
 })
@@ -45,15 +48,71 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
     @AttributeProperty({type: Boolean})
     expanded!: boolean;
 
-    constructor() {
-        super();
-        const shadowRoot = this.attachShadow({mode: "open"});
-        shadowRoot.append(
+    static {
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
             element("slot", {
                 attributes: {
                     name: "menu"
                 }
             })
+        );
+        style = /*css*/`
+            :host {
+                display: inline-block;
+                min-width: 18px;
+                min-height: 18px;
+                user-select: none;
+                white-space: nowrap;
+                cursor: pointer;
+            }
+            
+            :host(:focus) {
+                outline: 1px solid var(--focused-item-outline-color);
+                outline-offset: -1px;
+            }
+            
+            :host(:focus-within:not(:focus)) {
+                background-color: var(--focused-item-color);
+            }
+            
+            :host(:hover:not(:focus-within)) {
+                background-color: var(--hovered-item-color);
+            }
+            
+            :host([disabled]) {
+                color: lightgray;
+            }
+            
+            ::slotted([slot="menu"]) {
+                z-index: 1;
+                position: absolute;
+                color: initial;
+            }
+            
+            :host(:not([expanded])) ::slotted([slot="menu"]) {
+                opacity: 0;
+                pointer-events: none;
+            }
+            
+            :host::after {
+                display: inline-block;
+                text-align: center;
+                width: 18px;
+                height: 18px;
+                content: "▾";
+            }
+        `;
+    }
+
+    constructor() {
+        super();
+        const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
+        shadowRoot.append(
+            shadowTemplate.content.cloneNode(true)
         );
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
         this.addEventListener("click", this.#handleClickEvent.bind(this));

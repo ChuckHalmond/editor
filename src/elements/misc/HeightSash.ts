@@ -23,6 +23,8 @@ declare global {
     }
 }
 
+var style: string;
+
 @CustomElement({
     name: "e-hsash"
 })
@@ -32,6 +34,22 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
 
     get target(): HTMLElement | null {
         return this.#target;
+    }
+
+    static {
+        style = /*css*/`
+            :host {
+                display: block;
+                background-color: rgb(135, 206, 250);
+                transition-property: opacity;
+                transition-delay: 0.2s;
+                transition-duration: 0.2s;
+                transition-timing-function: ease-out;
+                
+                height: 4px;
+                cursor: ns-resize;
+            }
+        `;
     }
 
     @AttributeProperty({type: String})
@@ -51,6 +69,10 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
         this.#queuedPointerCallback = null;
         this.#pointerMovement = 0;
         this.#onCapture = false;
+        const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         this.addEventListener("pointerdown", this.#handlePointerDownEvent.bind(this));
         this.addEventListener("pointermove", this.#handlePointerMoveEvent.bind(this));
         this.addEventListener("pointerup", this.#handlePointerUpEvent.bind(this));

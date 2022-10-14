@@ -30,6 +30,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-listitem"
@@ -77,11 +78,42 @@ class HTMLEListItemElementBase extends HTMLElement implements HTMLEListItemEleme
         shadowTemplate.content.append(
             element("slot")
         );
+        style = /*css*/`
+            :host {
+                display: flex;
+                user-select: none;
+                line-height: 22px;
+            }
+            
+            :host([droptarget]) {
+                background-color: var(--droptarget-item-color);
+            }
+            
+            :host(:hover) {
+                background-color: var(--hovered-item-color);
+            }
+            
+            :host([active]) {
+                outline: 1px solid var(--focused-item-outline-color);
+                outline-offset: -1px;
+            }
+            
+            :host(:focus) {
+                background-color: var(--focus-background-color);
+            }
+            
+            :host([selected]) {
+                background-color: var(--selected-item-color);
+            }
+        `;
     }
     
     constructor() {
         super();
         const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );

@@ -28,6 +28,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 var toggleAnimations: WeakMap<HTMLEMenuItemElement, Animation>;
 var HIDE_DELAY_MS = 200;
 var SHOW_DELAY_MS = 400;
@@ -70,18 +71,48 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
         shadowTemplate.content.append(
             element("slot")
         );
+        style = /*css*/`
+            :host {
+                display: flex;
+                flex-direction: column;
+            
+                padding: 3px;
+                background-color: white;
+                width: max-content;
+                box-sizing: border-box;
+            
+                -webkit-box-shadow: var(--menu-box-shadow);
+                box-shadow: var(--menu-box-shadow);
+            }
+            
+            :host([contextual]) {
+                z-index: 1;
+                position: absolute;
+            
+                transition-property: opacity;
+                transition-duration: 0.2s;
+                opacity: 0;
+            }
+            
+            :host([contextual]:focus-within) {
+                opacity: 1;
+            }
+        `;
         toggleAnimations = new WeakMap();
     }
 
     constructor() {
         super();
-        const shadowRoot = this.attachShadow({mode: "open"});
         this.#activeIndex = -1;
-        shadowRoot.append(
-            shadowTemplate.content.cloneNode(true)
-        );
         this.#walker = document.createTreeWalker(
             this, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
+        );
+        const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
+        shadowRoot.append(
+            shadowTemplate.content.cloneNode(true)
         );
         this.addEventListener("click", this.#handleClickEvent.bind(this));
         this.addEventListener("mouseover", this.#handleMouseOverEvent.bind(this));

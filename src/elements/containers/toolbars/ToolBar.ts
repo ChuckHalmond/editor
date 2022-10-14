@@ -28,6 +28,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 var wasExpandedOnMouseDown: WeakMap<HTMLEToolBarItemElement, boolean>;
 
 @CustomElement({
@@ -63,6 +64,12 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
             element("slot")
         );
         wasExpandedOnMouseDown = new WeakMap();
+        style = /*css*/`
+            :host {
+                display: flex;
+                flex-direction: row;
+            }
+        `;
     }
 
     constructor() {
@@ -71,6 +78,9 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
             this, NodeFilter.SHOW_ELEMENT, this.#nodeFilter.bind(this)
         );
         const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );

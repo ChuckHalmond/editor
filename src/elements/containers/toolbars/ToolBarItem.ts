@@ -30,6 +30,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 var iconPart: HTMLElement;
 
 @CustomElement({
@@ -89,11 +90,74 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
                 part: "icon"
             }
         });
+        style = /*css*/`
+            :host {
+                display: flex;
+                user-select: none;
+                white-space: nowrap;
+                cursor: pointer;
+                line-height: 22px;
+            }
+        
+            
+            :host([disabled]) {
+                opacity: 0.38;
+                pointer-events: none;
+            }
+            
+            :host(:hover) {
+                background-color: var(--hovered-item-color);
+            }
+            
+            :host([pressed]) {
+                background-color: var(--activated-item-color);
+            }
+            
+            :host(:not([iconed])) [part="icon"] {
+                display: none;
+            }
+
+            [part="icon"] {
+                flex: none;
+                display: inline-block;
+                width: 18px;
+                height: 18px;
+                padding: 2px;
+                overflow: hidden;
+            }
+            
+            [part="icon"]::before {
+                display: inline-block;
+                width: 18px;
+                height: 18px;
+                content: "";
+                mask-size: 18px 18px;
+                -webkit-mask-size: 18px 18px;
+                background-color: var(--icon-color, none);
+                -webkit-mask-image: var(--icon-image, none);
+                mask-image: var(--icon-image, none);
+                filter: var(--icon-filter, none);
+            }
+            
+            :host(:focus-within):host-context(e-toolbar:focus-within) {
+                outline: 1px solid var(--focused-item-outline-color);
+                outline-offset: -1px;
+            }
+            
+            :host([type="menubutton"]) ::slotted(e-menubutton):focus,
+            :host([type="select"]) ::slotted(e-select):focus {
+                outline: none;
+                outline-offset: none;
+            }
+        `;
     }
 
     constructor() {
         super();
         const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );

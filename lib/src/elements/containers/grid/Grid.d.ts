@@ -1,9 +1,7 @@
 import { HTMLEGridBodyElement } from "./GridBody";
 import { HTMLEGridCellElement } from "./GridCell";
-import { HTMLEGridCellCollection } from "./GridCellCollection";
 import { HTMLEGridHeadElement } from "./GridHead";
 import { HTMLEGridRowElement } from "./GridRow";
-import { HTMLEGridRowCollection } from "./GridRowCollection";
 export { HTMLEGridElement };
 interface HTMLEGridElementConstructor {
     prototype: HTMLEGridElement;
@@ -13,13 +11,13 @@ interface HTMLEGridElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     readonly body: HTMLEGridBodyElement | null;
     readonly head: HTMLEGridHeadElement | null;
-    readonly cells: HTMLEGridCellCollection;
-    readonly rows: HTMLEGridRowCollection;
     readonly activeCell: HTMLEGridCellElement | null;
     readonly activeRow: HTMLEGridRowElement | null;
     selectby: "cell" | "row";
     name: string;
     multiselectable: boolean;
+    cells(): HTMLEGridCellElement[];
+    rows(): HTMLEGridRowElement[];
     beginSelection(): void;
     endSelection(): void;
     clearSelection(): void;

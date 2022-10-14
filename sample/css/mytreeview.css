@@ -21,6 +21,7 @@ e-treeitem:is(
     display: grid;
     grid-template-columns: 1fr 1fr;
     column-gap: 2rem;
+    row-gap: 6px;
 }
 
 .dialog-footer {
@@ -42,23 +43,16 @@ e-tablist {
 }
 
 e-tab {
-    border: 1px solid var(--section-border-color);
+    border-bottom: 1px solid var(--section-border-color);
 }
 
-e-tab:not([selected]) {
-    background-color: lightgrey;
+e-tab[selected] {
+    border-bottom: none;
 }
 
 e-tabpanel {
     padding: 8px;
     border: 1px solid var(--section-border-color);
-}
-
-e-tab[selected] {
-    background-color: white;
-    z-index: 1;
-    padding: 3px 6px;
-    border-bottom: none;
 }
 
 e-tab:has(+ e-tab[selected]) {
@@ -67,4 +61,14 @@ e-tab:has(+ e-tab[selected]) {
 
 e-tab[selected] + e-tab {
     border-left: none;
+}
+
+e-toolbaritem[name="visibility"] {
+    --icon-color: black;
+    --icon-image: url("/assets/visibility_FILL1_wght400_GRAD0_opsz48.svg");
+}
+
+e-toolbaritem[name="visibility"][pressed] {
+    --icon-image: url("/assets/visibility_off_FILL1_wght400_GRAD0_opsz48.svg");
+    background-color: revert;
 }

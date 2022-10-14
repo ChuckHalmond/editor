@@ -5,8 +5,7 @@ interface HTMLELoaderElementConstructor {
 }
 interface HTMLELoaderElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    type: "bar" | "circle";
-    promise: Promise<any> | null;
+    type: "bar" | "spinner";
 }
 declare global {
     interface HTMLElementTagNameMap {

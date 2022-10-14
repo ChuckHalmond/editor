@@ -1,5 +1,5 @@
-import { HTMLEGridCellCollection } from "./GridCellCollection";
-import { HTMLEGridRowCollection } from "./GridRowCollection";
+import { HTMLEGridCellElement } from "./GridCell";
+import { HTMLEGridRowElement } from "./GridRow";
 export { HTMLEGridBodyElement };
 interface HTMLEGridBodyElementConstructor {
     prototype: HTMLEGridBodyElement;
@@ -7,8 +7,8 @@ interface HTMLEGridBodyElementConstructor {
 }
 interface HTMLEGridBodyElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly cells: HTMLEGridCellCollection;
-    readonly rows: HTMLEGridRowCollection;
+    cells(): HTMLEGridCellElement[];
+    rows(): HTMLEGridRowElement[];
 }
 declare global {
     interface HTMLElementTagNameMap {

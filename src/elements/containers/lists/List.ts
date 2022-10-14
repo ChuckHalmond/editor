@@ -28,6 +28,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-list"
@@ -74,6 +75,16 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
                 ]
             })
         );
+        style = /*css*/`
+            :host {
+                display: block;
+            }
+            
+            :host(:focus) {
+                outline: 1px solid var(--focused-item-outline-color);
+                outline-offset: -1px;
+            }
+        `;
     }
 
     items(): HTMLEListItemElement[] {
@@ -90,6 +101,9 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
         this.#onSelection = false;
         this.#hasSelectionChanged = false;
         const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );

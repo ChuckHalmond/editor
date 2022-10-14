@@ -23,6 +23,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-menuitemgroup"
@@ -48,11 +49,28 @@ class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItem
             }),
             element("slot")
         );
+        style = /*css*/`
+            :host {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            [part="label"] {
+                font-weight: bold;
+            }
+            
+            :host([label]) [part="label"] {
+                padding-bottom: 6px;
+            }
+        `;
     }
 
     constructor() {
         super();
         const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );

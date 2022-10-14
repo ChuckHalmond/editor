@@ -1,4 +1,4 @@
-import { CustomElement, AttributeProperty } from "../../Element";
+import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLETreeItemElement } from "./TreeItem";
 import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
 
@@ -27,6 +27,9 @@ declare global {
         "e-tree": HTMLETreeElement,
     }
 }
+
+var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-tree"
@@ -58,6 +61,23 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
     #hasSelectionChanged: boolean;
     #walker: TreeWalker;
 
+    static {
+        shadowTemplate = element("template");
+        shadowTemplate.content.append(
+            element("slot")
+        );
+        style = /*css*/`
+            :host {
+                display: block;
+            }
+            
+            :host(:focus) {
+                outline: 1px solid var(--focused-item-outline-color);
+                outline-offset: -1px;
+            }
+        `;
+    }
+
     constructor() {
         super();
         this.#walker = document.createTreeWalker(
@@ -66,6 +86,13 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
         this.#onSelection = false;
         this.#hasSelectionChanged = false;
         this.items = this.getElementsByTagName("e-treeitem");
+        const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
+        shadowRoot.append(
+            shadowTemplate.content.cloneNode(true)
+        );
         this.addEventListener("click", this.#handleClickEvent.bind(this));
         this.addEventListener("contextmenu", this.#handleContextMenuEvent.bind(this));
         this.addEventListener("dblclick", this.#handleDblClickEvent.bind(this));

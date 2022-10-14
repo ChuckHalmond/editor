@@ -26,6 +26,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-gridcell"
@@ -60,11 +61,45 @@ class HTMLEGridCellElementBase extends HTMLElement implements HTMLEGridCellEleme
         shadowTemplate.content.append(
             element("slot")
         );
+        style = /*css*/`
+            :host {
+                display: table-cell;
+                text-align: left;
+            }
+            
+            :host([type="columnheader"]:hover) {
+                background-color: var(--hovered-item-color);
+            }
+            
+            :host(:hover):host-context(e-grid:is(:not([selectby]), [selectby="cell"])) {
+                background-color: var(--hovered-item-color);
+            }
+            
+            :host([type="columnheader"][active]) {
+                background-color: var(--focused-item-color);
+            }
+            
+            :host([active]):host-context(e-grid:focus-within:is(:not([selectby]), [selectby="cell"])) {
+                outline: 1px solid var(--focused-item-outline-color);
+                outline-offset: -1px;
+            }
+
+            :host(:focus-visible):host-context(e-grid:focus-within:is([selectby="row"])) {
+                outline: none;
+            }
+            
+            :host([selected]):host-context(e-grid:is(:not([selectby]), [selectby="cell"])) {
+                background-color: var(--selected-item-color);
+            }
+        `;
     }
     
     constructor() {
         super();
         const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );

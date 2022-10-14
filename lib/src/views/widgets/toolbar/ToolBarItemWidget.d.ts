@@ -34,8 +34,8 @@ interface ToolBarItemWidgetFactory extends WidgetFactory {
     setType(item: HTMLElement, value: ToolBarItemType): void;
 }
 declare var toolbarItemWidget: {
-    "__#48@#template": HTMLElement;
-    "__#48@#types": ToolBarItemType[];
+    "__#46@#template": HTMLElement;
+    "__#46@#types": ToolBarItemType[];
     create(init?: {
         id?: string;
         type?: ToolBarItemType;
@@ -72,8 +72,8 @@ declare var toolbarItemWidget: {
     setDisabled(item: HTMLElement, value: boolean): void;
     setActive(item: HTMLElement, value: boolean): void;
     getActive(item: HTMLElement): boolean;
-    "__#48@#handleFocusOutEvent"(event: FocusEvent): void;
-    "__#48@#handleClickEvent"(event: MouseEvent): void;
-    "__#48@#positionMenu"(item: HTMLElement): void;
-    "__#48@#label"(item: HTMLElement): HTMLElement;
+    "__#46@#handleFocusOutEvent"(event: FocusEvent): void;
+    "__#46@#handleClickEvent"(event: MouseEvent): void;
+    "__#46@#positionMenu"(item: HTMLElement): void;
+    "__#46@#label"(item: HTMLElement): HTMLElement;
 };

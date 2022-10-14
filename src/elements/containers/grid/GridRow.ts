@@ -1,7 +1,6 @@
 import { AttributeProperty, CustomElement, element } from "../../Element";
 import { HTMLEMenuElement } from "../menus/Menu";
 import { HTMLEGridCellElement } from "./GridCell";
-import { HTMLEGridCellCollection } from "./GridCellCollection";
 
 export { HTMLEGridRowElement };
 
@@ -12,12 +11,12 @@ interface HTMLEGridRowElementConstructor {
 
 interface HTMLEGridRowElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly cells: HTMLEGridCellCollection;
     readonly menu: HTMLEMenuElement | null;
     name: string;
     active: boolean;
     selected: boolean;
     posinset: number;
+    cells(): HTMLEGridCellElement[];
 }
 
 declare global {
@@ -27,6 +26,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 
 @CustomElement({
     name: "e-gridrow"
@@ -34,7 +34,10 @@ var shadowTemplate: HTMLTemplateElement;
 class HTMLEGridRowElementBase extends HTMLElement implements HTMLEGridRowElement {
 
     readonly shadowRoot!: ShadowRoot;
-    readonly cells: HTMLEGridCellCollection;
+
+    cells(): HTMLEGridCellElement[] {
+        return Array.from(this.querySelectorAll<HTMLEGridCellElement>("e-gridcell"));
+    }
 
     get menu(): HTMLEMenuElement | null {
         return this.#menu;
@@ -57,48 +60,35 @@ class HTMLEGridRowElementBase extends HTMLElement implements HTMLEGridRowElement
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
-            element("style", {
-                children: [
-                    /*css*/`
-                        :host {
-                            display: table-row;
-                        }
-
-                        :host([droptarget]) {
-                            background-color: gainsboro;
-                        }
-                        
-                        :host(:hover) {
-                            background-color: rgba(135, 206, 250, 0.2);
-                        }
-
-                        :host([active]) {
-                            outline: 1px solid rgb(135, 206, 250);
-                            outline-offset: -1px;
-                        }
-
-                        :host([selected]) {
-                            background-color: rgba(135, 206, 250, 0.4);
-                            outline: 1px solid rgb(135, 206, 250);
-                            outline-offset: -1px;
-                        }
-                    `
-                ]
-            }),
-            element("slot"),
-            element("slot", {
-                attributes: {
-                    name: "menu"
-                }
-            })
+            element("slot")
         );
+        style = /*css*/`
+            :host {
+                display: table-row;
+            }
+            
+            :host(:hover):host-context(e-grid:is([selectby="row"])) {
+                background-color: var(--hovered-item-color);
+            }
+            
+            :host([active]):host-context(e-grid:focus-within:is([selectby="row"])) {
+                outline: 1px solid var(--focused-item-outline-color);
+                outline-offset: -1px;
+            }
+            
+            :host([selected]):host-context(e-grid:is([selectby="row"])) {
+                background-color: var(--selected-item-color);
+            }
+        `;
     }
     
     constructor() {
         super();
         this.#menu = null;
-        this.cells = new HTMLEGridCellCollection(this);
         const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
@@ -123,24 +113,14 @@ class HTMLEGridRowElementBase extends HTMLElement implements HTMLEGridRowElement
 
     #handleSlotChangeEvent(event: Event): void {
         const {target} = event;
-        const {name: slotName} = <HTMLSlotElement>target ;
-        switch (slotName) {
-            case "menu": {
-                const element = (<HTMLSlotElement>target).assignedElements()[0];
-                this.#menu = element instanceof HTMLEMenuElement ? element : null;
-                break;
-            }
-            default: {
-                const assignedCells = <HTMLEGridCellElement[]>(<HTMLSlotElement>target)
-                    .assignedElements()
-                    .filter(
-                        element_i => element_i instanceof HTMLEGridCellElement
-                    );
-                assignedCells.forEach((cell_i, i) => {
-                    cell_i.posinset = i;
-                });
-            }
-        }
+        const assignedCells = <HTMLEGridCellElement[]>(<HTMLSlotElement>target)
+            .assignedElements()
+            .filter(
+                element_i => element_i instanceof HTMLEGridCellElement
+            );
+        assignedCells.forEach((cell_i, i) => {
+            cell_i.posinset = i;
+        });
     }
 }
 

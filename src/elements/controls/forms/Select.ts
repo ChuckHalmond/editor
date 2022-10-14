@@ -30,6 +30,7 @@ declare global {
 }
 
 var shadowTemplate: HTMLTemplateElement;
+var style: string;
 var mutationObserver: MutationObserver;
 
 @CustomElement({
@@ -95,6 +96,63 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
                 children: element("slot")
             })
         );
+        style = /*css*/`
+            :host {
+                display: inline-block;
+                user-select: none;
+                line-height: 22px;
+                border: 1px solid var(--item-border-color);
+            }
+            
+            :host(:focus-within) {
+                background-color: var(--focused-item-color);
+            }
+            
+            :host([disabled]) {
+                opacity: 0.38;
+                pointer-events: none;
+            }
+            
+            [part="content"] {
+                display: flex;
+                overflow: hidden;
+                padding: 0 4px;
+            }
+            
+            [part="content"]::after {
+                display: inline-block;
+                text-align: center;
+                width: 18px;
+                height: 18px;
+                margin-left: 6px;
+                content: "▾";
+            }
+            
+            [part="value"] {
+                margin-right: auto;
+                text-align: right;
+            }
+            
+            [part="box"] {
+                z-index: 1;
+                position: fixed;
+            
+                display: block;
+                padding: 6px 0;
+                width: max-content;
+            
+                background-color: white;
+            
+                -webkit-box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
+                -moz-box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
+                box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px;
+            }
+            
+            :host(:not([expanded])) [part="box"] {
+                opacity: 0;
+                pointer-events: none;
+            }
+        `;
         mutationObserver = new MutationObserver(
             (mutationsList: MutationRecord[]) => {
                 mutationsList.forEach((mutation: MutationRecord) => {
@@ -114,7 +172,7 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
                     }
                 });
             }
-        )
+        );
     }
 
     constructor() {
@@ -123,12 +181,15 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
         internals.role = "combobox";
         this.internals = internals;
         this.#wasExpandedOnMouseDown = false;
-        const shadowRoot = this.attachShadow({mode: "open"});
-        shadowRoot.append(
-            shadowTemplate.content.cloneNode(true)
-        );
         this.#walker = document.createTreeWalker(
             this, NodeFilter.SHOW_ELEMENT, this.#walkerNodeFilter.bind(this)
+        );
+        const shadowRoot = this.attachShadow({mode: "open"});
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
+        shadowRoot.append(
+            shadowTemplate.content.cloneNode(true)
         );
         this.addEventListener("click", this.#handleClickEvent.bind(this));
         this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
