@@ -10,7 +10,6 @@ interface HTMLEStatusItemGroupElementConstructor {
 
 interface HTMLEStatusItemGroupElement extends HTMLElement {
     name: string;
-    label: string;
 }
 
 declare global {
@@ -31,9 +30,6 @@ class HTMLEStatusItemGroupElementBase extends HTMLElement implements HTMLEStatus
     
     @AttributeProperty({type: String})
     name!: string;
-
-    @AttributeProperty({type: String, observed: true})
-    label!: string;
 
     static {
         shadowTemplate = element("template");

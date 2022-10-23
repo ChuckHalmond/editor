@@ -4,8 +4,8 @@ import { HTMLEToolBarElement } from "../src/elements/containers/toolbars/ToolBar
 import { HTMLEToolBarItemElement } from "../src/elements/containers/toolbars/ToolBarItem";
 import { HTMLETreeElement } from "../src/elements/containers/trees/Tree";
 import { HTMLETreeItemElement } from "../src/elements/containers/trees/TreeItem";
-import { CustomElement, element, fragment, reactiveElement } from "../src/elements/Element";
-import { ModelEvent, ModelProperty } from "../src/models/Model";
+import { CustomElement, revokeReactiveElement, element, fragment, reactiveElement, reactiveElementsMap } from "../src/elements/Element";
+import { ModelEvent, ModelObject, ModelProperty } from "../src/models/Model";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "../src/views/GridView";
 import { TreeItemModelList, TreeItemModel, TreeModel, TreeView } from "../src/views/TreeView";
 
@@ -685,27 +685,145 @@ export async function main() {
         })
     );
 
-    document.body.prepend(
+    document.body.append(
         ...[
-            "tablist.html",
-            "sash.html",
-            "loaders.html",
-            "tree.html",
-            "menubar.html",
-            "list.html"
+            "tablist",
+            "sash",
+            "loaders",
+            "tree",
+            "menubar",
+            "list",
+            "status"
         ].map(example => {
             return element("details", {
                 children: [
                     element("summary", {
-                        children: example
+                        children: `${example}.html`
                     }),
                     element("e-import", {
                         attributes: {
-                            src: `example/${example}`
+                            src: `example/${example}.html`
                         }
                     })
                 ]
             })
         })
     );
+    document.querySelector("e-import[src='example/status.html']")!.addEventListener("load", () => {
+        const lastStatusItem = document.querySelector("e-statusitem:last-child");
+        if (lastStatusItem) {
+            lastStatusItem.addEventListener("click", (event) => {
+                const {currentTarget, target} = event;
+                if (target === currentTarget) {
+                    const select = lastStatusItem.querySelector("e-select");
+                    if (select) {
+                        select.expand();
+                    }
+                }
+            });
+        }
+    });
+
+    class PersonModel extends ModelObject {
+        @ModelProperty()
+        name: string;
+
+        @ModelProperty()
+        age: number;
+
+        constructor(name: string, age: number) {
+            super();
+            this.name = name;
+            this.age = age;
+        }
+    }
+
+    @CustomElement({name: "e-person"})
+    class PersonElement extends HTMLElement {
+        readonly shadowRoot!: ShadowRoot;
+
+        #person?: PersonModel;
+
+        get person(): PersonModel | undefined {
+            return this.#person;
+        }
+
+        set person(person: PersonModel | undefined) {
+            const oldPerson = this.#person;
+            if (oldPerson !== person) {
+                if (oldPerson) {
+                    revokeReactiveElement(oldPerson, this);
+                }
+                if (person) {
+                    reactiveElement(
+                        person, this,
+                        this.personReactiveProperties,
+                        this.handlePersonModelChange.bind(this)
+                    );
+                }
+                this.#person = person;
+            }
+        }
+
+        constructor() {
+            super();
+            const shadowRoot = this.attachShadow({mode: "open"});
+            shadowRoot.replaceChildren(
+                element("input", {
+                    attributes: {
+                        id: "age_input",
+                        type: "number"
+                    }
+                }),
+                element("input", {
+                    attributes: {
+                        id: "name_input",
+                        type: "text"
+                    }
+                })
+            );
+            shadowRoot.addEventListener("change", this.#handleInputChangeEvent.bind(this));
+        }
+
+        #handleInputChangeEvent(event: Event): void {
+            const {target} = event;
+            const {person} = this;
+            if (target instanceof HTMLInputElement && person) {
+                if (target.matches("#name_input")) {
+                    person.name = target.value;
+                }
+                else if (target.matches("#age_input")) {
+                    person.age = target.valueAsNumber;
+                }
+            }
+        }
+
+        personReactiveProperties = ["name", "age"];
+
+        handlePersonModelChange(element: this, propertyName: string, oldValue: any, newValue: any) {
+            const {shadowRoot} = this;
+            switch (propertyName) {
+                case "name": {
+                    shadowRoot
+                        .querySelector<HTMLInputElement>("#name_input")!
+                        .value = newValue;
+                    break;
+                }
+                case "age": {
+                    shadowRoot
+                        .querySelector<HTMLInputElement>("#age_input")!
+                        .valueAsNumber = newValue;
+                    break;
+                }
+            }
+        }
+    }
+    
+    const personElement = new PersonElement();
+    document.body.append(
+        personElement
+    );
+
+    (window as any)["personElement"] = personElement;
+    (window as any)["PersonModel"] = PersonModel;
 }

@@ -1,8 +1,7 @@
-import { HTMLESelectElement } from "../../controls/forms/Select";
-import { CustomElement, AttributeProperty, element, QueryProperty } from "../../Element";
-import { HTMLEMenuButtonElement } from "../menus/MenuButton";
+import { CustomElement, AttributeProperty, element } from "../../Element";
 
 export { HTMLEStatusItemElement };
+export { EStatusItem };
 
 interface HTMLEStatusItemElementConstructor {
     prototype: HTMLEStatusItemElement;
@@ -11,15 +10,8 @@ interface HTMLEStatusItemElementConstructor {
 
 interface HTMLEStatusItemElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly menubutton: HTMLEMenuButtonElement | null;
-    readonly select: HTMLESelectElement | null;
-    value: string;
     name: string;
-    label: string;
     active: boolean;
-    pressed: boolean;
-    iconed: boolean;
-    type: "button" | "checkbox" | "radio" | "menubutton" | "select";
 }
 
 declare global {
@@ -30,7 +22,6 @@ declare global {
 
 var shadowTemplate: HTMLTemplateElement;
 var style: string;
-var iconPart: HTMLElement;
 
 @CustomElement({
     name: "e-statusitem"
@@ -39,56 +30,22 @@ class HTMLEStatusItemElementBase extends HTMLElement implements HTMLEStatusItemE
     
     readonly shadowRoot!: ShadowRoot;
 
-    @QueryProperty({selector: ":scope > e-menubutton[slot=menubutton]"})
-    readonly menubutton!: HTMLEMenuButtonElement | null;
-    
-    @QueryProperty({selector: ":scope > e-select[slot=select]"})
-    readonly select!: HTMLESelectElement | null;
-
     @AttributeProperty({type: Boolean})
     active!: boolean;
-
-    @AttributeProperty({type: Boolean})
-    pressed!: boolean;
-
-    @AttributeProperty({type: Boolean})
-    expanded!: boolean;
-
-    @AttributeProperty({type: Boolean, observed: true})
-    iconed!: boolean;
-
-    @AttributeProperty({type: String, observed: true})
-    value!: string;
 
     @AttributeProperty({type: String})
     name!: string;
 
-    @AttributeProperty({type: String, observed: true})
-    label!: string;
-
-    @AttributeProperty({type: String})
-    type!: "button" | "checkbox" | "radio" | "menubutton" | "select";
-
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
-            element("slot"),
-            element("slot", {
+            element("span", {
                 attributes: {
-                    name: "select"
-                }
-            }),
-            element("slot", {
-                attributes: {
-                    name: "menubutton"
-                }
+                    part: "content"
+                },
+                children: element("slot")
             })
         );
-        iconPart = element("span", {
-            attributes: {
-                part: "icon"
-            }
-        });
         style = /*css*/`
             :host {
                 display: flex;
@@ -107,45 +64,13 @@ class HTMLEStatusItemElementBase extends HTMLElement implements HTMLEStatusItemE
                 background-color: var(--hovered-item-color);
             }
             
-            :host([pressed]) {
-                background-color: var(--activated-item-color);
-            }
-            
-            :host(:not([iconed])) [part="icon"] {
-                display: none;
-            }
-
-            [part="icon"] {
-                flex: none;
-                display: inline-block;
-                width: 18px;
-                height: 18px;
-                padding: 2px;
-                overflow: hidden;
-            }
-            
-            [part="icon"]::before {
-                display: inline-block;
-                width: 18px;
-                height: 18px;
-                content: "";
-                mask-size: 18px 18px;
-                -webkit-mask-size: 18px 18px;
-                background-color: var(--icon-color, none);
-                -webkit-mask-image: var(--icon-image, none);
-                mask-image: var(--icon-image, none);
-                filter: var(--icon-filter, none);
-            }
-            
-            :host(:focus-within):host-context(e-toolbar:focus-within) {
+            :host(:focus-within):host-context(e-statusbar:focus-within) {
                 outline: 1px solid var(--focused-item-outline-color);
                 outline-offset: -1px;
             }
             
-            :host([type="menubutton"]) ::slotted(e-menubutton):focus,
-            :host([type="select"]) ::slotted(e-select):focus {
-                outline: none;
-                outline-offset: none;
+            [part="content"] {
+                padding: 0 4px;
             }
         `;
     }
@@ -165,152 +90,37 @@ class HTMLEStatusItemElementBase extends HTMLElement implements HTMLEStatusItemE
         const {tabIndex} = this;
         this.tabIndex = tabIndex;
     }
-
-    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
-        switch (name) {
-            case "label": {
-                //...
-                break;
-            }
-            case "iconed": {
-                const {shadowRoot} = this;
-                if (newValue !== null) {
-                    shadowRoot.prepend(iconPart.cloneNode(true));
-                }
-                else {
-                    const iconPart = shadowRoot.querySelector<HTMLElement>("[part=icon]");
-                    if (iconPart) {
-                        iconPart.remove();
-                    }
-                }
-                break;
-            }
-        }
-    }
 }
 
 var HTMLEStatusItemElement: HTMLEStatusItemElementConstructor = HTMLEStatusItemElementBase;
 
-interface EToolBarItemConstructor {
+interface EStatusItemConstructor {
     prototype: HTMLEStatusItemElement;
     new(init: {
         name: string;
         label: string;
-        type: "button" | "checkbox" | "radio" | "menubutton" | "select";
-        value?: string;
-        trigger?: () => void;
-        menubutton?: HTMLEMenuButtonElement;
-        select?: HTMLESelectElement;
-    }): HTMLEStatusItemElement;
-    button(init: {
-        name: string;
-        label: string;
-        value?: string;
-        trigger?: () => void;
-    }): HTMLEStatusItemElement;
-    checkbox(init: {
-        name: string;
-        label: string;
-        value?: string;
-        trigger?: () => void;
-    }): HTMLEStatusItemElement;
-    radio(init: {
-        name: string;
-        label: string;
-        value?: string;
-        trigger?: () => void;
-    }): HTMLEStatusItemElement;
-    menubutton(init: {
-        name: string;
-        label: string;
-        menubutton: HTMLEMenuButtonElement;
-    }): HTMLEStatusItemElement;
-    select(init: {
-        name: string;
-        label: string;
-        select: HTMLESelectElement;
+        onclick?: () => void;
     }): HTMLEStatusItemElement;
 }
 
-var EToolBarItem = <EToolBarItemConstructor>Object.assign(
+var EStatusItem = <EStatusItemConstructor>Object.assign(
     <Function>function(init: {
         name: string;
         label: string;
-        type: "button" | "checkbox" | "radio" | "menubutton" | "select";
-        value?: string;
-        trigger?: () => void;
-        menubutton?: HTMLEMenuButtonElement;
-        select?: HTMLESelectElement;
+        onclick?: () => void;
     }) {
-        const {label, name, type, value, trigger, menubutton, select} = init;
-        if (menubutton) {
-            menubutton.slot = "menubutton";
-        }
-        if (select) {
-            select.slot = "select";
-        }
-        return element("e-toolbaritem", {
+        const {label, name, onclick} = init;
+        return element("e-statusitem", {
             attributes: {
-                tabindex: -1,
                 title: label,
                 name: name,
-                value: value,
-                type: type
             },
-            children: menubutton ? [menubutton] : select ? [select] : undefined,
+            children: label,
             listeners: {
-                click: trigger
+                click: onclick
             }
         });
     }, {
-        prototype: HTMLEStatusItemElement.prototype,
-        button(init: {
-            name: string,
-            label: string,
-            value?: string,
-            trigger?: () => void;
-        }) {
-            return new EToolBarItem({
-                ...init, type: "button"
-            });
-        },
-        checkbox(init: {
-            name: string;
-            label: string;
-            value?: string;
-            trigger?: () => void;
-        }) {
-            return new EToolBarItem({
-                ...init, type: "checkbox"
-            });
-        },
-        radio(init: {
-            name: string;
-            label: string;
-            value?: string;
-            trigger?: () => void;
-        }) {
-            return new EToolBarItem({
-                ...init, type: "radio"
-            });
-        },
-        menubutton(init: {
-            name: string;
-            label: string;
-            menubutton: HTMLEMenuButtonElement;
-        }) {
-            return new EToolBarItem({
-                ...init, type: "menubutton"
-            });
-        },
-        select(init: {
-            name: string;
-            label: string;
-            select: HTMLESelectElement;
-        }) {
-            return new EToolBarItem({
-                ...init, type: "select"
-            });
-        },
+        prototype: HTMLEStatusItemElement.prototype
     }
 );

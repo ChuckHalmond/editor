@@ -346,15 +346,15 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
 
     #handleDragLeaveEvent(event: DragEvent): void {
         const {relatedTarget} = event;
-        if (relatedTarget) {
-            const relatedTargetRoot = (<Node>relatedTarget).getRootNode();
-            const relatedTargetHost =
-                relatedTargetRoot instanceof ShadowRoot ?
-                relatedTargetRoot.host :
-                relatedTarget;
-            if (!this.contains(<Node>relatedTargetHost)) {
-                this.#setDropTargetItem(null);
+        let rootNode = <Node>relatedTarget;
+        while (!(rootNode instanceof HTMLETreeItemElement || rootNode instanceof Document)) {
+            rootNode = rootNode.getRootNode();
+            if (rootNode instanceof ShadowRoot) {
+                rootNode = rootNode.host;
             }
+        }
+        if (rootNode instanceof Document) {
+            this.#setDropTargetItem(null);
         }
     }
 
@@ -371,13 +371,12 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
                 if (ctrlKey) {
                     if (activeItem) {
                         const walker = this.#walker;
-                        const {root} = walker;
                         walker.currentNode = activeItem;
                         const firstItem = <HTMLETreeItemElement>(
-                            walker.currentNode = walker.parentNode() ?? root, walker.firstChild()
+                            walker.currentNode = walker.parentNode() ?? this, walker.firstChild()
                         );
                         const lastItem = <HTMLETreeItemElement>(
-                            walker.currentNode = walker.parentNode() ?? root, walker.lastChild()
+                            walker.currentNode = walker.parentNode() ?? this, walker.lastChild()
                         );
                         if (firstItem && lastItem) {
                             const range = this.#getItemsRange(

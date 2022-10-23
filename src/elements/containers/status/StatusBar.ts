@@ -2,58 +2,48 @@ import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEStatusItemElement } from "./StatusItem";
 import { HTMLEStatusItemGroupElement } from "./StatusItemGroup";
 
-export { HTMLEToolBarElement };
+export { HTMLEStatusBarElement };
 
-type ToolBarOrientation = "horizontal" | "vertical";
 
-interface HTMLEToolBarElement extends HTMLElement {
+interface HTMLEStatusBarElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
     readonly activeItem: HTMLEStatusItemElement | null;
     items(): HTMLEStatusItemElement[];
     firstItem(): HTMLEStatusItemElement | null;
-    name: string;
-    orientation: ToolBarOrientation;
 }
 
 interface HTMLEToolbarElementConstructor {
-    prototype: HTMLEToolBarElement;
-    new(): HTMLEToolBarElement;
+    prototype: HTMLEStatusBarElement;
+    new(): HTMLEStatusBarElement;
 }
 
 declare global {
     interface HTMLElementTagNameMap {
-        "e-statusbar": HTMLEToolBarElement,
+        "e-statusbar": HTMLEStatusBarElement,
     }
 }
 
 var shadowTemplate: HTMLTemplateElement;
 var style: string;
-var wasExpandedOnMouseDown: WeakMap<HTMLEStatusItemElement, boolean>;
 
 @CustomElement({
     name: "e-statusbar"
 })
-class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement {
+class HTMLEStatusBarElementBase extends HTMLElement implements HTMLEStatusBarElement {
 
     readonly shadowRoot!: ShadowRoot;
 
     get activeItem(): HTMLEStatusItemElement | null {
         return this.querySelector<HTMLEStatusItemElement>(
-            "e-toolbaritem[active]"
+            "e-statusitem[active]"
         );
     }
 
     items(): HTMLEStatusItemElement[] {
         return Array.from(this.querySelectorAll<HTMLEStatusItemElement>(
-            ":is(:scope, :scope > e-toolbaritemgroup) > e-toolbaritem"
+            ":is(:scope, :scope > e-statusitemgroup) > e-statusitem"
         ));
     }
-
-    @AttributeProperty({type: String})
-    name!: string;
-
-    @AttributeProperty({type: String})
-    orientation!: ToolBarOrientation;
 
     #walker: TreeWalker;
 
@@ -62,11 +52,19 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         shadowTemplate.content.append(
             element("slot")
         );
-        wasExpandedOnMouseDown = new WeakMap();
         style = /*css*/`
             :host {
                 display: flex;
                 flex-direction: row;
+            }
+
+            :host(:focus) {
+                outline: 1px solid var(--focused-item-outline-color);
+                outline-offset: -1px;
+            }
+
+            ::slotted(e-statusitem:not(:first-child)) {
+                margin-left: 4px;
             }
         `;
     }
@@ -83,13 +81,11 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
-        this.addEventListener("click", this.#handleClickEvent.bind(this));
         this.addEventListener("contextmenu", this.#handleContextMenuEvent.bind(this));
         this.addEventListener("dblclick", this.#handleDblClickEvent.bind(this));
         this.addEventListener("focus", this.#handleFocusEvent.bind(this));
         this.addEventListener("focusin", this.#handleFocusInEvent.bind(this));
         this.addEventListener("focusout", this.#handleFocusOutEvent.bind(this));
-        this.addEventListener("mousedown", this.#handleMouseDownEvent.bind(this));
         this.addEventListener("keydown", this.#handleKeyDownEvent.bind(this));
     }
 
@@ -143,44 +139,6 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         }
     }
 
-    #handleClickEvent(event: MouseEvent): void {
-        const {target} = event;
-        const targetItem = (<HTMLElement>target).closest("e-toolbaritem");
-        if (targetItem) {
-            const {type, pressed} = targetItem;
-            switch (type) {
-                case "checkbox": {
-                    targetItem.pressed = !pressed;
-                    break;
-                }
-                case "radio": {
-                    targetItem.pressed = true;
-                    break;
-                }
-                case "menubutton": {
-                    const {menubutton} = targetItem;
-                    if (menubutton && !menubutton.contains(<Node>target)) {
-                        const force = !wasExpandedOnMouseDown.get(targetItem) ?? true;
-                        menubutton.toggle(force);
-                        if (force) {
-                            menubutton.firstItem?.focus({preventScroll: true});
-                        }
-                    }
-                    break;
-                }
-                case "select": {
-                    const {select} = targetItem;
-                    if (select && !select.contains(<Node>target)) {
-                        const force = !wasExpandedOnMouseDown.get(targetItem) ?? true;
-                        select.toggle(force);
-                    }
-                    break;
-                }
-            }
-        }
-        event.stopPropagation();
-    }
-
     #handleContextMenuEvent(event: MouseEvent): void {
         event.stopPropagation();
     }
@@ -199,7 +157,7 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
 
     #handleFocusInEvent(event: FocusEvent): void {
         const {target} = event;
-        const targetItem = <HTMLEStatusItemElement | null>(<HTMLElement>target).closest("e-toolbaritem");
+        const targetItem = <HTMLEStatusItemElement | null>(<HTMLElement>target).closest("e-statusitem");
         if (targetItem) {
             this.#setActiveItem(targetItem);
             this.tabIndex = -1;
@@ -214,58 +172,13 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         }
     }
 
-    #handleMouseDownEvent(event: MouseEvent): void {
-        const {target} = event;
-        const targetItem = (<HTMLElement>target).closest("e-toolbaritem");
-        if (targetItem) {
-            const {type} = targetItem;
-            switch (type) {
-                case "menubutton": {
-                    const {menubutton} = targetItem;
-                    if (menubutton && !menubutton.contains(<Node>target)) {
-                        wasExpandedOnMouseDown.set(targetItem, menubutton.expanded);
-                    }
-                    break;
-                }
-                case "select": {
-                    const {select} = targetItem;
-                    if (select && !select.contains(<Node>target)) {
-                        wasExpandedOnMouseDown.set(targetItem, select.expanded);
-                    }
-                    break;
-                }
-            }
-        }
-    }
-
     #handleKeyDownEvent(event: KeyboardEvent): void {
         const {key} = event;
         const {activeItem} = this;
         switch (key) {
             case "Enter": {
                 if (activeItem) {
-                    const {type} = activeItem;
-                    switch (type) {
-                        case "menubutton": {
-                            const {menubutton} = activeItem;
-                            if (menubutton) {
-                                menubutton.expand();
-                                menubutton.firstItem?.focus({preventScroll: true});
-                            }
-                            break;
-                        }
-                        case "select": {
-                            const {select} = activeItem;
-                            if (select) {
-                                select.expand();
-                            }
-                            break;
-                        }
-                        default: {
-                            activeItem.click();
-                            break;
-                        }
-                    }
+                    activeItem.click();
                     event.stopPropagation();
                 }
                 break;
@@ -302,19 +215,6 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
                 event.stopPropagation();
                 break;
             }
-            case "ArrowDown": {
-                if (activeItem) {
-                    const {type} = activeItem;
-                    switch (type) {
-                        case "select": {
-                            activeItem.select?.expand();
-                            event.stopPropagation();
-                            break;
-                        }
-                    }
-                }
-                break;
-            }
             case "Home": {
                 const firstItem = this.firstItem();
                 if (firstItem) {
@@ -331,8 +231,13 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
                 event.stopPropagation();
                 break;
             }
+            case "Escape": {
+                this.focus({preventScroll: true});
+                event.stopPropagation();
+                break;
+            }
         }
     }
 }
 
-var HTMLEToolBarElement: HTMLEToolbarElementConstructor = HTMLEToolBarElementBase;
+var HTMLEStatusBarElement: HTMLEToolbarElementConstructor = HTMLEStatusBarElementBase;

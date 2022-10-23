@@ -408,6 +408,20 @@ class GridViewBase extends View implements GridView {
         gridElement.clearSelection();
     }
 
+    removeAllDisplayFilters(): void {
+        const {model, gridElement} = this;
+        const {rows} = model;
+        const displayFilters = this.#displayFilters;
+        displayFilters.splice(0, displayFilters.length);
+        Array.from(rows.values()).forEach((row_i) => {
+            const rowElement = this.getRowElement(row_i);
+            if (rowElement) {
+                rowElement.hidden = !this.#filter(row_i);
+            }
+        });
+        gridElement.clearSelection();
+    }
+
     #renderGridColumnHeaderCell(column: GridColumnModel): Element {
         const gridColumnElement = reactiveElement(
             column,
@@ -448,7 +462,7 @@ class GridViewBase extends View implements GridView {
             ["sortorder"],
             (cell, property, oldValue, newValue) => {
                 switch (property) {
-                    case "sortorder":
+                    case "sortorder": {
                         const {dataset} = cell;
                         if (typeof newValue !== "undefined") {
                             dataset.sortorder = newValue.toString();
@@ -457,6 +471,7 @@ class GridViewBase extends View implements GridView {
                             delete dataset.sortorder;
                         }
                         break;
+                    }
                 }
             }
         );
@@ -510,7 +525,7 @@ class GridViewBase extends View implements GridView {
             const {sortorder, filters} = column;
             const contextMenu = element("e-menu",  {
                 attributes: {
-                    contextual: true,
+                    contextual: true
                 },
                 children: [
                     element("e-menuitem",  {
@@ -618,7 +633,15 @@ class GridViewBase extends View implements GridView {
                                         },
                                         children: name
                                     })
-                                }),
+                                }).concat(
+                                    element("e-menuitem", {
+                                        attributes: {
+                                            type: "button",
+                                            label: "Remove filters"
+                                        },
+                                        children: "Remove filters"
+                                    })
+                                ),
                                 listeners: {
                                     click: (event) => {
                                         const {target} = event;
@@ -633,6 +656,9 @@ class GridViewBase extends View implements GridView {
                                                 else {
                                                     this.removeDisplayFilter(filter);
                                                 }
+                                            }
+                                            else {
+                                                this.removeAllDisplayFilters();
                                             }
                                         }
                                         gridElement.focus();
@@ -654,9 +680,14 @@ class GridViewBase extends View implements GridView {
         const {target} = event;
         if (target instanceof HTMLInputElement) {
             const {value} = target;
-            this.setSearchFilter(value !== "" ? {
-                filter: (row) => row.name.toLowerCase().includes(value.toLowerCase())
-            } : null);
+            if (value !== "") {
+                this.setSearchFilter({
+                    filter: (row) => row.name.toLowerCase().includes(value.toLowerCase())
+                });
+            }
+            else {
+                this.setSearchFilter(null);
+            }
         }
     }
 
@@ -670,8 +701,8 @@ class GridViewBase extends View implements GridView {
             if (targetHeader) {
                 const targetColumn = Array.from(columns.values()).find(column_i => column_i.name == targetHeader.id);
                 if (targetColumn) {
-                    const sortorder = targetColumn.sortorder !== undefined ? -targetColumn.sortorder : 1;
-                    model.sortByColumn(targetColumn, sortorder);
+                    const {sortorder = -1} = targetColumn;
+                    model.sortByColumn(targetColumn, -sortorder);
                 }
             }
         }

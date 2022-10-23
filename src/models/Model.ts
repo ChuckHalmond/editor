@@ -356,8 +356,10 @@ class ModelNodeBase extends ModelEventTargetBase implements ModelNode {
             oldValue, newValue
         });
         records.push(record);
-        this.dispatchEvent(new ModelEvent("modelchange"));
-        records.splice(0);
+        if (!this.#isRecording) {
+            this.dispatchEvent(new ModelEvent("modelchange"));
+            records.splice(0);
+        }
     }
 
     #handleRecord(record: ModelChangeRecord): void {
@@ -389,35 +391,15 @@ delete ModelNodeBase.ModelNodeRecordsAccessor;
 var ModelNode: ModelNodeConstructor = ModelNodeBase;
 
 interface ModelPropertyDecorator {
-    (
-        init?: {
-            type: typeof String | typeof Number | typeof Boolean | typeof Date | typeof Object
-        }
-    ): <Model extends ModelObject>(target: Model, property: string) => void;
+    (): <Model extends ModelObject>(target: Model, property: string) => void;
 }
 
-const ModelProperty: ModelPropertyDecorator = function(
-    init?: {
-        type: typeof String | typeof Number | typeof Boolean | typeof Date | typeof Object
-    }
-) {
+const ModelProperty: ModelPropertyDecorator = function() {
     return (
         target: ModelObject, property: string
     ) => {
         const {constructor} = target;
         const {prototype} = constructor;
-        /*const observedAttributes = Reflect.get(constructor, "observedAttributes", constructor);
-        if (Array.isArray(observedAttributes)) {
-            observedAttributes.push(property);
-        }
-        else {
-            Object.defineProperty(
-                constructor, "observedAttributes", {
-                    value: [property],
-                    writable: false
-                }
-            );
-        }*/
         const setter = function(this: ModelObject, value: any) {
             const oldValue = ModelObjectPropertiesAccessor.getProperty(this, property);
             ModelObjectPropertiesAccessor.setProperty(this, property, value);

@@ -13,8 +13,8 @@ interface HTMLEToolTipElement extends HTMLElement {
     htmlFor: string;
     position: "top" | "bottom" | "right" | "left";
     visible: boolean;
-    show(): void;
-    hide(): void;
+    show(options?: {immediate?: boolean}): void;
+    hide(options?: {immediate?: boolean}): void;
 }
 
 declare global {
@@ -25,8 +25,10 @@ declare global {
 
 var shadowTemplate: HTMLTemplateElement;
 var style: string;
-var HIDE_DELAY_MS = 200;
+
+var HIDE_DELAY_MS = 100;
 var SHOW_DELAY_MS = 200;
+var ANIMATION_DURATION = 100;
 
 @CustomElement({
     name: "e-tooltip"
@@ -75,23 +77,27 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
                 display: inline-block;
                 position: fixed;
                 padding: 4px;
-                border-radius: 4px;
+                border-radius: 3px;
                 box-sizing: border-box;
                 background-color: white;
                 border: 1px solid black;
                 pointer-events: none;
             }
             
-            :host(:not([visible])) {
+            :host([hidden]) {
                 display: none;
+            }
+
+            :host(:not([visible])) {
+                opacity: 0;
             }
             
             [part="arrow"] {
                 display: inline-block;
                 position: fixed;
                 z-index: 1;
-                width: 6px;
-                height: 6px;
+                width: 4px;
+                height: 4px;
                 box-sizing: border-box;
                 background-color: white;
                 border: 1px solid black;
@@ -99,19 +105,19 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
             }
             
             :host(:is(:not([position]), [position="top"])) [part="arrow"] {
-                transform: translate(-3px, -3px) rotate(45deg);
+                transform: translate(-2px, -2px) rotate(45deg);
             }
             
             :host(:is([position="bottom"])) [part="arrow"] {
-                transform: translate(-3px, -3px) rotate(225deg);
+                transform: translate(-2px, -2px) rotate(225deg);
             }
             
             :host(:is([position="left"])) [part="arrow"] {
-                transform: translate(-3px, -3px) rotate(315deg);
+                transform: translate(-2px, -2px) rotate(315deg);
             }
             
             :host(:is([position="right"])) [part="arrow"] {
-                transform: translate(-3px, -3px) rotate(135deg);
+                transform: translate(-2px, -2px) rotate(135deg);
             }        
         `;
     }
@@ -173,8 +179,8 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
         }
     }
 
-    show(): void {
-        this.visible = true;
+    show(options?: {immediate?: boolean}): void {
+        const {immediate = false} = options ?? {};
         let toggleAnimation = this.#toggleAnimation;
         if (toggleAnimation !== null) {
             const {id} = toggleAnimation;
@@ -182,27 +188,32 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
                 toggleAnimation.cancel();
             }
         }
-        toggleAnimation = this.animate([
-            { opacity: 0 },
-            { opacity: 1 }
-        ], {
-            id: "show",
-            duration: SHOW_DELAY_MS
-        })
-        const {finished} = toggleAnimation;
-        finished.then(
-            () => {
-                this.#toggleAnimation = null;
-            },
-            () => {
-                this.visible = false;
-            }
-        );
-        this.#toggleAnimation = toggleAnimation;
-        this.#position();
+        if (!this.visible) {
+            this.hidden = false;
+            toggleAnimation = this.animate([
+                { opacity: 0 },
+                { opacity: 1 }
+            ], {
+                id: "show",
+                delay: immediate ? 0 : SHOW_DELAY_MS,
+                duration: immediate ? 0 : ANIMATION_DURATION
+            });
+            const {finished} = toggleAnimation;
+            finished.then(
+                () => {
+                    this.visible = true;
+                }
+            );
+            this.#toggleAnimation = toggleAnimation;
+            this.#position();
+        }
+        else {
+            this.#toggleAnimation = null;
+        }
     }
 
-    hide(): void {
+    hide(options?: {immediate?: boolean}): void {
+        const {immediate = false} = options ?? {};
         let toggleAnimation = this.#toggleAnimation;
         if (toggleAnimation !== null) {
             const {id} = toggleAnimation;
@@ -210,23 +221,27 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
                 toggleAnimation.cancel();
             }
         }
-        toggleAnimation = this.animate([
-            { opacity: 1 },
-            { opacity: 0 }
-        ], {
-            id: "hide",
-            duration: HIDE_DELAY_MS
-        });
-        const {finished} = toggleAnimation;
-        finished.then(
-            () => {
-                this.visible = false;
-            },
-            () => {
-                this.visible = true;
-            }
-        );
-        this.#toggleAnimation = toggleAnimation;
+        if (this.visible) {
+            toggleAnimation = this.animate([
+                { opacity: 1 },
+                { opacity: 0 }
+            ], {
+                id: "hide",
+                delay: immediate ? 0 : HIDE_DELAY_MS,
+                duration: immediate ? 0 : ANIMATION_DURATION
+            });
+            const {finished} = toggleAnimation;
+            finished.then(
+                () => {
+                    this.visible = false;
+                    this.hidden = true;
+                }
+            );
+            this.#toggleAnimation = toggleAnimation;
+        }
+        else {
+            this.#toggleAnimation = null;
+        }
     }
 
     #arrow(): HTMLElement {
@@ -237,12 +252,13 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
         const target = id ? document.getElementById(id) : null;
         if (target !== null) {
             const oldTarget = this.#target;
+            const targetListenerObject = this.#targetListenerObject;
             if (oldTarget) {
-                oldTarget.removeEventListener("mouseenter", this.#targetListenerObject);
-                oldTarget.removeEventListener("mouseleave", this.#targetListenerObject);
+                oldTarget.removeEventListener("mouseenter", targetListenerObject);
+                oldTarget.removeEventListener("mouseleave", targetListenerObject);
             }
-            target.addEventListener("mouseenter", this.#targetListenerObject);
-            target.addEventListener("mouseleave", this.#targetListenerObject);
+            target.addEventListener("mouseenter", targetListenerObject);
+            target.addEventListener("mouseleave", targetListenerObject);
         }
         this.#target = target;
     }
@@ -302,19 +318,35 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
 
     #handleTargetMouseEnterEvent(): void {
         this.show();
-        document.addEventListener("keydown", this.#documentListenerObject);
+        const toggleAnimation = this.#toggleAnimation;
+        if (toggleAnimation) {
+            const documentListenerObject = this.#documentListenerObject;
+            const {finished} = toggleAnimation;
+            finished.then(() => {
+                document.addEventListener("keydown", documentListenerObject);
+            });
+        }
     }
 
     #handleTargetMouseLeaveEvent(): void {
         this.hide();
-        document.removeEventListener("keydown", this.#documentListenerObject);
+        const toggleAnimation = this.#toggleAnimation;
+        if (toggleAnimation) {
+            const documentListenerObject = this.#documentListenerObject;
+            const {finished} = toggleAnimation;
+            finished.then(() => {
+                document.removeEventListener("keydown", documentListenerObject);
+            });
+        }
     }
 
     #handleDocumentKeyDownEvent(event: KeyboardEvent): void {
         const {key} = event;
         switch (key) {
             case "Escape": {
-                this.hide();
+                this.hide({
+                    immediate: true
+                });
                 break;
             }
         }

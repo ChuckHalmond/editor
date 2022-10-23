@@ -143,11 +143,11 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
                 outline-offset: -1px;
             }
             
-            :host([type="menubutton"]) ::slotted(e-menubutton):focus,
+            /*:host([type="menubutton"]) ::slotted(e-menubutton):focus,
             :host([type="select"]) ::slotted(e-select):focus {
                 outline: none;
                 outline-offset: none;
-            }
+            }*/
         `;
     }
 

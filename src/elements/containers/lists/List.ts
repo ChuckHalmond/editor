@@ -311,12 +311,14 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
 
     #handleDragLeaveEvent(event: DragEvent): void {
         const {relatedTarget} = event;
-        const relatedTargetRoot = (<Node>relatedTarget).getRootNode();
-        const relatedTargetHost =
-            relatedTargetRoot instanceof ShadowRoot ?
-            relatedTargetRoot.host :
-            relatedTarget;
-        if (!this.contains(<Node>relatedTargetHost)) {
+        let rootNode = <Node>relatedTarget;
+        while (!(rootNode instanceof HTMLEListItemElement || rootNode instanceof Document)) {
+            rootNode = rootNode.getRootNode();
+            if (rootNode instanceof ShadowRoot) {
+                rootNode = rootNode.host;
+            }
+        }
+        if (rootNode instanceof Document) {
             this.#setDropTargetItem(null);
         }
     }

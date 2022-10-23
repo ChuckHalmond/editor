@@ -1,15 +1,15 @@
 import { ModelList, ModelNode, ModelChangeRecord, ModelChangeObserver, ModelChangeObserverOptions } from "../models/Model";
 import { camelToTrain } from "./Snippets";
-/*
-export { subtreeNodes };
-export { ancestorNodes };*/
+
 export { CustomElement };
 export { ReactiveChildElements };
 export { QueryProperty };
 export { QueryAllProperty };
 export { AttributeProperty };
 export { reactiveElement };
+export { revokeReactiveElement };
 export { reactiveChildElements };
+export { revokeReactiveChildElements };
 export { element };
 export { fragment };
 export { textNode };
@@ -19,6 +19,8 @@ export { areAttributesMatching };
 export { AttributeMutationMixinBase };
 export { trimMultilineIndent };
 export { Stylesheet };
+
+export { reactiveElementsMap };
 
 interface AttributePropertyDecorator {
     (
@@ -425,16 +427,33 @@ function reactiveElement<M extends ModelNode, E extends Element>(
     properties.forEach((property_i) => {
         if (property_i in model) {
             const value = Reflect.get(model, property_i, model);
-            if (value !== undefined) {
-                react(element, <any>property_i, <any>undefined, value);
-            }
+            react(element, <any>property_i, <any>undefined, value);
         }
     });
     return element;
 }
 
+function revokeReactiveElement<M extends ModelNode, E extends Element>(
+    model: M,
+    element: E
+): void {
+    const reactiveElementsMapEntry = reactiveElementsMap.get(model);
+    if (reactiveElementsMapEntry) {
+        const {reactiveElementsArray} = reactiveElementsMapEntry;
+        const reactiveElementIndex = reactiveElementsArray.findIndex(
+            reactiveElement => reactiveElement.elementRef.deref() === element
+        );
+        if (reactiveElementIndex > -1) {
+            reactiveElementsArray.splice(reactiveElementIndex, 1);
+        }
+        if (reactiveElementsArray.length === 0) {
+            reactiveElementsMap.delete(model);
+        }
+    }
+}
+
 interface ReactiveChildElements {
-    (parent: Node & ParentNode): void;
+    (parent: ParentNode): void;
 }
 
 const reactiveChildElementsMap = new WeakMap<ModelList, {
@@ -529,7 +548,7 @@ function reactiveChildElements<Model extends ModelNode>(
     mapping: (item: Model) => Element,
     placeholder?: Element
 ): ReactiveChildElements {
-    return (parent: Node & ParentNode) => {
+    return (parent: ParentNode) => {
         const parentRef = new WeakRef(parent);
         const reactiveChildElementsMapEntry = reactiveChildElementsMap.get(list);
         const reactiveChildElement = {parentRef, mapping, placeholder};
@@ -548,6 +567,25 @@ function reactiveChildElements<Model extends ModelNode>(
         const children = list.length == 0 && placeholder ?
             [placeholder] : Array.from(list.values()).map(mapping);
         parent.replaceChildren(...children);
+    }
+}
+
+function revokeReactiveChildElements<Model extends ModelNode>(
+    list: ModelList<Model>,
+    parent: ParentNode,
+): void {
+    const reactiveChildElementsMapEntry = reactiveChildElementsMap.get(list);
+    if (reactiveChildElementsMapEntry) {
+        const {reactiveChildElementsArray} = reactiveChildElementsMapEntry;
+        const reactiveChildElementsIndex = reactiveChildElementsArray.findIndex(
+            reactiveChildElement => reactiveChildElement.parentRef.deref() === parent
+        );
+        if (reactiveChildElementsIndex > -1) {
+            reactiveChildElementsArray.splice(reactiveChildElementsIndex, 1);
+        }
+        if (reactiveChildElementsArray.length === 0) {
+            reactiveChildElementsMap.delete(list);
+        }
     }
 }
 

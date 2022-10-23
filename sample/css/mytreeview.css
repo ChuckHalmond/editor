@@ -1,9 +1,9 @@
-e-treeitem .badge {
+.badge {
     margin-left: 4px;
     order: 2;
 }
 
-e-treeitem .label {
+.label {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

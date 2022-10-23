@@ -103,6 +103,10 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
                 line-height: 22px;
                 border: 1px solid var(--item-border-color);
             }
+
+            :host(:focus-visible) {
+                outline: none;
+            }
             
             :host(:focus-within) {
                 background-color: var(--focused-item-color);
@@ -122,8 +126,8 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
             [part="content"]::after {
                 display: inline-block;
                 text-align: center;
-                width: 18px;
-                height: 18px;
+                width: 22px;
+                height: 22px;
                 margin-left: 6px;
                 content: "▾";
             }

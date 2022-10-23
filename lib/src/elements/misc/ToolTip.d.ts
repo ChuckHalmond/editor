@@ -9,8 +9,12 @@ interface HTMLEToolTipElement extends HTMLElement {
     htmlFor: string;
     position: "top" | "bottom" | "right" | "left";
     visible: boolean;
-    show(): void;
-    hide(): void;
+    show(options?: {
+        immediate?: boolean;
+    }): void;
+    hide(options?: {
+        immediate?: boolean;
+    }): void;
 }
 declare global {
     interface HTMLElementTagNameMap {
