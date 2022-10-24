@@ -324,42 +324,51 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
         const {menu} = this;
         if (menu !== null) {
             const {style: menuStyle} = menu;
-            const {top: itemTop, bottom: itemBottom, left: itemLeft, right: itemRight} = this.getBoundingClientRect();
+            let {top: itemTop, bottom: itemBottom, left: itemLeft, right: itemRight} = this.getBoundingClientRect();
             const {width: menuWidth, height: menuHeight} = menu.getBoundingClientRect();
-            const {scrollY, scrollX} = window;
             const {clientWidth, clientHeight} = document.body;
             const {type} = this;
-            if (type == "menu") {
+            if (type === "menu") {
+                const offsetParent = <HTMLElement>(menu.offsetParent ?? document.body);
+                const {offsetLeft, offsetTop} = offsetParent;
                 const overflowX = itemRight + menuWidth - clientWidth;
                 const overflowY = itemTop + menuHeight - clientHeight;
+                itemLeft -= offsetLeft;
+                itemRight -= offsetLeft;
+                itemTop -= offsetTop;
+                itemBottom -= offsetTop;
                 menuStyle.setProperty("left", `${
                     overflowX > 0 ?
-                    scrollX + itemRight - menuWidth :
-                    scrollX + itemLeft
+                    itemRight - menuWidth :
+                    itemLeft
                 }px`);
                 menuStyle.setProperty("top", `${
                     overflowY > 0 ?
-                    scrollY + itemTop - menuHeight :
-                    scrollY + itemBottom
+                    itemTop - menuHeight  :
+                    itemBottom
                 }px`);
             }
             else {
+                const overflowX = itemRight + menuWidth - clientWidth;
+                const overflowY = itemTop + menuHeight - clientHeight;
                 const closestMenu = this.closest("e-menu");
                 if (closestMenu !== null) {
                     const {top: closestMenuTop, left: closestMenuLeft} = closestMenu.getBoundingClientRect();
-                    const overflowX = itemRight + menuWidth - clientWidth;
-                    const overflowY = itemTop + menuHeight - clientHeight;
-                    menuStyle.setProperty("left", `${
-                        overflowX > 0 ?
-                        itemLeft - menuWidth - closestMenuLeft :
-                        itemRight - closestMenuLeft
-                    }px`);
-                    menuStyle.setProperty("top", `${
-                        overflowY > 0 ?
-                        itemBottom  - menuHeight - closestMenuTop :
-                        itemTop - closestMenuTop
-                    }px`);
+                    itemLeft -= closestMenuLeft;
+                    itemRight -= closestMenuLeft;
+                    itemTop -= closestMenuTop;
+                    itemBottom -= closestMenuTop;
                 }
+                menuStyle.setProperty("left", `${
+                    overflowX > 0 ?
+                    itemLeft - menuWidth :
+                    itemRight
+                }px`);
+                menuStyle.setProperty("top", `${
+                    overflowY > 0 ?
+                    itemBottom - menuHeight :
+                    itemTop
+                }px`);
             }
         }
     }

@@ -150,21 +150,26 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
         const {menu} = this;
         if (menu !== null) {
             const {style: menuStyle} = menu;
-            const {top: itemTop, bottom: itemBottom, left: itemLeft, right: itemRight} = this.getBoundingClientRect();
+            let {top: itemTop, bottom: itemBottom, left: itemLeft, right: itemRight} = this.getBoundingClientRect();
             const {width: menuWidth, height: menuHeight} = menu.getBoundingClientRect();
-            const {scrollY, scrollX} = window;
             const {clientWidth, clientHeight} = document.body;
+            const offsetParent = <HTMLElement>(menu.offsetParent ?? document.body);
+            const {offsetLeft, offsetTop} = offsetParent;
             const overflowX = itemRight + menuWidth - clientWidth;
             const overflowY = itemTop + menuHeight - clientHeight;
+            itemLeft -= offsetLeft;
+            itemRight -= offsetLeft;
+            itemTop -= offsetTop;
+            itemBottom -= offsetTop;
             menuStyle.setProperty("left", `${
                 overflowX > 0 ?
-                scrollX + itemRight - menuWidth :
-                scrollX + itemLeft
+                itemRight - menuWidth :
+                itemLeft
             }px`);
             menuStyle.setProperty("top", `${
                 overflowY > 0 ?
-                scrollY + itemTop - menuHeight :
-                scrollY + itemBottom
+                itemTop - menuHeight :
+                itemBottom
             }px`);
         }
     }

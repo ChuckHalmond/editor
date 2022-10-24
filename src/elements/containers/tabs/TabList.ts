@@ -24,6 +24,7 @@ declare global {
 
 var shadowTemplate: HTMLTemplateElement;
 var style: string;
+var SELECT_ANIMATION_DURATION = 300;
 
 @CustomElement({
     name: "e-tablist"
@@ -58,7 +59,15 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
         style = /*css*/`
             :host {
                 display: flex;
-                border-bottom: 1px solid var(--section-border-color);
+            }
+
+            :host::after {
+                position: absolute;
+                display: inline-block;
+                content: " ";
+                transform: translateY(-100%);
+                box-sizing: border-box;
+                border-top: 2px solid var(--focused-item-outline-color);
             }
 
             ::slotted(e-tab) {
@@ -95,6 +104,23 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
         const tabToSelect = selectedTab ?? this.firstItem();
         if (tabToSelect) {
             this.#selectTab(tabToSelect);
+            setTimeout(() => {
+                let {width: tabWidth, left: tabLeft, bottom: tabBottom} = tabToSelect.getBoundingClientRect();
+                const offsetParent = <HTMLElement>(tabToSelect.offsetParent ?? document.body);
+                const {offsetLeft, offsetTop} = offsetParent;
+                tabLeft -= offsetLeft;
+                tabBottom -= offsetTop;
+                this.animate([{
+                    width: `${tabWidth}px`,
+                    left: `${tabLeft}px`,
+                    top: `${tabBottom}px`
+                }], {
+                    duration: 0,
+                    fill: "forwards",
+                    easing: "ease-in-out",
+                    pseudoElement: "::after"
+                });
+            });
         }
     }
 
@@ -151,6 +177,18 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
         const targetTab = (<Element>target).closest("e-tab");
         if (targetTab) {
             targetTab.select();
+            const {width: tabWidth, left: tabLeft, bottom: tabBottom} = targetTab.getBoundingClientRect();
+            const {left: dialogLeft, top: dialogTop} = this.closest("dialog")?.getBoundingClientRect() ?? {left: 0, top: 0};
+            this.animate([{
+                width: `${tabWidth}px`,
+                left: `${tabLeft - dialogLeft}px`,
+                top: `${tabBottom - dialogTop}px`
+            }], {
+                duration: SELECT_ANIMATION_DURATION,
+                fill: "forwards",
+                easing: "ease-in-out",
+                pseudoElement: "::after"
+            });
         }
     }
 
@@ -230,10 +268,7 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
             const {tabs} = this;
             tabs.forEach((tab_i) => {
                 if (tab_i !== targetTab) {
-                    //const {selected} = tab_i;
-                    //if (selected) {
-                        tab_i.selected = false;
-                    //}
+                    tab_i.selected = false;
                     const {panel} = tab_i;
                     if (panel) {
                         panel.hidden = true;

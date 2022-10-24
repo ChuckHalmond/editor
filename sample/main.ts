@@ -4,6 +4,7 @@ import { HTMLEToolBarElement } from "../src/elements/containers/toolbars/ToolBar
 import { HTMLEToolBarItemElement } from "../src/elements/containers/toolbars/ToolBarItem";
 import { HTMLETreeElement } from "../src/elements/containers/trees/Tree";
 import { HTMLETreeItemElement } from "../src/elements/containers/trees/TreeItem";
+import { HTMLETabListElement } from "../src/elements/containers/tabs/TabList";
 import { CustomElement, revokeReactiveElement, element, fragment, reactiveElement, reactiveElementsMap } from "../src/elements/Element";
 import { ModelEvent, ModelObject, ModelProperty } from "../src/models/Model";
 import { GridColumnModel, GridModel, GridRowModel, GridView } from "../src/views/GridView";
@@ -12,6 +13,13 @@ import { TreeItemModelList, TreeItemModel, TreeModel, TreeView } from "../src/vi
 import * as editor from "../index";
 
 editor;
+
+interface PreloadDataFile {
+    assets: {
+        as: "image",
+        hrefs: string[]
+    }[]
+}
 
 class MyTreeItemModelList extends TreeItemModelList {
     readonly items!: MyTreeItemModel[];
@@ -75,6 +83,22 @@ class MyTreeItemModel extends TreeItemModel {
 }
 
 export async function main() {
+    const preloadData = <PreloadDataFile>(await fetch("/assets/preload.json").then((resp) => resp.json()));
+    preloadData.assets.forEach(
+        asset => {
+            document.head.append(
+                ...asset.hrefs.map(href =>
+                    element("link", {
+                        attributes: {
+                            as: asset.as,
+                            href: `/assets/${href}`
+                        }
+                    })
+                )
+            )
+        }
+    );
+    
     const gridView = new GridView();
     gridView.resizable = true;
     gridView.setModel(
@@ -386,7 +410,75 @@ export async function main() {
                             method: "dialog"
                         },
                         children: [
+                            element("e-menubar", {
+                                attributes: {
+                                    tabindex: 0
+                                },
+                                children: [
+                                    element("e-menuitem", {
+                                        attributes: {
+                                            type: "menu",
+                                            label: "Menu 1"
+                                        },
+                                        children: [
+                                            "Menu 1",
+                                            element("e-menu", {
+                                                attributes: {
+                                                    slot: "menu"
+                                                },
+                                                children: [
+                                                    element("e-menuitem", {
+                                                        attributes: {
+                                                            type: "checkbox"
+                                                        },
+                                                        children: "Menuitem 1"
+                                                    }),
+                                                    element("e-menuitem", {
+                                                        attributes: {
+                                                            type: "checkbox"
+                                                        },
+                                                        children: "Menuitem 2"
+                                                    }),
+                                                    element("e-menuitem", {
+                                                        attributes: {
+                                                            type: "submenu"
+                                                        },
+                                                        children: [
+                                                            "Submenu 1",
+                                                            element("e-menu", {
+                                                                attributes: {
+                                                                    slot: "menu"
+                                                                },
+                                                                children: [
+                                                                    EMenuItem.radio({
+                                                                        label: "SubmenuItem 1",
+                                                                        name: "radio",
+                                                                        value: String(0)
+                                                                    }),
+                                                                    EMenuItem.radio({
+                                                                        label: "SubmenuItem 2",
+                                                                        name: "radio",
+                                                                        value: String(1)
+                                                                    }),
+                                                                    EMenuItem.radio({
+                                                                        label: "SubmenuItem 3",
+                                                                        name: "radio",
+                                                                        value: String(3)
+                                                                    })
+                                                                ]
+                                                            })
+                                                        ]
+                                                    })
+                                                ]
+                                            })
+                                        ]
+                                    })
+                                ]
+                            }),
                             element("e-tablist", {
+                                attributes: {
+                                    tabindex: 0
+                                },
                                 children: [
                                     element("e-tab", {
                                         attributes: {
@@ -422,7 +514,9 @@ export async function main() {
                                                             id: "visibility",
                                                             type: "checkbox",
                                                             name: "visibility",
-                                                            checked: visibility
+                                                            checked: visibility,
+                                                            tabindex: 0,
+                                                            autofocus: true
                                                         }
                                                     }),
                                                     element("label", {
@@ -436,7 +530,8 @@ export async function main() {
                                                             id: "name",
                                                             type: "text",
                                                             name: "name",
-                                                            value: name
+                                                            value: name,
+                                                            tabindex: 0
                                                         }
                                                     }),
                                                     element("label", {
@@ -448,7 +543,8 @@ export async function main() {
                                                     element("e-select", {
                                                         attributes: {
                                                             id: "type",
-                                                            name: "type"
+                                                            name: "type",
+                                                            tabindex: 0
                                                         },
                                                         children: ["parent", "leaf"].map(
                                                             type_i => element("e-option", {
@@ -578,6 +674,11 @@ export async function main() {
                                                     label: "SubmenuItem 2",
                                                     name: "radio",
                                                     value: String(1)
+                                                }),
+                                                EMenuItem.radio({
+                                                    label: "SubmenuItem 3",
+                                                    name: "radio",
+                                                    value: String(3)
                                                 })
                                             ]
                                         })
@@ -826,4 +927,40 @@ export async function main() {
 
     (window as any)["personElement"] = personElement;
     (window as any)["PersonModel"] = PersonModel;
+
+
+    document.querySelector("e-import[src*='tablist']")?.addEventListener("load", () => {
+        const tablist = document.querySelector<HTMLETabListElement>("e-tablist");
+        if (tablist) {
+            const {selectedTab} = tablist;
+            if (selectedTab) {
+                const tabBox = selectedTab.getBoundingClientRect();
+                const {bottom, left, width} = tabBox;
+                tablist.animate([
+                    { width: `${width}px`, left: `${left}px`, top: `${bottom}px` }
+                ], {
+                    duration: 0,
+                    fill: "forwards",
+                    easing: "ease-in-out",
+                    pseudoElement: "::after"
+                });
+            }
+            tablist?.addEventListener("click", (event) => {
+                const {target} = event;
+                const tab = (<Element>target).closest("e-tab");
+                if (tab) {
+                    const tabBox = tab.getBoundingClientRect();
+                    const {bottom, left, width} = tabBox;
+                    tablist.animate([
+                        { width: `${width}px`, left: `${left}px`, top: `${bottom}px` }
+                    ], {
+                        duration: 400,
+                        fill: "forwards",
+                        easing: "ease-in-out",
+                        pseudoElement: "::after"
+                    });
+                }
+            });
+        }
+    });
 }

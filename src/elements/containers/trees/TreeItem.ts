@@ -111,10 +111,6 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                 outline-offset: -1px;
             }
             
-            :host(:focus) [part="content"] {
-                background-color: var(--focus-background-color);
-            }
-            
             [part="content"]:hover {
                 background-color: var(--hovered-item-color);
             }

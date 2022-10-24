@@ -65,7 +65,6 @@ class HTMLETabElementBase extends HTMLElement implements HTMLETabElement {
                 user-select: none;
                 white-space: nowrap;
                 padding: 4px;
-                border: 1px solid var(--section-border-color);
             }
             
             :host([disabled]) {
@@ -75,20 +74,6 @@ class HTMLETabElementBase extends HTMLElement implements HTMLETabElement {
             
             :host(:hover) {
                 background-color: var(--hovered-item-color);
-            }
-            
-            :host([selected]) {
-                background-color: white;
-                border-bottom-color: transparent;
-                border-bottom-width: 0;
-            }
-            
-            :host(:not([selected])) {
-                background-color: whitesmoke;
-            }
-
-            :host(:not(:first-child)) {
-                border-left: none;
             }
             
             :host(:focus-visible):host-context(e-tablist:focus-within) {

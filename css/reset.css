@@ -7,6 +7,15 @@
     accent-color: var(--accent-color);
 }
 
+html.fullscreen,
+html.fullscreen > body {
+    height: 100%;
+}
+
+dialog {
+    overflow: visible;
+}
+
 body {
     font-family: "Open Sans";
     font-size: 13px;
@@ -45,6 +54,10 @@ textarea {
     font-family: inherit;
     font-size: inherit;
     box-sizing: content-box;
+}
+
+dialog {
+    box-sizing: border-box;
 }
 
 input {

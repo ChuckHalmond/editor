@@ -1,0 +1,13 @@
+{
+    "assets": [
+        {
+            "as": "image",
+            "hrefs": [
+                "arrow_drop_down_FILL0_wght400_GRAD0_opsz48.svg",
+                "arrow_drop_up_FILL0_wght400_GRAD0_opsz48.svg",
+                "arrow_right_FILL0_wght400_GRAD0_opsz48.svg",
+                "done_FILL0_wght400_GRAD0_opsz48.svg"
+            ]
+        }
+    ]
+}

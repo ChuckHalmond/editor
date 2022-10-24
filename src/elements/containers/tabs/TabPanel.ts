@@ -41,8 +41,6 @@ class HTMLETabPanelElementBase extends HTMLElement implements HTMLETabPanelEleme
             :host {
                 display: block;
                 padding: 4px;
-                border: 1px solid var(--section-border-color);
-                border-top: none;
             }
             
             :host([hidden]) {
@@ -63,8 +61,6 @@ class HTMLETabPanelElementBase extends HTMLElement implements HTMLETabPanelEleme
     }
 
     connectedCallback(): void {
-        const {tabIndex} = this;
-        this.tabIndex = tabIndex;
         const {tab} = this;
         if (tab) {
             customElements.upgrade(tab);
