@@ -9,12 +9,16 @@
     "sourceMap": true,
     "strict": true,
     "declaration": true,
-    "rootDir": "./",
-    "baseUrl": "./src",
+    "declarationDir": "./types",
+    "rootDir": "./src",
+    "baseUrl": "./",
     "skipLibCheck": true,
-    "esModuleInterop" : true,
-    "allowSyntheticDefaultImports" : true
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
+  "include": [
+    "./src/**/*"
+  ],
   "exclude": [
     "./lib",
     "./node_modules"
