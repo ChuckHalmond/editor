@@ -1,4 +1,6 @@
-:root {
+:root,
+::after,
+::before {
     --font-color: black;
     
     --icon-size: 18px;
