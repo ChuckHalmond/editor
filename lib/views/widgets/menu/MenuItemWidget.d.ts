@@ -58,7 +58,7 @@ declare var menuItemWidget: {
             hasIcon: boolean;
             hasArrow: boolean;
         };
-        checkbox: {
+        submenu: {
             role: string;
             hasIcon: boolean;
             hasArrow: boolean;
@@ -68,7 +68,7 @@ declare var menuItemWidget: {
             hasIcon: boolean;
             hasArrow: boolean;
         };
-        submenu: {
+        checkbox: {
             role: string;
             hasIcon: boolean;
             hasArrow: boolean;
