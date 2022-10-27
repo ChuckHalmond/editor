@@ -3,7 +3,8 @@ const glob = require("glob");
 
 exports.default = {
     entry: glob.sync("./src/**/*.ts", {ignore: "./src/**/*.d.ts"}).reduce((acc, file) => {
-        acc[file.replace(/^\.\/src\//, "")] = file;
+        const filename = file.replace(/^\.\/src\//, "");
+        acc[filename.substring(0, filename.lastIndexOf("."))] = file;
         return acc;
       }, {}
     ),
