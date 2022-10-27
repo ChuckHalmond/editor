@@ -67,8 +67,6 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
             element("slot")
         );
         style = /*css*/`
-            @import "../../../../../css/theme.css";
-            
             :host {
                 display: block;
             }
