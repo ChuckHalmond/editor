@@ -27,7 +27,13 @@ exports.default = {
             path.join(__dirname, "./")
         ]
     },
+    experiments: {
+        outputModule: true,
+    },
     output: {
+        library: {
+            type: "module"
+        },
         filename: "[name].js",
         path: path.resolve(__dirname, "./lib"),
     }
