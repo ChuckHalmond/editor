@@ -1,4 +1,3 @@
-import { themeStylesheet } from "../../../Theme";
 import { CustomElement, element, AttributeProperty, QueryProperty } from "../../Element";
 import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
 
@@ -97,6 +96,7 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
             :host {
                 display: block;
                 user-select: none;
+                --my-url: url("./");
             }
             
             :host([droptarget]) {
@@ -169,9 +169,9 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
     constructor() {
         super();
         const shadowRoot = this.attachShadow({mode: "open"});
-        const internalStylesheet = new CSSStyleSheet();
-        internalStylesheet.replace(style);
-        shadowRoot.adoptedStyleSheets = [internalStylesheet, themeStylesheet];
+        const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
