@@ -3,6 +3,10 @@ import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
 
 export { HTMLETreeItemElement };
 
+import * as icon from "assets/add_a_photo_FILL0_wght400_GRAD0_opsz48.svg";
+
+console.log(icon);
+
 interface HTMLETreeItemElementConstructor {
     prototype: HTMLETreeItemElement;
     new(): HTMLETreeItemElement;
@@ -96,7 +100,6 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
             :host {
                 display: block;
                 user-select: none;
-                --my-url: url("./");
             }
             
             :host([droptarget]) {
