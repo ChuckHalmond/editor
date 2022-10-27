@@ -1,12 +1,8 @@
 import { CustomElement, element, AttributeProperty, QueryProperty } from "../../Element";
 import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
-
-export { HTMLETreeItemElement };
-
-import * as icon from "assets/add_a_photo_FILL0_wght400_GRAD0_opsz48.svg";
 import { themeStylesheet } from "../../../stylesheets/Theme";
 
-console.log(icon);
+export { HTMLETreeItemElement };
 
 interface HTMLETreeItemElementConstructor {
     prototype: HTMLETreeItemElement;
