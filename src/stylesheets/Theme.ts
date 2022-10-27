@@ -5,6 +5,7 @@ import * as arrowDropUp from "../../assets/arrow_drop_up_FILL0_wght400_GRAD0_ops
 export { themeStylesheet };
 
 const themeStylesheet = new CSSStyleSheet();
+console.log(arrowRight);
 themeStylesheet.replace(/*css*/`
     :root {
         --font-color: black;
