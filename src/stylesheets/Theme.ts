@@ -1,11 +1,10 @@
-import * as arrowRight from "../../assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg";
-import * as arrowDropDown from "../../assets/arrow_drop_down_FILL0_wght400_GRAD0_opsz48.svg";
-import * as arrowDropUp from "../../assets/arrow_drop_up_FILL0_wght400_GRAD0_opsz48.svg";
+import arrowRight from "../../assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg";
+import arrowDropDown from "../../assets/arrow_drop_down_FILL0_wght400_GRAD0_opsz48.svg";
+import arrowDropUp from "../../assets/arrow_drop_up_FILL0_wght400_GRAD0_opsz48.svg";
 
 export { themeStylesheet };
 
 const themeStylesheet = new CSSStyleSheet();
-console.log(arrowRight);
 themeStylesheet.replace(/*css*/`
     :root {
         --font-color: black;
