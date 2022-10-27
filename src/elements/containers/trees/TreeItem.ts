@@ -173,7 +173,7 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
         adoptedStylesheet.replace(style).then(
             (stylesheet) => {
                 stylesheet.insertRule(
-                    themeStylesheet.cssRules[0].cssText
+                    themeStylesheet.cssRules[0].cssText.replace(":root", ":host")
                 );
             }
         );
