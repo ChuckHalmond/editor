@@ -1,29 +1,29 @@
-const path = require("path");
-const glob = require("glob");
+// const path = require("path");
+// const glob = require("glob");
 
-exports.default = {
-    entry: glob.sync("./src/**/*.ts", {ignore: "./src/**/*.d.ts"}),
-    devtool: "source-map",
-    module: {
-        rules: [
-            {
-                test: /\.ts$/,
-                use: "ts-loader"
-            },
-            {
-                test: /\.svg/,
-                type: "asset/resource"
-            }
-        ],
-    },
-    resolve: {
-        extensions: [".ts", ".js"],
-        modules: [
-            path.join(__dirname, "./")
-        ]
-    },
-    output: {
-        filename: "[name].js",
-        path: path.resolve(__dirname, "./lib"),
-    }
-};
+// exports.default = {
+//     entry: glob.sync("./src/**/*.ts", {ignore: "./src/**/*.d.ts"}),
+//     devtool: "source-map",
+//     module: {
+//         rules: [
+//             {
+//                 test: /\.ts$/,
+//                 use: "ts-loader"
+//             },
+//             {
+//                 test: /\.svg/,
+//                 type: "asset/resource"
+//             }
+//         ],
+//     },
+//     resolve: {
+//         extensions: [".ts", ".js"],
+//         modules: [
+//             path.join(__dirname, "./")
+//         ]
+//     },
+//     output: {
+//         filename: "[name].js",
+//         path: path.resolve(__dirname, "./lib"),
+//     }
+// };
