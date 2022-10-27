@@ -58,12 +58,12 @@ declare var menuItemWidget: {
             hasIcon: boolean;
             hasArrow: boolean;
         };
-        checkbox: {
+        radio: {
             role: string;
             hasIcon: boolean;
             hasArrow: boolean;
         };
-        radio: {
+        checkbox: {
             role: string;
             hasIcon: boolean;
             hasArrow: boolean;
