@@ -4,6 +4,7 @@ import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
 export { HTMLETreeItemElement };
 
 import * as icon from "assets/add_a_photo_FILL0_wght400_GRAD0_opsz48.svg";
+import { themeStylesheet } from "../../../stylesheets/Theme";
 
 console.log(icon);
 
@@ -174,7 +175,7 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
         const shadowRoot = this.attachShadow({mode: "open"});
         const adoptedStylesheet = new CSSStyleSheet();
         adoptedStylesheet.replace(style);
-        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet, themeStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
