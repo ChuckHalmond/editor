@@ -170,6 +170,7 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
         super();
         const shadowRoot = this.attachShadow({mode: "open"});
         const adoptedStylesheet = new CSSStyleSheet();
+        adoptedStylesheet.replace(style);
         shadowRoot.adoptedStyleSheets = [adoptedStylesheet, themeStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
