@@ -15,7 +15,9 @@ themeStylesheet.replace(/*css*/`
     }
 
     :root {
+        font-size: 14px;
         font-family: "Open Sans";
+
         --font-color: black;
         
         --icon-size: 18px;
