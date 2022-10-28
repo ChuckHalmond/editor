@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
     "outDir": "./lib",
+    "typeRoots": [
+      "./types"
+    ],
     "target": "es2021",
     "experimentalDecorators": true,
     "noImplicitAny": true,
