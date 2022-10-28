@@ -1,9 +1,6 @@
 {
   "compilerOptions": {
     "outDir": "./lib",
-    "typeRoots": [
-      "./types"
-    ],
     "target": "es2021",
     "experimentalDecorators": true,
     "noImplicitAny": true,
@@ -19,7 +16,8 @@
     "allowSyntheticDefaultImports": true
   },
   "include": [
-    "./src"
+    "./src",
+    "./types"
   ],
   "exclude": [
     "./node_modules",
