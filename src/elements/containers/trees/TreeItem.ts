@@ -1,6 +1,6 @@
 import { CustomElement, element, AttributeProperty, QueryProperty } from "../../Element";
 import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
-import { themeStylesheet } from "../../../stylesheets/Theme";
+import { themeStylesheet } from "../../../web/Theme";
 
 export { HTMLETreeItemElement };
 
