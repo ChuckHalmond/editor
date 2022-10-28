@@ -49,7 +49,7 @@ class HTMLEGridHeadElementBase extends HTMLElement implements HTMLEGridHeadEleme
         );
         style = /*css*/`
             :host {
-                display: table-row-group;
+                display: table-header-group;
             }
         `;
     }
