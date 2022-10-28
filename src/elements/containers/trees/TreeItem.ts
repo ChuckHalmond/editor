@@ -1,6 +1,5 @@
 import { CustomElement, element, AttributeProperty, QueryProperty } from "../../Element";
 import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
-import { themeStylesheet } from "../../../web/Theme";
 
 export { HTMLETreeItemElement };
 
@@ -171,7 +170,7 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
         const shadowRoot = this.attachShadow({mode: "open"});
         const adoptedStylesheet = new CSSStyleSheet();
         adoptedStylesheet.replace(style);
-        shadowRoot.adoptedStyleSheets = [adoptedStylesheet, themeStylesheet];
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
