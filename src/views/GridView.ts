@@ -5,6 +5,7 @@ import { HTMLEGridCellElement } from "../elements/containers/grid/GridCell";
 import { HTMLEGridElement } from "../elements/containers/grid/Grid";
 import { HTMLEGridRowElement } from "../elements/containers/grid/GridRow";
 import { HTMLEWidthSashElement } from "../elements/misc/WidthSash";
+import { HTMLEMenuElement } from "../elements/containers/menus/Menu";
 
 export { GridModel };
 export { GridRowModel };
@@ -13,6 +14,7 @@ export { GridView };
 
 HTMLEGridElement;
 HTMLEWidthSashElement;
+HTMLEMenuElement;
 
 interface GridInit {
     rows: GridRowModel[];
@@ -180,7 +182,6 @@ class GridViewBase extends View implements GridView {
             
             e-gridcell[type="gridcell"] {
                 max-width: 0;
-            
                 overflow: clip;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -317,12 +318,6 @@ class GridViewBase extends View implements GridView {
     renderShadow(): Node {
         const {model} = this;
         return fragment(
-            element("link", {
-                attributes: {
-                    rel: "stylesheet",
-                    href: "/css/main.css"
-                }
-            }),
             element("div", {
                 children: element("input", {
                     attributes: {
