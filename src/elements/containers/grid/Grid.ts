@@ -36,6 +36,9 @@ declare global {
     }
 }
 
+HTMLEGridHeadElement;
+HTMLEGridBodyElement;
+
 var shadowTemplate: HTMLTemplateElement;
 var style: string;
 
