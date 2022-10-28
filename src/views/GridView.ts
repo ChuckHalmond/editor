@@ -4,6 +4,7 @@ import { View } from "./View";
 import { HTMLEGridCellElement } from "../elements/containers/grid/GridCell";
 import { HTMLEGridElement } from "../elements/containers/grid/Grid";
 import { HTMLEGridRowElement } from "../elements/containers/grid/GridRow";
+import { HTMLEWidthSashElement } from "../elements/misc/WidthSash";
 
 export { GridModel };
 export { GridRowModel };
@@ -11,6 +12,7 @@ export { GridColumnModel };
 export { GridView };
 
 HTMLEGridElement;
+HTMLEWidthSashElement;
 
 interface GridInit {
     rows: GridRowModel[];
