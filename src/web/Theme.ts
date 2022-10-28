@@ -2,11 +2,20 @@ import arrowRight from "../../assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg"
 import arrowDropDown from "../../assets/arrow_drop_down_FILL0_wght400_GRAD0_opsz48.svg";
 import arrowDropUp from "../../assets/arrow_drop_up_FILL0_wght400_GRAD0_opsz48.svg";
 
+import openSans from "../../assets/fonts/Open_Sans/OpenSans-VariableFont_wdth,wght.ttf";
+
 export { themeStylesheet };
 
 const themeStylesheet = new CSSStyleSheet();
 themeStylesheet.replace(/*css*/`
+
+    @font-face {
+        font-family: "Open Sans";
+        src: url(${openSans}) format("truetype")
+    }
+    
     :root {
+        font-family: "Open Sans";
         --font-color: black;
         
         --icon-size: 18px;
