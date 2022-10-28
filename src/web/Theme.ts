@@ -13,8 +13,8 @@ themeStylesheet.replace(/*css*/`
         font-family: "Open Sans";
         src: url(${openSans}) format("truetype")
     }
-    
-    :root {
+
+    :host {
         font-family: "Open Sans";
         --font-color: black;
         
