@@ -10,6 +10,8 @@ export { GridRowModel };
 export { GridColumnModel };
 export { GridView };
 
+HTMLEGridElement;
+
 interface GridInit {
     rows: GridRowModel[];
     columns: GridColumnModel[];

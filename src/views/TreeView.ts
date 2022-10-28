@@ -11,6 +11,8 @@ export { TreeModel };
 export { TreeItemModel };
 export { TreeView };
 
+HTMLETreeElement;
+
 interface TreeModelInit {
     items: TreeItemModel[];
     sortFunction?: (item_a: TreeItemModel, item_b: TreeItemModel) => number;
