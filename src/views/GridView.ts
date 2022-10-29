@@ -6,6 +6,7 @@ import { HTMLEGridElement } from "../elements/containers/grid/Grid";
 import { HTMLEGridRowElement } from "../elements/containers/grid/GridRow";
 import { HTMLEWidthSashElement } from "../elements/misc/WidthSash";
 import { HTMLEMenuElement } from "../elements/containers/menus/Menu";
+import { resetStylesheet } from "../stylesheets/Reset";
 
 export { GridModel };
 export { GridRowModel };
@@ -277,7 +278,7 @@ class GridViewBase extends View implements GridView {
         const shadowRoot = this.attachShadow({mode: "open"});
         const adoptedStylesheet = new CSSStyleSheet();
         adoptedStylesheet.replace(style);
-        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet, resetStylesheet];
         this.setModel(model ?? new GridModel());
     }
 

@@ -98,6 +98,7 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
         );
         style = /*css*/`
             :host {
+                position: relative;
                 display: inline-block;
                 user-select: none;
                 line-height: 22px;
@@ -139,7 +140,7 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
             
             [part="box"] {
                 z-index: 1;
-                position: fixed;
+                position: absolute;
             
                 display: block;
                 padding: 6px 0;
@@ -305,22 +306,31 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
     }
     
     #setSelectedOption(option: HTMLEOptionElement | null) {
-        const {label, value} = option ?? {
-            label: "",
-            value: ""
-        };
+        const {label, value} = option ?? {label: "", value: ""};
         const {internals} = this;
         this.#value().textContent = label;
         internals.setFormValue(value);
     }
 
     #positionBox(): void {
-        const box = this.#box()
-        const {style: optionsStyle} = box;
-        const {bottom, left} = this.getBoundingClientRect();
-        const {scrollX, scrollY} = window;
-        optionsStyle.setProperty("top", `${bottom + scrollY}px`);
-        optionsStyle.setProperty("left", `${left + scrollX}px`);
+        const box = this.#box();
+        const {offsetLeft, offsetTop} = this;
+        const {width, height} = this.getBoundingClientRect();
+        const {style: boxStyle} = box;
+        const {width: boxWidth, height: boxHeight} = box.getBoundingClientRect();
+        const {clientWidth, clientHeight} = document.body;
+        const overflowX = offsetLeft + width + boxWidth - clientWidth;
+        const overflowY = offsetTop + boxHeight - clientHeight;
+        boxStyle.setProperty("left", `${
+            overflowX > 0 ?
+            width - boxWidth :
+            0
+        }px`);
+        boxStyle.setProperty("top", `${
+            overflowY > 0 ?
+            -boxHeight :
+            height
+        }px`);
     }
 
     #handleClickEvent(event: MouseEvent): void {

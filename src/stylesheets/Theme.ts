@@ -1,7 +1,7 @@
 import arrowRight from "../../assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg";
 import arrowDropDown from "../../assets/arrow_drop_down_FILL0_wght400_GRAD0_opsz48.svg";
 import arrowDropUp from "../../assets/arrow_drop_up_FILL0_wght400_GRAD0_opsz48.svg";
-
+import done from "../../assets/done_FILL0_wght400_GRAD0_opsz48.svg";
 import openSans from "../../assets/fonts/Open_Sans/OpenSans-VariableFont_wdth,wght.ttf";
 
 export { themeStylesheet };
@@ -17,6 +17,12 @@ themeStylesheet.replace(/*css*/`
     :root {
         font-size: 14px;
         font-family: "Open Sans";
+
+        --arrow-right: url(${arrowRight});
+        --arrow-dropdown: url(${arrowDropDown});
+        --arrow-dropup: url(${arrowDropUp});
+        --done: url(${done});
+        --open-sans: url(${openSans});
 
         --font-color: black;
         
@@ -48,11 +54,11 @@ themeStylesheet.replace(/*css*/`
         --droptarget-item-color: hsl(203, 92%, 50%, 50%);
 
         --arrow-color: var(--font-color);
-        --arrow-icon-collapsed: url(${arrowRight});
-        --arrow-icon-expanded: url(${arrowDropDown});
+        --arrow-icon-collapsed: var(--arrow-right);
+        --arrow-icon-expanded: var(--arrow-dropdown);
 
         --sortorder-indicator-color: var(--font-color);
-        --sortorder-indicator-ascending: url(${arrowDropUp});
-        --sortorder-indicator-descending: url(${arrowDropDown});
+        --sortorder-indicator-ascending: var(--arrow-dropup);
+        --sortorder-indicator-descending: var(--arrow-dropdown);
     }
 `);

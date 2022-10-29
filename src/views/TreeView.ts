@@ -4,6 +4,7 @@ import { HTMLETreeElement } from "../elements/containers/trees/Tree";
 import { HTMLETreeItemElement } from "../elements/containers/trees/TreeItem";
 import { AttributeProperty, CustomElement, element, fragment, reactiveChildElements, reactiveElement } from "../elements/Element";
 import { ModelEvent, ModelList, ModelObject, ModelProperty } from "../models/Model";
+import { resetStylesheet } from "../stylesheets/Reset";
 import { View } from "./View";
 
 export { TreeItemModelList };
@@ -271,7 +272,7 @@ class TreeViewBase extends View implements TreeView {
         const shadowRoot = this.attachShadow({mode: "open"});
         const adoptedStylesheet = new CSSStyleSheet();
         adoptedStylesheet.replace(style);
-        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
+        shadowRoot.adoptedStyleSheets = [adoptedStylesheet, resetStylesheet];
         this.setModel(model ?? new TreeModel());
     }
 

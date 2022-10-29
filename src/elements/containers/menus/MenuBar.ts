@@ -51,6 +51,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
         );
         style = /*css*/`
             :host {
+                position: relative;
                 display: flex;
                 flex-direction: row;
                 width: max-content;

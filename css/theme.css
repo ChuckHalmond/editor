@@ -1,4 +1,10 @@
+@font-face {
+    font-family: "Open Sans";
+    src: url(${openSans}) format("truetype")
+}
+
 :root {
+    font-size: 14px;
     font-family: "Open Sans";
     --font-color: black;
     

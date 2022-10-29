@@ -60,6 +60,7 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
         );
         style = /*css*/`
             :host {
+                position: relative;
                 display: inline-block;
                 padding: 2px;
                 line-height: 18px;
@@ -149,27 +150,22 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
     #positionMenu(): void {
         const {menu} = this;
         if (menu !== null) {
+            const {width, height} = this.getBoundingClientRect();
             const {style: menuStyle} = menu;
-            let {top: itemTop, bottom: itemBottom, left: itemLeft, right: itemRight} = this.getBoundingClientRect();
             const {width: menuWidth, height: menuHeight} = menu.getBoundingClientRect();
             const {clientWidth, clientHeight} = document.body;
-            const offsetParent = <HTMLElement>(menu.offsetParent ?? document.body);
-            const {offsetLeft, offsetTop} = offsetParent;
-            const overflowX = itemRight + menuWidth - clientWidth;
-            const overflowY = itemTop + menuHeight - clientHeight;
-            itemLeft -= offsetLeft;
-            itemRight -= offsetLeft;
-            itemTop -= offsetTop;
-            itemBottom -= offsetTop;
+            const {offsetLeft, offsetTop} = this;
+            const overflowX = offsetLeft + width + menuWidth - clientWidth;
+            const overflowY = offsetTop + menuHeight - clientHeight;
             menuStyle.setProperty("left", `${
                 overflowX > 0 ?
-                itemRight - menuWidth :
-                itemLeft
+                width - menuWidth :
+                0
             }px`);
             menuStyle.setProperty("top", `${
                 overflowY > 0 ?
-                itemTop - menuHeight :
-                itemBottom
+                -menuHeight  :
+                height
             }px`);
         }
     }

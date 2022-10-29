@@ -58,6 +58,7 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
         );
         style = /*css*/`
             :host {
+                position: relative;
                 display: flex;
             }
 
@@ -68,10 +69,6 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
                 transform: translateY(-100%);
                 box-sizing: border-box;
                 border-top: 2px solid var(--focused-item-outline-color);
-            }
-
-            ::slotted(e-tab) {
-                transform: translateY(1px);
             }
         `;
     }
@@ -105,15 +102,12 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
         if (tabToSelect) {
             this.#selectTab(tabToSelect);
             setTimeout(() => {
-                let {width: tabWidth, left: tabLeft, bottom: tabBottom} = tabToSelect.getBoundingClientRect();
-                const offsetParent = <HTMLElement>(tabToSelect.offsetParent ?? document.body);
-                const {offsetLeft, offsetTop} = offsetParent;
-                tabLeft -= offsetLeft;
-                tabBottom -= offsetTop;
+                const {width: tabWidth, height: tabHeight} = tabToSelect.getBoundingClientRect();
+                const {offsetLeft} = tabToSelect;
                 this.animate([{
                     width: `${tabWidth}px`,
-                    left: `${tabLeft}px`,
-                    top: `${tabBottom}px`
+                    left: `${offsetLeft}px`,
+                    top: `${tabHeight}px`
                 }], {
                     duration: 0,
                     fill: "forwards",
@@ -177,12 +171,17 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
         const targetTab = (<Element>target).closest("e-tab");
         if (targetTab) {
             targetTab.select();
-            const {width: tabWidth, left: tabLeft, bottom: tabBottom} = targetTab.getBoundingClientRect();
-            const {left: dialogLeft, top: dialogTop} = this.closest("dialog")?.getBoundingClientRect() ?? {left: 0, top: 0};
+            const {width: tabWidth, height: tabHeight} = targetTab.getBoundingClientRect();
+            const {offsetLeft} = targetTab;
+            console.log({
+                width: `${tabWidth}px`,
+                left: `${offsetLeft}px`,
+                top: `${tabHeight}px`
+            });
             this.animate([{
                 width: `${tabWidth}px`,
-                left: `${tabLeft - dialogLeft}px`,
-                top: `${tabBottom - dialogTop}px`
+                left: `${offsetLeft}px`,
+                top: `${tabHeight}px`
             }], {
                 duration: SELECT_ANIMATION_DURATION,
                 fill: "forwards",

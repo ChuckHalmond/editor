@@ -32,8 +32,7 @@ e-menubutton::part(content) {
     --icon-image: url("../assets/more_horiz_FILL0_wght700_GRAD0_opsz48.svg");
 }
 
-e-menuitem[type="submenu"],
-.menuitem:is(.menuitem-submenu) {
+e-menuitem[type="submenu"] {
     --arrow-color: black;
     --arrow-image: url("../assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg");
 }
