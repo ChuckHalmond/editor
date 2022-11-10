@@ -1,11 +1,10 @@
+import { DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR, DEFAULT_THEME_SELECTED_ITEM_COLOR, DEFAULT_THEME_HOVERED_ITEM_COLOR, DEFAULT_THEME_FOCUSED_ITEM_COLOR } from "./Theme";
+
 export { resetStylesheet };
 
 const resetStylesheet = new CSSStyleSheet();
 resetStylesheet.replace(/*css*/`
-    :root {
-        accent-color: var(--accent-color);
-    }
-
+    
     html.fullscreen,
     html.fullscreen > body {
         height: 100%;
@@ -23,25 +22,9 @@ resetStylesheet.replace(/*css*/`
     ::backdrop {
         background-color: rgba(120, 120, 120, 0.2);
     }
-    
-    /*
-    *:focus-visible {
-        outline: none;
-    }
-    */
-    /*
-    :focus-visible {
-        outline: 2px solid var(--focused-item-outline-color);
-        outline-offset: 1px;
-    }
-    */
 
     ::selection {
-        background-color: var(--selected-item-color);
-    }
-
-    ::marker {
-        color: var(--accent-color);
+        background-color: ${DEFAULT_THEME_SELECTED_ITEM_COLOR};
     }
     
     input,
@@ -60,7 +43,7 @@ resetStylesheet.replace(/*css*/`
     }
 
     input {
-        border: 1px solid var(--item-border-color);
+        border: 1px solid grey;
     }
 
     legend {
@@ -69,15 +52,15 @@ resetStylesheet.replace(/*css*/`
 
     select,
     progress {
-        height: var(--padded-line-height);
+        height: 22px;
     }
 
     input {
-        height: var(--line-height);
+        height: 18px;
     }
 
     input:is([type="radio"], [type="checkbox"]) {
-        width: var(--line-height); 
+        width: 18px; 
     }
 
     input[type="color" i] {
@@ -100,7 +83,7 @@ resetStylesheet.replace(/*css*/`
     dialog,
     fieldset {
         padding: 8px;
-        border: 1px solid var(--section-border-color);
+        border: 1px solid lightgrey;
     }
 
     button[type="submit"] {
@@ -108,19 +91,19 @@ resetStylesheet.replace(/*css*/`
     }
 
     button:hover {
-        background-color: var(--hovered-item-color);
+        background-color: var(--theme-hovered-item-color, ${DEFAULT_THEME_HOVERED_ITEM_COLOR});
     }
 
     button:not([aria-pressed]):focus,
     button[aria-pressed="true"] {
-        background-color: var(--focused-item-color);
+        background-color: var(--theme-focused-item-color, ${DEFAULT_THEME_FOCUSED_ITEM_COLOR});
     }
 
     button {
-        height: var(--line-height);
+        height: 18px;
         appearance: none;
         background: none;
-        border: 1px solid var(--focused-item-outline-color);
+        border: 1px solid var(--theme-focused-item-outline-color, ${DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR});
     }
 
     table {
@@ -130,15 +113,5 @@ resetStylesheet.replace(/*css*/`
     ul {
         padding: 0;
         margin: 0;
-    }
-
-    e-menuitem[type="submenu"] {
-        --arrow-color: black;
-        --arrow-image: var(--arrow-right);
-    }
-
-    e-menuitem:is([type="checkbox"], [type="radio"])[checked] {
-        --icon-color: black;
-        --icon-image: var(--done);
     }
 `);

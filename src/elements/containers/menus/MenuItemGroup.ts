@@ -1,6 +1,8 @@
 import { element, CustomElement, AttributeProperty } from "../../Element";
 import { HTMLEMenuItemElement, EMenuItem } from "./MenuItem";
 
+import "./MenuItem";
+
 export { HTMLEMenuItemGroupElement };
 export { EMenuItemGroup };
 

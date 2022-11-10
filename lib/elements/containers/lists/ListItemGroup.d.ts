@@ -1,3 +1,4 @@
+import "./ListItem";
 export { HTMLEListItemGroupElement };
 interface HTMLEListItemGroupElementConstructor {
     prototype: HTMLEListItemGroupElement;

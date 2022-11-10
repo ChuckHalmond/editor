@@ -1,4 +1,4 @@
-import { HTMLESelectElement } from "../../controls/forms/Select";
+import { HTMLESelectElement } from "../../controls/select/Select";
 import { HTMLEMenuButtonElement } from "../menus/MenuButton";
 export { HTMLEToolBarItemElement };
 export { EToolBarItem };

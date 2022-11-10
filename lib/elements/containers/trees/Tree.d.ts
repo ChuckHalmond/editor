@@ -1,4 +1,6 @@
 import { HTMLETreeItemElement } from "./TreeItem";
+import "./TreeItem";
+import "./TreeItemGroup";
 export { HTMLETreeElement };
 interface HTMLETreeElementConstructor {
     prototype: HTMLETreeElement;

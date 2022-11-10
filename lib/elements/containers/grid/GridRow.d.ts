@@ -1,5 +1,5 @@
-import { HTMLEMenuElement } from "../menus/Menu";
 import { HTMLEGridCellElement } from "./GridCell";
+import "./GridCell";
 export { HTMLEGridRowElement };
 interface HTMLEGridRowElementConstructor {
     prototype: HTMLEGridRowElement;
@@ -7,7 +7,6 @@ interface HTMLEGridRowElementConstructor {
 }
 interface HTMLEGridRowElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly menu: HTMLEMenuElement | null;
     name: string;
     active: boolean;
     selected: boolean;

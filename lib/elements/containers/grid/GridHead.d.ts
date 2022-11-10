@@ -1,5 +1,7 @@
 import { HTMLEGridCellElement } from "./GridCell";
 import { HTMLEGridRowElement } from "./GridRow";
+import "./GridRow";
+import "./GridCell";
 export { HTMLEGridHeadElement };
 interface HTMLEGridHeadElementConstructor {
     prototype: HTMLEGridHeadElement;

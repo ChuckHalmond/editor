@@ -1,6 +1,11 @@
+import { DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR } from "../../../stylesheets/Theme";
 import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEMenuItemElement } from "./MenuItem";
 import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
+
+import "./Menu";
+import "./MenuItem";
+import "./MenuItemGroup";
 
 export { HTMLEMenuBarElement };
 
@@ -58,7 +63,7 @@ class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement
             }
             
             :host(:focus) {
-                outline: 1px solid var(--focused-item-outline-color);
+                outline: 1px solid var(--theme-focused-item-outline-color, ${DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR});
                 outline-offset: -1px;
             }
         `;

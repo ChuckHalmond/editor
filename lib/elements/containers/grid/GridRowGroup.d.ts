@@ -1,3 +1,4 @@
+import "./GridRow";
 export { HTMLEGridRowGroupElement };
 interface HTMLEGridRowGroupElementConstructor {
     prototype: HTMLEGridRowGroupElement;

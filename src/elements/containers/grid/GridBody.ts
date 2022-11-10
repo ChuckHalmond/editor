@@ -2,6 +2,9 @@ import { CustomElement, element } from "../../Element";
 import { HTMLEGridCellElement } from "./GridCell";
 import { HTMLEGridRowElement } from "./GridRow";
 
+import "./GridRow";
+import "./GridCell";
+
 export { HTMLEGridBodyElement };
 
 interface HTMLEGridBodyElementConstructor {

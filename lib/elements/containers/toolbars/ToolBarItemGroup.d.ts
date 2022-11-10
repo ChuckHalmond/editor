@@ -1,3 +1,4 @@
+import "./ToolBarItem";
 export { HTMLEToolBarItemGroupElement };
 interface HTMLEToolBarItemGroupElementConstructor {
     prototype: HTMLEToolBarItemGroupElement;

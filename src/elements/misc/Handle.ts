@@ -1,3 +1,4 @@
+import { DEFAULT_THEME_SELECTED_ITEM_COLOR } from "../../stylesheets/Theme";
 import { CustomElement, AttributeProperty, element } from "../Element";
 
 export { HTMLEHandleElement };
@@ -45,7 +46,7 @@ class HTMLEHandleElementBase extends HTMLElement implements HTMLEHandleElement {
                 width: 24px;
                 height: 12px;
                 
-                background-color: var(--selected-item-color);
+                background-color: var(--theme-selected-item-color, ${DEFAULT_THEME_SELECTED_ITEM_COLOR});
 
                 -webkit-mask-image: url("/assets/dots.png");
                 mask-image: url("/assets/dots.png");

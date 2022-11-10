@@ -1,5 +1,8 @@
+import { DEFAULT_THEME_HOVERED_ITEM_COLOR } from "../../../stylesheets/Theme";
 import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLETabPanelElement } from "./TabPanel";
+
+import "./TabPanel";
 
 export { HTMLETabElement };
 
@@ -51,7 +54,11 @@ class HTMLETabElementBase extends HTMLElement implements HTMLETabElement {
     
     get panel(): HTMLETabPanelElement | null {
         const {controls} = this;
-        return (<Document | ShadowRoot>this.getRootNode()).querySelector<HTMLETabPanelElement>(`e-tabpanel[id='${controls}']`);
+        const rootNode = this.getRootNode();
+        if (rootNode instanceof Document || rootNode instanceof ShadowRoot) {
+            return rootNode.querySelector<HTMLETabPanelElement>(`e-tabpanel[id='${controls}']`);
+        }
+        return null;
     }
 
     static {
@@ -73,12 +80,7 @@ class HTMLETabElementBase extends HTMLElement implements HTMLETabElement {
             }
             
             :host(:hover) {
-                background-color: var(--hovered-item-color);
-            }
-            
-            :host(:focus-visible):host-context(e-tablist:focus-within) {
-                outline: 1px solid var(--focused-item-outline-color);
-                outline-offset: -1px;
+                background-color: var(--theme-hovered-item-color, ${DEFAULT_THEME_HOVERED_ITEM_COLOR});
             }
         `;
     }

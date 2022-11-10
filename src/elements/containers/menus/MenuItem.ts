@@ -1,3 +1,4 @@
+import { DEFAULT_THEME_CHECKED_IMAGE, DEFAULT_THEME_ACTIVATED_ITEM_COLOR, DEFAULT_THEME_FOCUSED_ITEM_COLOR, DEFAULT_THEME_HOVERED_ITEM_COLOR, DEFAULT_THEME_ARROW_RIGHT_IMAGE } from "../../../stylesheets/Theme";
 import { CustomElement, AttributeProperty, QueryProperty, element } from "../../Element";
 import { HTMLEMenuElement } from "./Menu";
 
@@ -116,11 +117,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
             }
             
             :host(:focus-within) {
-                background-color: var(--focused-item-color);
-            }
-
-            :host(:focus-visible) {
-                outline: none;
+                background-color: ${DEFAULT_THEME_FOCUSED_ITEM_COLOR};
             }
             
             :host(:is([type="menu"], [type="submenu"])) ::slotted([slot="menu"]) {
@@ -129,8 +126,12 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
             }
             
             :host(:is([type="menu"], [type="submenu"]):not([expanded])) ::slotted([slot="menu"]) {
+                width: 0;
+                height: 0;
+                padding: 0;
                 opacity: 0;
                 pointer-events: none;
+                overflow: hidden;
             }
             
             :host([type="submenu"]) [part="icon"] {
@@ -142,14 +143,16 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                 display: none;
             }
             
-            :host(:is([type="checkbox"], [type="radio"])[checked]) {
-                --icon-color: black;
-                --icon-image: url("/assets/done_FILL0_wght400_GRAD0_opsz48.svg");
+            :host(:is([type="checkbox"], [type="radio"])[checked]) [part="icon"]::before {
+                -webkit-mask-image: var(--theme-arrow-done-image, url(${DEFAULT_THEME_CHECKED_IMAGE}));
+                mask-image: var(--theme-arrow-done-image, url(${DEFAULT_THEME_CHECKED_IMAGE}));
+                background-color: black;
             }
             
-            :host([type="submenu"]) {
-                --arrow-color: black;
-                --arrow-image: url("/assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg");
+            :host([type="submenu"]) [part="arrow"]::after {
+                -webkit-mask-image: var(--theme-arrow-right-image, url(${DEFAULT_THEME_ARROW_RIGHT_IMAGE}));
+                mask-image: var(--theme-arrow-right-image, url(${DEFAULT_THEME_ARROW_RIGHT_IMAGE}));
+                background-color: black;
             }
             
             [part="icon"],
@@ -177,7 +180,7 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
             }
             
             :host(:is(:not([type]), [type="button"], [type="radio"], [type="checkbox"])[checked]) [part="icon"] {
-                background-color: var(--activated-item-color);
+                background-color: var(--theme-activated-item-color, ${DEFAULT_THEME_ACTIVATED_ITEM_COLOR});
             }
             
             :host(:is(:not([type]), [type="button"], [type="radio"], [type="checkbox"])) [part="icon"]::before {
@@ -187,10 +190,10 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                 content: "";
                 mask-size: 18px 18px;
                 -webkit-mask-size: 18px 18px;
-                background-color: var(--icon-color, none);
-                -webkit-mask-image: var(--icon-image, none);
-                mask-image: var(--icon-image, none);
-                filter: var(--icon-filter, none);
+
+                mask-image: none;
+                -webkit-mask-image: none;
+                background-color: none;
             }
             
             [part="arrow"] {
@@ -209,15 +212,15 @@ class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemEleme
                 content: "";
                 mask-size: 18px 18px;
                 -webkit-mask-size: 18px 18px;
-                background-color: var(--arrow-color, none);
-                -webkit-mask-image: var(--arrow-image, none);
-                mask-image: var(--arrow-image, none);
-                filter: var(--arrow-filter, none);
+
+                mask-image: none;
+                -webkit-mask-image: none;
+                background-color: none;
             }
 
             :host(:hover):host-context(e-menubar:focus),
             :host(:hover):host-context(e-menubar:not(:focus-within)) {
-                background-color: var(--hovered-item-color);
+                background-color: var(--theme-hovered-item-color, ${DEFAULT_THEME_HOVERED_ITEM_COLOR});
             }
         `;
     }

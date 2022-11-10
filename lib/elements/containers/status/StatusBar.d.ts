@@ -1,4 +1,6 @@
 import { HTMLEStatusItemElement } from "./StatusItem";
+import "./StatusItem";
+import "./StatusItemGroup";
 export { HTMLEStatusBarElement };
 interface HTMLEStatusBarElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;

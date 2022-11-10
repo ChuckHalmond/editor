@@ -1,6 +1,8 @@
 import { CustomElement, element } from "../../Element";
 import { HTMLEListItemElement } from "./ListItem";
 
+import "./ListItem";
+
 export { HTMLEListItemGroupElement };
 
 interface HTMLEListItemGroupElementConstructor {

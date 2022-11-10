@@ -1,6 +1,10 @@
+import { DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR } from "../../../stylesheets/Theme";
 import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEListItemElement } from "./ListItem";
 import { HTMLEListItemGroupElement } from "./ListItemGroup";
+
+import "./ListItem";
+import "./ListItemGroup";
 
 export { HTMLEListElement };
 
@@ -81,7 +85,7 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
             }
             
             :host(:focus) {
-                outline: 1px solid var(--focused-item-outline-color);
+                outline: 1px solid var(--theme-focused-item-outline-color, ${DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR});
                 outline-offset: -1px;
             }
         `;
@@ -311,15 +315,20 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
 
     #handleDragLeaveEvent(event: DragEvent): void {
         const {relatedTarget} = event;
-        let rootNode = <Node>relatedTarget;
-        while (!(rootNode instanceof HTMLEListItemElement || rootNode instanceof Document)) {
-            rootNode = rootNode.getRootNode();
-            if (rootNode instanceof ShadowRoot) {
-                rootNode = rootNode.host;
+        if (relatedTarget instanceof Element) {
+            const parentItem  = relatedTarget.closest("e-listitem");
+            if (!parentItem) {
+                let rootNode = <Node>relatedTarget;
+                while (!(rootNode instanceof HTMLEListItemElement || rootNode instanceof Document)) {
+                    rootNode = rootNode.getRootNode();
+                    if (rootNode instanceof ShadowRoot) {
+                        rootNode = rootNode.host;
+                    }
+                }
+                if (rootNode instanceof Document) {
+                    this.#setDropTargetItem(null);
+                }
             }
-        }
-        if (rootNode instanceof Document) {
-            this.#setDropTargetItem(null);
         }
     }
 

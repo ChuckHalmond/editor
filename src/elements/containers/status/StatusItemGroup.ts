@@ -1,6 +1,8 @@
 
 import { element, CustomElement, AttributeProperty } from "../../Element";
 
+import "./StatusItem";
+
 export { HTMLEStatusItemGroupElement };
 
 interface HTMLEStatusItemGroupElementConstructor {

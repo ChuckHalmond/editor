@@ -1,4 +1,5 @@
 import { HTMLETabPanelElement } from "./TabPanel";
+import "./TabPanel";
 export { HTMLETabElement };
 interface HTMLETabElementConstructor {
     prototype: HTMLETabElement;

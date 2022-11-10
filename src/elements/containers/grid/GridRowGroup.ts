@@ -1,5 +1,7 @@
 import { CustomElement, element } from "../../Element";
-import { HTMLEGridCellElement } from "./GridCell";
+import { HTMLEGridRowElement } from "./GridRow";
+
+import "./GridRow";
 
 export { HTMLEGridRowGroupElement };
 
@@ -54,10 +56,10 @@ class HTMLEGridRowGroupElementBase extends HTMLElement implements HTMLEGridRowGr
 
     #handleSlotChangeEvent(event: Event): void {
         const {target} = event;
-        const assignedItems = <HTMLEGridCellElement[]>(<HTMLSlotElement>target)
+        const assignedItems = <HTMLEGridRowElement[]>(<HTMLSlotElement>target)
             .assignedElements()
             .filter(
-                element_i => element_i instanceof HTMLEGridCellElement
+                element_i => element_i instanceof HTMLEGridRowElement
             );
         assignedItems.forEach((item_i, i) => {
             item_i.posinset = i;

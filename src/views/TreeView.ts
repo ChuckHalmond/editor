@@ -5,14 +5,15 @@ import { HTMLETreeItemElement } from "../elements/containers/trees/TreeItem";
 import { AttributeProperty, CustomElement, element, fragment, reactiveChildElements, reactiveElement } from "../elements/Element";
 import { ModelEvent, ModelList, ModelObject, ModelProperty } from "../models/Model";
 import { resetStylesheet } from "../stylesheets/Reset";
+import { DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR } from "../stylesheets/Theme";
 import { View } from "./View";
+
+import "../elements/containers/trees";
 
 export { TreeItemModelList };
 export { TreeModel };
 export { TreeItemModel };
 export { TreeView };
-
-HTMLETreeElement;
 
 interface TreeModelInit {
     items: TreeItemModel[];
@@ -36,7 +37,7 @@ class TreeModel extends ModelObject {
         this.items = new ModelList(this.subtreeItems());
         this.sortFunction = sortFunction ??
             function(item_a: TreeItemModel, item_b: TreeItemModel) {
-                return item_a.name.localeCompare(item_b.name);
+                return item_a.id.localeCompare(item_b.id);
             };
         this.addEventListener("modelchange", this.#handleModelChangeEvent.bind(this));
     }
@@ -131,7 +132,7 @@ class TreeItemModel extends ModelObject {
     readonly childItems: ModelList<TreeItemModel>;
 
     @ModelProperty()
-    name: string;
+    id: string;
     
     @ModelProperty()
     type: "leaf" | "parent";
@@ -150,11 +151,11 @@ class TreeItemModel extends ModelObject {
     }
 
     get uri(): string {
-        const {parentNode, name} = this;
+        const {parentNode, id} = this;
         if (parentNode instanceof TreeItemModel) {
-            return `${parentNode.uri}${name}/`;
+            return `${parentNode.uri}${id}/`;
         }
-        return `${name}/`;
+        return `${id}/`;
     }
 
     get parentItem(): TreeItemModel | null {
@@ -165,13 +166,13 @@ class TreeItemModel extends ModelObject {
         return null;
     }
     
-    constructor(init: {name: string, type: "leaf" | "parent", items?: TreeItemModel[]}) {
+    constructor(init: {id: string, type: "leaf" | "parent", items?: TreeItemModel[]}) {
         super();
-        const {name, type, items = []} = init;
+        const {id, type, items = []} = init;
         items.forEach((item_i, i) => item_i.index = i);
         const childItems = new ModelList(items);
         childItems.setParent(this);
-        this.name = name;
+        this.id = id;
         this.childItems = childItems;
         this.type = type;
         this.index = -1;
@@ -256,7 +257,7 @@ class TreeViewBase extends View implements TreeView {
                 white-space: nowrap;
                 margin: 1px;
                 display: inline-block;
-                outline: 1px solid var(--focused-item-outline-color);
+                outline: 1px solid var(--theme-focused-item-outline-color, ${DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR});
                 outline-offset: -1px;
                 border-radius: 3px; 
                 padding: 2px 4px;
@@ -303,8 +304,7 @@ class TreeViewBase extends View implements TreeView {
         let closestItem = <HTMLETreeItemElement | null>item;
         while (closestItem !== null) {
             const {dataset, parentElement} = closestItem;
-            const {name} = dataset;
-            uri = `${name}/` + uri;
+            uri = `${dataset.id}/` + uri;
             closestItem = parentElement?.closest("e-treeitem") ?? null;
         }
         return uri;
@@ -333,14 +333,7 @@ class TreeViewBase extends View implements TreeView {
             }
         });
         return fragment(
-            /*element("link", {
-                attributes: {
-                    rel: "stylesheet",
-                    href: "/css/main.css"
-                }
-            }),*/
             treeElement,
-            element("slot"),
             element("div", {
                 attributes: {
                     class: "offscreen",
@@ -400,7 +393,7 @@ class TreeViewBase extends View implements TreeView {
 
     #renderTreeItem(item: TreeItemModel): HTMLETreeItemElement {
         const {draggable} = this;
-        const {index, level, name} = item;
+        const {index, level, id} = item;
         const toolbar = this.itemToolbarDelegate(item);
         const content = this.itemContentDelegate(item);
         const treeItemElement = reactiveElement(
@@ -412,23 +405,23 @@ class TreeViewBase extends View implements TreeView {
                     level: level
                 },
                 dataset: {
-                    name: name
+                    id: id
                 },
                 children: [
                     ...(content ? [content] : []),
                     ...(toolbar ? [toolbar] : [])
                 ]
             }),
-            ["index", "name", "type"],
+            ["index", "id", "type"],
             (treeitem, propertyName, oldValue, newValue) => {
                 switch (propertyName) {
                     case "index": {
                         treeitem.posinset = newValue;
                         break;
                     }
-                    case "name": {
+                    case "id": {
                         const {dataset} = treeitem;
-                        dataset.name = newValue;
+                        dataset.id = newValue;
                         break;
                     }
                     case "type": {
@@ -540,9 +533,9 @@ class TreeViewBase extends View implements TreeView {
                         targetParentItem ? targetParentItem : model;
                     const targetItems = Array.from(targetList.values());
                     targetItems.forEach((item_i) => {
-                        const sameLabelIndex = transferedItems.findIndex(item_j => item_j.name === item_i.name);
+                        const sameLabelIndex = transferedItems.findIndex(item_j => item_j.id === item_i.id);
                         if (sameLabelIndex > -1) {
-                            const doReplace = confirm(`Replace ${item_i.name}?`);
+                            const doReplace = confirm(`Replace ${item_i.id}?`);
                             if (doReplace) {
                                 targetList.remove(item_i);
                             }

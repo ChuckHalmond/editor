@@ -1,9 +1,12 @@
-import { CustomElement, AttributeProperty, element } from "../../Element";
+import { DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR } from "../../../stylesheets/Theme";
+import { CustomElement, element } from "../../Element";
 import { HTMLEStatusItemElement } from "./StatusItem";
 import { HTMLEStatusItemGroupElement } from "./StatusItemGroup";
 
-export { HTMLEStatusBarElement };
+import "./StatusItem";
+import "./StatusItemGroup";
 
+export { HTMLEStatusBarElement };
 
 interface HTMLEStatusBarElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
@@ -59,7 +62,7 @@ class HTMLEStatusBarElementBase extends HTMLElement implements HTMLEStatusBarEle
             }
 
             :host(:focus) {
-                outline: 1px solid var(--focused-item-outline-color);
+                outline: 1px solid var(--theme-focused-item-outline-color, ${DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR});
                 outline-offset: -1px;
             }
 

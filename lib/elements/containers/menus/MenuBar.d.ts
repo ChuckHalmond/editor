@@ -1,4 +1,7 @@
 import { HTMLEMenuItemElement } from "./MenuItem";
+import "./Menu";
+import "./MenuItem";
+import "./MenuItemGroup";
 export { HTMLEMenuBarElement };
 interface HTMLEMenuBarElementConstructor {
     prototype: HTMLEMenuBarElement;

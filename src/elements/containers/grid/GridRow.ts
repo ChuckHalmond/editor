@@ -1,6 +1,8 @@
+import { DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR, DEFAULT_THEME_HOVERED_ITEM_COLOR, DEFAULT_THEME_SELECTED_ITEM_COLOR } from "../../../stylesheets/Theme";
 import { AttributeProperty, CustomElement, element } from "../../Element";
-import { HTMLEMenuElement } from "../menus/Menu";
 import { HTMLEGridCellElement } from "./GridCell";
+
+import "./GridCell";
 
 export { HTMLEGridRowElement };
 
@@ -11,7 +13,6 @@ interface HTMLEGridRowElementConstructor {
 
 interface HTMLEGridRowElement extends HTMLElement {
     readonly shadowRoot: ShadowRoot;
-    readonly menu: HTMLEMenuElement | null;
     name: string;
     active: boolean;
     selected: boolean;
@@ -39,10 +40,6 @@ class HTMLEGridRowElementBase extends HTMLElement implements HTMLEGridRowElement
         return Array.from(this.querySelectorAll<HTMLEGridCellElement>("e-gridcell"));
     }
 
-    get menu(): HTMLEMenuElement | null {
-        return this.#menu;
-    }
-
     @AttributeProperty({type: String})
     name!: string;
 
@@ -55,8 +52,6 @@ class HTMLEGridRowElementBase extends HTMLElement implements HTMLEGridRowElement
     @AttributeProperty({type: Number})
     posinset!: number;
 
-    #menu: HTMLEMenuElement | null;
-
     static {
         shadowTemplate = element("template");
         shadowTemplate.content.append(
@@ -68,23 +63,22 @@ class HTMLEGridRowElementBase extends HTMLElement implements HTMLEGridRowElement
             }
             
             :host(:hover):host-context(e-grid:is([selectby="row"])) {
-                background-color: var(--hovered-item-color);
+                background-color: var(--theme-hovered-item-color, ${DEFAULT_THEME_HOVERED_ITEM_COLOR});
             }
             
             :host([active]):host-context(e-grid:focus-within:is([selectby="row"])) {
-                outline: 1px solid var(--focused-item-outline-color);
+                outline: 1px solid var(--theme-focused-item-outline-color, ${DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR});
                 outline-offset: -1px;
             }
             
             :host([selected]):host-context(e-grid:is([selectby="row"])) {
-                background-color: var(--selected-item-color);
+                background-color: var(--theme-selected-item-color, ${DEFAULT_THEME_SELECTED_ITEM_COLOR});
             }
         `;
     }
     
     constructor() {
         super();
-        this.#menu = null;
         const shadowRoot = this.attachShadow({mode: "open"});
         const adoptedStylesheet = new CSSStyleSheet();
         adoptedStylesheet.replace(style);
@@ -95,11 +89,6 @@ class HTMLEGridRowElementBase extends HTMLElement implements HTMLEGridRowElement
         shadowRoot.addEventListener(
             "slotchange", this.#handleSlotChangeEvent.bind(this)
         );
-    }
-    
-    connectedCallback(): void {
-        const {tabIndex} = this;
-        this.tabIndex = tabIndex;
     }
     
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {

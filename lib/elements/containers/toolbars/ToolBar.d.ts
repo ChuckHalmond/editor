@@ -1,4 +1,6 @@
 import { HTMLEToolBarItemElement } from "./ToolBarItem";
+import "./ToolBarItem";
+import "./ToolBarItemGroup";
 export { HTMLEToolBarElement };
 declare type ToolBarOrientation = "horizontal" | "vertical";
 interface HTMLEToolBarElement extends HTMLElement {

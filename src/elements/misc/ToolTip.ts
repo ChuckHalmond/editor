@@ -74,8 +74,9 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
         );
         style = /*css*/`
             :host {
-                display: inline-block;
                 position: fixed;
+                display: inline-block;
+                z-index: 1;
                 padding: 4px;
                 border-radius: 3px;
                 box-sizing: border-box;
@@ -166,15 +167,35 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
     }
 
     connectedCallback(): void {
-        const {htmlFor} = this;
-        this.#setTarget(htmlFor);
+        this.#setTarget();
     }
 
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
         switch (name) {
             case "for": {
-                this.#setTarget(newValue);
+                this.#setTarget();
                 break;
+            }
+        }
+    }
+
+    #setTarget(): void {
+        const {htmlFor} = this;
+        if (htmlFor) {
+            const rootNode = this.getRootNode();
+            if (rootNode instanceof Document || rootNode instanceof ShadowRoot) {
+                const target = rootNode.getElementById(htmlFor);
+                if (target !== null) {
+                    const oldTarget = this.#target;
+                    const targetListenerObject = this.#targetListenerObject;
+                    if (oldTarget) {
+                        oldTarget.removeEventListener("mouseenter", targetListenerObject);
+                        oldTarget.removeEventListener("mouseleave", targetListenerObject);
+                    }
+                    target.addEventListener("mouseenter", targetListenerObject);
+                    target.addEventListener("mouseleave", targetListenerObject);
+                }
+                this.#target = target;
             }
         }
     }
@@ -199,11 +220,9 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
                 duration: immediate ? 0 : ANIMATION_DURATION
             });
             const {finished} = toggleAnimation;
-            finished.then(
-                () => {
-                    this.visible = true;
-                }
-            );
+            finished.then(() => {
+                this.visible = true;
+            }).catch(_ => void 0);
             this.#toggleAnimation = toggleAnimation;
             this.#position();
         }
@@ -231,12 +250,10 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
                 duration: immediate ? 0 : ANIMATION_DURATION
             });
             const {finished} = toggleAnimation;
-            finished.then(
-                () => {
-                    this.visible = false;
-                    this.hidden = true;
-                }
-            );
+            finished.then(() => {
+                this.visible = false;
+                this.hidden = true;
+            }).catch(_ => void 0);
             this.#toggleAnimation = toggleAnimation;
         }
         else {
@@ -246,21 +263,6 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
 
     #arrow(): HTMLElement {
         return this.shadowRoot.querySelector<HTMLElement>("[part=arrow]")!;
-    }
-
-    #setTarget(id: string | null): void {
-        const target = id ? document.getElementById(id) : null;
-        if (target !== null) {
-            const oldTarget = this.#target;
-            const targetListenerObject = this.#targetListenerObject;
-            if (oldTarget) {
-                oldTarget.removeEventListener("mouseenter", targetListenerObject);
-                oldTarget.removeEventListener("mouseleave", targetListenerObject);
-            }
-            target.addEventListener("mouseenter", targetListenerObject);
-            target.addEventListener("mouseleave", targetListenerObject);
-        }
-        this.#target = target;
     }
 
     #position(): void {
@@ -324,7 +326,7 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
             const {finished} = toggleAnimation;
             finished.then(() => {
                 document.addEventListener("keydown", documentListenerObject);
-            });
+            }).catch(_ => void 0);
         }
     }
 
@@ -336,7 +338,7 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
             const {finished} = toggleAnimation;
             finished.then(() => {
                 document.removeEventListener("keydown", documentListenerObject);
-            });
+            }).catch(_ => void 0);
         }
     }
 

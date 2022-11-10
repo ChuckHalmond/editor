@@ -4,18 +4,18 @@ import { View } from "./View";
 import { HTMLEGridCellElement } from "../elements/containers/grid/GridCell";
 import { HTMLEGridElement } from "../elements/containers/grid/Grid";
 import { HTMLEGridRowElement } from "../elements/containers/grid/GridRow";
-import { HTMLEWidthSashElement } from "../elements/misc/WidthSash";
-import { HTMLEMenuElement } from "../elements/containers/menus/Menu";
 import { resetStylesheet } from "../stylesheets/Reset";
 
 export { GridModel };
 export { GridRowModel };
+export { GridRowFilter };
 export { GridColumnModel };
 export { GridView };
 
-HTMLEGridElement;
-HTMLEWidthSashElement;
-HTMLEMenuElement;
+import "../elements/controls/sashes";
+import "../elements/containers/grid";
+import "../elements/containers/menus";
+import { DEFAULT_THEME_ARROW_DROPDOWN_IMAGE, DEFAULT_THEME_ARROW_DROPUP_IMAGE } from "../stylesheets/Theme";
 
 interface GridInit {
     rows: GridRowModel[];
@@ -108,23 +108,13 @@ class GridColumnModel extends ModelObject {
 
 class GridRowModel extends ModelObject {
     id: number;
-
-    @ModelProperty()
-    name: string;
-
-    @ModelProperty()
-    age: number;
     
     constructor(init: {
-        id: number;
-        name: string,
-        age: number
+        id: number
     }) {
         super();
-        const {id, name, age} = init;
+        const {id} = init;
         this.id = id;
-        this.name = name;
-        this.age = age;
     }
 }
 
@@ -137,10 +127,18 @@ interface GridViewConstructor {
 interface GridView extends View {
     readonly shadowRoot: ShadowRoot;
     model: GridModel;
-    resizable: boolean;
-    sortable: boolean;
+    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
+    get gridElement(): HTMLEGridElement;
+    filter(row: GridRowModel): boolean;
     setColumnDelegate(delegate: (column: GridColumnModel) => string | Node): void;
     setCellDelegate(delegate: (row: GridRowModel, column: GridColumnModel) => string | Node): void;
+    getRowElement(row: GridRowModel): HTMLEGridRowElement | null;
+    getColumnHeaderElement(column: GridColumnModel): HTMLEGridCellElement | null;
+    getColumnCellsElements(column: GridColumnModel): HTMLEGridCellElement[];
+    renderShadow(): Node;
+    addDisplayFilter(filter: (GridRowFilter & {name: string;})): void;
+    removeDisplayFilter(filter: (GridRowFilter & {name: string;})): void;
+    removeAllDisplayFilters(): void;
 }
 
 declare global {
@@ -161,15 +159,8 @@ class GridViewBase extends View implements GridView {
 
     #columnDelegate: (column: GridColumnModel) => string | Node;
     #cellDelegate: (row: GridRowModel, column: GridColumnModel) => string | Node;
-    
-    @AttributeProperty({type: Boolean, observed: true})
-    resizable!: boolean;
-
-    @AttributeProperty({type: Boolean, observed: true})
-    sortable!: boolean;
 
     #displayFilters: (GridRowFilter & {name: string})[];
-    #searchFilter: GridRowFilter | null;
 
     static {
         style = /*css*/`
@@ -231,9 +222,10 @@ class GridViewBase extends View implements GridView {
                 height: 18px;
                 margin: 1px;
                 content: "";
+
                 mask-size: 18px 18px;
                 -webkit-mask-size: 18px 18px;
-                background-color: var(--sortorder-indicator-color, none);
+                background-color: none;
             }
             
             e-gridcell[type="columnheader"]:not([data-sortorder]) .gridheader-sort-indicator::before {
@@ -241,20 +233,15 @@ class GridViewBase extends View implements GridView {
             }
             
             e-gridcell[type="columnheader"][data-sortorder="1"] .gridheader-sort-indicator::before {
-                -webkit-mask-image: var(--sortorder-indicator-ascending, none);
-                mask-image: var(--sortorder-indicator-ascending, none);
+                -webkit-mask-image: var(--theme-arrow-dropup-image, url(${DEFAULT_THEME_ARROW_DROPUP_IMAGE}));
+                mask-image: var(--theme-arrow-dropup-image, url(${DEFAULT_THEME_ARROW_DROPUP_IMAGE}));
+                background-color: black;
             }
             
             e-gridcell[type="columnheader"][data-sortorder="-1"] .gridheader-sort-indicator::before {
-                -webkit-mask-image: var(--sortorder-indicator-descending, none);
-                mask-image: var(--sortorder-indicator-descending, none);
-            }
-            
-            e-gridhead e-wsash:not(:hover) {
-                flex: 0 0 auto;
-                width: 2px;
-                margin-right: 1px;
-                margin-left: 1px;
+                -webkit-mask-image: var(--theme-arrow-dropdown-image, url(${DEFAULT_THEME_ARROW_DROPDOWN_IMAGE}));
+                mask-image: var(--theme-arrow-dropdown-image, url(${DEFAULT_THEME_ARROW_DROPDOWN_IMAGE}));
+                background-color: black;
             }
         `;
     }
@@ -264,7 +251,6 @@ class GridViewBase extends View implements GridView {
     constructor(model?: GridModel) {
         super();
         this.#displayFilters = [];
-        this.#searchFilter = null;
         this.#cellDelegate =
             (row: GridRowModel, column: GridColumnModel) =>
                 element("label", {
@@ -319,16 +305,6 @@ class GridViewBase extends View implements GridView {
     renderShadow(): Node {
         const {model} = this;
         return fragment(
-            element("div", {
-                children: element("input", {
-                    attributes: {
-                        type: "search"
-                    },
-                    listeners: {
-                        input: <EventListener>this.#handleSearchInputEvent.bind(this)
-                    }
-                })
-            }),
             element("e-grid", {
                 attributes: {
                     tabindex: 0,
@@ -355,24 +331,9 @@ class GridViewBase extends View implements GridView {
         );
     }
 
-    #filter(row: GridRowModel): boolean {
+    filter(row: GridRowModel): boolean {
         const displayFilters = this.#displayFilters;
-        const searchFilter = this.#searchFilter;
-        return (displayFilters.length > 0 ? displayFilters.some(filter_i => filter_i.filter(row)) : true) &&
-        (searchFilter ? searchFilter.filter(row) : true);
-    }
-
-    setSearchFilter(filter: GridRowFilter | null): void {
-        const {model, gridElement} = this;
-        const {rows} = model;
-        this.#searchFilter = filter;
-        Array.from(rows.values()).forEach((row_i) => {
-            const rowElement = this.getRowElement(row_i);
-            if (rowElement) {
-                rowElement.hidden = !this.#filter(row_i);
-            }
-        });
-        gridElement.clearSelection();
+        return (displayFilters.length > 0 ? displayFilters.some(filter_i => filter_i.filter(row)) : true);
     }
 
     addDisplayFilter(filter: (GridRowFilter & {name: string;})): void {
@@ -384,7 +345,7 @@ class GridViewBase extends View implements GridView {
             Array.from(rows.values()).forEach((row_i) => {
                 const rowElement = this.getRowElement(row_i);
                 if (rowElement) {
-                    rowElement.hidden = !this.#filter(row_i);
+                    rowElement.hidden = !this.filter(row_i);
                 }
             });
         }
@@ -401,7 +362,7 @@ class GridViewBase extends View implements GridView {
             Array.from(rows.values()).forEach((row_i) => {
                 const rowElement = this.getRowElement(row_i);
                 if (rowElement) {
-                    rowElement.hidden = !this.#filter(row_i);
+                    rowElement.hidden = !this.filter(row_i);
                 }
             });
         }
@@ -416,7 +377,7 @@ class GridViewBase extends View implements GridView {
         Array.from(rows.values()).forEach((row_i) => {
             const rowElement = this.getRowElement(row_i);
             if (rowElement) {
-                rowElement.hidden = !this.#filter(row_i);
+                rowElement.hidden = !this.filter(row_i);
             }
         });
         gridElement.clearSelection();
@@ -435,7 +396,7 @@ class GridViewBase extends View implements GridView {
                         attributes: {
                             class: "gridheader-content"
                         },
-                        children: (<Node[]>[
+                        children: [
                             element("span", {
                                 attributes: {
                                     class: "gridheader-label"
@@ -446,16 +407,13 @@ class GridViewBase extends View implements GridView {
                                 attributes: {
                                     class: "gridheader-sort-indicator"
                                 }
+                            }),
+                            element("e-wsash", {
+                                attributes: {
+                                    controls: column.name
+                                }
                             })
-                        ]).concat(
-                            this.resizable ? [
-                                element("e-wsash", {
-                                    attributes: {
-                                        controls: column.name
-                                    }
-                                })
-                            ] : []
-                        )
+                        ] 
                     })
                 ]
             }),
@@ -481,6 +439,9 @@ class GridViewBase extends View implements GridView {
     #renderGridBodyRow(row: GridRowModel): Element {
         const {model} = this;
         const gridRowElement = element("e-gridrow", {
+            attributes: {
+                tabindex: -1
+            },
             dataset: {
                 index: row.id
             },
@@ -673,21 +634,6 @@ class GridViewBase extends View implements GridView {
             contextMenu.positionContextual(clientX, clientY);
             contextMenu.focus({preventScroll: true});
             event.preventDefault();
-        }
-    }
-
-    #handleSearchInputEvent(event: InputEvent) {
-        const {target} = event;
-        if (target instanceof HTMLInputElement) {
-            const {value} = target;
-            if (value !== "") {
-                this.setSearchFilter({
-                    filter: (row) => row.name.toLowerCase().includes(value.toLowerCase())
-                });
-            }
-            else {
-                this.setSearchFilter(null);
-            }
         }
     }
 

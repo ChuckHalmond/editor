@@ -1,6 +1,8 @@
 
 import { element, CustomElement, AttributeProperty } from "../../Element";
 
+import "./ToolBarItem";
+
 export { HTMLEToolBarItemGroupElement };
 
 interface HTMLEToolBarItemGroupElementConstructor {

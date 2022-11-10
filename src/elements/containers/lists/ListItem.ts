@@ -1,3 +1,4 @@
+import { DEFAULT_THEME_DROPTARGET_ITEM_COLOR, DEFAULT_THEME_FOCUSED_ITEM_COLOR, DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR, DEFAULT_THEME_HOVERED_ITEM_COLOR, DEFAULT_THEME_SELECTED_ITEM_COLOR } from "../../../stylesheets/Theme";
 import { CustomElement, element, AttributeProperty } from "../../Element";
 import { HTMLEMenuElement } from "../menus/Menu";
 import { HTMLEToolBarElement } from "../toolbars/ToolBar";
@@ -86,24 +87,24 @@ class HTMLEListItemElementBase extends HTMLElement implements HTMLEListItemEleme
             }
             
             :host([droptarget]) {
-                background-color: var(--droptarget-item-color);
+                background-color: var(--theme-droptarget-item-color, ${DEFAULT_THEME_DROPTARGET_ITEM_COLOR});
             }
             
             :host(:hover) {
-                background-color: var(--hovered-item-color);
+                background-color: var(--theme-hovered-item-color, ${DEFAULT_THEME_HOVERED_ITEM_COLOR});
             }
             
             :host([active]) {
-                outline: 1px solid var(--focused-item-outline-color);
+                outline: 1px solid var(--theme-focused-item-outline-color, ${DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR});
                 outline-offset: -1px;
             }
             
             :host(:focus) {
-                background-color: var(--focus-background-color);
+                background-color: var(--theme-focused-item-color, ${DEFAULT_THEME_FOCUSED_ITEM_COLOR});
             }
             
             :host([selected]) {
-                background-color: var(--selected-item-color);
+                background-color: var(--theme-selected-item-color, ${DEFAULT_THEME_SELECTED_ITEM_COLOR});
             }
         `;
     }

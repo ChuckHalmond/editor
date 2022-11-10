@@ -1,4 +1,5 @@
-import { HTMLESelectElement } from "../../controls/forms/Select";
+import { DEFAULT_THEME_ACTIVATED_ITEM_COLOR, DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR, DEFAULT_THEME_HOVERED_ITEM_COLOR } from "../../../stylesheets/Theme";
+import { HTMLESelectElement } from "../../controls/select/Select";
 import { CustomElement, AttributeProperty, element, QueryProperty } from "../../Element";
 import { HTMLEMenuButtonElement } from "../menus/MenuButton";
 
@@ -31,7 +32,7 @@ declare global {
 
 var shadowTemplate: HTMLTemplateElement;
 var style: string;
-var iconPart: HTMLElement;
+var iconPartTemplate: HTMLElement;
 
 @CustomElement({
     name: "e-toolbaritem"
@@ -85,7 +86,7 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
                 }
             })
         );
-        iconPart = element("span", {
+        iconPartTemplate = element("span", {
             attributes: {
                 part: "icon"
             }
@@ -105,11 +106,12 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
             }
             
             :host(:hover) {
-                background-color: var(--hovered-item-color);
+                background-color: var(--theme-hovered-item-color, ${DEFAULT_THEME_HOVERED_ITEM_COLOR});
             }
             
-            :host([pressed]) {
-                background-color: var(--activated-item-color);
+            :host([pressed]),
+            :host(:active) {
+                background-color: var(--theme-activated-item-color, ${DEFAULT_THEME_ACTIVATED_ITEM_COLOR});
             }
             
             :host(:not([iconed])) [part="icon"] {
@@ -132,22 +134,20 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
                 content: "";
                 mask-size: 18px 18px;
                 -webkit-mask-size: 18px 18px;
-                background-color: var(--icon-color, none);
-                -webkit-mask-image: var(--icon-image, none);
-                mask-image: var(--icon-image, none);
-                filter: var(--icon-filter, none);
+                background-color: none;
+                -webkit-mask-image: none;
+                mask-image: none;
+                filter: none;
             }
             
-            :host(:focus-within):host-context(e-toolbar:focus-within) {
-                outline: 1px solid var(--focused-item-outline-color);
+            :host(:focus) {
+                outline: 1px solid var(--theme-focused-item-outline-color, ${DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR});
                 outline-offset: -1px;
             }
             
-            /*:host([type="menubutton"]) ::slotted(e-menubutton):focus,
-            :host([type="select"]) ::slotted(e-select):focus {
-                outline: none;
-                outline-offset: none;
-            }*/
+            :host([type="select"]:focus) ::slotted(e-select) {
+                border-color: transparent;
+            }
         `;
     }
 
@@ -176,10 +176,10 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
             case "iconed": {
                 const {shadowRoot} = this;
                 if (newValue !== null) {
-                    shadowRoot.prepend(iconPart.cloneNode(true));
+                    shadowRoot.prepend(iconPartTemplate.cloneNode(true));
                 }
                 else {
-                    const iconPart = shadowRoot.querySelector<HTMLElement>("[part=icon]");
+                    const iconPart = this.#icon();
                     if (iconPart) {
                         iconPart.remove();
                     }
@@ -187,6 +187,10 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
                 break;
             }
         }
+    }
+
+    #icon(): HTMLElement {
+        return this.shadowRoot.querySelector<HTMLElement>("[part=icon]")!;
     }
 }
 

@@ -1,3 +1,4 @@
+import "./StatusItem";
 export { HTMLEStatusItemGroupElement };
 interface HTMLEStatusItemGroupElementConstructor {
     prototype: HTMLEStatusItemGroupElement;

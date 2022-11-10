@@ -1,9 +1,16 @@
 import { ModelList, ModelObject } from "../models/Model";
 import { View } from "./View";
+import { HTMLEGridCellElement } from "../elements/containers/grid/GridCell";
+import { HTMLEGridElement } from "../elements/containers/grid/Grid";
+import { HTMLEGridRowElement } from "../elements/containers/grid/GridRow";
 export { GridModel };
 export { GridRowModel };
+export { GridRowFilter };
 export { GridColumnModel };
 export { GridView };
+import "../elements/controls/sashes";
+import "../elements/containers/grid";
+import "../elements/containers/menus";
 interface GridInit {
     rows: GridRowModel[];
     columns: GridColumnModel[];
@@ -41,12 +48,8 @@ declare class GridColumnModel extends ModelObject {
 }
 declare class GridRowModel extends ModelObject {
     id: number;
-    name: string;
-    age: number;
     constructor(init: {
         id: number;
-        name: string;
-        age: number;
     });
 }
 interface GridViewConstructor {
@@ -57,10 +60,22 @@ interface GridViewConstructor {
 interface GridView extends View {
     readonly shadowRoot: ShadowRoot;
     model: GridModel;
-    resizable: boolean;
-    sortable: boolean;
+    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
+    get gridElement(): HTMLEGridElement;
+    filter(row: GridRowModel): boolean;
     setColumnDelegate(delegate: (column: GridColumnModel) => string | Node): void;
     setCellDelegate(delegate: (row: GridRowModel, column: GridColumnModel) => string | Node): void;
+    getRowElement(row: GridRowModel): HTMLEGridRowElement | null;
+    getColumnHeaderElement(column: GridColumnModel): HTMLEGridCellElement | null;
+    getColumnCellsElements(column: GridColumnModel): HTMLEGridCellElement[];
+    renderShadow(): Node;
+    addDisplayFilter(filter: (GridRowFilter & {
+        name: string;
+    })): void;
+    removeDisplayFilter(filter: (GridRowFilter & {
+        name: string;
+    })): void;
+    removeAllDisplayFilters(): void;
 }
 declare global {
     interface HTMLElementTagNameMap {

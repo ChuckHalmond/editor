@@ -1,3 +1,4 @@
+import { DEFAULT_THEME_ARROW_DROPDOWN_IMAGE, DEFAULT_THEME_ARROW_RIGHT_IMAGE, DEFAULT_THEME_DROPTARGET_ITEM_COLOR, DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR, DEFAULT_THEME_HOVERED_ITEM_COLOR, DEFAULT_THEME_SELECTED_ITEM_COLOR } from "../../../stylesheets/Theme";
 import { CustomElement, element, AttributeProperty, QueryProperty } from "../../Element";
 import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
 
@@ -99,30 +100,30 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
             }
             
             :host([droptarget]) {
-                background-color: var(--droptarget-item-color);
+                background-color: var(--theme-droptarget-item-color, ${DEFAULT_THEME_DROPTARGET_ITEM_COLOR});
             }
-            
-            :host([active]:focus-visible) {
+
+            :host(:focus-visible) {
                 outline: none;
             }
             
-            :host([active]:is(:focus, :not(:focus-within))):host-context(e-tree:focus-within) [part="content"] {
-                outline: 1px solid var(--focused-item-outline-color);
+            :host([active]):host-context(e-tree:focus-within) [part="content"] {
+                outline: 1px solid var(--theme-focused-item-outline-color, ${DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR});
                 outline-offset: -1px;
             }
             
             [part="content"]:hover {
-                background-color: var(--hovered-item-color);
+                background-color: var(--theme-hovered-item-color, ${DEFAULT_THEME_HOVERED_ITEM_COLOR});
             }
             
             :host([selected]) [part="content"] {
-                background-color: var(--selected-item-color);
+                background-color: var(--theme-selected-item-color, ${DEFAULT_THEME_SELECTED_ITEM_COLOR});
             }
             
             [part="content"] {
                 display: flex;
                 line-height: 22px;
-                padding-left: calc(var(--level) * var(--indent-width, 12px));
+                padding-left: 12px;
             }
             
             :host(:not([type="parent"])) ::slotted([slot="group"]),
@@ -147,20 +148,22 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                 height: 18px;
                 margin: 1px;
                 content: "";
+
                 mask-size: 18px 18px;
                 -webkit-mask-size: 18px 18px;
-                background-color: var(--arrow-color, none);
-                filter: var(--arrow-filter, none);
+                background-color: none;
             }
             
             :host(:not([expanded])) [part="arrow"]::before {
-                -webkit-mask-image: var(--arrow-icon-collapsed, none);
-                mask-image: var(--arrow-icon-collapsed, none);
+                -webkit-mask-image: var(--theme-arrow-right-image, url(${DEFAULT_THEME_ARROW_RIGHT_IMAGE}));
+                mask-image: var(--theme-arrow-right-image, url(${DEFAULT_THEME_ARROW_RIGHT_IMAGE}));
+                background-color: black;
             }
             
             :host([expanded]) [part="arrow"]::before {
-                -webkit-mask-image: var(--arrow-icon-expanded, none);
-                mask-image: var(--arrow-icon-expanded, none);
+                -webkit-mask-image: var(--theme-arrow-dropdown-image, url(${DEFAULT_THEME_ARROW_DROPDOWN_IMAGE}));
+                mask-image: var(--theme-arrow-dropdown-image, url(${DEFAULT_THEME_ARROW_DROPDOWN_IMAGE}));
+                background-color: black;
             }
         `;
     }
@@ -199,7 +202,7 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                 break;
             }
             case "level": {
-                this.style.setProperty("--level", `${this.level}`);
+                (<CSSStyleRule>this.shadowRoot.adoptedStyleSheets[0].cssRules[6]).styleMap.set("padding-left", `${12 * Number(newValue)}px`);
                 break;
             }
         }

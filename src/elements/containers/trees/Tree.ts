@@ -1,6 +1,10 @@
+import { DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR } from "../../../stylesheets/Theme";
 import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLETreeItemElement } from "./TreeItem";
 import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
+
+import "./TreeItem";
+import "./TreeItemGroup";
 
 export { HTMLETreeElement };
 
@@ -72,7 +76,7 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
             }
             
             :host(:focus) {
-                outline: 1px solid var(--focused-item-outline-color);
+                outline: 1px solid var(--theme-focused-item-outline-color, ${DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR});
                 outline-offset: -1px;
             }
         `;
@@ -346,15 +350,20 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
 
     #handleDragLeaveEvent(event: DragEvent): void {
         const {relatedTarget} = event;
-        let rootNode = <Node>relatedTarget;
-        while (!(rootNode instanceof HTMLETreeItemElement || rootNode instanceof Document)) {
-            rootNode = rootNode.getRootNode();
-            if (rootNode instanceof ShadowRoot) {
-                rootNode = rootNode.host;
+        if (relatedTarget instanceof Element) {
+            const parentItem  = relatedTarget.closest("e-treeitem");
+            if (!parentItem) {
+                let rootNode = <Node>relatedTarget;
+                while (!(rootNode instanceof HTMLETreeItemElement || rootNode instanceof Document)) {
+                    rootNode = rootNode.getRootNode();
+                    if (rootNode instanceof ShadowRoot) {
+                        rootNode = rootNode.host;
+                    }
+                }
+                if (rootNode instanceof Document) {
+                    this.#setDropTargetItem(null);
+                }
             }
-        }
-        if (rootNode instanceof Document) {
-            this.#setDropTargetItem(null);
         }
     }
 

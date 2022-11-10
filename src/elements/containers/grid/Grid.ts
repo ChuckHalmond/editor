@@ -1,9 +1,16 @@
+import { DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR } from "../../../stylesheets/Theme";
 import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEGridBodyElement } from "./GridBody";
 import { HTMLEGridCellElement } from "./GridCell";
 import { HTMLEGridHeadElement } from "./GridHead";
 import { HTMLEGridRowElement } from "./GridRow";
 import { HTMLEGridRowGroupElement } from "./GridRowGroup";
+
+import "./GridBody";
+import "./GridHead";
+import "./GridRowGroup";
+import "./GridRow";
+import "./GridCell";
 
 export { HTMLEGridElement };
 
@@ -104,7 +111,7 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
             }
             
             :host(:focus) {
-                outline: 1px solid var(--focused-item-outline-color);
+                outline: 1px solid var(--theme-focused-item-outline-color, ${DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR});
                 outline-offset: -1px;
             }
         `;

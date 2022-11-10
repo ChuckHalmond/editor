@@ -4,6 +4,7 @@ import { HTMLETreeElement } from "../elements/containers/trees/Tree";
 import { HTMLETreeItemElement } from "../elements/containers/trees/TreeItem";
 import { ModelList, ModelObject } from "../models/Model";
 import { View } from "./View";
+import "../elements/containers/trees";
 export { TreeItemModelList };
 export { TreeModel };
 export { TreeItemModel };
@@ -30,14 +31,14 @@ declare class TreeItemModelList {
 }
 declare class TreeItemModel extends ModelObject {
     readonly childItems: ModelList<TreeItemModel>;
-    name: string;
+    id: string;
     type: "leaf" | "parent";
     index: number;
     get level(): number;
     get uri(): string;
     get parentItem(): TreeItemModel | null;
     constructor(init: {
-        name: string;
+        id: string;
         type: "leaf" | "parent";
         items?: TreeItemModel[];
     });

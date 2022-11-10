@@ -2,6 +2,9 @@ import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEMenuItemElement } from "./MenuItem";
 import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
 
+import "./MenuItem";
+import "./MenuItemGroup";
+
 export { HTMLEMenuElement };
 export { EMenu };
 
@@ -81,21 +84,13 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                 width: max-content;
                 box-sizing: border-box;
             
-                -webkit-box-shadow: var(--menu-box-shadow);
-                box-shadow: var(--menu-box-shadow);
+                -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 3px;
+                box-shadow: rgba(0, 0, 0, 0.2) 0 1px 3px;
             }
             
             :host([contextual]) {
                 z-index: 1;
                 position: absolute;
-            
-                transition-property: opacity;
-                transition-duration: 0.2s;
-                opacity: 0;
-            }
-            
-            :host([contextual]:focus-within) {
-                opacity: 1;
             }
         `;
         toggleAnimations = new WeakMap();
@@ -230,6 +225,7 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                 }
             }
         }
+        event.stopPropagation();
     }
 
     #handleFocusInEvent(event: FocusEvent): void {
@@ -406,8 +402,19 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
                                 toggleAnimations.delete(activeItem);
                             });
                     }
+                    const {left, right, top, bottom} = (() => {
+                        const parentItem = this.closest("e-menuitem");
+                        if (parentItem && !parentItem.expanded) {
+                            parentItem.expand();
+                            const menuRect = this.getBoundingClientRect();
+                            parentItem.collapse();
+                            return menuRect;
+                        }
+                        else {
+                            return this.getBoundingClientRect();
+                        }
+                    })();
                     const {clientX, clientY} = event;
-                    const {left, right, top, bottom} = this.getBoundingClientRect();
                     const intersectsWithMouse = !(
                         left > clientX || right < clientX || top > clientY || bottom < clientY
                     );

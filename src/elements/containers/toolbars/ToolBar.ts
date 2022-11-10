@@ -1,7 +1,9 @@
-import { HTMLESelectElement } from "../../controls/forms/Select";
 import { CustomElement, AttributeProperty, element } from "../../Element";
 import { HTMLEToolBarItemElement } from "./ToolBarItem";
 import { HTMLEToolBarItemGroupElement } from "./ToolBarItemGroup";
+
+import "./ToolBarItem";
+import "./ToolBarItemGroup";
 
 export { HTMLEToolBarElement };
 
@@ -161,9 +163,9 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
                 case "menubutton": {
                     const {menubutton} = targetItem;
                     if (menubutton && !menubutton.contains(<Node>target)) {
-                        const force = !wasExpandedOnMouseDown.get(targetItem) ?? true;
-                        menubutton.toggle(force);
-                        if (force) {
+                        const expand = !wasExpandedOnMouseDown.get(targetItem);
+                        menubutton.toggle(expand);
+                        if (expand) {
                             menubutton.firstItem?.focus({preventScroll: true});
                         }
                     }
@@ -172,8 +174,8 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
                 case "select": {
                     const {select} = targetItem;
                     if (select && !select.contains(<Node>target)) {
-                        const force = !wasExpandedOnMouseDown.get(targetItem) ?? true;
-                        select.toggle(force);
+                        const expand = !wasExpandedOnMouseDown.get(targetItem);
+                        select.toggle(expand);
                     }
                     break;
                 }
@@ -243,7 +245,8 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
         const {key} = event;
         const {activeItem} = this;
         switch (key) {
-            case "Enter": {
+            case "Enter":
+            case " ": {
                 if (activeItem) {
                     const {type} = activeItem;
                     switch (type) {

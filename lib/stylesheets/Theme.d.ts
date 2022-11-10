@@ -1,2 +1,34 @@
-export { themeStylesheet };
-declare const themeStylesheet: CSSStyleSheet;
+import DEFAULT_THEME_ARROW_RIGHT_IMAGE from "../../assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg";
+import DEFAULT_THEME_ARROW_DROPDOWN_IMAGE from "../../assets/arrow_drop_down_FILL0_wght400_GRAD0_opsz48.svg";
+import DEFAULT_THEME_ARROW_DROPUP_IMAGE from "../../assets/arrow_drop_up_FILL0_wght400_GRAD0_opsz48.svg";
+import DEFAULT_THEME_CHECKED_IMAGE from "../../assets/done_FILL0_wght400_GRAD0_opsz48.svg";
+import { ModelObject } from "../models/Model";
+export { theme };
+export { DEFAULT_THEME_HOVERED_ITEM_COLOR };
+export { DEFAULT_THEME_FOCUSED_ITEM_COLOR };
+export { DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR };
+export { DEFAULT_THEME_SELECTED_ITEM_COLOR };
+export { DEFAULT_THEME_ACTIVATED_ITEM_COLOR };
+export { DEFAULT_THEME_DROPTARGET_ITEM_COLOR };
+export { DEFAULT_THEME_ARROW_RIGHT_IMAGE };
+export { DEFAULT_THEME_ARROW_DROPDOWN_IMAGE };
+export { DEFAULT_THEME_ARROW_DROPUP_IMAGE };
+export { DEFAULT_THEME_CHECKED_IMAGE };
+declare const DEFAULT_THEME_HOVERED_ITEM_COLOR: string;
+declare const DEFAULT_THEME_FOCUSED_ITEM_COLOR: string;
+declare const DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR: string;
+declare const DEFAULT_THEME_SELECTED_ITEM_COLOR: string;
+declare const DEFAULT_THEME_ACTIVATED_ITEM_COLOR: string;
+declare const DEFAULT_THEME_DROPTARGET_ITEM_COLOR: string;
+declare class Theme extends ModelObject {
+    #private;
+    tint: number;
+    checkedImage: string;
+    arrowRightImage: string;
+    arrowDropDownImage: string;
+    arrowDropUpImage: string;
+    stylesheet: CSSStyleSheet;
+    images(): Map<string, string>;
+    constructor();
+}
+declare const theme: Theme;

@@ -1,4 +1,6 @@
 import { HTMLEListItemElement } from "./ListItem";
+import "./ListItem";
+import "./ListItemGroup";
 export { HTMLEListElement };
 interface HTMLEListElementConstructor {
     prototype: HTMLEListElement;

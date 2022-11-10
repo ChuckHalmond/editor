@@ -1,3 +1,4 @@
+import { DEFAULT_THEME_FOCUSED_ITEM_COLOR, DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR, DEFAULT_THEME_HOVERED_ITEM_COLOR, DEFAULT_THEME_SELECTED_ITEM_COLOR } from "../../../stylesheets/Theme";
 import { CustomElement, element, AttributeProperty } from "../../Element";
 
 export { HTMLEGridCellElement };
@@ -68,28 +69,24 @@ class HTMLEGridCellElementBase extends HTMLElement implements HTMLEGridCellEleme
             }
             
             :host([type="columnheader"]:hover) {
-                background-color: var(--hovered-item-color);
+                background-color: var(--theme-hovered-item-color, ${DEFAULT_THEME_HOVERED_ITEM_COLOR});
             }
             
             :host(:hover):host-context(e-grid:is(:not([selectby]), [selectby="cell"])) {
-                background-color: var(--hovered-item-color);
+                background-color: var(--theme-hovered-item-color, ${DEFAULT_THEME_HOVERED_ITEM_COLOR});
             }
             
             :host([type="columnheader"][active]) {
-                background-color: var(--focused-item-color);
+                background-color: var(--theme-focused-item-color, ${DEFAULT_THEME_FOCUSED_ITEM_COLOR});
             }
             
             :host([active]):host-context(e-grid:focus-within:is(:not([selectby]), [selectby="cell"])) {
-                outline: 1px solid var(--focused-item-outline-color);
+                outline: 1px solid var(--theme-focused-item-outline-color, ${DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR});
                 outline-offset: -1px;
-            }
-
-            :host(:focus-visible):host-context(e-grid:focus-within:is([selectby="row"])) {
-                outline: none;
             }
             
             :host([selected]):host-context(e-grid:is(:not([selectby]), [selectby="cell"])) {
-                background-color: var(--selected-item-color);
+                background-color: var(--theme-selected-item-color, ${DEFAULT_THEME_SELECTED_ITEM_COLOR});
             }
         `;
     }
@@ -103,11 +100,6 @@ class HTMLEGridCellElementBase extends HTMLElement implements HTMLEGridCellEleme
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
-    }
-    
-    connectedCallback(): void {
-        const {tabIndex} = this;
-        this.tabIndex = tabIndex;
     }
     
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {

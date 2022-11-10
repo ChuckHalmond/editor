@@ -1,3 +1,4 @@
+import { DEFAULT_THEME_SELECTED_ITEM_COLOR } from "../../stylesheets/Theme";
 import { CustomElement, AttributeProperty, element, trimMultilineIndent } from "../Element";
 
 export { HTMLELoaderElement };
@@ -80,6 +81,7 @@ class HTMLELoaderElementBase extends HTMLElement implements HTMLELoaderElement {
                 width: 100%;
                 width: 86px;
                 border-radius: 4px;
+                background-color: whitesmoke;
             }
         
             [part="slider"] {
@@ -102,7 +104,7 @@ class HTMLELoaderElementBase extends HTMLElement implements HTMLELoaderElement {
             [part="cursor"] {
                 display: block;
                 width: 32px;
-                background-color: rgb(0, 128, 255);
+                background-color: var(--theme-activated-item-color, ${DEFAULT_THEME_SELECTED_ITEM_COLOR});
                 animation-name: cursor;
             }
         
@@ -119,14 +121,14 @@ class HTMLELoaderElementBase extends HTMLElement implements HTMLELoaderElement {
             }
         
             [part="spinner"]::after {
-                content: " ";
+                content: "";
                 display: block;
                 width: 12px;
                 height: 12px;
                 border-radius: 50%;
                 border-width: 4px;
                 border-style: solid;
-                border-color: transparent rgb(0, 128, 255);
+                border-color: transparent var(--theme-activated-item-color, ${DEFAULT_THEME_SELECTED_ITEM_COLOR});
                 animation: spin 1.2s linear infinite;
             }
         

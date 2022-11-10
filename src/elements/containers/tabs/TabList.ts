@@ -1,5 +1,9 @@
+import { DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR } from "../../../stylesheets/Theme";
 import { CustomElement, element } from "../../Element";
 import { HTMLETabElement } from "./Tab";
+
+import "./Tab";
+import "./TabPanel";
 
 export { HTMLETabListElement };
 
@@ -24,7 +28,7 @@ declare global {
 
 var shadowTemplate: HTMLTemplateElement;
 var style: string;
-var SELECT_ANIMATION_DURATION = 300;
+var SELECT_ANIMATION_DURATION = 200;
 
 @CustomElement({
     name: "e-tablist"
@@ -65,10 +69,11 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
             :host::after {
                 position: absolute;
                 display: inline-block;
-                content: " ";
+                content: "";
+                z-index: -1;
                 transform: translateY(-100%);
                 box-sizing: border-box;
-                border-top: 2px solid var(--focused-item-outline-color);
+                border-top: 2px solid var(--theme-focused-item-outline-color, ${DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR});
             }
         `;
     }
@@ -173,11 +178,6 @@ class HTMLETabListElementBase extends HTMLElement implements HTMLETabListElement
             targetTab.select();
             const {width: tabWidth, height: tabHeight} = targetTab.getBoundingClientRect();
             const {offsetLeft} = targetTab;
-            console.log({
-                width: `${tabWidth}px`,
-                left: `${offsetLeft}px`,
-                top: `${tabHeight}px`
-            });
             this.animate([{
                 width: `${tabWidth}px`,
                 left: `${offsetLeft}px`,

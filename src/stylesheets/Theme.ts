@@ -1,64 +1,136 @@
-import arrowRight from "../../assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg";
-import arrowDropDown from "../../assets/arrow_drop_down_FILL0_wght400_GRAD0_opsz48.svg";
-import arrowDropUp from "../../assets/arrow_drop_up_FILL0_wght400_GRAD0_opsz48.svg";
-import done from "../../assets/done_FILL0_wght400_GRAD0_opsz48.svg";
-import openSans from "../../assets/fonts/Open_Sans/OpenSans-VariableFont_wdth,wght.ttf";
+import DEFAULT_THEME_ARROW_RIGHT_IMAGE from "../../assets/arrow_right_FILL0_wght400_GRAD0_opsz48.svg";
+import DEFAULT_THEME_ARROW_DROPDOWN_IMAGE from "../../assets/arrow_drop_down_FILL0_wght400_GRAD0_opsz48.svg";
+import DEFAULT_THEME_ARROW_DROPUP_IMAGE from "../../assets/arrow_drop_up_FILL0_wght400_GRAD0_opsz48.svg";
+import DEFAULT_THEME_CHECKED_IMAGE from "../../assets/done_FILL0_wght400_GRAD0_opsz48.svg";
+import openSansTtf from "../../assets/fonts/Open_Sans/OpenSans-VariableFont_wdth,wght.ttf";
 
-export { themeStylesheet };
+import { ModelObject, ModelProperty } from "../models/Model";
 
-const themeStylesheet = new CSSStyleSheet();
-themeStylesheet.replace(/*css*/`
+export { theme };
 
-    @font-face {
-        font-family: "Open Sans";
-        src: url(${openSans}) format("truetype")
+export { DEFAULT_THEME_HOVERED_ITEM_COLOR };
+export { DEFAULT_THEME_FOCUSED_ITEM_COLOR };
+export { DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR };
+export { DEFAULT_THEME_SELECTED_ITEM_COLOR };
+export { DEFAULT_THEME_ACTIVATED_ITEM_COLOR };
+export { DEFAULT_THEME_DROPTARGET_ITEM_COLOR };
+
+export { DEFAULT_THEME_ARROW_RIGHT_IMAGE };
+export { DEFAULT_THEME_ARROW_DROPDOWN_IMAGE };
+export { DEFAULT_THEME_ARROW_DROPUP_IMAGE };
+export { DEFAULT_THEME_CHECKED_IMAGE };
+
+const DEFAULT_THEME_TINT = 203;
+const DEFAULT_THEME_ACCENT_COLOR = `hsl(var(--theme-tint, ${DEFAULT_THEME_TINT}), 92%, 50%, 50%)`;
+const DEFAULT_THEME_HOVERED_ITEM_COLOR = `hsl(var(--theme-tint, ${DEFAULT_THEME_TINT}), 92%, 80%, 50%)`;
+const DEFAULT_THEME_FOCUSED_ITEM_COLOR = `hsl(var(--theme-tint, ${DEFAULT_THEME_TINT}), 92%, 50%, 50%)`;
+const DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR = `hsl(var(--theme-tint, ${DEFAULT_THEME_TINT}), 92%, 50%)`;
+const DEFAULT_THEME_SELECTED_ITEM_COLOR = `hsl(var(--theme-tint, ${DEFAULT_THEME_TINT}), 92%, 75%, 75%)`;
+const DEFAULT_THEME_ACTIVATED_ITEM_COLOR = `hsl(var(--theme-tint, ${DEFAULT_THEME_TINT}), 92%, 50%, 50%)`;
+const DEFAULT_THEME_DROPTARGET_ITEM_COLOR = `hsl(var(--theme-tint, ${DEFAULT_THEME_TINT}), 92%, 50%, 50%)`;
+
+class Theme extends ModelObject {
+    @ModelProperty()
+    tint!: number;
+
+    @ModelProperty()
+    checkedImage!: string;
+
+    @ModelProperty()
+    arrowRightImage!: string;
+
+    @ModelProperty()
+    arrowDropDownImage!: string;
+
+    @ModelProperty()
+    arrowDropUpImage!: string;
+
+    stylesheet: CSSStyleSheet;
+
+    images(): Map<string, string> {
+        return new Map([
+            ["checkedImage", this.checkedImage],
+            ["arrowRightImage", this.arrowRightImage],
+            ["arrowDropDownImage", this.arrowDropDownImage],
+            ["arrowDropUpImage", this.arrowDropUpImage],
+        ])
     }
 
-    :root {
-        font-size: 14px;
-        font-family: "Open Sans";
+    constructor() {
+        super();
+        this.stylesheet = new CSSStyleSheet();
+        this.stylesheet.replace(/*css*/`
+            :root {
+                --theme-accent-color: ${DEFAULT_THEME_ACCENT_COLOR};
+                --theme-hovered-item-color: ${DEFAULT_THEME_HOVERED_ITEM_COLOR};
+                --theme-focused-item-color: ${DEFAULT_THEME_FOCUSED_ITEM_COLOR};
+                --theme-focused-item-outline-color: ${DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR};
+                --theme-selected-item-color: ${DEFAULT_THEME_SELECTED_ITEM_COLOR};
+                --theme-activated-item-color: ${DEFAULT_THEME_ACTIVATED_ITEM_COLOR};
+                --theme-droptarget-item-color: ${DEFAULT_THEME_DROPTARGET_ITEM_COLOR};
 
-        --arrow-right: url(${arrowRight});
-        --arrow-dropdown: url(${arrowDropDown});
-        --arrow-dropup: url(${arrowDropUp});
-        --done: url(${done});
-        --open-sans: url(${openSans});
+                --theme-arrow-color: var(--font-color);
+                --theme-arrow-icon-collapsed: var(--arrow-right);
+                --theme-arrow-icon-expanded: var(--arrow-dropdown);
 
-        --font-color: black;
-        
-        --icon-size: 18px;
+                --theme-sortorder-indicator-color: var(--font-color);
+                --theme-sortorder-indicator-ascending: var(--arrow-dropup);
+                --theme-sortorder-indicator-descending: var(--arrow-dropdown);
+            }
+            
+            @font-face {
+                font-family: "Open Sans";
+                src: url(${openSansTtf}) format("truetype")
+            }
 
-        --line-height: 18px;
-        --padded-line-height: 22px;
+            :root {
+                font-size: 10px;
+                font-family: "Open Sans";
+                accent-color: var(--theme-accent-color);
+            }
 
-        --menu-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 3px;
-
-        --primary-color: white;
-        --secondary-color: white;
-
-        --text-color: white;
-        --text-darker-color: white;
-        --text-lighter-color: white;
-
-        --content-background-color: white;
-        --item-border-color: grey;
-        --section-border-color: lightgrey;
-        --padding-background-color: gainsboro;
-
-        --accent-color: hsl(212, 100%, 50%);
-        --hovered-item-color: hsl(203, 92%, 80%, 50%);
-        --focused-item-color: hsl(203, 92%, 50%, 50%);
-        --focused-item-outline-color: hsl(203, 92%, 50%);
-        --selected-item-color: hsl(203, 92%, 75%, 75%);
-        --activated-item-color: hsl(203, 92%, 50%, 50%);
-        --droptarget-item-color: hsl(203, 92%, 50%, 50%);
-
-        --arrow-color: var(--font-color);
-        --arrow-icon-collapsed: var(--arrow-right);
-        --arrow-icon-expanded: var(--arrow-dropdown);
-
-        --sortorder-indicator-color: var(--font-color);
-        --sortorder-indicator-ascending: var(--arrow-dropup);
-        --sortorder-indicator-descending: var(--arrow-dropdown);
+            ::selection {
+                background-color: var(--theme-selected-item-color);
+            }
+        `);
+        this.addEventListener("modelchange", this.#handleModelChangeEvent.bind(this));
+        this.tint = DEFAULT_THEME_TINT;
+        this.arrowRightImage = DEFAULT_THEME_ARROW_RIGHT_IMAGE;
+        this.arrowDropDownImage = DEFAULT_THEME_ARROW_DROPDOWN_IMAGE;
+        this.arrowDropUpImage = DEFAULT_THEME_ARROW_DROPUP_IMAGE;
+        this.checkedImage = DEFAULT_THEME_ARROW_DROPDOWN_IMAGE;
     }
-`);
+
+    #handleModelChangeEvent() {
+        const {stylesheet} = this;
+        const variablesMap = (<CSSStyleRule>stylesheet.cssRules[0]).styleMap;
+        const records = this.getRecords();
+        records.forEach((record) => {
+            const {propertyName, newValue} = record;
+            switch (propertyName) {
+                case "tint": {
+                    variablesMap.set("--theme-tint", String(newValue));
+                    break;
+                }
+                case "checkedImage": {
+                    variablesMap.set("--theme-checked-image", `url(${String(newValue)})`);
+                    break;
+                }
+                case "arrowRightImage": {
+                    variablesMap.set("--theme-arrow-right-image", `url(${String(newValue)})`);
+                    break;
+                }
+                case "arrowDropDown": {
+                    variablesMap.set("--theme-arrow-dropdown-image", `url(${String(newValue)})`);
+                    break;
+                }
+                case "arrowDropUp": {
+                    variablesMap.set("--theme-arrow-dropup-image", `url(${String(newValue)})`);
+                    break;
+                }
+            }
+        });
+}
+}
+
+const theme = new Theme();

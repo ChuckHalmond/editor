@@ -1,5 +1,7 @@
 import { CustomElement, element } from "../../Element";
 
+import "./TreeItem";
+
 export { HTMLETreeItemGroupElement };
 
 interface HTMLETreeItemGroupElementConstructor {

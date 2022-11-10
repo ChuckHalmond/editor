@@ -1,3 +1,4 @@
+import "./TreeItem";
 export { HTMLETreeItemGroupElement };
 interface HTMLETreeItemGroupElementConstructor {
     prototype: HTMLETreeItemGroupElement;

@@ -1,6 +1,11 @@
+import { DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR, DEFAULT_THEME_FOCUSED_ITEM_COLOR, DEFAULT_THEME_HOVERED_ITEM_COLOR } from "../../../stylesheets/Theme";
 import { CustomElement, AttributeProperty, element, QueryProperty } from "../../Element";
 import { HTMLEMenuElement } from "./Menu";
 import { HTMLEMenuItemElement } from "./MenuItem";
+
+import "./Menu";
+import "./MenuItem";
+import "./MenuItemGroup";
 
 export { HTMLEMenuButtonElement };
 export { EMenuButton };
@@ -70,16 +75,16 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
             }
             
             :host(:focus) {
-                outline: 1px solid var(--focused-item-outline-color);
+                outline: 1px solid var(--theme-focused-item-outline-color, ${DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR});
                 outline-offset: -1px;
             }
             
             :host(:focus-within:not(:focus)) {
-                background-color: var(--focused-item-color);
+                background-color: var(--theme-focused-item-color, ${DEFAULT_THEME_FOCUSED_ITEM_COLOR});
             }
             
             :host(:hover:not(:focus-within)) {
-                background-color: var(--hovered-item-color);
+                background-color: var(--theme-hovered-item-color, ${DEFAULT_THEME_HOVERED_ITEM_COLOR});
             }
             
             :host([disabled]) {
