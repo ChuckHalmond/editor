@@ -390,26 +390,26 @@ delete ModelNodeBase.ModelNodeRecordsAccessor;
 
 var ModelNode: ModelNodeConstructor = ModelNodeBase;
 
-interface ModelPropertyDecorator {
+interface ReactivePropertyDecorator {
     (): <Model extends ModelObject>(target: Model, property: string) => void;
 }
 
-const ReactiveProperty: ModelPropertyDecorator = function() {
+const ReactiveProperty: ReactivePropertyDecorator = function() {
     return (
         target: ModelObject, property: string
     ) => {
         const {constructor} = target;
         const {prototype} = constructor;
         const setter = function(this: ModelObject, value: any) {
-            const oldValue = ModelObjectPropertiesAccessor.getProperty(this, property);
-            ModelObjectPropertiesAccessor.setProperty(this, property, value);
+            const oldValue = ModelReactivePropertiesAccessor.getProperty(this, property);
+            ModelReactivePropertiesAccessor.setProperty(this, property, value);
             if (value !== oldValue) {
                 ModelNodeRecordsAccessor.triggerChange(this, property, oldValue, value);
             }
             return true;
         };
         const getter = function(this: ModelObject) {
-            return ModelObjectPropertiesAccessor.getProperty(this, property);
+            return ModelReactivePropertiesAccessor.getProperty(this, property);
         };
         Object.defineProperty(prototype, property, {
             set: setter,
@@ -426,7 +426,7 @@ interface ModelObjectConstructor {
 
 interface ModelObject extends ModelNode {}
 
-interface ModelObjectPropertiesAccessor {
+interface ModelReactivePropertiesAccessor {
     setProperty(node: ModelNode, property: string, value: any): void;
     getProperty(node: ModelNode, property: string,): any;
 }
@@ -439,7 +439,7 @@ class ModelObjectBase extends ModelNodeBase implements ModelObject {
         this.#properties = new Map();
     }
 
-    static ModelObjectPropertiesAccessor? = new class ModelPropertiesAccessor {
+    static ModelReactivePropertiesAccessor? = new class ModelReactivePropertiesAccessor {
         setProperty(node: ModelObject, property: string, value: any): void {
             if (node instanceof ModelObjectBase) {
                 node.#properties.set(property, value);
@@ -454,8 +454,8 @@ class ModelObjectBase extends ModelNodeBase implements ModelObject {
     }
 }
 
-var ModelObjectPropertiesAccessor: ModelObjectPropertiesAccessor = ModelObjectBase.ModelObjectPropertiesAccessor!;
-delete ModelObjectBase.ModelObjectPropertiesAccessor;
+var ModelReactivePropertiesAccessor: ModelReactivePropertiesAccessor = ModelObjectBase.ModelReactivePropertiesAccessor!;
+delete ModelObjectBase.ModelReactivePropertiesAccessor;
 
 var ModelObject: ModelObjectConstructor = ModelObjectBase;
 

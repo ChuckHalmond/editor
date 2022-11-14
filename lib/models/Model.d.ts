@@ -85,10 +85,10 @@ interface ModelNode extends ModelEventTarget {
     endChanges(): void;
 }
 declare var ModelNode: ModelNodeConstructor;
-interface ModelPropertyDecorator {
+interface ReactivePropertyDecorator {
     (): <Model extends ModelObject>(target: Model, property: string) => void;
 }
-declare const ReactiveProperty: ModelPropertyDecorator;
+declare const ReactiveProperty: ReactivePropertyDecorator;
 interface ModelObjectConstructor {
     prototype: ModelObject;
     new (): ModelObject;
