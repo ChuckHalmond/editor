@@ -4,7 +4,7 @@ import DEFAULT_THEME_ARROW_DROPUP_IMAGE from "../../assets/arrow_drop_up_FILL0_w
 import DEFAULT_THEME_CHECKED_IMAGE from "../../assets/done_FILL0_wght400_GRAD0_opsz48.svg";
 import openSansTtf from "../../assets/fonts/Open_Sans/OpenSans-VariableFont_wdth,wght.ttf";
 
-import { ModelObject, ModelProperty } from "../models/Model";
+import { ModelObject, ReactiveProperty } from "../models/Model";
 
 export { theme };
 
@@ -30,19 +30,19 @@ const DEFAULT_THEME_ACTIVATED_ITEM_COLOR = `hsl(var(--theme-tint, ${DEFAULT_THEM
 const DEFAULT_THEME_DROPTARGET_ITEM_COLOR = `hsl(var(--theme-tint, ${DEFAULT_THEME_TINT}), 92%, 50%, 50%)`;
 
 class Theme extends ModelObject {
-    @ModelProperty()
+    @ReactiveProperty()
     tint!: number;
 
-    @ModelProperty()
+    @ReactiveProperty()
     checkedImage!: string;
 
-    @ModelProperty()
+    @ReactiveProperty()
     arrowRightImage!: string;
 
-    @ModelProperty()
+    @ReactiveProperty()
     arrowDropDownImage!: string;
 
-    @ModelProperty()
+    @ReactiveProperty()
     arrowDropUpImage!: string;
 
     stylesheet: CSSStyleSheet;

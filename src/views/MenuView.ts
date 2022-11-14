@@ -1,6 +1,6 @@
 import { HTMLEMenuItemElement } from "../elements/containers/menus/MenuItem";
 import { CustomElement, element, reactiveChildElements, reactiveElement } from "../elements/Element";
-import { ModelList, ModelObject, ModelProperty } from "../models/Model";
+import { ModelList, ModelObject, ReactiveProperty } from "../models/Model";
 import { View } from "./View";
 
 export { MenuModel };
@@ -15,7 +15,7 @@ interface MenuInit {
 class MenuModel extends ModelObject {
     readonly items: ModelList<MenuItemModel>;
     
-    @ModelProperty()
+    @ReactiveProperty()
     name?: string;
     
     constructor(init: MenuInit) {
@@ -33,16 +33,16 @@ interface MenuItemInit {
 }
 
 class MenuItemModel extends ModelObject {
-    @ModelProperty()
+    @ReactiveProperty()
     name?: string;
 
-    @ModelProperty()
+    @ReactiveProperty()
     label: string;
 
-    @ModelProperty()
+    @ReactiveProperty()
     type?: "button" | "radio" | "checkbox" | "menu" | "submenu";
 
-    @ModelProperty()
+    @ReactiveProperty()
     menu?: MenuModel;
     
     constructor(init: MenuItemInit) {

@@ -1,5 +1,5 @@
 import { element, reactiveChildElements, CustomElement, fragment, AttributeProperty, reactiveElement } from "../elements/Element";
-import { ModelList, ModelObject, ModelProperty } from "../models/Model";
+import { ModelList, ModelObject, ReactiveProperty } from "../models/Model";
 import { View } from "./View";
 import { HTMLEGridCellElement } from "../elements/containers/grid/GridCell";
 import { HTMLEGridElement } from "../elements/containers/grid/Grid";
@@ -92,7 +92,7 @@ class GridColumnModel extends ModelObject {
     readonly extract: (row: GridRowModel) => string;
     readonly filters: (GridRowFilter & {name: string})[];
 
-    @ModelProperty()
+    @ReactiveProperty()
     sortorder: number | undefined;
 
     constructor(init: GridColumnInit) {

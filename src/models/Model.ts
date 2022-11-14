@@ -2,7 +2,7 @@ export { ModelChangeRecord };
 export { ModelEvent };
 export { ModelNode };
 export { ModelObject };
-export { ModelProperty };
+export { ReactiveProperty };
 export { ModelList };
 export { ModelChangeObserverOptions };
 export { ModelChangeObserver };
@@ -394,7 +394,7 @@ interface ModelPropertyDecorator {
     (): <Model extends ModelObject>(target: Model, property: string) => void;
 }
 
-const ModelProperty: ModelPropertyDecorator = function() {
+const ReactiveProperty: ModelPropertyDecorator = function() {
     return (
         target: ModelObject, property: string
     ) => {

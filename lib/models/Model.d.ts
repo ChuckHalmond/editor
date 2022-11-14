@@ -2,7 +2,7 @@ export { ModelChangeRecord };
 export { ModelEvent };
 export { ModelNode };
 export { ModelObject };
-export { ModelProperty };
+export { ReactiveProperty };
 export { ModelList };
 export { ModelChangeObserverOptions };
 export { ModelChangeObserver };
@@ -88,7 +88,7 @@ declare var ModelNode: ModelNodeConstructor;
 interface ModelPropertyDecorator {
     (): <Model extends ModelObject>(target: Model, property: string) => void;
 }
-declare const ModelProperty: ModelPropertyDecorator;
+declare const ReactiveProperty: ModelPropertyDecorator;
 interface ModelObjectConstructor {
     prototype: ModelObject;
     new (): ModelObject;

@@ -3,7 +3,7 @@ import { HTMLEToolBarElement } from "../elements/containers/toolbars/ToolBar";
 import { HTMLETreeElement } from "../elements/containers/trees/Tree";
 import { HTMLETreeItemElement } from "../elements/containers/trees/TreeItem";
 import { AttributeProperty, CustomElement, element, fragment, reactiveChildElements, reactiveElement } from "../elements/Element";
-import { ModelEvent, ModelList, ModelObject, ModelProperty } from "../models/Model";
+import { ModelEvent, ModelList, ModelObject, ReactiveProperty } from "../models/Model";
 import { resetStylesheet } from "../stylesheets/Reset";
 import { DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR } from "../stylesheets/Theme";
 import { View } from "./View";
@@ -131,13 +131,13 @@ class TreeItemModelList {
 class TreeItemModel extends ModelObject {
     readonly childItems: ModelList<TreeItemModel>;
 
-    @ModelProperty()
+    @ReactiveProperty()
     id: string;
     
-    @ModelProperty()
+    @ReactiveProperty()
     type: "leaf" | "parent";
 
-    @ModelProperty()
+    @ReactiveProperty()
     index: number;
 
     get level(): number {
