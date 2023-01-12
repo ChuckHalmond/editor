@@ -130,7 +130,7 @@ class Theme extends ModelObject {
                 }
             }
         });
-}
+    }
 }
 
 const theme = new Theme();
