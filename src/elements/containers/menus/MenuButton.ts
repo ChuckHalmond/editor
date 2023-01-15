@@ -1,4 +1,4 @@
-import { DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR, DEFAULT_THEME_FOCUSED_ITEM_COLOR, DEFAULT_THEME_HOVERED_ITEM_COLOR, DEFAULT_THEME_ARROW_RIGHT_IMAGE } from "../../../stylesheets/Theme";
+import { DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR, DEFAULT_THEME_FOCUSED_ITEM_COLOR, DEFAULT_THEME_HOVERED_ITEM_COLOR } from "../../../stylesheets/Theme";
 import { CustomElement, AttributeProperty, element, QueryProperty } from "../../Element";
 import { HTMLEMenuElement } from "./Menu";
 import { HTMLEMenuItemElement } from "./MenuItem";
@@ -57,11 +57,6 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
         shadowTemplate = element("template");
         shadowTemplate.content.append(
             element("slot"),
-            element("span", {
-                attributes: {
-                    part: "arrow"
-                }
-            }),
             element("slot", {
                 attributes: {
                     name: "menu"
@@ -107,27 +102,12 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
                 pointer-events: none;
             }
             
-            [part="arrow"] {
-                flex: none;
+            :host::after {
                 display: inline-block;
+                text-align: center;
                 width: 18px;
                 height: 18px;
-                margin: 1px 4px 1px 1px;
-                pointer-events: none;
-            }
-            
-            [part="arrow"]::after {
-                display: inline-block;
-                width: 18px;
-                height: 18px;
-                margin: 1px;
-                content: "";
-                mask-size: 18px 18px;
-                -webkit-mask-size: 18px 18px;
-                
-                -webkit-mask-image: var(--theme-arrow-right-image, url(${DEFAULT_THEME_ARROW_RIGHT_IMAGE}));
-                mask-image: var(--theme-arrow-right-image, url(${DEFAULT_THEME_ARROW_RIGHT_IMAGE}));
-                background-color: black;
+                content: "▾";
             }
         `;
     }
