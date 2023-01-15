@@ -57,6 +57,11 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
         shadowTemplate = element("template");
         shadowTemplate.content.append(
             element("slot"),
+            element("span", {
+                attributes: {
+                    part: "arrow"
+                }
+            }),
             element("slot", {
                 attributes: {
                     name: "menu"
@@ -102,7 +107,7 @@ class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonE
                 pointer-events: none;
             }
             
-            :host::after {
+            [part="arrow"] {
                 display: inline-block;
                 text-align: center;
                 width: 18px;
