@@ -28,10 +28,10 @@ var style: string;
 })
 class HTMLELoaderElementBase extends HTMLElement implements HTMLELoaderElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
     
     @AttributeProperty({type: String, defaultValue: "bar", observed: true})
-    type!: "bar" | "spinner";
+    declare type: "bar" | "spinner";
 
     static {
         barShadowTemplate = element("template");

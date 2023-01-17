@@ -34,28 +34,28 @@ var style: string;
 })
 class HTMLEGridCellElementBase extends HTMLElement implements HTMLEGridCellElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
     
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     @AttributeProperty({type: String})
-    headers!: string;
+    declare headers: string;
 
     @AttributeProperty({type: String})
-    type!: "rowheader" | "columnheader" | "gridcell";
+    declare type: "rowheader" | "columnheader" | "gridcell";
 
     @AttributeProperty({type: Number})
-    posinset!: number;
+    declare posinset: number;
 
     @AttributeProperty({type: Boolean})
-    droptarget!: boolean;
+    declare droptarget: boolean;
 
     @AttributeProperty({type: Boolean})
-    active!: boolean;
+    declare active: boolean;
 
     @AttributeProperty({type: Boolean, observed: true})
-    selected!: boolean;
+    declare selected: boolean;
 
     static {
         shadowTemplate = element("template");

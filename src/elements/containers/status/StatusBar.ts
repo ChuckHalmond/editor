@@ -34,7 +34,7 @@ var style: string;
 })
 class HTMLEStatusBarElementBase extends HTMLElement implements HTMLEStatusBarElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     get activeItem(): HTMLEStatusItemElement | null {
         return this.querySelector<HTMLEStatusItemElement>(

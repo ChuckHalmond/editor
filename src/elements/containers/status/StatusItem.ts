@@ -29,13 +29,13 @@ var style: string;
 })
 class HTMLEStatusItemElementBase extends HTMLElement implements HTMLEStatusItemElement {
     
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     @AttributeProperty({type: Boolean})
-    active!: boolean;
+    declare active: boolean;
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     static {
         shadowTemplate = element("template");

@@ -39,37 +39,37 @@ var iconPartTemplate: HTMLElement;
 })
 class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarItemElement {
     
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     @QueryProperty({selector: ":scope > e-menubutton[slot=menubutton]"})
-    readonly menubutton!: HTMLEMenuButtonElement | null;
+    declare readonly menubutton: HTMLEMenuButtonElement | null;
     
     @QueryProperty({selector: ":scope > e-select[slot=select]"})
-    readonly select!: HTMLESelectElement | null;
+    declare readonly select: HTMLESelectElement | null;
 
     @AttributeProperty({type: Boolean})
-    active!: boolean;
+    declare active: boolean;
 
     @AttributeProperty({type: Boolean})
-    pressed!: boolean;
+    declare pressed: boolean;
 
     @AttributeProperty({type: Boolean})
-    expanded!: boolean;
+    declare expanded: boolean;
 
     @AttributeProperty({type: Boolean, observed: true})
-    iconed!: boolean;
+    declare iconed: boolean;
 
     @AttributeProperty({type: String, observed: true})
-    value!: string;
+    declare value: string;
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     @AttributeProperty({type: String, observed: true})
-    label!: string;
+    declare label: string;
 
     @AttributeProperty({type: String})
-    type!: "button" | "checkbox" | "radio" | "menubutton" | "select";
+    declare type: "button" | "checkbox" | "radio" | "menubutton" | "select";
 
     static {
         shadowTemplate = element("template");

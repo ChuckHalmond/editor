@@ -39,37 +39,37 @@ var style: string;
 })
 class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     @AttributeProperty({type: Number})
-    posinset!: number;
+    declare posinset: number;
 
     @AttributeProperty({type: String, observed: true})
-    label!: string;
+    declare label: string;
 
     @AttributeProperty({type: Boolean, observed: true})
-    expanded!: boolean;
+    declare expanded: boolean;
     
     @AttributeProperty({type: Boolean})
-    droptarget!: boolean;
+    declare droptarget: boolean;
 
     @AttributeProperty({type: Boolean})
-    active!: boolean;
+    declare active: boolean;
 
     @AttributeProperty({type: Boolean, observed: true})
-    selected!: boolean;
+    declare selected: boolean;
 
     @AttributeProperty({type: Number, observed: true})
-    level!: number;
+    declare level: number;
 
     @AttributeProperty({type: String, defaultValue: "leaf"})
-    type!: "leaf" | "parent";
+    declare type: "leaf" | "parent";
 
     @QueryProperty({selector: ":scope > e-treeitemgroup[slot=group]"})
-    group!: HTMLETreeItemGroupElement | null;
+    declare group: HTMLETreeItemGroupElement | null;
     
     static {
         shadowTemplate = element("template");

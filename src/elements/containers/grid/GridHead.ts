@@ -31,7 +31,7 @@ var style: string;
     name: "e-gridhead"
 })
 class HTMLEGridHeadElementBase extends HTMLElement implements HTMLEGridHeadElement {
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     cells(): HTMLEGridCellElement[] {
         return Array.from(this.querySelectorAll<HTMLEGridCellElement>(

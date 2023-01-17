@@ -29,13 +29,13 @@ var style: string;
 })
 class HTMLEToolBarItemGroupElementBase extends HTMLElement implements HTMLEToolBarItemGroupElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
     
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     @AttributeProperty({type: String, observed: true})
-    label!: string;
+    declare label: string;
 
     static {
         shadowTemplate = element("template");

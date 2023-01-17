@@ -38,7 +38,7 @@ var style: string;
 })
 class HTMLEListItemElementBase extends HTMLElement implements HTMLEListItemElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
     
     get badge(): HTMLElement | null {
         return this.#badge;
@@ -53,22 +53,22 @@ class HTMLEListItemElementBase extends HTMLElement implements HTMLEListItemEleme
     }
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     @AttributeProperty({type: Number})
-    posinset!: number;
+    declare posinset: number;
 
     @AttributeProperty({type: String, observed: true})
-    label!: string;
+    declare label: string;
 
     @AttributeProperty({type: Boolean})
-    droptarget!: boolean;
+    declare droptarget: boolean;
 
     @AttributeProperty({type: Boolean})
-    active!: boolean;
+    declare active: boolean;
 
     @AttributeProperty({type: Boolean, observed: true})
-    selected!: boolean;
+    declare selected: boolean;
 
     #badge: HTMLElement | null;
     #toolbar: HTMLEToolBarElement | null;

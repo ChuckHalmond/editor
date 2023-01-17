@@ -30,10 +30,10 @@ var style: string;
 })
 class HTMLEHandleElementBase extends HTMLElement implements HTMLEHandleElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     @AttributeProperty({type: String, observed: true})
-    controls!: string;
+    declare controls: string;
 
     #target: HTMLElement | null;
     #onCapture: boolean;

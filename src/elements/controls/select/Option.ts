@@ -32,23 +32,23 @@ var style: string;
     name: "e-option"
 })
 class HTMLEOptionElementBase extends HTMLElement implements HTMLEOptionElement {
-    readonly shadowRoot!: ShadowRoot;
-    readonly internals: ElementInternals;
+    declare readonly shadowRoot: ShadowRoot;
+    declare readonly internals: ElementInternals;
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     @AttributeProperty({type: String})
-    value!: string;
+    declare value: string;
     
     @AttributeProperty({type: String, observed: true})
-    label!: string;
+    declare label: string;
 
     @AttributeProperty({type: Boolean})
-    disabled!: boolean;
+    declare disabled: boolean;
 
     @AttributeProperty({type: Boolean, observed: true})
-    selected!: boolean;
+    declare selected: boolean;
 
     static {
         shadowTemplate = element("template");

@@ -36,22 +36,22 @@ var style: string;
 })
 class HTMLEMenuButtonElementBase extends HTMLElement implements HTMLEMenuButtonElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
     
     @QueryProperty({selector: ":scope > e-menu[slot=menu]"})
-    readonly menu!: HTMLEMenuElement | null;
+    declare readonly menu: HTMLEMenuElement | null;
     
     @QueryProperty({selector: ":scope > e-menu[slot=menu] e-menuitem"})
-    readonly firstItem!: HTMLEMenuItemElement | null;
+    declare readonly firstItem: HTMLEMenuItemElement | null;
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     @AttributeProperty({type: Boolean})
-    disabled!: boolean;
+    declare disabled: boolean;
 
     @AttributeProperty({type: Boolean})
-    expanded!: boolean;
+    declare expanded: boolean;
 
     static {
         shadowTemplate = element("template");

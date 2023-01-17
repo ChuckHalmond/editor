@@ -54,7 +54,7 @@ var style: string;
 })
 class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     cells(): HTMLEGridCellElement[] {
         return Array.from(this.querySelectorAll<HTMLEGridCellElement>(
@@ -85,13 +85,13 @@ class HTMLEGridElementBase extends HTMLElement implements HTMLEGridElement {
     }
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     @AttributeProperty({type: String, defaultValue: "cell"})
-    selectby!: "cell" | "row";
+    declare selectby: "cell" | "row";
 
     @AttributeProperty({type: Boolean})
-    multiselectable!: boolean;
+    declare multiselectable: boolean;
 
     #onSelection: boolean;
     #hasSelectionChanged: boolean;

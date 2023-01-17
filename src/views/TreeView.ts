@@ -230,13 +230,13 @@ var style: string;
     name: "e-treeview"
 })
 class TreeViewBase extends View implements TreeView {
-    readonly shadowRoot!: ShadowRoot;
-    readonly model!: TreeModel;
+    declare readonly shadowRoot: ShadowRoot;
+    declare readonly model: TreeModel;
 
     #dragImages: WeakMap<TreeItemModel, WeakRef<Element>>;
 
     @AttributeProperty({type: Boolean, observed: true})
-    draggable!: boolean;
+    declare draggable: boolean;
 
     static {
         style = /*css*/`

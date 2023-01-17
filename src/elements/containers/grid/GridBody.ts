@@ -31,7 +31,7 @@ var style: string;
     name: "e-gridbody"
 })
 class HTMLEGridBodyElementBase extends HTMLElement implements HTMLEGridBodyElement {
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     cells(): HTMLEGridCellElement[] {
         return Array.from(this.querySelectorAll<HTMLEGridCellElement>(

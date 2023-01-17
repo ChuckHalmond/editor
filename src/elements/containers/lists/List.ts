@@ -39,7 +39,7 @@ var style: string;
 })
 class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     get activeItem(): HTMLEListItemElement | null {
         return this.querySelector<HTMLEListItemElement>(
@@ -54,10 +54,10 @@ class HTMLEListElementBase extends HTMLElement implements HTMLEListElement {
     }
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
     
     @AttributeProperty({type: Boolean})
-    droptarget!: boolean;
+    declare droptarget: boolean;
 
     #onSelection: boolean;
     #hasSelectionChanged: boolean;

@@ -39,12 +39,12 @@ var style: string;
 class HTMLEMenuBarElementBase extends HTMLElement implements HTMLEMenuBarElement {
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     @AttributeProperty({type: Boolean})
-    expanded!: boolean;
+    declare expanded: boolean;
     
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     #activeIndex: number;
     #walker: TreeWalker;

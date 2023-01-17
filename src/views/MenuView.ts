@@ -75,7 +75,7 @@ declare global {
     name: "v-menu"
 })
 class MenuViewBase extends View {
-    readonly model!: MenuModel;
+    declare readonly model: MenuModel;
 
     constructor()
     constructor(model: MenuModel)

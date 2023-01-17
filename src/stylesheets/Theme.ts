@@ -31,19 +31,19 @@ const DEFAULT_THEME_DROPTARGET_ITEM_COLOR = `hsl(var(--theme-tint, ${DEFAULT_THE
 
 class Theme extends ModelObject {
     @ReactiveProperty()
-    tint!: number;
+    declare tint: number;
 
     @ReactiveProperty()
-    checkedImage!: string;
+    declare checkedImage: string;
 
     @ReactiveProperty()
-    arrowRightImage!: string;
+    declare arrowRightImage: string;
 
     @ReactiveProperty()
-    arrowDropDownImage!: string;
+    declare arrowDropDownImage: string;
 
     @ReactiveProperty()
-    arrowDropUpImage!: string;
+    declare arrowDropUpImage: string;
 
     stylesheet: CSSStyleSheet;
 

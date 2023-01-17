@@ -34,23 +34,23 @@ var style: string;
 })
 class HTMLEGridRowElementBase extends HTMLElement implements HTMLEGridRowElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     cells(): HTMLEGridCellElement[] {
         return Array.from(this.querySelectorAll<HTMLEGridCellElement>("e-gridcell"));
     }
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     @AttributeProperty({type: Boolean})
-    active!: boolean;
+    declare active: boolean;
 
     @AttributeProperty({type: Boolean})
-    selected!: boolean;
+    declare selected: boolean;
 
     @AttributeProperty({type: Number})
-    posinset!: number;
+    declare posinset: number;
 
     static {
         shadowTemplate = element("template");

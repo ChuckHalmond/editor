@@ -41,7 +41,7 @@ var SHOW_DELAY_MS = 400;
 })
 class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     items(): HTMLEMenuItemElement[] {
         return Array.from(this.querySelectorAll<HTMLEMenuItemElement>(
@@ -61,10 +61,10 @@ class HTMLEMenuElementBase extends HTMLElement implements HTMLEMenuElement {
     }
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     @AttributeProperty({type: Boolean})
-    contextual!: boolean;
+    declare contextual: boolean;
 
     #walker: TreeWalker;
     #activeIndex: number;

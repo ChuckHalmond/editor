@@ -35,20 +35,20 @@ var ANIMATION_DURATION = 100;
 })
 class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     get target(): HTMLElement | null {
         return this.#target;
     }
 
     @AttributeProperty({type: String, observed: true, name: "for"})
-    htmlFor!: string;
+    declare htmlFor: string;
 
     @AttributeProperty({type: String, defaultValue: "top"})
-    position!: "top" | "bottom" | "right" | "left";
+    declare position: "top" | "bottom" | "right" | "left";
 
     @AttributeProperty({type: Boolean})
-    visible!: boolean;
+    declare visible: boolean;
 
     #target: HTMLElement | null;
     #targetListenerObject: EventListenerObject;

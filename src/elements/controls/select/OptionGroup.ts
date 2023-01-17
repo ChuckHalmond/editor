@@ -25,7 +25,7 @@ var style: string;
 })
 class HTMLEOptionGroupElementBase extends HTMLElement implements HTMLEOptionGroupElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     static {
         shadowTemplate = element("template");

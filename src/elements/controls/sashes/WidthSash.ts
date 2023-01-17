@@ -33,20 +33,20 @@ var style: string;
 })
 class HTMLEWidthSashElementBase extends HTMLElement implements HTMLEWidthSashElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     get target(): HTMLElement | null {
         return this.#target;
     }
 
     @AttributeProperty({type: String, observed: true})
-    controls!: string;
+    declare controls: string;
 
     @AttributeProperty({type: String, defaultValue: "right"})
-    growdir!: "right" | "left";
+    declare growdir: "right" | "left";
 
     @AttributeProperty({type: Boolean})
-    max!: boolean;
+    declare max: boolean;
 
     #target: HTMLElement | null;
     #onCapture: boolean;

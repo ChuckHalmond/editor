@@ -28,10 +28,10 @@ var style: string;
 })
 class HTMLEStatusItemGroupElementBase extends HTMLElement implements HTMLEStatusItemGroupElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
     
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     static {
         shadowTemplate = element("template");

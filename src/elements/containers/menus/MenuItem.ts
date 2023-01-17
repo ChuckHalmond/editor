@@ -43,38 +43,38 @@ var style: string;
 })
 class HTMLEMenuItemElementBase extends HTMLElement implements HTMLEMenuItemElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
     readonly internals: ElementInternals;
     
     @QueryProperty({selector: ":scope > e-menu[slot=menu]"})
-    menu!: HTMLEMenuElement | null;
+    declare menu: HTMLEMenuElement | null;
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     @AttributeProperty({type: String, observed: true})
-    label!: string | null;
+    declare label: string | null;
 
     @AttributeProperty({type: String})
-    value!: string;
+    declare value: string;
 
     @AttributeProperty({type: String})
-    hotkey!: string;
+    declare hotkey: string;
 
     @AttributeProperty({type: Boolean, observed: true})
-    disabled!: boolean;
+    declare disabled: boolean;
 
     @AttributeProperty({type: Boolean, observed: true})
-    checked!: boolean;
+    declare checked: boolean;
 
     @AttributeProperty({type: Boolean, observed: true})
-    expanded!: boolean;
+    declare expanded: boolean;
 
     @AttributeProperty({type: Boolean})
-    overflown!: boolean;
+    declare overflown: boolean;
 
     @AttributeProperty({type: String, defaultValue: "button", observed: true})
-    type!: "button" | "checkbox" | "radio" | "menu" | "submenu";
+    declare type: "button" | "checkbox" | "radio" | "menu" | "submenu";
 
     static {
         shadowTemplate = element("template");

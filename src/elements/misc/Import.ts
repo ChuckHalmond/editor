@@ -26,7 +26,7 @@ declare global {
 class HTMLEImportElementBase extends HTMLElement implements HTMLEImportElement {
 
     @AttributeProperty({type: String})
-    src!: string;
+    declare src: string;
     
     connectedCallback(): void {
         const {src} = this;

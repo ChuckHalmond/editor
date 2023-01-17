@@ -40,7 +40,7 @@ var style: string;
 })
 class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
     readonly items: HTMLCollectionOf<HTMLETreeItemElement>;
 
     get activeItem(): HTMLETreeItemElement | null {
@@ -56,10 +56,10 @@ class HTMLETreeElementBase extends HTMLElement implements HTMLETreeElement {
     }
     
     @AttributeProperty({type: Boolean})
-    droptarget!: boolean;
+    declare droptarget: boolean;
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     #onSelection: boolean;
     #hasSelectionChanged: boolean;

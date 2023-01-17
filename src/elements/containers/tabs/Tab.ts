@@ -38,19 +38,19 @@ var style: string;
 class HTMLETabElementBase extends HTMLElement implements HTMLETabElement {
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     @AttributeProperty({type: Boolean})
-    disabled!: boolean;
+    declare disabled: boolean;
 
     @AttributeProperty({type: String, observed: true})
-    controls!: string;
+    declare controls: string;
 
     @AttributeProperty({type: Boolean})
-    active!: boolean;
+    declare active: boolean;
 
     @AttributeProperty({type: Boolean, observed: true})
-    selected!: boolean;
+    declare selected: boolean;
     
     get panel(): HTMLETabPanelElement | null {
         const {controls} = this;

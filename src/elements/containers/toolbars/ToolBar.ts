@@ -38,7 +38,7 @@ var wasExpandedOnMouseDown: WeakMap<HTMLEToolBarItemElement, boolean>;
 })
 class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     get activeItem(): HTMLEToolBarItemElement | null {
         return this.querySelector<HTMLEToolBarItemElement>(
@@ -53,10 +53,10 @@ class HTMLEToolBarElementBase extends HTMLElement implements HTMLEToolBarElement
     }
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     @AttributeProperty({type: String})
-    orientation!: ToolBarOrientation;
+    declare orientation: ToolBarOrientation;
 
     #walker: TreeWalker;
 

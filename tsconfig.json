@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./lib",
-    "target": "es2021",
+    "target": "esnext",
     "experimentalDecorators": true,
     "noImplicitAny": true,
     "module": "esnext",
@@ -15,10 +15,6 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": [
-    "./src",
-    "./types"
-  ],
   "exclude": [
     "./node_modules",
     "./lib"

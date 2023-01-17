@@ -28,7 +28,7 @@ var style: string;
 })
 class HTMLEListItemGroupElementBase extends HTMLElement implements HTMLEListItemGroupElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     static {
         shadowTemplate = element("template");

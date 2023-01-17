@@ -39,7 +39,7 @@ var mutationObserver: MutationObserver;
 })
 class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
     
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
     readonly internals: ElementInternals;
 
     static get formAssociated(): boolean {
@@ -61,16 +61,16 @@ class HTMLESelectElementBase extends HTMLElement implements HTMLESelectElement {
     }
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     @AttributeProperty({type: String, observed: true})
-    value!: string;
+    declare value: string;
 
     @AttributeProperty({type: String, defaultValue: "select", observed: true})
-    type!: string;
+    declare type: string;
 
     @AttributeProperty({type: Boolean})
-    expanded!: boolean;
+    declare expanded: boolean;
 
     #walker: TreeWalker;
     #wasExpandedOnMouseDown: boolean;

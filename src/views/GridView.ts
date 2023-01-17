@@ -154,8 +154,8 @@ var style: string;
 })
 class GridViewBase extends View implements GridView {
 
-    readonly shadowRoot!: ShadowRoot;
-    readonly model!: GridModel;
+    declare readonly shadowRoot: ShadowRoot;
+    declare readonly model: GridModel;
 
     #columnDelegate: (column: GridColumnModel) => string | Node;
     #cellDelegate: (row: GridRowModel, column: GridColumnModel) => string | Node;

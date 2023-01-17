@@ -33,12 +33,12 @@ var style: string;
 class HTMLEMenuItemGroupElementBase extends HTMLElement implements HTMLEMenuItemGroupElement {
 
     @AttributeProperty({type: String})
-    name!: string;
+    declare name: string;
 
     @AttributeProperty({type: String, observed: true})
-    label!: string;
+    declare label: string;
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
     readonly internals: ElementInternals;
 
     static {

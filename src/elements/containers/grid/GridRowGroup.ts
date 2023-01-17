@@ -28,7 +28,7 @@ var style: string;
 })
 class HTMLEGridRowGroupElementBase extends HTMLElement implements HTMLEGridRowGroupElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     static {
         shadowTemplate = element("template");

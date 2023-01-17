@@ -32,7 +32,7 @@ var style: string;
 })
 class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashElement {
 
-    readonly shadowRoot!: ShadowRoot;
+    declare readonly shadowRoot: ShadowRoot;
 
     get target(): HTMLElement | null {
         return this.#target;
@@ -55,10 +55,10 @@ class HTMLEHeightSashElementBase extends HTMLElement implements HTMLEHeightSashE
     }
 
     @AttributeProperty({type: String})
-    controls!: string;
+    declare controls: string;
 
     @AttributeProperty({type: String, defaultValue: "top"})
-    growdir!: "top" | "bottom";
+    declare growdir: "top" | "bottom";
 
     #target: HTMLElement | null;
     #onCapture: boolean;
