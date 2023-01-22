@@ -208,6 +208,9 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
             if (id === "hide") {
                 toggleAnimation.cancel();
             }
+            else if (!immediate) {
+                return;
+            }
         }
         if (!this.visible) {
             this.hidden = false;
@@ -238,6 +241,9 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
             const {id} = toggleAnimation;
             if (id === "show") {
                 toggleAnimation.cancel();
+            }
+            else if (!immediate) {
+                return;
             }
         }
         if (this.visible) {
