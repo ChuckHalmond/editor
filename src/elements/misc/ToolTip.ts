@@ -197,6 +197,7 @@ class HTMLEToolTipElementBase extends HTMLElement implements HTMLEToolTipElement
                 }
                 this.#target = target;
             }
+            this.#position();
         }
     }
 

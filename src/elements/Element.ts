@@ -317,8 +317,18 @@ function element<K extends keyof HTMLElementTagNameMap>(
         }
         if (dataset) {
             const {dataset: elementDataset} = element;
-            Object.keys(dataset).forEach((datasetEntry_i) => {
-                elementDataset[datasetEntry_i] = String(dataset[datasetEntry_i]);
+            Object.entries(dataset).forEach(([attributeName, attributeValue]) => {
+                if (typeof attributeValue === "boolean") {
+                    if (attributeValue) {
+                        elementDataset[camelToTrain(attributeName)] = "";
+                    }
+                    else {
+                        delete elementDataset[camelToTrain(attributeName)];
+                    }
+                }
+                else {
+                    elementDataset[camelToTrain(attributeName)] = String(attributeValue);
+                }
             });
         }
         if (children) {
