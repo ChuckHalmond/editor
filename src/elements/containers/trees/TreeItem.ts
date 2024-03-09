@@ -1,8 +1,10 @@
-import { DEFAULT_THEME_ARROW_DROPDOWN_IMAGE, DEFAULT_THEME_ARROW_RIGHT_IMAGE, DEFAULT_THEME_DROPTARGET_ITEM_COLOR, DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR, DEFAULT_THEME_HOVERED_ITEM_COLOR, DEFAULT_THEME_SELECTED_ITEM_COLOR } from "../../../stylesheets/Theme";
 import { CustomElement, element, AttributeProperty, QueryProperty } from "../../Element";
 import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
 
 export { HTMLETreeItemElement };
+
+import stylesheet from "../../../../css/elements/containers/trees/treeitem.css" assert { type: 'css' };
+import { theme } from "../../../stylesheets/Theme";
 
 interface HTMLETreeItemElementConstructor {
     prototype: HTMLETreeItemElement;
@@ -93,79 +95,6 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                 }
             })
         );
-        style = /*css*/`
-            :host {
-                display: block;
-                user-select: none;
-            }
-            
-            :host([droptarget]) {
-                background-color: var(--theme-droptarget-item-color, ${DEFAULT_THEME_DROPTARGET_ITEM_COLOR});
-            }
-
-            :host(:focus-visible) {
-                outline: none;
-            }
-            
-            :host([active]):host-context(e-tree:focus-within) [part="content"] {
-                outline: 1px solid var(--theme-focused-item-outline-color, ${DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR});
-                outline-offset: -1px;
-            }
-            
-            [part="content"]:hover {
-                background-color: var(--theme-hovered-item-color, ${DEFAULT_THEME_HOVERED_ITEM_COLOR});
-            }
-            
-            :host([selected]) [part="content"] {
-                background-color: var(--theme-selected-item-color, ${DEFAULT_THEME_SELECTED_ITEM_COLOR});
-            }
-            
-            [part="content"] {
-                display: flex;
-                line-height: 22px;
-                padding-left: 12px;
-            }
-            
-            :host(:not([type="parent"])) ::slotted([slot="group"]),
-            :host(:not([expanded])) ::slotted([slot="group"]) {
-                display: none;
-            }
-            
-            :host(:not([type="parent"])) [part="arrow"]::before {
-                visibility: hidden;
-            }
-            
-            [part="arrow"] {
-                display: inline-block;
-                width: 18px;
-                height: 18px;
-                margin: 1px 4px 1px 1px;
-            }
-            
-            [part="arrow"]::before {
-                display: inline-block;
-                width: 18px;
-                height: 18px;
-                margin: 1px;
-                content: "";
-
-                mask-size: 18px 18px;
-                -webkit-mask-size: 18px 18px;
-                background-color: none;
-            }
-            
-            :host(:not([expanded])) [part="arrow"]::before {
-                -webkit-mask-image: var(--theme-arrow-right-image, url(${DEFAULT_THEME_ARROW_RIGHT_IMAGE}));
-                mask-image: var(--theme-arrow-right-image, url(${DEFAULT_THEME_ARROW_RIGHT_IMAGE}));
-                background-color: black;
-            }
-            
-            :host([expanded]) [part="arrow"]::before {
-                -webkit-mask-image: var(--theme-arrow-dropdown-image, url(${DEFAULT_THEME_ARROW_DROPDOWN_IMAGE}));
-                mask-image: var(--theme-arrow-dropdown-image, url(${DEFAULT_THEME_ARROW_DROPDOWN_IMAGE}));
-                background-color: black;
-            }
-        `;
     }
     
     constructor() {
@@ -173,7 +102,14 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
         const shadowRoot = this.attachShadow({mode: "open"});
         const adoptedStylesheet = new CSSStyleSheet();
         adoptedStylesheet.replace(style);
-        shadowRoot.adoptedStyleSheets = [adoptedStylesheet];
+        shadowRoot.adoptedStyleSheets = [theme.stylesheet, ...Array.from(<IterableIterator<any>>stylesheet).map(
+            (item) => {
+                const [count, source] = item;
+                const stylesheet = new CSSStyleSheet();
+                stylesheet.replace(source);
+                return stylesheet;
+            }
+        )];
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );

@@ -69,6 +69,12 @@ class Theme extends ModelObject {
                 --theme-activated-item-color: ${DEFAULT_THEME_ACTIVATED_ITEM_COLOR};
                 --theme-droptarget-item-color: ${DEFAULT_THEME_DROPTARGET_ITEM_COLOR};
 
+                --theme-tint: ${DEFAULT_THEME_TINT};
+                --theme-arrow-right-image: url(${DEFAULT_THEME_ARROW_RIGHT_IMAGE});
+                --theme-arrow-dropdown-image: url(${DEFAULT_THEME_ARROW_DROPDOWN_IMAGE});
+                --theme-arrow-dropup-image: url(${DEFAULT_THEME_ARROW_DROPUP_IMAGE});
+                --theme-checked-image: url(${DEFAULT_THEME_ARROW_DROPDOWN_IMAGE});
+
                 --theme-arrow-color: var(--font-color);
                 --theme-arrow-icon-collapsed: var(--arrow-right);
                 --theme-arrow-icon-expanded: var(--arrow-dropdown);

@@ -1,0 +1,76 @@
+@import "../container.css";
+
+:host {
+    display: block;
+    user-select: none;
+}
+
+/* 
+Added from container.css
+:host([droptarget]) {
+    background-color: var(--theme-droptarget-item-color);
+}
+*/
+
+:host(:focus-visible) {
+    outline: none;
+}
+
+:host([active]):host-context(e-tree:focus-within) [part="content"] {
+    outline: 1px solid var(--theme-focused-item-outline-color);
+    outline-offset: -1px;
+}
+
+[part="content"]:hover {
+    background-color: var(--theme-hovered-item-color);
+}
+
+:host([selected]) [part="content"] {
+    background-color: var(--theme-selected-item-color);
+}
+
+[part="content"] {
+    display: flex;
+    line-height: 22px;
+    padding-left: 12px;
+}
+
+:host(:not([type="parent"])) ::slotted([slot="group"]),
+:host(:not([expanded])) ::slotted([slot="group"]) {
+    display: none;
+}
+
+:host(:not([type="parent"])) [part="arrow"]::before {
+    visibility: hidden;
+}
+
+[part="arrow"] {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin: 1px 4px 1px 1px;
+}
+
+[part="arrow"]::before {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin: 1px;
+    content: "";
+
+    mask-size: 18px 18px;
+    -webkit-mask-size: 18px 18px;
+    background-color: none;
+}
+
+:host(:not([expanded])) [part="arrow"]::before {
+    -webkit-mask-image: var(--theme-arrow-right-image);
+    mask-image: var(--theme-arrow-right-image);
+    background-color: black;
+}
+
+:host([expanded]) [part="arrow"]::before {
+    -webkit-mask-image: var(--theme-arrow-dropdown-image);
+    mask-image: var(--theme-arrow-dropdown-image);
+    background-color: black;
+}
