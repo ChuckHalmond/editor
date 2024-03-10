@@ -4,6 +4,7 @@ import { HTMLEToolBarItemGroupElement } from "./ToolBarItemGroup";
 
 import "./ToolBarItem";
 import "./ToolBarItemGroup";
+import { DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR } from "../../../stylesheets/Theme";
 
 export { HTMLEToolBarElement };
 

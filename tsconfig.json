@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "outDir": "./lib",
-    "target": "esnext",
+    "target": "ESNext",
     "experimentalDecorators": true,
     "noImplicitAny": true,
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "sourceMap": true,
     "strict": true,
     "declaration": true,

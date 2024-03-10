@@ -160,6 +160,12 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
+        this.addEventListener("focusin", () => {
+            console.log("in");
+        });
+        this.addEventListener("focusout", () => {
+            console.log("out");
+        });
     }
 
     connectedCallback(): void {

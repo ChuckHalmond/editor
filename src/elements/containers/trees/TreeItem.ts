@@ -138,7 +138,7 @@ class HTMLETreeItemElementBase extends HTMLElement implements HTMLETreeItemEleme
                 break;
             }
             case "level": {
-                (<CSSStyleRule>this.shadowRoot.adoptedStyleSheets[0].cssRules[6]).styleMap.set("padding-left", `${12 * Number(newValue)}px`);
+                (<CSSStyleRule>this.shadowRoot.adoptedStyleSheets[2].cssRules[5]).styleMap.set("padding-left", `${12 * Number(newValue)}px`);
                 break;
             }
         }
