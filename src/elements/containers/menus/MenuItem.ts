@@ -1,5 +1,6 @@
 import { DEFAULT_THEME_CHECKED_IMAGE, DEFAULT_THEME_ACTIVATED_ITEM_COLOR, DEFAULT_THEME_FOCUSED_ITEM_COLOR, DEFAULT_THEME_HOVERED_ITEM_COLOR, DEFAULT_THEME_ARROW_RIGHT_IMAGE } from "../../../stylesheets/Theme";
 import { CustomElement, AttributeProperty, QueryProperty, element } from "../../Element";
+import { constructor } from "../../Snippets";
 import { HTMLEMenuElement } from "./Menu";
 
 export { HTMLEMenuItemElement };
@@ -403,15 +404,9 @@ interface EMenuItemConstructor {
     }): HTMLEMenuItemElement;
 }
 
-var EMenuItem = <EMenuItemConstructor>Object.assign(
-    <Function>function(init: {
-        name?: string;
-        label: string;
-        type?: "button" | "checkbox" | "radio" | "menu" | "submenu";
-        value?: string;
-        trigger?: () => void;
-        menu?: HTMLEMenuElement;
-    }) {
+var EMenuItem: EMenuItemConstructor = constructor(
+    HTMLEMenuItemElement.prototype,
+    (init) => {
         const {label, name, type, value, trigger, menu} = init;
         if (menu) {
             menu.slot = "menu";
@@ -435,51 +430,27 @@ var EMenuItem = <EMenuItemConstructor>Object.assign(
             }
         });
     }, {
-        prototype: HTMLEMenuItemElement.prototype,
-        button(init: {
-            name?: string,
-            label: string,
-            value?: string,
-            trigger?: () => void;
-        }) {
+        button(init) {
             return new EMenuItem({
                 ...init, type: "button"
             });
         },
-        checkbox(init: {
-            name?: string;
-            label: string;
-            value?: string;
-            trigger?: () => void;
-        }) {
+        checkbox(init) {
             return new EMenuItem({
                 ...init, type: "checkbox"
             });
         },
-        radio(init: {
-            name?: string;
-            label: string;
-            value?: string;
-            trigger?: () => void;
-        }) {
+        radio(init) {
             return new EMenuItem({
                 ...init, type: "radio"
             });
         },
-        menu(init: {
-            name?: string;
-            label: string;
-            menu: HTMLEMenuElement;
-        }) {
+        menu(init) {
             return new EMenuItem({
                 ...init, type: "menu"
             });
         },
-        submenu(init: {
-            name?: string;
-            label: string;
-            menu: HTMLEMenuElement;
-        }) {
+        submenu(init) {
             return new EMenuItem({
                 ...init, type: "submenu"
             });

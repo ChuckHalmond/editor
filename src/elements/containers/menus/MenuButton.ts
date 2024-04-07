@@ -6,6 +6,7 @@ import { HTMLEMenuItemElement } from "./MenuItem";
 import "./Menu";
 import "./MenuItem";
 import "./MenuItemGroup";
+import { constructor } from "../../Snippets";
 
 export { HTMLEMenuButtonElement };
 export { EMenuButton };
@@ -30,6 +31,12 @@ interface HTMLEMenuButtonElement extends HTMLElement {
 
 var shadowTemplate: HTMLTemplateElement;
 var style: string;
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "e-menubutton": HTMLEMenuButtonElement,
+    }
+}
 
 @CustomElement({
     name: "e-menubutton"
@@ -227,10 +234,9 @@ interface EMenuButtonConstructor {
     }): HTMLEMenuButtonElement;
 }
 
-var EMenuButton = <EMenuButtonConstructor>Object.assign(
-    <Function>function(init: {
-        menu: HTMLEMenuElement
-    }) {
+var EMenuButton: EMenuButtonConstructor = constructor(
+    HTMLEMenuButtonElement.prototype,
+    (init) => {
         const {menu} = init;
         menu.slot = "menu";
         return element("e-menubutton", {
@@ -239,7 +245,5 @@ var EMenuButton = <EMenuButtonConstructor>Object.assign(
             },
             children: [menu]
         });
-    }, {
-        prototype: HTMLEMenuButtonElement.prototype,
     }
 );

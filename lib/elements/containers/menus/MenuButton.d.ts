@@ -21,6 +21,11 @@ interface HTMLEMenuButtonElement extends HTMLElement {
     expand(): void;
     collapse(): void;
 }
+declare global {
+    interface HTMLElementTagNameMap {
+        "e-menubutton": HTMLEMenuButtonElement;
+    }
+}
 declare var HTMLEMenuButtonElement: HTMLEMenuButtonElementConstructor;
 interface EMenuButtonConstructor {
     prototype: HTMLEMenuButtonElement;

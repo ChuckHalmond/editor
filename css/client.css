@@ -18,12 +18,12 @@ body {
 
 e-toolbaritem[name="visibility"] {
     --icon-color: black;
-    --icon-image: url("../assets/visibility_FILL1_wght400_GRAD0_opsz48.svg");
+    --icon-image: url("../assets/visibility_FILL1_wght400_GRAD0_opsz48.svg?inline");
 }
 
 e-toolbaritem[name="visibility"][pressed] {
     --icon-color: black;
-    --icon-image: url("../assets/visibility_off_FILL1_wght400_GRAD0_opsz48.svg");
+    --icon-image: url("../assets/visibility_off_FILL1_wght400_GRAD0_opsz48.svg?inline");
     background-color: revert;
 }
 

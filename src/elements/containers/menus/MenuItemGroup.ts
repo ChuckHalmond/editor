@@ -1,4 +1,5 @@
 import { element, CustomElement, AttributeProperty } from "../../Element";
+import { constructor } from "../../Snippets";
 import { HTMLEMenuItemElement, EMenuItem } from "./MenuItem";
 
 import "./MenuItem";
@@ -102,11 +103,9 @@ interface EMenuItemGroupConstructor {
     radios(init: {name: string, items: {label: string, value: string}[]}): HTMLEMenuItemGroupElement;
 }
 
-var EMenuItemGroup = <EMenuItemGroupConstructor>Object.assign(
-    <Function>function(init: {
-        name?: string,
-        items: HTMLEMenuItemElement[]
-    }) {
+var EMenuItemGroup: EMenuItemGroupConstructor = constructor(
+    HTMLEMenuItemGroupElement.prototype,
+    (init) => {
         const {name, items} = init;
         return element("e-menuitemgroup", {
             attributes: {
@@ -115,14 +114,7 @@ var EMenuItemGroup = <EMenuItemGroupConstructor>Object.assign(
             children: items
         });
     }, {
-        prototype: HTMLEMenuItemGroupElement.prototype,
-        radios: (init: {
-            name: string,
-            items: {
-                label: string,
-                value: string
-            }[]
-        }) => {
+        radios: (init) => {
             const {name, items} = init;
             return element("e-menuitemgroup", {
                 attributes: {

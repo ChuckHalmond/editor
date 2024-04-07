@@ -4,6 +4,7 @@ import { HTMLEMenuItemGroupElement } from "./MenuItemGroup";
 
 import "./MenuItem";
 import "./MenuItemGroup";
+import { constructor } from "../../Snippets";
 
 export { HTMLEMenuElement };
 export { EMenu };
@@ -519,11 +520,9 @@ interface EMenuConstructor {
     }): HTMLEMenuElement;
 }
 
-var EMenu = <EMenuConstructor>Object.assign(
-    <Function>function(init: {
-        name?: string;
-        children?: (HTMLEMenuItemElement | HTMLEMenuItemGroupElement | HTMLHRElement)[];
-    }) {
+var EMenu: EMenuConstructor = constructor(
+    HTMLEMenuElement.prototype,
+    (init) => {
         const {name, children} = init;
         return element("e-menu", {
             attributes: {
@@ -532,7 +531,5 @@ var EMenu = <EMenuConstructor>Object.assign(
             },
             children: children
         });
-    }, {
-        prototype: HTMLEMenuElement.prototype,
     }
 );

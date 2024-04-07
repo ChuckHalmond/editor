@@ -25,7 +25,7 @@ declare global {
 }
 declare var HTMLEToolBarItemElement: HTMLEToolBarItemElementConstructor;
 interface EToolBarItemConstructor {
-    prototype: HTMLEToolBarItemElement;
+    readonly prototype: HTMLEToolBarItemElement;
     new (init: {
         name: string;
         label: string;

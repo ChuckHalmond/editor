@@ -1,6 +1,7 @@
 import { DEFAULT_THEME_ACTIVATED_ITEM_COLOR, DEFAULT_THEME_FOCUSED_ITEM_OUTLINE_COLOR, DEFAULT_THEME_HOVERED_ITEM_COLOR } from "../../../stylesheets/Theme";
 import { HTMLESelectElement } from "../../controls/select/Select";
 import { CustomElement, AttributeProperty, element, QueryProperty } from "../../Element";
+import { constructor } from "../../Snippets";
 import { HTMLEMenuButtonElement } from "../menus/MenuButton";
 
 export { HTMLEToolBarItemElement };
@@ -160,12 +161,6 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
         shadowRoot.append(
             shadowTemplate.content.cloneNode(true)
         );
-        this.addEventListener("focusin", () => {
-            console.log("in");
-        });
-        this.addEventListener("focusout", () => {
-            console.log("out");
-        });
     }
 
     connectedCallback(): void {
@@ -203,7 +198,7 @@ class HTMLEToolBarItemElementBase extends HTMLElement implements HTMLEToolBarIte
 var HTMLEToolBarItemElement: HTMLEToolBarItemElementConstructor = HTMLEToolBarItemElementBase;
 
 interface EToolBarItemConstructor {
-    prototype: HTMLEToolBarItemElement;
+    readonly prototype: HTMLEToolBarItemElement;
     new(init: {
         name: string;
         label: string;
@@ -243,16 +238,9 @@ interface EToolBarItemConstructor {
     }): HTMLEToolBarItemElement;
 }
 
-var EToolBarItem = <EToolBarItemConstructor>Object.assign(
-    <Function>function(init: {
-        name: string;
-        label: string;
-        type: "button" | "checkbox" | "radio" | "menubutton" | "select";
-        value?: string;
-        trigger?: () => void;
-        menubutton?: HTMLEMenuButtonElement;
-        select?: HTMLESelectElement;
-    }) {
+var EToolBarItem: EToolBarItemConstructor = constructor(
+    HTMLEToolBarItemElement.prototype,
+    (init) => {
         const {label, name, type, value, trigger, menubutton, select} = init;
         if (menubutton) {
             menubutton.slot = "menubutton";
@@ -274,54 +262,30 @@ var EToolBarItem = <EToolBarItemConstructor>Object.assign(
             }
         });
     }, {
-        prototype: HTMLEToolBarItemElement.prototype,
-        button(init: {
-            name: string,
-            label: string,
-            value?: string,
-            trigger?: () => void;
-        }) {
+        button(init) {
             return new EToolBarItem({
                 ...init, type: "button"
             });
         },
-        checkbox(init: {
-            name: string;
-            label: string;
-            value?: string;
-            trigger?: () => void;
-        }) {
+        checkbox(init) {
             return new EToolBarItem({
                 ...init, type: "checkbox"
             });
         },
-        radio(init: {
-            name: string;
-            label: string;
-            value?: string;
-            trigger?: () => void;
-        }) {
+        radio(init) {
             return new EToolBarItem({
                 ...init, type: "radio"
             });
         },
-        menubutton(init: {
-            name: string;
-            label: string;
-            menubutton: HTMLEMenuButtonElement;
-        }) {
+        menubutton(init) {
             return new EToolBarItem({
                 ...init, type: "menubutton"
             });
         },
-        select(init: {
-            name: string;
-            label: string;
-            select: HTMLESelectElement;
-        }) {
+        select(init) {
             return new EToolBarItem({
                 ...init, type: "select"
             });
-        },
+        }
     }
 );

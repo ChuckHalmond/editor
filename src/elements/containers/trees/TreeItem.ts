@@ -3,7 +3,7 @@ import { HTMLETreeItemGroupElement } from "./TreeItemGroup";
 
 export { HTMLETreeItemElement };
 
-import stylesheet from "../../../../css/elements/containers/trees/treeitem.css" assert { type: 'css' };
+import stylesheet from "../../../../css/elements/containers/trees/treeitem.css";
 import { theme } from "../../../stylesheets/Theme";
 
 interface HTMLETreeItemElementConstructor {
